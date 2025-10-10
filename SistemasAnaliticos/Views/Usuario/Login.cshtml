@@ -1,0 +1,144 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión - RRHH</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
+     
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .left-panel {
+            position: relative;
+            height: 100vh;
+        }
+
+        .login-container {
+            max-width: 400px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px 30px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-control {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+            .form-control:focus {
+                border-color: #4d90fe;
+                box-shadow: 0 0 0 2px rgba(77, 144, 254, 0.2);
+            }
+
+        .btn-login {
+            padding: 14px;
+            background: #012473;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+            .btn-login:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+                background: #012473;
+                color: white;
+            }
+
+        .login-footer {
+            font-size: 14px;
+            color: #666;
+        }
+
+            .login-footer a {
+                color: #2575fc;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+                .login-footer a:hover {
+                    text-decoration: underline;
+                }
+
+        .forgot-password {
+            color: #E00319 !important;
+        }
+    </style>
+</head>
+<body style="background-image: url('/Img/Fondo.png');">
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <!-- Panel izquierdo -->
+            <div class="col-md-6 d-none d-md-block p-0">
+                <div class="left-panel"></div>
+            </div>
+
+            <!-- Panel derecho con formulario -->
+            <div class="col-md-6 d-flex align-items-center justify-content-center p-4 bg-light">
+                <div class="login-container w-100">
+                    <div class="login-header text-center mb-4">
+                        <h1>Iniciar Sesión</h1>
+                        <p>Ingresa a tu cuenta para continuar</p>
+                    </div>
+
+                    <form>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="email" placeholder="tu@email.com" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="password" placeholder="Tu contraseña" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-login w-100">Iniciar Sesión</button>
+                    </form>
+
+                    <div class="login-footer text-center mt-4">
+                        <p>¿No tienes una cuenta? <a href="#">Regístrate</a></p>
+                        <p><a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
