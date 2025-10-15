@@ -3,32 +3,27 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SistemasAnaliticos.Controllers
 {
-    public class UsuarioController : Controller
+    public class HomeController : Controller
     {
-        // GET: UsuarioController
+        // GET: HomeController
         public ActionResult Index()
         {
             return View();
         }
 
-        public ActionResult Login()
-        {
-            return View();
-        }
-
-        // GET: UsuarioController/Details/5
+        // GET: HomeController/Details/5
         public ActionResult Details(int id)
         {
             return View();
         }
 
-        // GET: UsuarioController/Create
+        // GET: HomeController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: UsuarioController/Create
+        // POST: HomeController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
@@ -43,13 +38,13 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-        // GET: UsuarioController/Edit/5
+        // GET: HomeController/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: UsuarioController/Edit/5
+        // POST: HomeController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -64,13 +59,13 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-        // GET: UsuarioController/Delete/5
+        // GET: HomeController/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: UsuarioController/Delete/5
+        // POST: HomeController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)

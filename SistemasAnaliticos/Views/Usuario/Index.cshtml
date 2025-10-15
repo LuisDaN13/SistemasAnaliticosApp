@@ -1,0 +1,479 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .btn-custom-primary {
+            background-color: #012473;
+            border-color: #012473;
+            color: white;
+        }
+
+            .btn-custom-primary:hover {
+                background-color: #013599;
+                border-color: #013599;
+                color: white;
+            }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        .card-employee {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+            .card-employee:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            }
+
+        .card-employee-header {
+            color: white;
+            position: relative;
+        }
+
+        .employee-avatar {
+            width: 180px;
+            height: 180px;
+            
+            object-fit: cover;
+        }
+
+        .employee-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 0.8rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            color: black;
+        }
+
+        .employee-tags {
+            display: flex;
+            gap: 0.5rem; /* espacio entre las burbujas */
+            flex-wrap: wrap; /* por si se hace muy pequeño el contenedor */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .employee-tag {
+            background-color: rgba(1, 36, 115, 0.1);
+            font-size: 0.9rem;
+            color: black;
+            margin: 0;
+            padding: 4px 10px;
+            border-radius: 20px; /* forma de burbuja */
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .card-employee-body {
+            padding: 1.5rem 1.5rem 0 1.5rem;
+        }
+
+        .employee-info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .employee-info-text {
+            font-size: 0.9rem;
+            color: var(--dark-color);
+        }
+
+        .employee-status {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            width: 100px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .status-active {
+            background-color: #198754;
+            color: #99f6e4;
+        }
+
+        .status-vacations {
+            background-color: rgba(247, 37, 133, 0.15);
+            color: #f72585;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 400px;
+        }
+
+        .search-input {
+            padding-left: 40px;
+            border-radius: 30px;
+            border: 1px solid #dee2e6;
+        }
+
+        .header-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background-color: white;
+        }
+
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card-employee-footer {
+            padding: 1rem 1.5rem;
+        }
+
+        /* Contenedor principal del footer */
+        .footer-actions {
+            display: flex;
+            width: 100%;
+        }
+
+        /* Cada “slot” de botón ocupa el mismo espacio */
+        .footer-slot-details {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-slot-edit {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-slot-delete {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Botones (ya definidos por ti, aquí solo aseguramos consistencia visual) */
+        .action-btn {
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .action-btn:hover {
+                background-color: rgba(108, 117, 125, 0.1);
+                color: var(--dark-color);
+            }
+
+        .btn-details {
+            color: #64B5F6;
+        }
+
+        .btn-edit {
+            color: #ffc107;
+        }
+
+        .btn-delete {
+            color: #dc3545;
+        }
+
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <!-- Main Content -->
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+
+        <!-- Header -->
+        <div class="header-card p-4 mt-4">
+            <h1 class="h2 fw-bold text-gray-900 mb-2">Gestión de Empleados</h1>
+            <p class="text-muted">Administra la información de todos los <span id="employeeCount">6</span> empleados de la empresa</p>
+        </div>
+
+        <!-- Actions Bar -->
+        <div class="header-card p-4 mt-4 mb-5">
+            <div class="card-body">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-6 col-lg-8">
+                        <div class="position-relative">
+                            <i class="bi bi-search text-muted search-icon"></i>
+                            <input type="text"
+                                   class="form-control ps-5"
+                                   id="searchInput"
+                                   placeholder="Buscar por nombre, departamento o puesto...">
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-secondary d-flex align-items-center">
+                                <i class="bi bi-funnel me-2"></i>
+                                Filtrar
+                            </button>
+                            <button class="btn btn-custom-primary d-flex align-items-center">
+                                <i class="bi bi-plus me-2"></i>
+                                Nuevo Empleado
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employees Cards -->
+        <div id="employeesCards" class="employees-grid">
+            <!-- Las cards se cargarán aquí dinámicamente -->
+        </div>
+
+        <div id="noResults" class="text-center py-5 d-none">
+            <div class="mb-4">
+                <i class="bi bi-search display-1 text-muted"></i>
+            </div>
+            <h4 class="text-muted">No se encontraron empleados</h4>
+            <p class="text-muted">Intenta con otros términos de búsqueda</p>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Datos de empleados
+        const employees = [
+            {
+                name: "Rusell Kevin",
+                position: "Gerente de Ventas",
+                department: "Ventas",
+                email: "maria.gonzalez@company.com",
+                phone: "+52 55 1234 5678",
+                personalEmail: "maria.gonzalez.personal@gmail.com",
+                personalPhone: "+52 55 8765 4321",
+                avatar: '/Img/jmora.jpg',
+            },
+            {
+                name: "Carlos Ramírez",
+                position: "Desarrollador Senior",
+                department: "IT",
+                email: "carlos.ramirez@company.com",
+                phone: "+52 55 2345 6789",
+                personalEmail: "carlos.ramirez.personal@hotmail.com",
+                personalPhone: "+52 55 7654 3210",
+                avatar: '/Img/sin foto.png',
+            },
+            {
+                name: "Ana Martínez",
+                position: "Recursos Humanos",
+                department: "Administración",
+                email: "ana.martinez@company.com",
+                phone: "+52 55 3456 7890",
+                personalEmail: "ana.martinez.personal@yahoo.com",
+                personalPhone: "+52 55 6543 2109",
+                avatar: '/Img/sin foto.png',
+            },
+            {
+                name: "Luis Torres",
+                position: "Analista Financiero",
+                department: "Finanzas",
+                email: "luis.torres@company.com",
+                phone: "+52 55 4567 8901",
+                personalEmail: "luis.torres.personal@gmail.com",
+                personalPhone: "+52 55 5432 1098",
+                avatar: '/Img/sin foto.png',
+            },
+            {
+                name: "Patricia Hernández",
+                position: "Diseñadora UX/UI",
+                department: "Diseño",
+                email: "patricia.hernandez@company.com",
+                phone: "+52 55 5678 9012",
+                personalEmail: "patricia.hernandez.personal@outlook.com",
+                personalPhone: "+52 55 4321 0987",
+                avatar: '/Img/sin foto.png',
+            },
+            {
+                name: "Roberto Sánchez",
+                position: "Contador",
+                department: "Finanzas",
+                email: "roberto.sanchez@company.com",
+                phone: "+52 55 6789 0123",
+                personalEmail: "roberto.sanchez.personal@gmail.com",
+                personalPhone: "+52 55 3210 9876",
+                avatar: '/Img/sin foto.png',
+            },
+        ];
+
+        // Función para generar avatar de fallback
+        function getAvatarFallback(name) {
+            return name.split(' ').map(n => n[0]).join('');
+        }
+
+        // Función para renderizar empleados como cards
+        function renderEmployees(employeesList) {
+            const cardsContainer = document.getElementById('employeesCards');
+            const noResults = document.getElementById('noResults');
+            const employeeCount = document.getElementById('employeeCount');
+
+            employeeCount.textContent = employeesList.length;
+
+            if (employeesList.length === 0) {
+                cardsContainer.innerHTML = '';
+                noResults.classList.remove('d-none');
+                return;
+            }
+
+            noResults.classList.add('d-none');
+
+            cardsContainer.innerHTML = employeesList.map(employee => `
+                <div class="card card-employee">
+                    <div class="card-employee-header text-center">
+                        <div class="position-relative d-inline-block w-100" style="background-color: rgba(1, 36, 115, 0.1)">
+                            <img src="${employee.avatar}" alt="${employee.name}"
+                                 class="employee-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="avatar-fallback d-none">${getAvatarFallback(employee.name)}</div>
+                        </div>
+                        <h5 class="employee-name">${employee.name}</h5>
+                        <div class="employee-tags">
+                            <p class="employee-tag">${employee.position}</p>
+                            <p class="employee-tag">${employee.department}</p>
+                        </div>
+                            </div>
+                    <div class="card-employee-body">
+                        <div class="employee-info-item">
+                            <div class="employee-info-text">
+                                <strong>Correo Empresarial:</strong><br>
+                                ${employee.email}
+                            </div>
+                        </div>
+                        <div class="employee-info-item">
+                            <div class="employee-info-text">
+                                <strong>Teléfono Empresarial:</strong><br>
+                                ${employee.phone}
+                            </div>
+                        </div>
+                        <div class="employee-info-item">
+                            <div class="employee-info-text">
+                                <strong>Correo Personal:</strong><br>
+                                ${employee.personalEmail}
+                            </div>
+                        </div>
+                        <div class="employee-info-item">
+                            <div class="employee-info-text">
+                                <strong>Teléfono Personal:</strong><br>
+                                ${employee.personalPhone}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-employee-footer">
+                        <div class="footer-actions">
+                            <div class="footer-slot-details">
+                                <button class="action-btn" title="Detalles">
+                                    <i class="bi bi-file-text"></i>
+                                </button>
+                            </div>
+                            <div class="footer-slot-edit">
+                                <button class="action-btn" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                            <div class="footer-slot-delete">
+                                <button class="action-btn" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Función para filtrar empleados
+        function filterEmployees(searchTerm) {
+            if (!searchTerm) {
+                return employees;
+            }
+
+            const term = searchTerm.toLowerCase();
+            return employees.filter(emp =>
+                emp.name.toLowerCase().includes(term) ||
+                emp.department.toLowerCase().includes(term) ||
+                emp.position.toLowerCase().includes(term)
+            );
+        }
+
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Renderizar empleados iniciales
+            renderEmployees(employees);
+
+            // Configurar búsqueda en tiempo real
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function(e) {
+                const filtered = filterEmployees(e.target.value);
+                renderEmployees(filtered);
+            });
+
+            // Configurar eventos de los botones de acción
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.btn-details')) {
+                    const card = e.target.closest('.card-employee');
+                    const employeeName = card.querySelector('.employee-name').textContent;
+                    alert(`Ver detalles de: ${employeeName}`);
+                }
+
+                if (e.target.closest('.btn-edit')) {
+                    const card = e.target.closest('.card-employee');
+                    const employeeName = card.querySelector('.employee-name').textContent;
+                    alert(`Editar empleado: ${employeeName}`);
+                }
+
+                if (e.target.closest('.btn-delete')) {
+                    const card = e.target.closest('.card-employee');
+                    const employeeName = card.querySelector('.employee-name').textContent;
+                    if (confirm(`¿Estás seguro de que quieres eliminar a ${employeeName}?`)) {
+                        alert(`Empleado ${employeeName} eliminado`);
+                    }
+                }
+            });
+
+            // Botón nuevo empleado
+            document.querySelector('.btn-custom-primary').addEventListener('click', function() {
+                alert('Abrir formulario para nuevo empleado');
+            });
+        });
+    </script>
+</body>
+</html>
