@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using SistemasAnaliticos.Entidades;
 
 namespace SistemasAnaliticos.Models
 {
     public class DBContext : IdentityDbContext<Usuario, Rol, String>
     {
-        public DBContext(DbContextOptions<DBContext> options) : base(options)
-        {
+        public DBContext(DbContextOptions<DBContext> options) : base(options) { }
+           
+        public DbSet<UsuarioSesion> UsuarioSesion { get; set; }
 
-        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             // LLAMAR PRIMERO AL MÉTODO BASE
@@ -18,22 +19,30 @@ namespace SistemasAnaliticos.Models
             // LUEGO TU CONFIGURACIÓN PERSONALIZADA
             builder.Entity<Usuario>(entity =>
             {
-                entity.Ignore(u => u.Email);
-                entity.Ignore(u => u.NormalizedEmail);
-                entity.Ignore(u => u.EmailConfirmed);
-                entity.Ignore(u => u.SecurityStamp);
-                entity.Ignore(u => u.ConcurrencyStamp);
-                entity.Ignore(u => u.PhoneNumber);
-                entity.Ignore(u => u.PhoneNumberConfirmed);
-                entity.Ignore(u => u.TwoFactorEnabled);
-                entity.Ignore(u => u.LockoutEnd);
-                entity.Ignore(u => u.LockoutEnabled);
-                entity.Ignore(u => u.AccessFailedCount);
+                entity.Property(u => u.salario).HasColumnType("decimal(18,2)");
             });
 
-            builder.Entity<Rol>(entity =>
+            builder.Entity<UsuarioSesion>(entity =>
             {
-                entity.Ignore(u => u.ConcurrencyStamp);
+                entity.ToTable("UsuarioSesion"); // Nombre de tabla
+                entity.HasKey(us => us.Id); // Clave primaria
+
+                entity.Property(us => us.SessionId)
+                      .IsRequired()
+                      .HasMaxLength(128);
+
+                entity.Property(us => us.LoginDate)
+                      .IsRequired();
+
+                entity.Property(us => us.IsActive)
+                      .IsRequired();
+
+                // Configurar la relación FOREIGN KEY explícitamente
+                entity.HasOne(us => us.User)
+                      .WithMany() // Si no tienes colección en Usuario
+                      .HasForeignKey(us => us.UserId)
+                      .IsRequired()
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

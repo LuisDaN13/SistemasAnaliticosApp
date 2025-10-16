@@ -1,4 +1,6 @@
-﻿@{
+﻿@model LoginDTO;
+
+@{
     Layout = null;
 }
 
@@ -114,15 +116,23 @@
                         <p>Ingresa a tu cuenta para continuar</p>
                     </div>
 
-                    <form>
+                    <form asp-controller="Usuario" asp-action="Login" method="post">
                         <div class="mb-3">
                             <label for="email" class="form-label">Correo Electrónico</label>
-                            <input type="email" class="form-control" id="email" placeholder="tu@email.com" required>
+                            <input type="email"
+                                   class="form-control"
+                                   asp-for="Email"
+                                   placeholder="tu@email.com"
+                                   required>
                         </div>
 
                         <div class="mb-3">
                             <label for="password" class="form-label">Contraseña</label>
-                            <input type="password" class="form-control" id="password" placeholder="Tu contraseña" required>
+                            <input type="password" 
+                                    class="form-control" 
+                                    asp-for="Password"
+                                    placeholder="Tu contraseña"
+                                    required>
                         </div>
 
                         <button type="submit" class="btn btn-login w-100">Iniciar Sesión</button>

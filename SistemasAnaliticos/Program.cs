@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,11 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Base de Datos a Usar
-var con = builder.Configuration.GetConnectionString("pruebas");
-builder.Services.AddDbContext<DBContext>( o => o.UseSqlServer("con"));
+builder.Services.AddDbContext<DBContext>( o => o.UseSqlServer(builder.Configuration.GetConnectionString("pruebas")));
 
 // Servicio de Identity
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(op =>
+builder.Services.AddIdentity<Usuario, Rol>(op =>
 {
     op.Password.RequireNonAlphanumeric = false;
     op.Password.RequiredLength = 8;

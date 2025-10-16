@@ -20,7 +20,10 @@ namespace SistemasAnaliticos.Entidades
 
         [Required]
         [StringLength(50)]
-        public string? segundoApellido { get; set; } = string.Empty;
+        public string segundoApellido { get; set; } = string.Empty;
+
+        [Required]
+        public int noEmpleado { get; set; } = 0;
 
         [Required]
         public DateTime fechaNacimiento { get; set; }
@@ -111,6 +114,10 @@ namespace SistemasAnaliticos.Entidades
 
         [StringLength(50)]
         public string? tipoLicencia { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string tipoPariente { get; set; } = string.Empty;
 
         [Required]
         [StringLength(100)]

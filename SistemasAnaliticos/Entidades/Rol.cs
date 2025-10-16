@@ -3,6 +3,6 @@
 namespace SistemasAnaliticos.Entidades
 {
     public class Rol : IdentityRole
-    { 
+    {
     }
 }
