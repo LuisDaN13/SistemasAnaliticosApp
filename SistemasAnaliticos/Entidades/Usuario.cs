@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SistemasAnaliticos.Entidades
 {
@@ -32,6 +33,7 @@ namespace SistemasAnaliticos.Entidades
         [StringLength(20)]
         public string cedula { get; set; } = string.Empty;
 
+
         // INFORMACIÓN DEMOGRÁFICA
 
         [Required]
@@ -43,6 +45,7 @@ namespace SistemasAnaliticos.Entidades
         [Required]
         [StringLength(5)]
         public string? tipoSangre { get; set; }
+
 
         // DIRECCIÓN 
 
@@ -129,8 +132,8 @@ namespace SistemasAnaliticos.Entidades
 
         // ARCHIVOS Y SALUD
 
-        [StringLength(255)]
-        public string? foto { get; set; }
+        [Column(TypeName = "varbinary(max)")]
+        public byte[]? foto { get; set; }
 
         [StringLength(500)]
         public string? padecimientosAlergias { get; set; }
