@@ -27,11 +27,15 @@ namespace SistemasAnaliticos.Entidades
         public int noEmpleado { get; set; } = 0;
 
         [Required]
+        [StringLength(20)]
+        public string cedula { get; set; } = string.Empty;
+
+        [Required]
         public DateTime fechaNacimiento { get; set; }
 
         [Required]
-        [StringLength(20)]
-        public string cedula { get; set; } = string.Empty;
+        [StringLength(10)]
+        public string genero { get; set; } = string.Empty;
 
 
         // INFORMACIÓN DEMOGRÁFICA
@@ -39,12 +43,13 @@ namespace SistemasAnaliticos.Entidades
         [Required]
         [StringLength(20)]
         public string estadoCivil { get; set; } = string.Empty;
-        public bool? hijos { get; set; }
-        public int? cantidadHijos { get; set; }
 
         [Required]
         [StringLength(5)]
         public string? tipoSangre { get; set; }
+
+        public bool? hijos { get; set; }
+        public int? cantidadHijos { get; set; }
 
 
         // DIRECCIÓN 
@@ -63,6 +68,7 @@ namespace SistemasAnaliticos.Entidades
 
         [StringLength(255)]
         public string? direccionExacta { get; set; } = string.Empty;
+
 
         // INFORMACIÓN LABORAL
 
@@ -100,6 +106,7 @@ namespace SistemasAnaliticos.Entidades
         [StringLength(50)]
         public string? cuentaIBAN { get; set; }
 
+
         // CONTACTOS
 
         [Required]
@@ -112,6 +119,7 @@ namespace SistemasAnaliticos.Entidades
 
         [StringLength(20)]
         public string? telefonoHabitacion { get; set; }
+
 
         // INFORMACIÓN ADICIONAL
 
@@ -130,6 +138,7 @@ namespace SistemasAnaliticos.Entidades
         [StringLength(20)]
         public string telefonoEmergencia { get; set; } = string.Empty;
 
+
         // ARCHIVOS Y SALUD
 
         [Column(TypeName = "varbinary(max)")]
@@ -137,6 +146,7 @@ namespace SistemasAnaliticos.Entidades
 
         [StringLength(500)]
         public string? padecimientosAlergias { get; set; }
+
 
         // PROPIEDADES CALCULADAS
         public string nombreCompleto => $"{primerNombre} {segundoNombre} {primerApellido} {segundoApellido}";

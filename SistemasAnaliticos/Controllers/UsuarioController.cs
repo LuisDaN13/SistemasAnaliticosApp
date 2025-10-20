@@ -121,7 +121,7 @@ namespace SistemasAnaliticos.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Usuario model)
         {
             try
             {
