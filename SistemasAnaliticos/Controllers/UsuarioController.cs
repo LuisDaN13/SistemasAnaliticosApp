@@ -129,7 +129,7 @@ namespace SistemasAnaliticos.Controllers
             }
             catch
             {
-                return View();
+                return RedirectToAction("Usuario", "Index");
             }
         }
 

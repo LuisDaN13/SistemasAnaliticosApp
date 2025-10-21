@@ -24,14 +24,16 @@ namespace SistemasAnaliticos.Entidades
         public string segundoApellido { get; set; } = string.Empty;
 
         [Required]
-        public int noEmpleado { get; set; } = 0;
+        [StringLength(15)]
+        public string noEmpleado { get; set; } = string.Empty;
 
         [Required]
         [StringLength(20)]
         public string cedula { get; set; } = string.Empty;
 
         [Required]
-        public DateTime fechaNacimiento { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime? fechaNacimiento { get; set; }
 
         [Required]
         [StringLength(10)]
@@ -48,7 +50,7 @@ namespace SistemasAnaliticos.Entidades
         [StringLength(5)]
         public string? tipoSangre { get; set; }
 
-        public bool? hijos { get; set; }
+        public bool hijos { get; set; }
         public int? cantidadHijos { get; set; }
 
 
@@ -99,8 +101,8 @@ namespace SistemasAnaliticos.Entidades
         public string? extension { get; set; }
 
         [Required]
-        [DataType(DataType.Currency)]
-        public decimal salario { get; set; }
+        [StringLength(15)]
+        public string salario { get; set; } = string.Empty;
 
         [Required]
         [StringLength(50)]
@@ -151,8 +153,10 @@ namespace SistemasAnaliticos.Entidades
         // PROPIEDADES CALCULADAS
         public string nombreCompleto => $"{primerNombre} {segundoNombre} {primerApellido} {segundoApellido}";
 
-        public int edad => DateTime.Now.Year - fechaNacimiento.Year -
-                          (DateTime.Now.Date < fechaNacimiento.Date.AddYears(DateTime.Now.Year - fechaNacimiento.Year) ? 1 : 0);
+        public int? edad => fechaNacimiento.HasValue
+            ? DateTime.Now.Year - fechaNacimiento.Value.Year -
+              (DateTime.Now.Date < fechaNacimiento.Value.AddYears(DateTime.Now.Year - fechaNacimiento.Value.Year) ? 1 : 0)
+            : null;
 
         // AÑOS LABORANDO 
         public int aniosLaborando

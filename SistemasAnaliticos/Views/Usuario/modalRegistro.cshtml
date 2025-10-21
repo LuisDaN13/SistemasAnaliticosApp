@@ -329,39 +329,39 @@
 
                                             <div class="row g-3">
                                                 <div class="col-md-6" style="margin-top: 2.0rem !important">
-                                                    <label for="firstName" class="form-label required-field">Primer Nombre</label>
-                                                    <input type="text" class="form-control" id="firstName" name="Usuario.primerNombre" placeholder="Ingrese el primer nombre" required>
+                                                    <label class="form-label required-field">Primer Nombre</label>
+                                                    <input class="form-control" asp-for="primerNombre" placeholder="Ingrese el primer nombre" required>
                                                 </div>
                                                 <div class="col-md-6" style="margin-top: 2.0rem !important">
-                                                    <label for="secondName" class="form-label">Segundo Nombre</label>
-                                                    <input type="text" class="form-control" id="secondName" name="Usuario.segundoNombre" placeholder="Ingrese el segundo nombre" required>
+                                                    <label class="form-label">Segundo Nombre</label>
+                                                    <input class="form-control" asp-for="segundoNombre" placeholder="Ingrese el segundo nombre" required>
                                                 </div>
 
                                                 <div class="col-md-6" style="margin-top: 2.0rem !important">
-                                                    <label for="firstLastname" class="form-label required-field">Primer Apellido</label>
-                                                    <input type="text" class="form-control" id="firstLastname" name="Usuario.primerApellido" placeholder="Ingrese el primer apellido" required>
+                                                    <label class="form-label required-field">Primer Apellido</label>
+                                                    <input class="form-control" asp-for="primerApellido" placeholder="Ingrese el primer apellido" required>
                                                 </div>
                                                 <div class="col-md-6" style="margin-top: 2.0rem !important">
-                                                    <label for="secondLastname" class="form-label required-field">Segundo Apellido</label>
-                                                    <input type="text" class="form-control" id="secondLastname" name="Usuario.segundoApellido" placeholder="Ingrese el segundo apellido" required>
+                                                    <label class="form-label required-field">Segundo Apellido</label>
+                                                    <input class="form-control" asp-for="segundoApellido" placeholder="Ingrese el segundo apellido" required>
                                                 </div>
 
                                                 <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
-                                                    <label style="margin-top: 1.25rem" for="noEmpleado" class="form-label required-field">No.Empleado</label>
-                                                    <input type="number" class="form-control" id="noEmpleado" name="Usuario.noEmpleado" placeholder="Ej: 00000" required>
+                                                    <label style="margin-top: 1.25rem" class="form-label required-field">No.Empleado</label>
+                                                    <input type="number" class="form-control" asp-for="noEmpleado" placeholder="Ej: 00000" required>
                                                 </div>
                                                 <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
-                                                    <label style="margin-top: 1.25rem" for="noCedula" class="form-label required-field">No.Cédula</label>
-                                                    <input type="number" class="form-control" id="noCedula" name="Usuario.cedula" placeholder="Ej: 0-0000-0000" required>
+                                                    <label style="margin-top: 1.25rem" class="form-label required-field">No.Cédula</label>
+                                                    <input class="form-control" asp-for="cedula" placeholder="Ej: 0-0000-0000" required>
                                                 </div>
 
                                                 <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
-                                                    <label style="margin-top: 1.25rem" for="birthDate" class="form-label required-field">Fecha de Nacimiento</label>
-                                                    <input type="date" class="form-control" name="Usuario.fechaNacimiento" required>
+                                                    <label style="margin-top: 1.25rem" class="form-label required-field">Fecha de Nacimiento</label>
+                                                    <input type="date" class="form-control" asp-for="fechaNacimiento" required>
                                                 </div>
                                                 <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
-                                                    <label style="margin-top: 1.25rem" for="gender" class="form-label required-field">Género</label>
-                                                    <select class="form-select" id="gender" name="Usuario.genero" required>
+                                                    <label style="margin-top: 1.25rem" class="form-label required-field">Género</label>
+                                                    <select class="form-select" asp-for="genero" required>
                                                         <option value="" selected disabled>Seleccione género</option>
                                                         <option value="masculino">Masculino</option>
                                                         <option value="femenino">Femenino</option>
@@ -500,7 +500,7 @@
                                                     </div>
 
                                                     <script>
-                                                                                                            document.addEventListener('DOMContentLoaded', function() {
+                                                        document.addEventListener('DOMContentLoaded', function() {
                                                             const checkboxes = document.querySelectorAll('.licencia-checkbox');
                                                             const containerSeleccionadas = document.getElementById('licenciasSeleccionadas');
                                                             const inputHidden = document.getElementById('licenciasData');
@@ -626,20 +626,20 @@
                                                     </script>
 
                                                     <!-- Campo oculto para almacenar las licencias seleccionadas -->
-                                                    <input type="hidden" id="licenciasData" name="licencias" required>
+                                                    <input type="hidden" id="licenciasData" name="licencias">
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <!-- Paso 2: Información de Contacto -->
+                                        <!-- Paso 2: Información de Demográfica -->
                                         <div class="step-content d-none" id="step2">
                                             <h3 class="section-title">Información Demográfica</h3>
                                             <p class="section-subtitle">Datos estadísticos que describen características del empleado</p>
 
                                             <div class="row g-3">
                                                 <div class="col-6" style="margin-top: 2.0rem !important">
-                                                    <label for="maritalStatus" class="form-label required-field">Estado Civil</label>
-                                                    <select class="form-select" required>
+                                                    <label class="form-label required-field">Estado Civil</label>
+                                                    <select class="form-select" required asp-for="estadoCivil">
                                                         <option value="" selected disabled>Seleccione estado civil</option>
                                                         <option value="Soltero">Soltero(a)</option>
                                                         <option value="Casado">Casado(a)</option>
@@ -649,8 +649,8 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-6" style="margin-top: 2rem !important">
-                                                    <label for="maritalStatus" class="form-label required-field">Tipo de Sangre</label>
-                                                    <select class="form-select" required>
+                                                    <label class="form-label required-field">Tipo de Sangre</label>
+                                                    <select class="form-select" required asp-for="tipoSangre">
                                                         <option value="" selected disabled>Seleccione el tipo de sangre</option>
                                                         <option value="A+">A+</option>
                                                         <option value="O+">O+</option>
@@ -667,26 +667,26 @@
                                                     <div class="d-flex justify-content-between w-100">
                                                         <label for="hijosSwitch" class="form-label fw-semibold mb-0">¿Tiene Hijos?</label>
                                                         <div class="form-check form-switch d-flex align-items-center" style="margin-bottom: 0;">
-                                                            <input class="form-check-input" type="checkbox" role="switch" id="hijosSwitch"
+                                                            <input class="form-check-input" type="checkbox" role="switch" asp-for="hijos"
                                                                     style="transform: scale(1.6); cursor: pointer;">
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12" style="margin-top: 0">
-                                                    <label for="noHijos" class="form-label">Cantidad de Hijos</label>
-                                                    <input type="number" class="form-control" id="noHijos" placeholder="Ej: 0" disabled>
+                                                    <label class="form-label">Cantidad de Hijos</label>
+                                                    <input type="number" class="form-control" asp-for="cantidadHijos" placeholder="Ej: 0" disabled>
                                                 </div>
 
                                                 <div class="col-12 border-top" style="margin-top: 1rem !important; padding-top: 1rem;">
                                                     <div>
-                                                        <label for="Foto" class="form-label fw-semibold">Subir Foto del Empleado</label>
-                                                        <input type="file" class="form-control" id="Foto" name="Foto" accept=".jpg,.jpeg,.png" />
+                                                        <label class="form-label fw-semibold">Subir Foto del Empleado</label>
+                                                        <input type="file" class="form-control" id="foto" name="Usuario.foto" accept=".jpg,.jpeg,.png" />
                                                         <div class="form-text" style="">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
                                                     </div>
                                                 </div>
 
                                                 <div class="col-12 border-top" style="margin-top: 1.25rem !important; padding-top: 1rem;">
-                                                    <label for="address" class="form-label">Padecimientos / Alergias</label>
+                                                    <label class="form-label">Padecimientos / Alergias</label>
                                                     <textarea asp-for="padecimientosAlergias"
                                                               class="form-control"
                                                               rows="3"
@@ -698,33 +698,33 @@
                                             </div>
                                         </div>
 
-                                        <!-- Paso 3: Información Laboral -->
+                                        <!-- Paso 3: Dirección -->
                                         <div class="step-content d-none" id="step3">
                                             <h3 class="section-title">Dirección</h3>
                                             <p class="section-subtitle">Ubicaciones detalladas relacionadas</p>
 
                                             <div class="row g-3">
                                                 <div class="col-8" style="margin-top: 2.0rem !important">
-                                                    <label for="provinciaChoose" class="form-label required-field">Provincia</label>
-                                                    <select class="form-select" required id="provincia" name="Usuario.provincia" onchange="cargarCantones()">
+                                                    <label class="form-label required-field">Provincia</label>
+                                                    <select class="form-select" required asp-for="provincia" onchange="cargarCantones()">
                                                         <option value="" selected disabled>Cargando provincias</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-8" style="margin-top: 2.0rem !important">
-                                                    <label for="cantonesChoose" class="form-label required-field">Cantón</label>
-                                                    <select class="form-select" required id="canton" name="Usuario.canton" onchange="cargarDistritos()">
+                                                    <label class="form-label required-field">Cantón</label>
+                                                    <select class="form-select" required asp-for="canton" onchange="cargarDistritos()">
                                                         <option value="" selected disabled>Seleccione primero la provincia</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-8" style="margin-top: 2.0rem !important">
-                                                    <label for="distritosChoose" class="form-label required-field">Distrito</label>
-                                                    <select class="form-select" required id="distrito" name="Usuario.distrito">
+                                                    <label class="form-label required-field">Distrito</label>
+                                                    <select class="form-select" required asp-for="distrito">
                                                         <option value="" selected disabled>Seleccione primero el cantón</option>
                                                     </select>
                                                 </div>
 
                                                 <div class="col-12" style="margin-top: 3rem !important">
-                                                    <label for="address" class="form-label">Ubicación Exacta</label>
+                                                    <label class="form-label">Ubicación Exacta</label>
                                                     <textarea asp-for="direccionExacta" 
                                                         class="form-control" 
                                                         rows="5"
@@ -736,7 +736,7 @@
                                             </div>
                                         </div>
 
-                                        <!-- Paso 4: Compensación -->
+                                        <!-- Paso 4: Información Laboral -->
                                         <div class="step-content d-none" id="step4">
                                             <h3 class="section-title">Información Laboral</h3>
                                             <p class="section-subtitle">Información relacionada con el puesto y otros</p>
@@ -770,7 +770,7 @@
 
                                                 <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
                                                     <label style="margin-top: 1.25rem" class="form-label required-field">Fecha de Ingreso</label>
-                                                    <input type="date" class="form-control" id="fechaIngreso" name="Usuario.fechaIngreso" required>
+                                                    <input type="date" class="form-control" asp-for="fechaIngreso" required>
                                                 </div>
                                                 <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
                                                     <label style="margin-top: 1.25rem"  class="form-label required-field">Jefe</label>
@@ -781,11 +781,11 @@
                                              
                                                 <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
                                                     <label style="margin-top: 1.25rem"  class="form-label">Correo Empresarial</label>
-                                                    <input type="text" class="form-control" placeholder="Ingrese el correo empresarial">
+                                                    <input asp-for="correoEmpresa" type="text" class="form-control" placeholder="Ingrese el correo empresarial">
                                                 </div>
                                                 <div class="col-md-3 border-top" style="margin-top: 2.0rem !important">
                                                     <label style="margin-top: 1.25rem" class="form-label">Celular Empr.</label>
-                                                    <input type="text" class="form-control" placeholder="Ingrese el número empresarial">
+                                                    <input asp-for="celularOficina" type="text" class="form-control" placeholder="Ingrese el número empresarial">
                                                 </div>
                                                 <div class="col-md-3 border-top" style="margin-top: 2.0rem !important">
                                                     <label style="margin-top: 1.25rem" class="form-label">Extensión</label>
@@ -802,7 +802,7 @@
                                                     <div class="currency-input">
                                                         <div class="input-group">
                                                             <span class="input-group-text">₡</span>
-                                                            <input class="form-control" id="salario" name="Usuario.salario" required>
+                                                            <input type="number" class="form-control" asp-for="salario" required>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -818,24 +818,23 @@
                                             </div>
                                         </div>
 
-                                        <!-- Paso 5: Educación y Habilidades -->
+                                        <!-- Paso 5: Contacto -->
                                         <div class="step-content d-none" id="step5">
                                             <h3 class="section-title">Contacto</h3>
                                             <p class="section-subtitle">Información para el contacto del empleado</p>
 
                                             <div class="row g-3">
-
                                                 <div class="col-md-6" style="margin-top: 2.0rem !important">
                                                     <label class="form-label required-field">Celular Personal</label>
-                                                    <input type="text" class="form-control" name="Usuario.celularPersonal" placeholder="Ingrese el número celular" required>
+                                                    <input type="text" class="form-control" id="celularPersonal" name="Usuario.celularPersonal" placeholder="Ingrese el número celular" required>
                                                 </div>
                                                 <div class="col-md-6" style="margin-top: 2.0rem !important">
                                                     <label class="form-label required-field">Correo Personal</label>
-                                                    <input type="text" class="form-control" name="Usuario.correoPersonal" placeholder="Ingrese el correo electrónico" required>
+                                                    <input type="text" class="form-control" id="correoPersonal" name="Usuario.correoPersonal" placeholder="Ingrese el correo electrónico" required>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label">Teléfono de Habitación</label>
-                                                    <input type="text" class="form-control" placeholder="Ingrese el teléfono">
+                                                    <input asp-for="telefonoHabitacion" type="text" class="form-control" placeholder="Ingrese el teléfono">
                                                 </div>
 
                                                 <div class="mt-4 pt-3 border-top" style="margin-top: 2.0rem !important">
@@ -848,18 +847,18 @@
 
                                                     <div class="row g-3">
                                                         <div class="col-12">
-                                                            <label for="emergencyContactName" class="form-label required-field">Nombre Completo</label>
-                                                            <input type="text" class="form-control" name="Usuario.contactoEmergencia" placeholder="Nombre del contacto de emergencia" required>
+                                                            <label class="form-label required-field">Nombre Completo</label>
+                                                            <input type="text" class="form-control" id="contactoEmergencia" name="Usuario.contactoEmergencia" placeholder="Nombre del contacto de emergencia" required>
                                                         </div>
                                                         <div class="col-md-6">
-                                                            <label for="emergencyContactPhone" class="form-label required-field">Teléfono</label>
-                                                            <input type="tel" class="form-control" name="Usuario.telefonoEmergencia" placeholder="+506 1234 5678" required>
+                                                            <label class="form-label required-field">Teléfono</label>
+                                                            <input type="tel" class="form-control" id="telefonoEmergencia" name="Usuario.telefonoEmergencia" placeholder="+506 1234 5678" required>
                                                         </div>
                                                         <div class="col-md-6">
-                                                            <label for="emergencyContactRelation" class="form-label required-field">Relación</label>
-                                                            <select class="form-select" required asp-for="tipoPariente">
+                                                            <label class="form-label required-field">Relación</label>
+                                                            <select class="form-select" id="emergencyContactRelation" required asp-for="tipoPariente">
                                                                 <option value="" selected disabled>Seleccione relación</option>
-                                                                <option value="padre">Padre/Madre</option>
+                                                                <option value="padre/madre">Padre/Madre</option>
                                                                 <option value="conyuge">Cónyuge</option>
                                                                 <option value="hermano">Hermano(a)</option>
                                                                 <option value="hijo">Hijo(a)</option>
@@ -900,21 +899,122 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Provincias conocidas de CR (mejor usar lista fija para provincias)
+        // Provincias conocidas de CR
         const provinciasCR = [
             "San José", "Alajuela", "Cartago", "Heredia",
             "Guanacaste", "Puntarenas", "Limón"
         ];
 
-        // Cargar provincias al iniciar
+        // Funciones auxiliares seguras - DEFINIR PRIMERO
+        function getSafeValue(selector) {
+            try {
+                const element = document.querySelector(selector);
+                if (!element) {
+                    console.warn('Elemento no encontrado:', selector);
+                    return '';
+                }
+                return element.value || '';
+            } catch (error) {
+                console.error('Error en getSafeValue:', error);
+                return '';
+            }
+        }
+
+        function getSafeChecked(selector) {
+            try {
+                const element = document.querySelector(selector);
+                return element ? element.checked : false;
+            } catch (error) {
+                console.error('Error en getSafeChecked:', error);
+                return false;
+            }
+        }
+
+        // Función para recopilar datos del formulario - DEFINIR ANTES DE USAR
+        function collectFormData() {
+            console.log('=== INICIANDO collectFormData ===');
+
+            // Debugging específico para los campos problemáticos
+            const primerNombreElem = document.getElementById('primerNombre');
+            const primerApellidoElem = document.getElementById('primerApellido');
+
+            console.log('primerNombre element:', primerNombreElem);
+            console.log('primerNombre value:', primerNombreElem?.value);
+            console.log('primerApellido element:', primerApellidoElem);
+            console.log('primerApellido value:', primerApellidoElem?.value);
+
+            try {
+                const formData = {
+                    // Paso 1: Información Personal
+                    primerNombre: getSafeValue('#primerNombre'),
+                    segundoNombre: getSafeValue('#segundoNombre'),
+                    primerApellido: getSafeValue('#primerApellido'),
+                    segundoApellido: getSafeValue('#segundoApellido'),
+                    noEmpleado: getSafeValue('#noEmpleado'),
+                    cedula: getSafeValue('#noCedula'),
+                    fechaNacimiento: getSafeValue('input[name="Usuario.fechaNacimiento"]'),
+                    genero: getSafeValue('#gender'),
+                    licencias: getSafeValue('#licenciasData'),
+
+                    // Paso 2: Información Demográfica
+                    estadoCivil: getSafeValue('#estadoCivil'),
+                    tipoSangre: getSafeValue('#tipoSangre'),
+                    tieneHijos: getSafeChecked('#hijosSwitch'),
+                    noHijos: getSafeValue('#noHijos'),
+                    padecimientosAlergias: getSafeValue('#padecimientosAlergias'),
+
+                    // Paso 3: Dirección
+                    provincia: getSafeValue('#provincia'),
+                    canton: getSafeValue('#canton'),
+                    distrito: getSafeValue('#distrito'),
+                    direccionExacta: getSafeValue('#direccionExacta'),
+
+                    // Paso 4: Información Laboral
+                    profesion: getSafeValue('#profesion'),
+                    puesto: getSafeValue('#puesto'),
+                    departamento: getSafeValue('#departamento'),
+                    fechaIngreso: getSafeValue('#fechaIngreso'),
+                    jefe: getSafeValue('#jefe'),
+                    salario: getSafeValue('#salario'),
+                    cuentaIBAN: getSafeValue('#cuentaIBAN'),
+                    extension: getSafeValue('#extension'),
+
+                    // Paso 5: Contacto
+                    celularPersonal: getSafeValue('#celularPersonal'),
+                    correoPersonal: getSafeValue('#correoPersonal'),
+                    contactoEmergencia: getSafeValue('#contactoEmergencia'),
+                    telefonoEmergencia: getSafeValue('#telefonoEmergencia'),
+                    tipoPariente: getSafeValue('#tipoPariente')
+                };
+
+                console.log('✅ Datos recolectados exitosamente:', formData);
+                return formData;
+
+            } catch (error) {
+                console.error('❌ Error crítico en collectFormData:', error);
+                return null;
+            }
+        }
+
+        // Esperar a que el DOM esté completamente cargado
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM cargado - inicializando componentes...');
+
+            // Inicializar componentes en orden
+            inicializarStepper();
             cargarProvincias();
+            inicializarLicencias();
+            inicializarSwitchHijos();
         });
 
         function cargarProvincias() {
-            const selectProvincia = document.getElementById('provincia');
-            selectProvincia.innerHTML = '<option value="">Seleccione una provincia</option>';
+            const selectProvincia = document.querySelector('select[asp-for="provincia"]');
+            if (!selectProvincia) {
+                console.error('❌ No se encontró el elemento provincia');
+                return;
+            }
 
+            selectProvincia.innerHTML = '<option value="">Seleccione una provincia</option>';
             provinciasCR.forEach(provincia => {
                 const option = document.createElement('option');
                 option.value = provincia;
@@ -923,132 +1023,7 @@
             });
         }
 
-        async function cargarCantones() {
-            const provincia = document.getElementById('provincia').value;
-            const selectCanton = document.getElementById('canton');
-            const selectDistrito = document.getElementById('distrito');
-
-            // Reset dropdowns
-            selectCanton.innerHTML = '<option value="">Cargando cantones...</option>';
-            selectCanton.disabled = true;
-            selectDistrito.innerHTML = '<option value="">Seleccione cantón primero</option>';
-            selectDistrito.disabled = true;
-
-            if (!provincia) return;
-
-            try {
-                const cantones = await buscarCantones(provincia);
-                selectCanton.innerHTML = '<option value="">Seleccione un cantón</option>';
-
-                // Filtrar y mostrar cantones únicos
-                const cantonesUnicos = [];
-                const nombresVistos = new Set();
-
-                cantones.forEach(item => {
-                    const nombreCanton = item.name || item.display_name.split(',')[0];
-                    if (!nombresVistos.has(nombreCanton)) {
-                        nombresVistos.add(nombreCanton);
-                        cantonesUnicos.push({
-                            name: nombreCanton,
-                            display_name: item.display_name
-                        });
-                    }
-                });
-
-                cantonesUnicos.forEach(canton => {
-                    const option = document.createElement('option');
-                    option.value = canton.name;
-                    option.textContent = canton.name;
-                    option.setAttribute('data-display', canton.display_name);
-                    selectCanton.appendChild(option);
-                });
-
-                selectCanton.disabled = false;
-
-            } catch (error) {
-                selectCanton.innerHTML = '<option value="">Error cargando cantones</option>';
-                console.error('Error:', error);
-            }
-        }
-
-        async function cargarDistritos() {
-            const provincia = document.getElementById('provincia').value;
-            const canton = document.getElementById('canton').value;
-            const selectDistrito = document.getElementById('distrito');
-
-            selectDistrito.innerHTML = '<option value="">Cargando distritos...</option>';
-            selectDistrito.disabled = true;
-
-            if (!provincia || !canton) return;
-
-            try {
-                const distritos = await buscarDistritos(provincia, canton);
-                selectDistrito.innerHTML = '<option value="">Seleccione un distrito</option>';
-
-                // Filtrar distritos únicos
-                const distritosUnicos = [];
-                const nombresVistos = new Set();
-
-                distritos.forEach(item => {
-                    const nombreDistrito = item.name || item.display_name.split(',')[0];
-                    if (!nombresVistos.has(nombreDistrito)) {
-                        nombresVistos.add(nombreDistrito);
-                        distritosUnicos.push({
-                            name: nombreDistrito,
-                            display_name: item.display_name,
-                            lat: item.lat,
-                            lon: item.lon
-                        });
-                    }
-                });
-
-                distritosUnicos.forEach(distrito => {
-                    const option = document.createElement('option');
-                    option.value = distrito.name;
-                    option.textContent = distrito.name;
-                    option.setAttribute('data-lat', distrito.lat);
-                    option.setAttribute('data-lon', distrito.lon);
-                    selectDistrito.appendChild(option);
-                });
-
-                selectDistrito.disabled = false;
-
-            } catch (error) {
-                selectDistrito.innerHTML = '<option value="">Error cargando distritos</option>';
-                console.error('Error:', error);
-            }
-        }
-
-        // Funciones de búsqueda (las mismas del primer ejemplo)
-        async function buscarCantones(provincia) {
-            const response = await fetch(
-                `https://nominatim.openstreetmap.org/search?` +
-                `country=Costa+Rica&` +
-                `state=${encodeURIComponent(provincia)}&` +
-                `featureType=city&` +
-                `format=json&` +
-                `addressdetails=1&` +
-                `limit=50`
-            );
-            return await response.json();
-        }
-
-        async function buscarDistritos(provincia, canton) {
-            const response = await fetch(
-                `https://nominatim.openstreetmap.org/search?` +
-                `country=Costa+Rica&` +
-                `state=${encodeURIComponent(provincia)}&` +
-                `city=${encodeURIComponent(canton)}&` +
-                `featureType=town&` +
-                `format=json&` +
-                `addressdetails=1&` +
-                `limit=50`
-            );
-            return await response.json();
-        }
-    </script>
-    <script>
-                document.addEventListener('DOMContentLoaded', function() {
+        function inicializarStepper() {
             let currentStep = 1;
             const totalSteps = 5;
 
@@ -1058,6 +1033,17 @@
             const nextBtn = document.getElementById('nextBtn');
             const submitBtn = document.getElementById('submitBtn');
             const stepItems = document.querySelectorAll('.step-item');
+
+            console.log('🔧 Inicializando stepper...');
+            console.log('prevBtn:', prevBtn);
+            console.log('nextBtn:', nextBtn);
+            console.log('submitBtn:', submitBtn);
+
+            // Verificar que los elementos existen
+            if (!prevBtn || !nextBtn || !submitBtn) {
+                console.error('❌ No se encontraron los botones de navegación');
+                return;
+            }
 
             // Inicializar
             updateStepDisplay();
@@ -1088,20 +1074,22 @@
                 });
             });
 
-            // Función para validar el paso actual
             function validateCurrentStep() {
                 const currentStepElement = document.getElementById(`step${currentStep}`);
+                if (!currentStepElement) {
+                    console.error(`❌ No se encontró el paso ${currentStep}`);
+                    return false;
+                }
+
                 const requiredFields = currentStepElement.querySelectorAll('[required]');
                 let isValid = true;
                 let firstInvalidField = null;
 
-                // Validar cada campo requerido
                 requiredFields.forEach(field => {
-                    const value = field.value.trim();
+                    const value = field.value ? field.value.trim() : '';
                     const fieldType = field.type;
                     const tagName = field.tagName.toLowerCase();
 
-                    // Remover clases de error previas
                     field.classList.remove('is-invalid');
 
                     let fieldValid = true;
@@ -1112,6 +1100,8 @@
                         fieldValid = value !== '' && !isNaN(value);
                     } else if (fieldType === 'date') {
                         fieldValid = value !== '';
+                    } else if (fieldType === 'checkbox') {
+                        fieldValid = field.checked;
                     } else {
                         fieldValid = value !== '';
                     }
@@ -1119,19 +1109,14 @@
                     if (!fieldValid) {
                         isValid = false;
                         field.classList.add('is-invalid');
-
-                        // Guardar el primer campo inválido para hacer scroll
                         if (!firstInvalidField) {
                             firstInvalidField = field;
                         }
                     }
                 });
 
-                // Mostrar mensaje de error si hay campos inválidos
                 if (!isValid) {
                     showValidationError('Por favor complete todos los campos requeridos antes de continuar.');
-
-                    // Hacer scroll al primer campo inválido
                     if (firstInvalidField) {
                         firstInvalidField.scrollIntoView({
                             behavior: 'smooth',
@@ -1146,11 +1131,8 @@
                 return isValid;
             }
 
-            // Función para mostrar mensaje de error
             function showValidationError(message) {
-                // Remover mensaje de error previo si existe
                 hideValidationError();
-
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
                 errorDiv.innerHTML = `
@@ -1160,22 +1142,28 @@
                 `;
 
                 const currentStepContent = document.getElementById(`step${currentStep}`);
-                currentStepContent.appendChild(errorDiv);
-            }
-
-            // Función para ocultar mensaje de error
-            function hideValidationError() {
-                const currentStepContent = document.getElementById(`step${currentStep}`);
-                const existingAlert = currentStepContent.querySelector('.alert');
-                if (existingAlert) {
-                    existingAlert.remove();
+                if (currentStepContent) {
+                    currentStepContent.appendChild(errorDiv);
                 }
             }
 
-            // Función para actualizar la visualización del paso actual
+            function hideValidationError() {
+                for (let i = 1; i <= totalSteps; i++) {
+                    const stepContent = document.getElementById(`step${i}`);
+                    if (stepContent) {
+                        const existingAlert = stepContent.querySelector('.alert');
+                        if (existingAlert) {
+                            existingAlert.remove();
+                        }
+                    }
+                }
+            }
+
             function updateStepDisplay() {
                 // Actualizar contador
-                stepCounter.textContent = `${currentStep}/${totalSteps}`;
+                if (stepCounter) {
+                    stepCounter.textContent = `${currentStep}/${totalSteps}`;
+                }
 
                 // Mostrar/ocultar contenido de pasos
                 document.querySelectorAll('.step-content').forEach((content, index) => {
@@ -1203,11 +1191,9 @@
                     const stepIcon = item.querySelector('.step-icon');
                     const stepTitle = item.querySelector('.step-title');
 
-                    // Remover todas las clases de estado
                     item.classList.remove('active', 'completed');
                     stepIcon.classList.remove('active', 'completed', 'inactive');
 
-                    // Aplicar clases según el estado
                     if (stepNumber === currentStep) {
                         item.classList.add('active');
                         stepIcon.classList.add('active');
@@ -1219,10 +1205,7 @@
                     }
                 });
 
-                // Limpiar mensajes de error al cambiar de paso
                 hideValidationError();
-
-                // Remover clases de error de todos los campos
                 document.querySelectorAll('.is-invalid').forEach(field => {
                     field.classList.remove('is-invalid');
                 });
@@ -1235,7 +1218,6 @@
                     border-color: #dc3545 !important;
                     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
                 }
-
                 .alert {
                     border-radius: 8px;
                     margin-bottom: 1rem;
@@ -1243,44 +1225,36 @@
             `;
             document.head.appendChild(style);
 
-            // Manejar el switch de hijos
-            const hijosSwitch = document.getElementById('hijosSwitch');
-            const noHijosInput = document.getElementById('noHijos');
-
-            if (hijosSwitch && noHijosInput) {
-                hijosSwitch.addEventListener('change', function() {
-                    noHijosInput.disabled = !this.checked;
-                    if (!this.checked) {
-                        noHijosInput.value = '';
-                    }
-                });
-            }
-
             // Manejar envío del formulario
-            submitBtn.addEventListener('click', function() {
-                // Validar TODOS los pasos antes de enviar, no solo el actual
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                console.log('🔄 Validando formulario completo...');
+
+                // Validar TODOS los pasos antes de enviar
                 let allStepsValid = true;
                 const invalidFields = [];
 
-                // Validar cada paso y recolectar campos inválidos
                 for (let step = 1; step <= totalSteps; step++) {
                     const stepElement = document.getElementById(`step${step}`);
+                    if (!stepElement) continue;
+
                     const requiredFields = stepElement.querySelectorAll('[required]');
 
                     requiredFields.forEach(field => {
-                        const value = field.value.trim();
+                        const value = field.value ? field.value.trim() : '';
                         const fieldType = field.type;
                         const tagName = field.tagName.toLowerCase();
 
                         let fieldValid = true;
 
                         if (tagName === 'select') {
-                            fieldValid = field.value !== '' && field.value !== null && field.value !== 'Seleccione...';
+                            fieldValid = field.value !== '' && field.value !== null;
                         } else if (fieldType === 'number') {
                             fieldValid = value !== '' && !isNaN(value) && Number(value) > 0;
                         } else if (fieldType === 'date') {
                             fieldValid = value !== '';
-                        } else if (fieldType === 'checkbox' || fieldType === 'switch') {
+                        } else if (fieldType === 'checkbox') {
                             fieldValid = field.checked;
                         } else {
                             fieldValid = value !== '';
@@ -1297,20 +1271,18 @@
                 }
 
                 if (allStepsValid) {
-                    // Aquí iría la lógica para recopilar todos los datos del formulario
+                    console.log('✅ Formulario válido, recolectando datos...');
                     const formData = collectFormData();
-                    console.log('Formulario enviado:', formData);
-                    alert('Empleado creado exitosamente');
 
-                    // Cerrar modal y resetear
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('createEmployeeModal'));
-                    modal.hide();
-                    resetForm();
+                    if (formData) {
+                        console.log('📤 Enviando formulario...');
+                        // Aquí puedes enviar el formulario
+                        document.getElementById('employeeForm').submit();
+                    } else {
+                        showValidationError('Error al recolectar los datos del formulario.');
+                    }
                 } else {
-                    // Mostrar mensaje de error
                     showValidationError('Por favor complete todos los campos requeridos en todos los pasos antes de enviar el formulario.');
-
-                    // Hacer scroll al primer campo inválido
                     if (invalidFields.length > 0) {
                         invalidFields[0].scrollIntoView({
                             behavior: 'smooth',
@@ -1320,80 +1292,99 @@
                     }
                 }
             });
+        }
 
-            // Función para recopilar datos del formulario
-            function collectFormData() {
-                return {
-                    // Paso 1: Información Personal
-                    firstName: document.getElementById('firstName').value,
-                    secondName: document.getElementById('secondName').value,
-                    firstLastname: document.getElementById('firstLastname').value,
-                    secondLastname: document.getElementById('secondLastname').value,
-                    noEmpleado: document.getElementById('noEmpleado').value,
-                    noCedula: document.getElementById('noCedula').value,
-                    birthDate: document.getElementById('birthDate').value,
-                    gender: document.getElementById('gender').value,
+        function inicializarLicencias() {
+            const checkboxes = document.querySelectorAll('.licencia-checkbox');
+            const containerSeleccionadas = document.getElementById('licenciasSeleccionadas');
+            const inputHidden = document.getElementById('licenciasData');
 
-                    // Paso 2: Información Demográfica
-                    maritalStatus: document.getElementById('maritalStatus').value,
-                    tipoSangre: document.getElementById('maritalStatus').value, // Nota: hay dos elementos con el mismo ID
-                    tieneHijos: document.getElementById('hijosSwitch').checked,
-                    noHijos: document.getElementById('noHijos').value,
-                    padecimientosAlergias: document.querySelector('[asp-for="padecimientosAlergias"]').value,
-
-                    // Paso 3: Dirección
-                    provincia: document.getElementById('provincia').value,
-                    canton: document.getElementById('canton').value,
-                    distrito: document.getElementById('distrito').value,
-                    direccionExacta: document.querySelector('[asp-for="direccionExacta"]').value,
-
-                    // Paso 4: Información Laboral
-                    profesion: document.querySelector('[asp-for="profesion"]').value,
-                    puesto: document.querySelector('[asp-for="puesto"]').value,
-                    departamento: document.querySelector('[asp-for="departamento"]').value,
-                    fechaIngreso: document.querySelector('[asp-for="fechaIngreso"]').value,
-                    jefe: document.querySelector('[asp-for="jefe"]').value,
-                    salario: document.querySelector('[asp-for="salario"]').value,
-                    cuentaIBAN: document.querySelector('[asp-for="cuentaIBAN"]').value,
-                    extension: document.querySelector('[asp-for="extension"]').value,
-
-                    // Paso 5: Contacto
-                    // Agregar aquí los campos de contacto cuando los agregues
-                    emergencyContactName: document.querySelector('[placeholder="Nombre del contacto de emergencia"]').value,
-                    emergencyContactPhone: document.querySelector('[placeholder="+506 1234 5678"]').value,
-                    emergencyContactRelation: document.getElementById('emergencyContactRelation').value
-                };
+            if (!checkboxes.length || !containerSeleccionadas || !inputHidden) {
+                console.warn('⚠️ Elementos de licencias no encontrados');
+                return;
             }
 
-            // Resetear formulario cuando se cierra el modal
-            document.getElementById('createEmployeeModal').addEventListener('hidden.bs.modal', function() {
-                resetForm();
+            console.log('🔧 Inicializando sistema de licencias...');
+
+            let licenciasSeleccionadas = [];
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        agregarLicencia(this.value);
+                    } else {
+                        removerLicencia(this.value);
+                    }
+                    actualizarInterfaz();
+                });
             });
 
-            // Función para resetear el formulario
-            function resetForm() {
-                currentStep = 1;
-                updateStepDisplay();
+            function agregarLicencia(licencia) {
+                if (!licenciasSeleccionadas.includes(licencia)) {
+                    licenciasSeleccionadas.push(licencia);
+                }
+            }
 
-                // Limpiar todos los campos del formulario
-                document.querySelectorAll('input, select, textarea').forEach(element => {
-                    if (element.type !== 'button') {
-                        element.value = '';
-                        element.classList.remove('is-invalid');
-                    }
-                });
+            function removerLicencia(licencia) {
+                licenciasSeleccionadas = licenciasSeleccionadas.filter(lic => lic !== licencia);
+            }
 
-                // Resetear el switch de hijos
-                if (hijosSwitch && noHijosInput) {
-                    hijosSwitch.checked = false;
-                    noHijosInput.disabled = true;
-                    noHijosInput.value = '';
+            function actualizarInterfaz() {
+                if (licenciasSeleccionadas.length > 0) {
+                    containerSeleccionadas.innerHTML = '';
+                    licenciasSeleccionadas.forEach(licencia => {
+                        const tag = document.createElement('span');
+                        tag.className = 'licencia-tag';
+                        tag.innerHTML = `
+                            ${licencia}
+                            <button type="button" class="btn-close btn-close-white"
+                                    onclick="removerLicenciaDesdeTag('${licencia}')"></button>
+                        `;
+                        containerSeleccionadas.appendChild(tag);
+                    });
+                } else {
+                    containerSeleccionadas.innerHTML = '<span class="text-muted">No hay licencias seleccionadas</span>';
                 }
 
-                // Limpiar mensajes de error
-                hideValidationError();
+                inputHidden.value = licenciasSeleccionadas.join(',');
+                validarLicencias();
             }
-        });
+
+            function validarLicencias() {
+                if (licenciasSeleccionadas.length > 0) {
+                    inputHidden.classList.remove('is-invalid');
+                } else {
+                    inputHidden.classList.add('is-invalid');
+                }
+            }
+
+            // Hacer función global para los tags
+            window.removerLicenciaDesdeTag = function(licencia) {
+                removerLicencia(licencia);
+                actualizarInterfaz();
+            };
+
+            validarLicencias();
+        }
+
+        function inicializarSwitchHijos() {
+            const hijosSwitch = document.getElementById('hijosSwitch');
+            const noHijosInput = document.getElementById('noHijos');
+
+            if (!hijosSwitch || !noHijosInput) {
+                console.warn('⚠️ Elementos de hijos no encontrados');
+                return;
+            }
+
+            console.log('🔧 Inicializando switch de hijos...');
+
+            hijosSwitch.addEventListener('change', function() {
+                noHijosInput.disabled = !this.checked;
+                if (!this.checked) {
+                    noHijosInput.value = '';
+                }
+            });
+        }
     </script>
 </body>
 </html>
