@@ -6,6 +6,8 @@ using SistemasAnaliticos.DTO;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using System.Runtime.InteropServices;
+using System.Text;
+using static SistemasAnaliticos.Models.codigoFotos;
 
 namespace SistemasAnaliticos.Controllers
 {
@@ -23,9 +25,26 @@ namespace SistemasAnaliticos.Controllers
         }
 
         // INDEX = PRESENTAR A LOS EMPLEADOS CON CARDS PARA SCINICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View();
+            var cards = await _context.Users
+                .AsNoTracking()
+                .OrderByDescending(x => x.primerNombre)
+                .Select(x => new CardsDTO
+                {
+                    Id = x.Id,
+                    Nombre = x.primerNombre + " " + x.primerApellido + " " + x.segundoApellido,
+                    Puesto = x.puesto,
+                    Departamento = x.departamento,
+                    CorreoEmp = x.correoEmpresa,
+                    TelefonoEmp = x.celularOficina,
+                    CorreoPerso = x.celularPersonal,
+                    TelefonoPerso = x.celularPersonal,
+                    Foto = x.foto
+                })
+                .ToListAsync();
+
+                return View(cards);
         }
 
         // LOGIN = INICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
@@ -121,11 +140,77 @@ namespace SistemasAnaliticos.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Usuario model)
+        public async Task<ActionResult> Create(Usuario model)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var fotoService = new CodigoFotos();
+
+                var nuevo = new Usuario
+                {
+                    primerNombre = model.primerNombre,
+                    segundoNombre = model.segundoNombre,
+                    primerApellido = model.primerApellido,
+                    segundoApellido = model.segundoApellido,
+
+                    //UserName = model.primerNombre.Substring(0, 1).ToLower() + model.primerApellido.normalizar().ToLower(),
+
+                    noEmpleado = model.noEmpleado,
+                    cedula = model.cedula,
+                    fechaNacimiento = model.fechaNacimiento,
+                    genero = model.genero,
+                    estadoCivil = model.estadoCivil,
+                    tipoSangre = model.tipoSangre,
+
+                    hijos = model.hijos,
+                    cantidadHijos = model.cantidadHijos,
+
+                    provincia = model.provincia,
+                    canton = model.canton,
+                    distrito = model.distrito,
+                    direccionExacta = model.direccionExacta,
+
+                    profesion = model.profesion,
+                    puesto = model.puesto,
+                    departamento = model.departamento,
+                    fechaIngreso = model.fechaIngreso,
+                    correoEmpresa = model.correoEmpresa,
+                    Email = model.correoEmpresa,
+                    UserName = model.correoEmpresa,
+
+                    celularOficina = model.celularOficina,
+                    jefe = model.jefe,
+                    extension = model.extension,
+                    salario = model.salario,
+                    cuentaIBAN = model.cuentaIBAN,
+                    celularPersonal = model.celularPersonal,
+                    correoPersonal = model.correoPersonal,
+                    telefonoHabitacion = model.telefonoHabitacion,
+
+                    tipoLicencia = model.tipoLicencia,
+                    tipoPariente = model.tipoPariente,
+                    contactoEmergencia = model.contactoEmergencia,
+                    telefonoEmergencia = model.telefonoEmergencia,
+                    padecimientosAlergias = model.padecimientosAlergias,
+                    estado = true,
+                };
+
+                var pass = "123456789";
+
+                var resultado = await userManager.CreateAsync(nuevo, pass);
+                if (resultado.Succeeded)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    foreach (var error in resultado.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                    return View(model);
+                }
+
             }
             catch
             {

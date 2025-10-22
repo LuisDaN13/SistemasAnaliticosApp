@@ -663,24 +663,47 @@
                                                     </select>
                                                 </div>
 
+
+                                                <!-- BLOQUE DE HIJOS CON JAVASCRIPT Y SU VALIDACION -->
                                                 <div class="col-md-12 border-top d-flex align-items-center" style="margin-top: 1rem !important; min-height: 80px;">
                                                     <div class="d-flex justify-content-between w-100">
                                                         <label for="hijosSwitch" class="form-label fw-semibold mb-0">¿Tiene Hijos?</label>
                                                         <div class="form-check form-switch d-flex align-items-center" style="margin-bottom: 0;">
-                                                            <input class="form-check-input" type="checkbox" role="switch" asp-for="hijos"
-                                                                    style="transform: scale(1.6); cursor: pointer;">
+                                                            <input class="form-check-input" type="checkbox" role="switch" id="hijosSwitch"
+                                                                asp-for="hijos" style="transform: scale(1.6); cursor: pointer;">
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12" style="margin-top: 0">
                                                     <label class="form-label">Cantidad de Hijos</label>
-                                                    <input type="number" class="form-control" asp-for="cantidadHijos" placeholder="Ej: 0" disabled>
+                                                    <input type="number" class="form-control" id="cantidadHijos" asp-for="cantidadHijos" placeholder="Ej: 0" disabled min="1">
                                                 </div>
+                                                <script>
+                                                    document.getElementById('hijosSwitch')?.addEventListener('change', function() {
+                                                        const cantidadHijos = document.getElementById('cantidadHijos');
+                                                        if (cantidadHijos) {
+                                                            cantidadHijos.disabled = !this.checked;
+                                                            cantidadHijos.required = this.checked;
+                                                            if (!this.checked) cantidadHijos.value = '';
+                                                        }
+                                                    });
+
+                                                    // Estado inicial
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        const hijosSwitch = document.getElementById('hijosSwitch');
+                                                        const cantidadHijos = document.getElementById('cantidadHijos');
+                                                        if (hijosSwitch && cantidadHijos) {
+                                                            cantidadHijos.disabled = !hijosSwitch.checked;
+                                                            cantidadHijos.required = hijosSwitch.checked;
+                                                        }
+                                                    });
+                                                </script>
+                                                
 
                                                 <div class="col-12 border-top" style="margin-top: 1rem !important; padding-top: 1rem;">
                                                     <div>
                                                         <label class="form-label fw-semibold">Subir Foto del Empleado</label>
-                                                        <input type="file" class="form-control" id="foto" name="Usuario.foto" accept=".jpg,.jpeg,.png" />
+                                                        <input asp-for="fotoFile" type="file" class="form-control" accept=".jpg,.jpeg,.png" />
                                                         <div class="form-text" style="">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
                                                     </div>
                                                 </div>
@@ -826,15 +849,15 @@
                                             <div class="row g-3">
                                                 <div class="col-md-6" style="margin-top: 2.0rem !important">
                                                     <label class="form-label required-field">Celular Personal</label>
-                                                    <input type="text" class="form-control" id="celularPersonal" name="Usuario.celularPersonal" placeholder="Ingrese el número celular" required>
+                                                    <input class="form-control" asp-for="celularPersonal" placeholder="Ingrese el número celular" required>
                                                 </div>
                                                 <div class="col-md-6" style="margin-top: 2.0rem !important">
                                                     <label class="form-label required-field">Correo Personal</label>
-                                                    <input type="text" class="form-control" id="correoPersonal" name="Usuario.correoPersonal" placeholder="Ingrese el correo electrónico" required>
+                                                    <input class="form-control" asp-for="correoPersonal" placeholder="Ingrese el correo electrónico" required>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <label class="form-label">Teléfono de Habitación</label>
-                                                    <input asp-for="telefonoHabitacion" type="text" class="form-control" placeholder="Ingrese el teléfono">
+                                                    <input class="form-control" asp-for="telefonoHabitacion" placeholder="Ingrese el teléfono">
                                                 </div>
 
                                                 <div class="mt-4 pt-3 border-top" style="margin-top: 2.0rem !important">
@@ -848,15 +871,15 @@
                                                     <div class="row g-3">
                                                         <div class="col-12">
                                                             <label class="form-label required-field">Nombre Completo</label>
-                                                            <input type="text" class="form-control" id="contactoEmergencia" name="Usuario.contactoEmergencia" placeholder="Nombre del contacto de emergencia" required>
+                                                            <input type="text" class="form-control" asp-for="contactoEmergencia" placeholder="Nombre del contacto de emergencia" required>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <label class="form-label required-field">Teléfono</label>
-                                                            <input type="tel" class="form-control" id="telefonoEmergencia" name="Usuario.telefonoEmergencia" placeholder="+506 1234 5678" required>
+                                                            <input class="form-control" asp-for="telefonoEmergencia" placeholder="+506 1234 5678" required>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <label class="form-label required-field">Relación</label>
-                                                            <select class="form-select" id="emergencyContactRelation" required asp-for="tipoPariente">
+                                                            <select class="form-select" asp-for="tipoPariente" required>
                                                                 <option value="" selected disabled>Seleccione relación</option>
                                                                 <option value="padre/madre">Padre/Madre</option>
                                                                 <option value="conyuge">Cónyuge</option>
@@ -932,17 +955,6 @@
 
         // Función para recopilar datos del formulario - DEFINIR ANTES DE USAR
         function collectFormData() {
-            console.log('=== INICIANDO collectFormData ===');
-
-            // Debugging específico para los campos problemáticos
-            const primerNombreElem = document.getElementById('primerNombre');
-            const primerApellidoElem = document.getElementById('primerApellido');
-
-            console.log('primerNombre element:', primerNombreElem);
-            console.log('primerNombre value:', primerNombreElem?.value);
-            console.log('primerApellido element:', primerApellidoElem);
-            console.log('primerApellido value:', primerApellidoElem?.value);
-
             try {
                 const formData = {
                     // Paso 1: Información Personal

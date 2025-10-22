@@ -393,7 +393,7 @@
         <!-- Header -->
         <div class="header-card p-4 mt-4">
             <h1 class="h2 fw-bold text-gray-900 mb-2">Gestión de Empleados</h1>
-            <p class="text-muted">Administra la información de todos los <span id="employeeCount">6</span> empleados de la empresa</p>
+            <p class="text-muted">Administra la información de todos los @* <span id="employeeCount">@Model.Count</span> *@ empleados de la empresa</p>
         </div>
 
         <!-- Actions Bar -->
@@ -429,7 +429,81 @@
 
         <!-- Employees Cards -->
         <div id="employeesCards" class="employees-grid">
-            <!-- Las cards se cargarán aquí dinámicamente -->
+            @foreach (var empleado in Model)
+            {
+                <div class="card card-employee">
+                    <div class="card-employee-header text-center">
+                        <div class="position-relative d-inline-block w-100" style="background-color: rgba(1, 36, 115, 0.1)">
+                            @if (empleado.Foto != null && empleado.Foto.Length > 0)
+                            {
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(empleado.Foto)"
+                                     alt="foto de Empleado"
+                                     class="employee-avatar"
+                                     style="cursor: pointer;"
+                                     data-bs-toggle="modal"
+                                     data-bs-target="#fotoModal"
+                                     onclick="mostrarImagenModal('@Convert.ToBase64String(empleado.Foto)')">
+                            }
+                            else
+                            {
+                                <img src="/Img/sin foto.png"
+                                     alt="foto de Empleado"
+                                     class="employee-avatar">
+                            }
+                        </div>
+                        <h5 class="employee-name">@empleado.Nombre</h5>
+                        <div class="employee-tags">
+                            <p class="employee-tag">@empleado.Puesto</p>
+                            <p class="employee-tag">@empleado.Departamento</p>
+                        </div>
+                    </div>
+                    <div class="card-employee-body">
+                        <div class="employee-info-item">
+                            <div class="employee-info-text">
+                                <strong>Correo Empresarial:</strong><br>
+                                @empleado.correoEmpresa
+                            </div>
+                        </div>
+                        <div class="employee-info-item">
+                            <div class="employee-info-text">
+                                <strong>Teléfono Empresarial:</strong><br>
+                                @empleado.celularOficina
+                            </div>
+                        </div>
+                        <div class="employee-info-item">
+                            <div class="employee-info-text">
+                                <strong>Correo Personal:</strong><br>
+                                @empleado.celularPersonal
+                            </div>
+                        </div>
+                        <div class="employee-info-item">
+                            <div class="employee-info-text">
+                                <strong>Teléfono Personal:</strong><br>
+                                @empleado.celularPersonal
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-employee-footer">
+                        <div class="footer-actions">
+                            <div class="footer-slot-details">
+                                <button class="action-btn btn-details" title="Detalles" data-id="@empleado.Id">
+                                    <i class="bi bi-file-text"></i>
+                                </button>
+                            </div>
+                            <div class="footer-slot-edit">
+                                <button class="action-btn btn-edit" title="Editar" data-id="@empleado.Id">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                            <div class="footer-slot-delete">
+                                <button class="action-btn btn-delete" title="Eliminar" data-id="@empleado.Id">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
 
         <div id="noResults" class="text-center py-5 d-none">
@@ -440,210 +514,85 @@
             <p class="text-muted">Intenta con otros términos de búsqueda</p>
         </div>
     </main>
-    
+
     <!-- Modal de Registro -->
     @Html.Partial("modalRegistro", new SistemasAnaliticos.Entidades.Usuario())
 
     <!-- SCRIPT DE LA API DE LA UBICACION -->
-    <script src= '/JS\overpassAPI.js'></script>
+    <script src='~/JS/overpassAPI.js'></script>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Datos de empleados
-        const employees = [
-            {
-                name: "Rusell Kevin",
-                position: "Gerente de Ventas",
-                department: "Ventas",
-                email: "maria.gonzalez@company.com",
-                phone: "+52 55 1234 5678",
-                personalEmail: "maria.gonzalez.personal@gmail.com",
-                personalPhone: "+52 55 8765 4321",
-                avatar: '/Img/jmora.jpg',
-            },
-            {
-                name: "Carlos Ramírez",
-                position: "Desarrollador Senior",
-                department: "IT",
-                email: "carlos.ramirez@company.com",
-                phone: "+52 55 2345 6789",
-                personalEmail: "carlos.ramirez.personal@hotmail.com",
-                personalPhone: "+52 55 7654 3210",
-                avatar: '/Img/sin foto.png',
-            },
-            {
-                name: "Ana Martínez",
-                position: "Recursos Humanos",
-                department: "Administración",
-                email: "ana.martinez@company.com",
-                phone: "+52 55 3456 7890",
-                personalEmail: "ana.martinez.personal@yahoo.com",
-                personalPhone: "+52 55 6543 2109",
-                avatar: '/Img/sin foto.png',
-            },
-            {
-                name: "Luis Torres",
-                position: "Analista Financiero",
-                department: "Finanzas",
-                email: "luis.torres@company.com",
-                phone: "+52 55 4567 8901",
-                personalEmail: "luis.torres.personal@gmail.com",
-                personalPhone: "+52 55 5432 1098",
-                avatar: '/Img/sin foto.png',
-            },
-            {
-                name: "Patricia Hernández",
-                position: "Diseñadora UX/UI",
-                department: "Diseño",
-                email: "patricia.hernandez@company.com",
-                phone: "+52 55 5678 9012",
-                personalEmail: "patricia.hernandez.personal@outlook.com",
-                personalPhone: "+52 55 4321 0987",
-                avatar: '/Img/sin foto.png',
-            },
-            {
-                name: "Roberto Sánchez",
-                position: "Contador",
-                department: "Finanzas",
-                email: "roberto.sanchez@company.com",
-                phone: "+52 55 6789 0123",
-                personalEmail: "roberto.sanchez.personal@gmail.com",
-                personalPhone: "+52 55 3210 9876",
-                avatar: '/Img/sin foto.png',
-            },
-        ];
-
         // Función para generar avatar de fallback
         function getAvatarFallback(name) {
             return name.split(' ').map(n => n[0]).join('');
         }
 
-        // Función para renderizar empleados como cards
-        function renderEmployees(employeesList) {
-            const cardsContainer = document.getElementById('employeesCards');
+        // Función para filtrar empleados en el cliente (búsqueda en tiempo real)
+        function filterEmployees(searchTerm) {
+            const cards = document.querySelectorAll('.card-employee');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const employeeName = card.querySelector('.employee-name').textContent.toLowerCase();
+                const position = card.querySelector('.employee-tag:nth-child(1)').textContent.toLowerCase();
+                const department = card.querySelector('.employee-tag:nth-child(2)').textContent.toLowerCase();
+
+                const matches = employeeName.includes(searchTerm) ||
+                               position.includes(searchTerm) ||
+                               department.includes(searchTerm);
+
+                card.style.display = matches ? 'block' : 'none';
+                if (matches) visibleCount++;
+            });
+
+            // Mostrar/ocultar mensaje de no resultados
             const noResults = document.getElementById('noResults');
             const employeeCount = document.getElementById('employeeCount');
 
-            employeeCount.textContent = employeesList.length;
+            employeeCount.textContent = visibleCount;
 
-            if (employeesList.length === 0) {
-                cardsContainer.innerHTML = '';
+            if (visibleCount === 0) {
                 noResults.classList.remove('d-none');
-                return;
+            } else {
+                noResults.classList.add('d-none');
             }
-
-            noResults.classList.add('d-none');
-
-            cardsContainer.innerHTML = employeesList.map(employee => `
-                <div class="card card-employee">
-                    <div class="card-employee-header text-center">
-                        <div class="position-relative d-inline-block w-100" style="background-color: rgba(1, 36, 115, 0.1)">
-                            <img src="${employee.avatar}" alt="${employee.name}"
-                                 class="employee-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="avatar-fallback d-none">${getAvatarFallback(employee.name)}</div>
-                        </div>
-                        <h5 class="employee-name">${employee.name}</h5>
-                        <div class="employee-tags">
-                            <p class="employee-tag">${employee.position}</p>
-                            <p class="employee-tag">${employee.department}</p>
-                        </div>
-                            </div>
-                    <div class="card-employee-body">
-                        <div class="employee-info-item">
-                            <div class="employee-info-text">
-                                <strong>Correo Empresarial:</strong><br>
-                                ${employee.email}
-                            </div>
-                        </div>
-                        <div class="employee-info-item">
-                            <div class="employee-info-text">
-                                <strong>Teléfono Empresarial:</strong><br>
-                                ${employee.phone}
-                            </div>
-                        </div>
-                        <div class="employee-info-item">
-                            <div class="employee-info-text">
-                                <strong>Correo Personal:</strong><br>
-                                ${employee.personalEmail}
-                            </div>
-                        </div>
-                        <div class="employee-info-item">
-                            <div class="employee-info-text">
-                                <strong>Teléfono Personal:</strong><br>
-                                ${employee.personalPhone}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-employee-footer">
-                        <div class="footer-actions">
-                            <div class="footer-slot-details">
-                                <button class="action-btn" title="Detalles">
-                                    <i class="bi bi-file-text"></i>
-                                </button>
-                            </div>
-                            <div class="footer-slot-edit">
-                                <button class="action-btn" title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                            </div>
-                            <div class="footer-slot-delete">
-                                <button class="action-btn" title="Eliminar">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Función para filtrar empleados
-        function filterEmployees(searchTerm) {
-            if (!searchTerm) {
-                return employees;
-            }
-
-            const term = searchTerm.toLowerCase();
-            return employees.filter(emp =>
-                emp.name.toLowerCase().includes(term) ||
-                emp.department.toLowerCase().includes(term) ||
-                emp.position.toLowerCase().includes(term)
-            );
         }
 
         // Inicializar la página
         document.addEventListener('DOMContentLoaded', function() {
-            // Renderizar empleados iniciales
-            renderEmployees(employees);
-
             // Configurar búsqueda en tiempo real
             const searchInput = document.getElementById('searchInput');
             searchInput.addEventListener('input', function(e) {
-                const filtered = filterEmployees(e.target.value);
-                renderEmployees(filtered);
+                filterEmployees(e.target.value.toLowerCase());
             });
 
             // Configurar eventos de los botones de acción
             document.addEventListener('click', function(e) {
                 if (e.target.closest('.btn-details')) {
-                    const card = e.target.closest('.card-employee');
-                    const employeeName = card.querySelector('.employee-name').textContent;
-                    alert(`Ver detalles de: ${employeeName}`);
+                    const button = e.target.closest('.btn-details');
+                    const employeeId = button.getAttribute('data-id');
+                    alert(`Ver detalles del empleado con ID: ${employeeId}`);
+                    // Aquí puedes redirigir a la página de detalles o abrir un modal
                 }
 
                 if (e.target.closest('.btn-edit')) {
-                    const card = e.target.closest('.card-employee');
-                    const employeeName = card.querySelector('.employee-name').textContent;
-                    alert(`Editar empleado: ${employeeName}`);
+                    const button = e.target.closest('.btn-edit');
+                    const employeeId = button.getAttribute('data-id');
+                    alert(`Editar empleado con ID: ${employeeId}`);
+                    // Aquí puedes redirigir a la página de edición o abrir un modal
                 }
 
                 if (e.target.closest('.btn-delete')) {
-                    const card = e.target.closest('.card-employee');
-                    const employeeName = card.querySelector('.employee-name').textContent;
+                    const button = e.target.closest('.btn-delete');
+                    const employeeId = button.getAttribute('data-id');
+                    const employeeName = button.closest('.card-employee').querySelector('.employee-name').textContent;
+
                     if (confirm(`¿Estás seguro de que quieres eliminar a ${employeeName}?`)) {
-                        alert(`Empleado ${employeeName} eliminado`);
+                        // Aquí puedes hacer una llamada AJAX para eliminar el empleado
+                        alert(`Empleado ${employeeName} eliminado (ID: ${employeeId})`);
                     }
                 }
             });

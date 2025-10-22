@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SistemasAnaliticos.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -31,7 +32,6 @@ namespace SistemasAnaliticos.Entidades
         [StringLength(20)]
         public string cedula { get; set; } = string.Empty;
 
-        [Required]
         [DataType(DataType.Date)]
         public DateTime? fechaNacimiento { get; set; }
 
@@ -85,8 +85,8 @@ namespace SistemasAnaliticos.Entidades
         [StringLength(100)]
         public string departamento { get; set; } = string.Empty;
 
-        [Required]
-        public DateTime fechaIngreso { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime? fechaIngreso { get; set; }
 
         [EmailAddress]
         public string? correoEmpresa { get; set; }
@@ -143,20 +143,24 @@ namespace SistemasAnaliticos.Entidades
 
         // ARCHIVOS Y SALUD
 
+        // FOTOS PARA BD Y FORMULARIOA
         [Column(TypeName = "varbinary(max)")]
         public byte[]? foto { get; set; }
 
+        [NotMapped]
+        [MaxFileSize(5)]
+        public IFormFile fotoFile { get; set; } = null!;
+
         [StringLength(500)]
         public string? padecimientosAlergias { get; set; }
+
+        public bool estado { get; set; }
 
 
         // PROPIEDADES CALCULADAS
         public string nombreCompleto => $"{primerNombre} {segundoNombre} {primerApellido} {segundoApellido}";
 
-        public int? edad => fechaNacimiento.HasValue
-            ? DateTime.Now.Year - fechaNacimiento.Value.Year -
-              (DateTime.Now.Date < fechaNacimiento.Value.AddYears(DateTime.Now.Year - fechaNacimiento.Value.Year) ? 1 : 0)
-            : null;
+        public int? edad => fechaNacimiento.HasValue ? DateTime.Now.Year - fechaNacimiento.Value.Year - (DateTime.Now.Date < fechaNacimiento.Value.AddYears(DateTime.Now.Year - fechaNacimiento.Value.Year) ? 1 : 0) : null;
 
         // AÑOS LABORANDO 
         public int aniosLaborando
@@ -164,10 +168,10 @@ namespace SistemasAnaliticos.Entidades
             get
             {
                 var today = DateTime.Today;
-                var anios = today.Year - fechaIngreso.Year;
+                var anios = today.Year - fechaIngreso.Value.Year;
 
                 // Ajustar si aún no ha llegado la fecha de aniversario este año
-                if (fechaIngreso.Date > today.AddYears(-anios))
+                if (fechaIngreso.Value.Date > today.AddYears(-anios))
                 {
                     anios--;
                 }
@@ -182,10 +186,10 @@ namespace SistemasAnaliticos.Entidades
             get
             {
                 var today = DateTime.Today;
-                var meses = ((today.Year - fechaIngreso.Year) * 12) + today.Month - fechaIngreso.Month;
+                var meses = ((today.Year - fechaIngreso.Value.Year) * 12) + today.Month - fechaIngreso.Value.Month;
 
                 // Ajustar si el día de ingreso aún no llega este mes
-                if (today.Day < fechaIngreso.Day)
+                if (today.Day < fechaIngreso.Value.Day)
                 {
                     meses--;
                 }

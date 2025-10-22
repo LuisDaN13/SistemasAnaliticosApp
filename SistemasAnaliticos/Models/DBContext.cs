@@ -8,7 +8,7 @@ namespace SistemasAnaliticos.Models
     public class DBContext : IdentityDbContext<Usuario, Rol, String>
     {
         public DBContext(DbContextOptions<DBContext> options) : base(options) { }
-           
+
         public DbSet<UsuarioSesion> UsuarioSesion { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -17,11 +17,6 @@ namespace SistemasAnaliticos.Models
             base.OnModelCreating(builder);
 
             // LUEGO TU CONFIGURACIÓN PERSONALIZADA
-            builder.Entity<Usuario>(entity =>
-            {
-                entity.Property(u => u.salario).HasColumnType("decimal(18,2)");
-            });
-
             builder.Entity<UsuarioSesion>(entity =>
             {
                 entity.ToTable("UsuarioSesion"); // Nombre de tabla

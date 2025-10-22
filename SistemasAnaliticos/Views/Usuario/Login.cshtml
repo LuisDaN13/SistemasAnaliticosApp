@@ -139,9 +139,15 @@
                     </form>
 
                     <div class="login-footer text-center mt-4">
-                        <p>¿No tienes una cuenta? <a href="#">Regístrate</a></p>
                         <p><a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a></p>
                     </div>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger" style="justify-items: center">
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        </div>
+                    }
                 </div>
             </div>
         </div>
