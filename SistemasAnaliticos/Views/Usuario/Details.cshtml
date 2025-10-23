@@ -1,1 +1,1273 @@
-﻿
+﻿@model SistemasAnaliticos.Entidades.Usuario
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .btn-custom-primary {
+            background-color: #012473;
+            border-color: #012473;
+            color: white;
+        }
+
+            .btn-custom-primary:hover {
+                background-color: #013599;
+                border-color: #013599;
+                color: white;
+            }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+
+        .card-employee {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+            .card-employee:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            }
+
+        .card-employee-header {
+            color: white;
+            position: relative;
+        }
+
+        .employee-avatar {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .employee-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 0.8rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            color: black;
+        }
+
+        .employee-tags {
+            display: flex;
+            gap: 0.5rem; /* espacio entre las burbujas */
+            flex-wrap: wrap; /* por si se hace muy pequeño el contenedor */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .employee-tag {
+            background-color: rgba(1, 36, 115, 0.1);
+            font-size: 0.9rem;
+            color: black;
+            margin: 0;
+            padding: 4px 10px;
+            border-radius: 20px; /* forma de burbuja */
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .card-employee-body {
+            padding: 1.5rem 1.5rem 0 1.5rem;
+        }
+
+        .employee-info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .employee-info-text {
+            font-size: 0.9rem;
+            color: var(--dark-color);
+        }
+
+        .employee-status {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            width: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .status-active {
+            background-color: #198754;
+            color: #99f6e4;
+        }
+
+        .status-vacations {
+            background-color: rgba(247, 37, 133, 0.15);
+            color: #f72585;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 400px;
+        }
+
+        .search-input {
+            padding-left: 40px;
+            border-radius: 30px;
+            border: 1px solid #dee2e6;
+        }
+
+        .header-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background-color: white;
+        }
+
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card-employee-footer {
+            padding: 1rem 1.5rem;
+        }
+
+        /* Contenedor principal del footer */
+        .footer-actions {
+            display: flex;
+            width: 100%;
+        }
+
+        /* Cada “slot” de botón ocupa el mismo espacio */
+        .footer-slot-details {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-slot-edit {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-slot-delete {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Botones (ya definidos por ti, aquí solo aseguramos consistencia visual) */
+        .action-btn {
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .action-btn:hover {
+                background-color: rgba(108, 117, 125, 0.1);
+                color: var(--dark-color);
+            }
+
+        .btn-details {
+            color: #64B5F6;
+        }
+
+        .btn-edit {
+            color: #ffc107;
+        }
+
+        .btn-delete {
+            color: #dc3545;
+        }
+    </style>
+
+    <!-- ESTILOS DEL MODAL -->
+    <style>
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+        .modal-xl-custom {
+            max-width: 1000px;
+        }
+
+        .stepper-sidebar {
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            color: white;
+            min-height: 600px;
+        }
+
+        .step-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+            .step-item:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .step-item.active {
+                background-color: rgba(255, 255, 255, 0.2);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .step-item.completed {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+            .step-icon.active {
+                background-color: white;
+                color: var(--primary-color);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .step-icon.completed {
+                background-color: var(--success-color);
+                color: white;
+            }
+
+            .step-icon.inactive {
+                background-color: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .step-description {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .required-field::after {
+            content: " *";
+            color: var(--danger-color);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .emergency-contact-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .emergency-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--danger-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+            .currency-input .input-group-text {
+                background-color: #e9ecef;
+                border-right: none;
+            }
+
+            .currency-input .form-control {
+                border-left: none;
+            }
+
+        .btn-primary-custom {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+            .btn-primary-custom:hover {
+                background-color: var(--secondary-color);
+                border-color: var(--secondary-color);
+            }
+
+        .btn-success-custom {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .modal-body {
+            padding: 0;
+        }
+
+        /* NUEVO ESTILO: Contenedor principal con flexbox */
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Altura fija del modal */
+        }
+
+        .form-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .modal-footer-custom {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 1rem 2rem;
+            margin-top: auto; /* Empuja los botones hacia abajo */
+        }
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <!-- Main Content -->
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+        @if (Model == null)
+        {
+            <!-- Employee Not Found -->
+            <div class="d-flex align-items-center justify-content-center" style="min-height: 68vh !important;">
+                <div class="card shadow-sm border-0" style="max-width: 700px">
+                    <div class="card-body p-5 pt-2 pb-0 text-center" style="display: flex; justify-content: center;">
+                        <div class="flex-shrink-0">
+                            <div id="lottie-animation" style="width: 240px; height: 240px;"></div>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; align-content: center;">
+                            <h2 class="h3 fw-bold text-dark mb-3 mt-3">Empleado no encontrado</h2>
+                            <p class="text-muted mb-4">El empleado que buscas no existe en nuestro sistema.</p>
+                        </div>
+                    </div>
+                    <div style="gap: 9%; padding-bottom: 4%; display: flex; justify-content: center; align-items: center;">
+                        <a href="/employees" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Volver a Empleados
+                        </a>
+                        <a href="/employees" class="btn btn-primary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Volver a Empleados
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- Employee Header Card -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="row align-items-start">
+                        <!-- Large Avatar -->
+                        <div class="col-md-auto mb-4 mb-md-0">
+                            <div class="rounded-circle border border-4 border-primary overflow-hidden position-relative"
+                                 style="width: 160px; height: 160px; cursor: pointer"
+                                 data-bs-toggle="modal"
+                                 data-bs-target="#avatarModal">
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.foto)"
+                                     alt="Foto de @Model.primerNombre"
+                                     class="img-fluid w-100 h-100 object-fit-cover"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
+                                <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center fw-bold text-primary position-absolute top-0 start-0"
+                                     style="font-size: 3rem; display: none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Employee Info -->
+                        <div class="col-md">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4">
+                                <div class="flex-grow-1 me-4">
+                                    <h1 class="h2 fw-bold text-dark mb-2">@Model.nombreCompleto</h1>
+                                    <p class="h5 text-muted mb-3">@Model.puesto</p>
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                                            @Model.departamento
+                                        </span>
+                                        <span class="badge @(Model.estado == true ? "bg-success bg-opacity-10 text-success border border-success border-opacity-25" : "bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25")">
+                                            @Model.estado
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="text-md-end">
+                                    <p class="text-muted small mb-1">NO. Empleado</p>
+                                    <p class="h3 fw-bold text-primary">#@Model.noEmpleado.ToString()</p>
+                                </div>
+                            </div>
+
+                            <!-- Quick Contact Info -->
+                            <div class="row g-3 mt-3">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-envelope text-primary me-3"></i>
+                                        <div>
+                                            <p class="text-muted small mb-0">Email</p>
+                                            <p class="fw-medium mb-0">@Model</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-phone text-primary me-3"></i>
+                                        <div>
+                                            <p class="text-muted small mb-0">Teléfono</p>
+                                            <p class="fw-medium mb-0">@Model</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-map-marker-alt text-primary me-3"></i>
+                                        <div>
+                                            <p class="text-muted small mb-0">Ubicación</p>
+                                            <p class="fw-medium mb-0">@Model</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-calendar text-primary me-3"></i>
+                                        <div>
+                                            <p class="text-muted small mb-0">Fecha de Ingreso</p>
+                                            <p class="fw-medium mb-0">@Model</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Information Grid -->
+            <div class="row g-4">
+                <!-- Personal Information -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="card-title mb-0 d-flex align-items-center">
+                                <i class="fas fa-user text-primary me-2"></i>
+                                Información Personal
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <p class="text-muted small mb-1">Fecha de Nacimiento</p>
+                                <p class="fw-medium text-dark mb-0">@Model)</p>
+                            </div>
+                            <div class="mb-3">
+                                <p class="text-muted small mb-1">Dirección</p>
+                                <p class="fw-medium text-dark mb-0">@Model</p>
+                            </div>
+                            <div>
+                                <p class="text-muted small mb-1">Contacto de Emergencia</p>
+                                <p class="fw-medium text-dark mb-1">@Model</p>
+                                <p class="text-muted small mb-0">@Model</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employment Information -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="card-title mb-0 d-flex align-items-center">
+                                <i class="fas fa-building text-primary me-2"></i>
+                                Información Laboral
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <p class="text-muted small mb-1">Tipo de Empleado</p>
+                                <p class="fw-medium text-dark mb-0">@Model</p>
+                            </div>
+                            <div class="mb-3">
+                                <p class="text-muted small mb-1">Horario de Trabajo</p>
+                                <p class="fw-medium text-dark mb-0">@Model</p>
+                            </div>
+                            <div>
+                                <p class="text-muted small mb-1">Supervisor</p>
+                                <p class="fw-medium text-dark mb-0">@Model</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compensation -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="card-title mb-0 d-flex align-items-center">
+                                <i class="fas fa-money-bill text-primary me-2"></i>
+                                Compensación
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <p class="text-muted small mb-1">Salario Mensual</p>
+                                <p class="h3 fw-bold text-primary mb-0">@Model</p>
+                            </div>
+                            <div>
+                                <p class="text-muted small mb-1">Tipo de Pago</p>
+                                <p class="fw-medium text-dark mb-0">Transferencia Bancaria</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="card-title mb-0 d-flex align-items-center">
+                                <i class="fas fa-file-text text-primary me-2"></i>
+                                Educación
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <p class="text-muted small mb-1">Nivel de Estudios</p>
+                                <p class="fw-medium text-dark mb-0">@Model</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="card-title mb-0 d-flex align-items-center">
+                                <i class="fas fa-award text-primary me-2"></i>
+                                Habilidades
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach (var skill in Model.contactoEmergencia)
+                                {
+                                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                                        @skill
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certifications -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="card-title mb-0 d-flex align-items-center">
+                                <i class="fas fa-credit-card text-primary me-2"></i>
+                                Certificaciones
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                @foreach (var cert in Model.licencias)
+                                {
+                                    <li class="d-flex align-items-start mb-2">
+                                        <span class="text-primary me-2">•</span>
+                                        <span class="fw-medium text-dark">@cert</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avatar Modal -->
+            <div class="modal fade" id="avatarModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">@Model.</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="@(Model)"
+                                 alt="@Model"
+                                 class="img-fluid rounded"
+                                 style="max-height: 500px"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
+                            <div class="bg-light d-flex align-items-center justify-content-center fw-bold text-primary rounded"
+                                 style="height: 300px; display: none; font-size: 4rem">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Incluir Lottie -->
+    <script src="https://unpkg.com/@@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+    <script>
+        // Inicializar la animación
+        const animation = document.createElement('lottie-player');
+        animation.setAttribute('src', '/lottie/Empty Box.json'); // Ruta a tu JSON
+        animation.setAttribute('background', 'transparent');
+        animation.setAttribute('speed', '1');
+        animation.setAttribute('style', 'width: 240px; height: 240px;');
+        animation.setAttribute('loop', '');
+        animation.setAttribute('autoplay', '');
+
+        document.getElementById('lottie-animation').appendChild(animation);
+    </script>
+    <script>
+        // Solo el código necesario para expandir la foto
+        document.addEventListener('DOMContentLoaded', function() {
+            // El modal de Bootstrap ya maneja la funcionalidad de expandir
+            // Solo agregamos algún efecto adicional si es necesario
+            const avatarModal = document.getElementById('avatarModal');
+            if (avatarModal) {
+                avatarModal.addEventListener('show.bs.modal', function () {
+                    console.log('Modal de avatar abierto');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Manager - Detalle de Empleado</title>
+    <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+<style>
+    :root {
+        --primary-color: #012473;
+        --hover-color: #013599;
+        --danger-color: #E00319;
+    }
+
+    body {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: 100vh;
+    }
+
+    .navbar-custom {
+        background-color: var(--primary-color);
+    }
+
+    .nav-link.active {
+        border-bottom: 2px solid white;
+        font-weight: 600;
+    }
+
+    .badge-department {
+        background-color: #e3f2fd;
+        color: #0d6efd;
+        border: 1px solid #bbdefb;
+    }
+
+    .badge-active {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .badge-vacations {
+        background-color: #fff3cd;
+        color: #664d03;
+    }
+
+    .avatar-large {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--primary-color);
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 8px;
+        height: 8px;
+        background-color: var(--danger-color);
+        border-radius: 50%;
+    }
+
+    .employee-id {
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+
+    .info-icon {
+        color: var(--primary-color);
+    }
+
+    .card-title-custom {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+</style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <i class="bi bi-briefcase me-2 fs-4"></i>
+                <span class="fs-4 fw-bold">HR Manager</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/employees">Empleados</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Nómina</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Reportes</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <button class="btn btn-outline-light position-relative p-2" type="button">
+                            <i class="bi bi-bell"></i>
+                            <span class="notification-badge"></span>
+                        </button>
+                    </div>
+
+                    <button class="btn btn-outline-light me-3 p-2">
+                        <i class="bi bi-gear"></i>
+                    </button>
+
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                            <img src="/admin-interface.png" alt="Admin" class="avatar me-2">
+                            <span class="d-none d-md-inline">Admin</span>
+                            <i class="bi bi-chevron-down ms-1"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="/employees" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>
+                Volver a Empleados
+            </a>
+        </div>
+
+        <!-- Employee Header Card -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body p-4">
+                <div class="row g-4 align-items-start">
+                    <!-- Large Avatar -->
+                    <div class="col-md-auto text-center">
+                        <div id="employeeAvatarContainer">
+                            <!-- Avatar will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Employee Info -->
+                    <div class="col-md">
+                        <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                            <div class="mb-3 mb-md-0">
+                                <h1 class="display-6 fw-bold text-dark mb-2" id="employeeName"></h1>
+                                <p class="fs-5 text-muted mb-3" id="employeePosition"></p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge badge-department" id="employeeDepartment"></span>
+                                    <span class="badge" id="employeeStatus"></span>
+                                </div>
+                            </div>
+                            <div class="text-md-end">
+                                <p class="text-muted mb-1">ID de Empleado</p>
+                                <p class="fs-3 fw-bold employee-id" id="employeeId"></p>
+                            </div>
+                        </div>
+
+                        <!-- Quick Contact Info -->
+                        <div class="row g-3 mt-3">
+                            <div class="col-md-5">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-envelope info-icon me-3 fs-5"></i>
+                                    <div>
+                                        <p class="text-muted mb-0 small">Correo Empresarial</p>
+                                        <p class="fw-medium mb-0" id="employeeEmail"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-telephone info-icon me-3 fs-5"></i>
+                                    <div>
+                                        <p class="text-muted mb-0 small">Teléfono Empresarial</p>
+                                        <p class="fw-medium mb-0" id="employeePhone"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-envelope info-icon me-3 fs-5"></i>
+                                    <div>
+                                        <p class="text-muted mb-0 small">Correo Personal</p>
+                                        <p class="fw-medium mb-0" id="employeeLocation"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-telephone info-icon me-3 fs-5"></i>
+                                    <div>
+                                        <p class="text-muted mb-0 small">Teléfono Personal</p>
+                                        <p class="fw-medium mb-0" id="employeeHireDate"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Information Grid -->
+        <div class="row g-4" id="employeeDetails">
+            <!-- Content will be populated by JavaScript -->
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Employee data
+        const employeesData = {
+            "1": {
+                id: 1,
+                name: "María González",
+                position: "Gerente de Ventas",
+                department: "Ventas",
+                email: "maria.gonzalez@company.com",
+                phone: "+52 55 1234 5678",
+                location: "Ciudad de México",
+                hireDate: "15/03/2020",
+                status: "Activo",
+                birthDate: "12/08/1988",
+                address: "Av. Reforma 123, Col. Centro, CDMX",
+                emergencyContact: "Juan González (Esposo)",
+                emergencyPhone: "+52 55 9876 5432",
+                salary: "$45,000 MXN",
+                employeeType: "Tiempo Completo",
+                workSchedule: "Lunes a Viernes, 9:00 AM - 6:00 PM",
+                supervisor: "Director Comercial",
+                education: "Licenciatura en Administración de Empresas",
+                skills: ["Liderazgo", "Negociación", "CRM", "Análisis de Ventas"],
+                certifications: ["Certificación en Ventas Estratégicas", "Diplomado en Liderazgo"]
+            },
+            "2": {
+                id: 2,
+                name: "Carlos Ramírez",
+                position: "Desarrollador Senior",
+                department: "IT",
+                email: "carlos.ramirez@company.com",
+                phone: "+52 55 2345 6789",
+                location: "Guadalajara",
+                hireDate: "22/06/2019",
+                status: "Activo",
+                birthDate: "05/03/1990",
+                address: "Calle Juárez 456, Col. Americana, Guadalajara",
+                emergencyContact: "Laura Ramírez (Hermana)",
+                emergencyPhone: "+52 33 8765 4321",
+                salary: "$55,000 MXN",
+                employeeType: "Tiempo Completo",
+                workSchedule: "Lunes a Viernes, 10:00 AM - 7:00 PM",
+                supervisor: "CTO",
+                education: "Ingeniería en Sistemas Computacionales",
+                skills: ["React", "Node.js", "TypeScript", "AWS", "Docker"],
+                certifications: ["AWS Certified Developer", "Scrum Master"]
+            },
+            "3": {
+                id: 3,
+                name: "Ana Martínez",
+                position: "Coordinadora de RRHH",
+                department: "Recursos Humanos",
+                email: "ana.martinez@company.com",
+                phone: "+52 55 3456 7890",
+                location: "Monterrey",
+                hireDate: "10/01/2021",
+                status: "Activo",
+                birthDate: "20/11/1992",
+                address: "Av. Constitución 789, Col. Centro, Monterrey",
+                emergencyContact: "Pedro Martínez (Padre)",
+                emergencyPhone: "+52 81 7654 3210",
+                salary: "$38,000 MXN",
+                employeeType: "Tiempo Completo",
+                workSchedule: "Lunes a Viernes, 8:00 AM - 5:00 PM",
+                supervisor: "Director de RRHH",
+                education: "Licenciatura en Psicología Organizacional",
+                skills: ["Reclutamiento", "Capacitación", "Nómina", "Relaciones Laborales"],
+                certifications: ["Certificación en Capital Humano", "Diplomado en Derecho Laboral"]
+            },
+            "4": {
+                id: 4,
+                name: "Luis Torres",
+                position: "Analista Financiero",
+                department: "Finanzas",
+                email: "luis.torres@company.com",
+                phone: "+52 55 4567 8901",
+                location: "Ciudad de México",
+                hireDate: "05/09/2018",
+                status: "Activo",
+                birthDate: "15/06/1985",
+                address: "Calle Insurgentes 321, Col. Roma, CDMX",
+                emergencyContact: "Carmen Torres (Madre)",
+                emergencyPhone: "+52 55 6543 2109",
+                salary: "$48,000 MXN",
+                employeeType: "Tiempo Completo",
+                workSchedule: "Lunes a Viernes, 9:00 AM - 6:00 PM",
+                supervisor: "Director Financiero",
+                education: "Licenciatura en Contaduría Pública",
+                skills: ["Análisis Financiero", "Excel Avanzado", "SAP", "Presupuestos"],
+                certifications: ["CPA", "Certificación en Finanzas Corporativas"]
+            },
+            "5": {
+                id: 5,
+                name: "Patricia Hernández",
+                position: "Diseñadora UX/UI",
+                department: "Diseño",
+                email: "patricia.hernandez@company.com",
+                phone: "+52 55 5678 9012",
+                location: "Puebla",
+                hireDate: "18/11/2021",
+                status: "Activo",
+                birthDate: "08/04/1994",
+                address: "Av. Juárez 654, Col. Centro, Puebla",
+                emergencyContact: "Roberto Hernández (Esposo)",
+                emergencyPhone: "+52 22 5432 1098",
+                salary: "$42,000 MXN",
+                employeeType: "Tiempo Completo",
+                workSchedule: "Lunes a Viernes, 10:00 AM - 7:00 PM",
+                supervisor: "Director Creativo",
+                education: "Licenciatura en Diseño Gráfico",
+                skills: ["Figma", "Adobe XD", "Sketch", "Prototyping", "User Research"],
+                certifications: ["Google UX Design Certificate", "Interaction Design Foundation"]
+            },
+            "6": {
+                id: 6,
+                name: "Roberto Sánchez",
+                position: "Contador",
+                department: "Finanzas",
+                email: "roberto.sanchez@company.com",
+                phone: "+52 55 6789 0123",
+                location: "Querétaro",
+                hireDate: "30/04/2020",
+                status: "Vacaciones",
+                birthDate: "25/09/1987",
+                address: "Calle Corregidora 987, Col. Centro, Querétaro",
+                emergencyContact: "María Sánchez (Esposa)",
+                emergencyPhone: "+52 44 4321 0987",
+                salary: "$40,000 MXN",
+                employeeType: "Tiempo Completo",
+                workSchedule: "Lunes a Viernes, 9:00 AM - 6:00 PM",
+                supervisor: "Director Financiero",
+                education: "Licenciatura en Contaduría",
+                skills: ["Contabilidad", "Impuestos", "Auditoría", "CONTPAQi"],
+                certifications: ["Contador Público Certificado", "Certificación Fiscal"]
+            }
+        };
+
+        // Get employee ID from URL (simulated)
+        function getEmployeeIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id') || '1'; // Default to employee 1 if no ID provided
+        }
+
+        // Render employee details
+        function renderEmployeeDetails() {
+            const employeeId = getEmployeeIdFromUrl();
+            const employee = employeesData[employeeId];
+
+            if (!employee) {
+                // Show error message if employee not found
+                document.querySelector('main').innerHTML = `
+                    <div class="min-vh-100 d-flex align-items-center justify-content-center">
+                        <div class="card shadow-sm">
+                            <div class="card-body p-5 text-center">
+                                <h2 class="text-dark mb-3">Empleado no encontrado</h2>
+                                <p class="text-muted mb-4">El empleado que buscas no existe en el sistema.</p>
+                                <a href="/employees" class="btn btn-primary">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Volver a Empleados
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Get initials for avatar fallback
+            const initials = employee.name.split(' ')
+                .map(n => n[0])
+                .join('');
+
+            // Determine badge class based on status
+            const statusClass = employee.status === 'Activo' ? 'badge-active' : 'badge-vacations';
+
+            // Render avatar
+            document.getElementById('employeeAvatarContainer').innerHTML = `
+                <img src="${employee.avatar || '/placeholder.svg'}"
+                     class="avatar-large mb-3"
+                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDE2MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNjAiIGhlaWdodD0iMTYwIiByeD0iODAiIGZpbGw9IiNlOWVhZWMiLz4KPHRleHQgeD0iODAiIHk9Ijg1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNmM3NTgwIiBmb250LXNpemU9IjQ4IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+${initials}</dGV4dD4KPC9zdmc+'">
+                <div class="fs-1 fw-bold text-muted d-none">${initials}</div>
+            `;
+
+            // Render basic info
+            document.getElementById('employeeName').textContent = employee.name;
+            document.getElementById('employeePosition').textContent = employee.position;
+            document.getElementById('employeeDepartment').textContent = employee.department;
+            document.getElementById('employeeStatus').textContent = employee.status;
+            document.getElementById('employeeStatus').className = `badge ${statusClass}`;
+            document.getElementById('employeeId').textContent = `#${employee.id.toString().padStart(4, '0')}`;
+            document.getElementById('employeeEmail').textContent = employee.email;
+            document.getElementById('employeePhone').textContent = employee.phone;
+            document.getElementById('employeeLocation').textContent = employee.location;
+            document.getElementById('employeeHireDate').textContent = employee.hireDate;
+
+            // Render detailed information grid
+            document.getElementById('employeeDetails').innerHTML = `
+                <!-- Personal Information -->
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0 card-title-custom">
+                                <i class="bi bi-person info-icon"></i>
+                                Información Personal
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <p class="text-muted mb-1 small">Fecha de Nacimiento</p>
+                                <p class="fw-medium">${employee.birthDate}</p>
+                            </div>
+                            <div class="mb-3">
+                                <p class="text-muted mb-1 small">Dirección</p>
+                                <p class="fw-medium">${employee.address}</p>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-1 small">Contacto de Emergencia</p>
+                                <p class="fw-medium mb-1">${employee.emergencyContact}</p>
+                                <p class="text-muted small">${employee.emergencyPhone}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employment Information -->
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0 card-title-custom">
+                                <i class="bi bi-building info-icon"></i>
+                                Información Laboral
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <p class="text-muted mb-1 small">Tipo de Empleado</p>
+                                <p class="fw-medium">${employee.employeeType}</p>
+                            </div>
+                            <div class="mb-3">
+                                <p class="text-muted mb-1 small">Horario de Trabajo</p>
+                                <p class="fw-medium">${employee.workSchedule}</p>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-1 small">Supervisor</p>
+                                <p class="fw-medium">${employee.supervisor}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compensation -->
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0 card-title-custom">
+                                <i class="bi bi-cash-coin info-icon"></i>
+                                Compensación
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <p class="text-muted mb-1 small">Salario Mensual</p>
+                                <p class="fs-3 fw-bold employee-id">${employee.salary}</p>
+                            </div>
+                            <div>
+                                <p class="text-muted mb-1 small">Tipo de Pago</p>
+                                <p class="fw-medium">Transferencia Bancaria</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education -->
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0 card-title-custom">
+                                <i class="bi bi-file-text info-icon"></i>
+                                Educación
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <p class="text-muted mb-1 small">Nivel de Estudios</p>
+                                <p class="fw-medium">${employee.education}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0 card-title-custom">
+                                <i class="bi bi-award info-icon"></i>
+                                Habilidades
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-2">
+                                ${employee.skills.map(skill =>
+                                    `<span class="badge badge-department">${skill}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certifications -->
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0 card-title-custom">
+                                <i class="bi bi-credit-card info-icon"></i>
+                                Certificaciones
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                ${employee.certifications.map(cert =>
+                                    `<li class="mb-2">
+                                        <i class="bi bi-dot text-primary me-1"></i>
+                                        <span class="fw-medium">${cert}</span>
+                                    </li>`
+                                ).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', renderEmployeeDetails);
+    </script>
+</body>
+</html>*/

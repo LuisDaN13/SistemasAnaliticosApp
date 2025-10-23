@@ -503,7 +503,7 @@
                                                         document.addEventListener('DOMContentLoaded', function() {
                                                             const checkboxes = document.querySelectorAll('.licencia-checkbox');
                                                             const containerSeleccionadas = document.getElementById('licenciasSeleccionadas');
-                                                            const inputHidden = document.getElementById('licenciasData');
+                                                            const inputHidden = document.getElementById('licencias');
                                                             const inputNuevaLicencia = document.getElementById('nuevaLicenciaInput');
                                                             const btnAgregarLicencia = document.getElementById('btnAgregarLicencia');
 
@@ -521,27 +521,6 @@
                                                                     actualizarInterfaz();
                                                                 });
                                                             });
-
-                                                            // Agregar licencia personalizada
-                                                            btnAgregarLicencia.addEventListener('click', agregarLicenciaPersonalizada);
-                                                            inputNuevaLicencia.addEventListener('keypress', function(e) {
-                                                                if (e.key === 'Enter') {
-                                                                    agregarLicenciaPersonalizada();
-                                                                }
-                                                            });
-
-                                                            function agregarLicenciaPersonalizada() {
-                                                                const nuevaLicencia = inputNuevaLicencia.value.trim().toUpperCase();
-
-                                                                if (nuevaLicencia && !licenciasSeleccionadas.includes(nuevaLicencia)) {
-                                                                    agregarLicencia(nuevaLicencia, nuevaLicencia);
-                                                                    inputNuevaLicencia.value = '';
-                                                                    actualizarInterfaz();
-
-                                                                    // Mostrar mensaje de éxito
-                                                                    mostrarMensajeTemporal(`Licencia "${nuevaLicencia}" agregada`, 'success');
-                                                                }
-                                                            }
 
                                                             function agregarLicencia(valor, texto) {
                                                                 if (!licenciasSeleccionadas.includes(valor)) {
@@ -626,7 +605,7 @@
                                                     </script>
 
                                                     <!-- Campo oculto para almacenar las licencias seleccionadas -->
-                                                    <input type="hidden" id="licenciasData" name="licencias">
+                                                    <input type="hidden" asp-for="licencias">
                                                 </div>
                                             </div>
                                         </div>
@@ -966,7 +945,8 @@
                     cedula: getSafeValue('#noCedula'),
                     fechaNacimiento: getSafeValue('input[name="Usuario.fechaNacimiento"]'),
                     genero: getSafeValue('#gender'),
-                    licencias: getSafeValue('#licenciasData'),
+
+                    licencias: getSafeValue('#licencias'),
 
                     // Paso 2: Información Demográfica
                     estadoCivil: getSafeValue('#estadoCivil'),
@@ -999,7 +979,6 @@
                     tipoPariente: getSafeValue('#tipoPariente')
                 };
 
-                console.log('✅ Datos recolectados exitosamente:', formData);
                 return formData;
 
             } catch (error) {
@@ -1309,7 +1288,7 @@
         function inicializarLicencias() {
             const checkboxes = document.querySelectorAll('.licencia-checkbox');
             const containerSeleccionadas = document.getElementById('licenciasSeleccionadas');
-            const inputHidden = document.getElementById('licenciasData');
+            const inputHidden = document.getElementById('licencias');
 
             if (!checkboxes.length || !containerSeleccionadas || !inputHidden) {
                 console.warn('⚠️ Elementos de licencias no encontrados');

@@ -463,34 +463,35 @@
                         <div class="employee-info-item">
                             <div class="employee-info-text">
                                 <strong>Correo Empresarial:</strong><br>
-                                @empleado.CorreoEmp
+                                @(empleado.CorreoEmp != null && !string.IsNullOrEmpty(empleado.CorreoEmp) ? empleado.CorreoEmp : "Sin Correo Empresarial")
                             </div>
                         </div>
                         <div class="employee-info-item">
                             <div class="employee-info-text">
                                 <strong>Teléfono Empresarial:</strong><br>
-                                @empleado.TelefonoEmp
+                                @(empleado.TelefonoEmp != null && !string.IsNullOrEmpty(empleado.TelefonoEmp) ? empleado.TelefonoEmp : "Sin Celular Empresarial")
                             </div>
                         </div>
                         <div class="employee-info-item">
                             <div class="employee-info-text">
                                 <strong>Correo Personal:</strong><br>
-                                @empleado.CorreoPerso
+                                @(empleado.CorreoPerso != null && !string.IsNullOrEmpty(empleado.CorreoPerso) ? empleado.CorreoPerso : "Sin Correo Personal")
                             </div>
                         </div>
                         <div class="employee-info-item">
                             <div class="employee-info-text">
                                 <strong>Teléfono Personal:</strong><br>
-                                @empleado.TelefonoPerso
+                                @(empleado.TelefonoPerso != null && !string.IsNullOrEmpty(empleado.TelefonoPerso) ? empleado.TelefonoPerso : "Sin Celular Personal")
                             </div>
                         </div>
                     </div>
                     <div class="card-employee-footer">
                         <div class="footer-actions">
                             <div class="footer-slot-details">
-                                <button class="action-btn btn-details" title="Detalles" data-id="@empleado.Id">
+                                <a asp-action="Details" asp-controller="Usuario" asp-route-id="@empleado.Id"
+                                    class="action-btn btn-details" title="Detalles">
                                     <i class="bi bi-file-text"></i>
-                                </button>
+                                </a>
                             </div>
                             <div class="footer-slot-edit">
                                 <button class="action-btn btn-edit" title="Editar" data-id="@empleado.Id">

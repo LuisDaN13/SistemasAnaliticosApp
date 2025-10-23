@@ -38,7 +38,7 @@ namespace SistemasAnaliticos.Controllers
                     Departamento = x.departamento,
                     CorreoEmp = x.correoEmpresa,
                     TelefonoEmp = x.celularOficina,
-                    CorreoPerso = x.celularPersonal,
+                    CorreoPerso = x.correoPersonal,
                     TelefonoPerso = x.celularPersonal,
                     Foto = x.foto
                 })
@@ -46,6 +46,7 @@ namespace SistemasAnaliticos.Controllers
 
                 return View(cards);
         }
+
 
         // LOGIN = INICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
         [HttpGet]
@@ -126,11 +127,19 @@ namespace SistemasAnaliticos.Controllers
             return View(model);
         }
 
+
         // DETAILS = VER MÁS INFORMACIÓN DEL EMPLEADO
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(string id)
         {
-            return View();
+            var details = await _context.Users
+                .AsNoTracking()
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
+
+            return View(details);
+
         }
+
 
         // CREATE = REGISTRAR EMPLEADO CON FORMULARIO Y TODO
         public ActionResult Create()
@@ -185,12 +194,14 @@ namespace SistemasAnaliticos.Controllers
                     correoPersonal = model.correoPersonal,
                     telefonoHabitacion = model.telefonoHabitacion,
 
-                    tipoLicencia = model.tipoLicencia,
+                    licencias = model.licencias,
                     tipoPariente = model.tipoPariente,
                     contactoEmergencia = model.contactoEmergencia,
                     telefonoEmergencia = model.telefonoEmergencia,
                     padecimientosAlergias = model.padecimientosAlergias,
                     estado = true,
+
+                    foto = fotoService.ConvertFileToByteArrayAsync(model.fotoFile).Result
                 };
 
                 var pass = "123456789";
@@ -216,11 +227,13 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
+
         // GET: UsuarioController/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
+
 
         // POST: UsuarioController/Edit/5
         [HttpPost]
@@ -237,11 +250,13 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
+
         // GET: UsuarioController/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
+
 
         // POST: UsuarioController/Delete/5
         [HttpPost]

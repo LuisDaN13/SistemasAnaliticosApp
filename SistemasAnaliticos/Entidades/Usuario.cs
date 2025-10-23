@@ -125,8 +125,8 @@ namespace SistemasAnaliticos.Entidades
 
         // INFORMACIÓN ADICIONAL
 
-        [StringLength(50)]
-        public string? tipoLicencia { get; set; }
+        [StringLength(80)]
+        public string? licencias { get; set; }
 
         [Required]
         [StringLength(100)]
