@@ -153,8 +153,6 @@ namespace SistemasAnaliticos.Controllers
                     primerApellido = model.primerApellido,
                     segundoApellido = model.segundoApellido,
 
-                    //UserName = model.primerNombre.Substring(0, 1).ToLower() + model.primerApellido.normalizar().ToLower(),
-
                     noEmpleado = model.noEmpleado,
                     cedula = model.cedula,
                     fechaNacimiento = model.fechaNacimiento,

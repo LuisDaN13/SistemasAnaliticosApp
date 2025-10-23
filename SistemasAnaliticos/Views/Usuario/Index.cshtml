@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model IEnumerable<SistemasAnaliticos.DTO.CardsDTO>
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
@@ -461,25 +463,25 @@
                         <div class="employee-info-item">
                             <div class="employee-info-text">
                                 <strong>Correo Empresarial:</strong><br>
-                                @empleado.correoEmpresa
+                                @empleado.CorreoEmp
                             </div>
                         </div>
                         <div class="employee-info-item">
                             <div class="employee-info-text">
                                 <strong>Teléfono Empresarial:</strong><br>
-                                @empleado.celularOficina
+                                @empleado.TelefonoEmp
                             </div>
                         </div>
                         <div class="employee-info-item">
                             <div class="employee-info-text">
                                 <strong>Correo Personal:</strong><br>
-                                @empleado.celularPersonal
+                                @empleado.CorreoPerso
                             </div>
                         </div>
                         <div class="employee-info-item">
                             <div class="employee-info-text">
                                 <strong>Teléfono Personal:</strong><br>
-                                @empleado.celularPersonal
+                                @empleado.TelefonoPerso
                             </div>
                         </div>
                     </div>

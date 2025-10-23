@@ -75,7 +75,7 @@ namespace SistemasAnaliticos.Entidades
         // INFORMACIÓN LABORAL
 
         [StringLength(100)]
-        public string profesion { get; set; } = string.Empty;
+        public string? profesion { get; set; } = string.Empty;
 
         [Required]
         [StringLength(100)]
