@@ -10,6 +10,7 @@
         public string TelefonoEmp { get; set; }
         public string CorreoPerso { get; set; }
         public string TelefonoPerso { get; set; }
+        public bool Estado { get; set; }
         public byte[]? Foto { get; set; }
     }
 }

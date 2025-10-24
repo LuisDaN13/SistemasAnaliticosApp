@@ -40,6 +40,7 @@ namespace SistemasAnaliticos.Controllers
                     TelefonoEmp = x.celularOficina,
                     CorreoPerso = x.correoPersonal,
                     TelefonoPerso = x.celularPersonal,
+                    Estado = x.estado,
                     Foto = x.foto
                 })
                 .ToListAsync();
@@ -251,26 +252,16 @@ namespace SistemasAnaliticos.Controllers
         }
 
 
-        // GET: UsuarioController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-
-        // POST: UsuarioController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Inactivar(long id)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var usuario = _context.Users.Find(id);
+
+            usuario.estado = false;
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

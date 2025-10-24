@@ -385,6 +385,27 @@
             padding: 1rem 2rem;
             margin-top: auto; /* Empuja los botones hacia abajo */
         }
+
+
+        .corner-triangle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50px; /* tamaño de la esquina */
+            height: 50px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%); /* forma de “doblez” */
+            z-index: 2;
+        }
+
+        /* Colores según estado */
+        .corner-green {
+            background-color: #2dbd4d; /* verde */
+        }
+
+        .corner-red {
+            background-color: #dc3545; /* rojo */
+        }
+
     </style>
 </head>
 <body class="bg-gradient-custom min-vh-100">
@@ -395,7 +416,7 @@
         <!-- Header -->
         <div class="header-card p-4 mt-4">
             <h1 class="h2 fw-bold text-gray-900 mb-2">Gestión de Empleados</h1>
-            <p class="text-muted">Administra la información de todos los @* <span id="employeeCount">@Model.Count</span> *@ empleados de la empresa</p>
+            <p class="text-muted">Administra la información de todos los <strong><span id="employeeCount">@Model.Count()</span></strong> empleados de la empresa</p>
         </div>
 
         <!-- Actions Bar -->
@@ -435,7 +456,11 @@
             {
                 <div class="card card-employee">
                     <div class="card-employee-header text-center">
-                        <div class="position-relative d-inline-block w-100" style="background-color: rgba(1, 36, 115, 0.1)">
+                        <div class="position-relative d-inline-block w-100" style="background-color: rgba(1, 36, 115, 0.1);">
+
+                            <!-- Indicador de estado (esquina superior derecha) -->
+                            <span class="corner-triangle @(empleado.Estado ? "corner-green" : "corner-red")"></span>
+
                             @if (empleado.Foto != null && empleado.Foto.Length > 0)
                             {
                                 <img src="data:image/jpeg;base64,@Convert.ToBase64String(empleado.Foto)"
@@ -453,6 +478,7 @@
                                      class="employee-avatar">
                             }
                         </div>
+
                         <h5 class="employee-name">@empleado.Nombre</h5>
                         <div class="employee-tags">
                             <p class="employee-tag">@empleado.Puesto</p>
@@ -499,8 +525,10 @@
                                 </button>
                             </div>
                             <div class="footer-slot-delete">
-                                <button class="action-btn btn-delete" title="Eliminar" data-id="@empleado.Id">
-                                    <i class="bi bi-trash"></i>
+                                <button type="button"
+                                        class="action-btn btn-delete"
+                                        onclick="abrirModalInactivar(@empleado.Id, '@empleado.Nombre')">
+                                    <i class="bi bi-slash-circle"></i>
                                 </button>
                             </div>
                         </div>
@@ -509,13 +537,66 @@
             }
         </div>
 
-        <div id="noResults" class="text-center py-5 d-none">
-            <div class="mb-4">
-                <i class="bi bi-search display-1 text-muted"></i>
+        <!-- Modal (solo uno) -->
+        <div class="modal fade" id="modalInactivar" tabindex="-1" aria-labelledby="modalInactivarLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title" id="modalInactivarLabel">Confirmar inactivación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Está seguro que desea inactivar este usuario?
+                    </div>
+                    <form id="formInactivar" method="post" asp-controller="Usuario" asp-action="Inactivar">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="id" name="id" value="" />
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Inactivar</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <h4 class="text-muted">No se encontraron empleados</h4>
-            <p class="text-muted">Intenta con otros términos de búsqueda</p>
         </div>
+
+        <script>
+            function abrirModalInactivar(id, nombre) {
+                // Establecer los valores en el modal
+                document.getElementById('idUsuario').value = id;
+                document.getElementById('nombreUsuario').textContent = nombre;
+
+                // Mostrar el modal
+                var modal = new bootstrap.Modal(document.getElementById('modalInactivar'));
+                modal.show();
+            }
+
+            // Opcional: Manejar el envío del formulario con AJAX para mejor experiencia
+            document.getElementById('formInactivar').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Cerrar modal y recargar la página
+                        var modal = bootstrap.Modal.getInstance(document.getElementById('modalInactivar'));
+                        modal.hide();
+                        location.reload();
+                    } else {
+                        alert('Error al inactivar el usuario');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al inactivar el usuario');
+                });
+            });
+        </script>
     </main>
 
     <!-- Modal de Registro -->
@@ -570,34 +651,6 @@
             const searchInput = document.getElementById('searchInput');
             searchInput.addEventListener('input', function(e) {
                 filterEmployees(e.target.value.toLowerCase());
-            });
-
-            // Configurar eventos de los botones de acción
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.btn-details')) {
-                    const button = e.target.closest('.btn-details');
-                    const employeeId = button.getAttribute('data-id');
-                    alert(`Ver detalles del empleado con ID: ${employeeId}`);
-                    // Aquí puedes redirigir a la página de detalles o abrir un modal
-                }
-
-                if (e.target.closest('.btn-edit')) {
-                    const button = e.target.closest('.btn-edit');
-                    const employeeId = button.getAttribute('data-id');
-                    alert(`Editar empleado con ID: ${employeeId}`);
-                    // Aquí puedes redirigir a la página de edición o abrir un modal
-                }
-
-                if (e.target.closest('.btn-delete')) {
-                    const button = e.target.closest('.btn-delete');
-                    const employeeId = button.getAttribute('data-id');
-                    const employeeName = button.closest('.card-employee').querySelector('.employee-name').textContent;
-
-                    if (confirm(`¿Estás seguro de que quieres eliminar a ${employeeName}?`)) {
-                        // Aquí puedes hacer una llamada AJAX para eliminar el empleado
-                        alert(`Empleado ${employeeName} eliminado (ID: ${employeeId})`);
-                    }
-                }
             });
         });
     </script>
