@@ -334,7 +334,7 @@
                                                 </div>
                                                 <div class="col-md-6" style="margin-top: 2.0rem !important">
                                                     <label class="form-label">Segundo Nombre</label>
-                                                    <input class="form-control" asp-for="segundoNombre" placeholder="Ingrese el segundo nombre" required>
+                                                    <input class="form-control" asp-for="segundoNombre" placeholder="Ingrese el segundo nombre">
                                                 </div>
 
                                                 <div class="col-md-6" style="margin-top: 2.0rem !important">
@@ -912,12 +912,10 @@
             try {
                 const element = document.querySelector(selector);
                 if (!element) {
-                    console.warn('Elemento no encontrado:', selector);
                     return '';
                 }
                 return element.value || '';
             } catch (error) {
-                console.error('Error en getSafeValue:', error);
                 return '';
             }
         }
@@ -927,7 +925,6 @@
                 const element = document.querySelector(selector);
                 return element ? element.checked : false;
             } catch (error) {
-                console.error('Error en getSafeChecked:', error);
                 return false;
             }
         }
@@ -982,14 +979,12 @@
                 return formData;
 
             } catch (error) {
-                console.error('❌ Error crítico en collectFormData:', error);
                 return null;
             }
         }
 
         // Esperar a que el DOM esté completamente cargado
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ DOM cargado - inicializando componentes...');
 
             // Inicializar componentes en orden
             inicializarStepper();
@@ -1024,17 +1019,6 @@
             const nextBtn = document.getElementById('nextBtn');
             const submitBtn = document.getElementById('submitBtn');
             const stepItems = document.querySelectorAll('.step-item');
-
-            console.log('🔧 Inicializando stepper...');
-            console.log('prevBtn:', prevBtn);
-            console.log('nextBtn:', nextBtn);
-            console.log('submitBtn:', submitBtn);
-
-            // Verificar que los elementos existen
-            if (!prevBtn || !nextBtn || !submitBtn) {
-                console.error('❌ No se encontraron los botones de navegación');
-                return;
-            }
 
             // Inicializar
             updateStepDisplay();
@@ -1220,8 +1204,6 @@
             submitBtn.addEventListener('click', function(e) {
                 e.preventDefault();
 
-                console.log('🔄 Validando formulario completo...');
-
                 // Validar TODOS los pasos antes de enviar
                 let allStepsValid = true;
                 const invalidFields = [];
@@ -1262,11 +1244,9 @@
                 }
 
                 if (allStepsValid) {
-                    console.log('✅ Formulario válido, recolectando datos...');
                     const formData = collectFormData();
 
                     if (formData) {
-                        console.log('📤 Enviando formulario...');
                         // Aquí puedes enviar el formulario
                         document.getElementById('employeeForm').submit();
                     } else {
@@ -1289,13 +1269,6 @@
             const checkboxes = document.querySelectorAll('.licencia-checkbox');
             const containerSeleccionadas = document.getElementById('licenciasSeleccionadas');
             const inputHidden = document.getElementById('licencias');
-
-            if (!checkboxes.length || !containerSeleccionadas || !inputHidden) {
-                console.warn('⚠️ Elementos de licencias no encontrados');
-                return;
-            }
-
-            console.log('🔧 Inicializando sistema de licencias...');
 
             let licenciasSeleccionadas = [];
 
@@ -1361,13 +1334,6 @@
         function inicializarSwitchHijos() {
             const hijosSwitch = document.getElementById('hijosSwitch');
             const noHijosInput = document.getElementById('noHijos');
-
-            if (!hijosSwitch || !noHijosInput) {
-                console.warn('⚠️ Elementos de hijos no encontrados');
-                return;
-            }
-
-            console.log('🔧 Inicializando switch de hijos...');
 
             hijosSwitch.addEventListener('change', function() {
                 noHijosInput.disabled = !this.checked;

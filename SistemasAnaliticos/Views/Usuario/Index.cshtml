@@ -1,4 +1,5 @@
-﻿@model IEnumerable<SistemasAnaliticos.DTO.CardsDTO>
+﻿@using System.Web
+@model IEnumerable<SistemasAnaliticos.DTO.CardsDTO>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -451,197 +452,263 @@
         </div>
 
         <!-- Employees Cards -->
-        <div id="employeesCards" class="employees-grid">
-            @foreach (var empleado in Model)
-            {
-                <div class="card card-employee">
-                    <div class="card-employee-header text-center">
-                        <div class="position-relative d-inline-block w-100" style="background-color: rgba(1, 36, 115, 0.1);">
+        <div>
+            <!-- Mensaje cuando no hay resultados -->
+            <div id="noResults">
+                <div style="border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); background-color: white; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; justify-content: space-around; padding: 2rem;">
+                        <p style="color: #6c757d; margin: 0; flex: 1; text-align: left; font-size: 1rem;">
+                            No se encontraron empleados que coincidan con la búsqueda.
+                        </p>
+                        <div id="lottie-animation" style="width: 110px; height: 110px; flex-shrink: 0;"></div>
 
-                            <!-- Indicador de estado (esquina superior derecha) -->
-                            <span class="corner-triangle @(empleado.Estado ? "corner-green" : "corner-red")"></span>
+                        <script>
+                            // Inicializar la animación
+                            const animation = document.createElement('lottie-player');
+                            animation.setAttribute('src', '/lottie/loading.json'); // Ruta a tu JSON
+                            animation.setAttribute('background', 'transparent');
+                            animation.setAttribute('speed', '1');
+                            animation.setAttribute('style', 'width: 110px; height: 110px;');
+                            animation.setAttribute('loop', '');
+                            animation.setAttribute('autoplay', '');
 
-                            @if (empleado.Foto != null && empleado.Foto.Length > 0)
-                            {
-                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(empleado.Foto)"
-                                     alt="foto de Empleado"
-                                     class="employee-avatar"
-                                     style="cursor: pointer;"
-                                     data-bs-toggle="modal"
-                                     data-bs-target="#fotoModal"
-                                     onclick="mostrarImagenModal('@Convert.ToBase64String(empleado.Foto)')">
-                            }
-                            else
-                            {
-                                <img src="/Img/sin foto.png"
-                                     alt="foto de Empleado"
-                                     class="employee-avatar">
-                            }
-                        </div>
-
-                        <h5 class="employee-name">@empleado.Nombre</h5>
-                        <div class="employee-tags">
-                            <p class="employee-tag">@empleado.Puesto</p>
-                            <p class="employee-tag">@empleado.Departamento</p>
-                        </div>
+                            document.getElementById('lottie-animation').appendChild(animation);
+                        </script>
                     </div>
-                    <div class="card-employee-body">
-                        <div class="employee-info-item">
-                            <div class="employee-info-text">
-                                <strong>Correo Empresarial:</strong><br>
-                                @(empleado.CorreoEmp != null && !string.IsNullOrEmpty(empleado.CorreoEmp) ? empleado.CorreoEmp : "Sin Correo Empresarial")
-                            </div>
-                        </div>
-                        <div class="employee-info-item">
-                            <div class="employee-info-text">
-                                <strong>Teléfono Empresarial:</strong><br>
-                                @(empleado.TelefonoEmp != null && !string.IsNullOrEmpty(empleado.TelefonoEmp) ? empleado.TelefonoEmp : "Sin Celular Empresarial")
-                            </div>
-                        </div>
-                        <div class="employee-info-item">
-                            <div class="employee-info-text">
-                                <strong>Correo Personal:</strong><br>
-                                @(empleado.CorreoPerso != null && !string.IsNullOrEmpty(empleado.CorreoPerso) ? empleado.CorreoPerso : "Sin Correo Personal")
-                            </div>
-                        </div>
-                        <div class="employee-info-item">
-                            <div class="employee-info-text">
-                                <strong>Teléfono Personal:</strong><br>
-                                @(empleado.TelefonoPerso != null && !string.IsNullOrEmpty(empleado.TelefonoPerso) ? empleado.TelefonoPerso : "Sin Celular Personal")
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-employee-footer">
-                        <div class="footer-actions">
-                            <div class="footer-slot-details">
-                                <a asp-action="Details" asp-controller="Usuario" asp-route-id="@empleado.Id"
-                                    class="action-btn btn-details" title="Detalles">
-                                    <i class="bi bi-file-text"></i>
-                                </a>
-                            </div>
-                            <div class="footer-slot-edit">
-                                <button class="action-btn btn-edit" title="Editar" data-id="@empleado.Id">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                            </div>
-                            <div class="footer-slot-delete">
-                                <button type="button"
-                                        class="action-btn btn-delete"
-                                        onclick="abrirModalInactivar(@empleado.Id, '@empleado.Nombre')">
-                                    <i class="bi bi-slash-circle"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-
-        <!-- Modal (solo uno) -->
-        <div class="modal fade" id="modalInactivar" tabindex="-1" aria-labelledby="modalInactivarLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header bg-warning text-dark">
-                        <h5 class="modal-title" id="modalInactivarLabel">Confirmar inactivación</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        ¿Está seguro que desea inactivar este usuario?
-                    </div>
-                    <form id="formInactivar" method="post" asp-controller="Usuario" asp-action="Inactivar">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" id="id" name="id" value="" />
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-warning">Inactivar</button>
-                        </div>
-                    </form>
                 </div>
             </div>
+
+            <div id="employeesCards" class="employees-grid">
+                @foreach (var empleado in Model)
+                {
+                    <div class="card card-employee">
+                        <div class="card-employee-header text-center">
+                            <div class="position-relative d-inline-block w-100" style="background-color: rgba(1, 36, 115, 0.1);">
+
+                                <!-- Indicador de estado (esquina superior derecha) -->
+                                <span class="corner-triangle @(empleado.Estado ? "corner-green" : "corner-red")"></span>
+
+                                @if (empleado.Foto != null && empleado.Foto.Length > 0)
+                                {
+                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(empleado.Foto)"
+                                            alt="foto de Empleado"
+                                            class="employee-avatar"
+                                            style="cursor: pointer;"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#fotoModal"
+                                            onclick="mostrarImagenModal('@Convert.ToBase64String(empleado.Foto)')">
+                                }
+                                else
+                                {
+                                    <img src="/Img/sin foto.png"
+                                            alt="foto de Empleado"
+                                            class="employee-avatar">
+                                }
+                            </div>
+
+                            <h5 class="employee-name" id="nombreCompleto">@empleado.Nombre</h5>
+                            <div class="employee-tags">
+                                <p class="employee-tag">@empleado.Puesto</p>
+                                <p class="employee-tag">@empleado.Departamento</p>
+                            </div>
+                        </div>
+                        <div class="card-employee-body">
+                            <div class="employee-info-item">
+                                <div class="employee-info-text">
+                                    <strong>Correo Empresarial:</strong><br>
+                                    @(empleado.CorreoEmp != null && !string.IsNullOrEmpty(empleado.CorreoEmp) ? empleado.CorreoEmp : "Sin Correo Empresarial")
+                                </div>
+                            </div>
+                            <div class="employee-info-item">
+                                <div class="employee-info-text">
+                                    <strong>Teléfono Empresarial:</strong><br>
+                                    @(empleado.TelefonoEmp != null && !string.IsNullOrEmpty(empleado.TelefonoEmp) ? empleado.TelefonoEmp : "Sin Celular Empresarial")
+                                </div>
+                            </div>
+                            <div class="employee-info-item">
+                                <div class="employee-info-text">
+                                    <strong>Correo Personal:</strong><br>
+                                    @(empleado.CorreoPerso != null && !string.IsNullOrEmpty(empleado.CorreoPerso) ? empleado.CorreoPerso : "Sin Correo Personal")
+                                </div>
+                            </div>
+                            <div class="employee-info-item">
+                                <div class="employee-info-text">
+                                    <strong>Teléfono Personal:</strong><br>
+                                    @(empleado.TelefonoPerso != null && !string.IsNullOrEmpty(empleado.TelefonoPerso) ? empleado.TelefonoPerso : "Sin Celular Personal")
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-employee-footer">
+                            <div class="footer-actions">
+                                <div class="footer-slot-details">
+                                    <a asp-action="Details" asp-controller="Usuario" asp-route-id="@empleado.Id"
+                                        class="action-btn btn-details" title="Detalles">
+                                        <i class="bi bi-file-text"></i>
+                                    </a>
+                                </div>
+                                <div class="footer-slot-edit">
+                                    <button class="action-btn btn-edit" title="Editar" data-id="@empleado.Id">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </div>
+                                <div class="footer-slot-delete">
+                                    <button class="action-btn btn-delete"
+                                            title="Inactivar"
+                                            data-id="@empleado.Id"
+                                            data-nombre="@empleado.Nombre"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalInactivar">
+                                        <i class="bi bi-slash-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
         </div>
-
-        <script>
-            function abrirModalInactivar(id, nombre) {
-                // Establecer los valores en el modal
-                document.getElementById('idUsuario').value = id;
-                document.getElementById('nombreUsuario').textContent = nombre;
-
-                // Mostrar el modal
-                var modal = new bootstrap.Modal(document.getElementById('modalInactivar'));
-                modal.show();
-            }
-
-            // Opcional: Manejar el envío del formulario con AJAX para mejor experiencia
-            document.getElementById('formInactivar').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const formData = new FormData(this);
-
-                fetch(this.action, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (response.ok) {
-                        // Cerrar modal y recargar la página
-                        var modal = bootstrap.Modal.getInstance(document.getElementById('modalInactivar'));
-                        modal.hide();
-                        location.reload();
-                    } else {
-                        alert('Error al inactivar el usuario');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error al inactivar el usuario');
-                });
-            });
-        </script>
     </main>
 
     <!-- Modal de Registro -->
     @Html.Partial("modalRegistro", new SistemasAnaliticos.Entidades.Usuario())
 
+    <!-- Modal de Inactivar -->
+    <div class="modal fade" id="modalInactivar" tabindex="-1" aria-labelledby="modalInactivarLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="modalInactivarLabel">Cambiar de Estado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin: 1rem;">
+                        ¿Está seguro que desea cambiar el estado del empleado
+                        <strong id="nombreInactivar"></strong>?
+                    </p>
+                </div>
+                <form id="formInactivar" asp-action="Inactivar" asp-controller="Usuario" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="idEmpleadoInactivar" name="id" />
+                    <div class="modal-footer d-flex justify-content-around">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning">Inactivar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
     <!-- SCRIPT DE LA API DE LA UBICACION -->
     <script src='~/JS/overpassAPI.js'></script>
+
+    <!-- Incluir Lottie -->
+    <script src="https://unpkg.com/@@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Codigo sobre el modal de inactivar -->
     <script>
-        // Función para generar avatar de fallback
-        function getAvatarFallback(name) {
-            return name.split(' ').map(n => n[0]).join('');
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalInactivar = document.getElementById('modalInactivar');
+            const form = document.getElementById('formInactivar');
+
+            modalInactivar.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-id');
+                console.log(1 + id);
+                const nombre = button.getAttribute('data-nombre');
+                console.log(nombre);
+                document.getElementById('idEmpleadoInactivar').value = id;
+                document.getElementById('nombreInactivar').textContent = nombre;
+            });
+
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const id = document.getElementById('idEmpleadoInactivar').value;
+
+                try {
+                    const response = await fetch(`/Usuario/Inactivar/${id}`, {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        }
+                    });
+
+                    const result = await response.json(); // Leer la respuesta JSON
+
+                    if (result.success) {
+                        const modal = bootstrap.Modal.getInstance(modalInactivar);
+                        modal.hide();
+
+                        // Redirigir usando la URL proporcionada por el servidor
+                        window.location.href = result.redirectUrl;
+                    } else {
+                        console.error("Error al inactivar el usuario:", result.message);
+                        // Mostrar mensaje de error al usuario
+                        alert("Error: " + result.message);
+                    }
+                } catch (error) {
+                    console.error("Error de red:", error);
+                    alert("Error de red: " + error.message);
+                }
+            });
+        });
+    </script>
+
+    <script>
+        // Función para normalizar texto (quitar tildes)
+        function normalizarTexto(texto) {
+            return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
         }
 
         // Función para filtrar empleados en el cliente (búsqueda en tiempo real)
         function filterEmployees(searchTerm) {
             const cards = document.querySelectorAll('.card-employee');
             let visibleCount = 0;
+            const searchNormalized = normalizarTexto(searchTerm);
 
             cards.forEach(card => {
-                const employeeName = card.querySelector('.employee-name').textContent.toLowerCase();
-                const position = card.querySelector('.employee-tag:nth-child(1)').textContent.toLowerCase();
-                const department = card.querySelector('.employee-tag:nth-child(2)').textContent.toLowerCase();
+                const employeeName = card.querySelector('.employee-name')?.textContent || '';
+                const tags = card.querySelectorAll('.employee-tag');
 
-                const matches = employeeName.includes(searchTerm) ||
-                               position.includes(searchTerm) ||
-                               department.includes(searchTerm);
+                // Obtener puesto (primer tag) y departamento (segundo tag)
+                const position = tags[0]?.textContent || '';
+                const department = tags[1]?.textContent || '';
 
-                card.style.display = matches ? 'block' : 'none';
-                if (matches) visibleCount++;
+                // Normalizar todos los textos para comparar
+                const nameNormalized = normalizarTexto(employeeName);
+                const positionNormalized = normalizarTexto(position);
+                const departmentNormalized = normalizarTexto(department);
+
+                const matches = nameNormalized.includes(searchNormalized) ||
+                               positionNormalized.includes(searchNormalized) ||
+                               departmentNormalized.includes(searchNormalized);
+
+                // Usar clases de Bootstrap en lugar de style.display
+                if (matches) {
+                    card.classList.remove('d-none');
+                    visibleCount++;
+                } else {
+                    card.classList.add('d-none');
+                }
             });
 
-            // Mostrar/ocultar mensaje de no resultados
-            const noResults = document.getElementById('noResults');
+            // Actualizar contador
             const employeeCount = document.getElementById('employeeCount');
+            if (employeeCount) {
+                employeeCount.textContent = visibleCount;
+            }
 
-            employeeCount.textContent = visibleCount;
-
-            if (visibleCount === 0) {
-                noResults.classList.remove('d-none');
-            } else {
-                noResults.classList.add('d-none');
+            // Mostrar/ocultar mensaje de no resultados (si existe)
+            const noResults = document.getElementById('noResults');
+            if (noResults) {
+                if (visibleCount === 0) {
+                    noResults.classList.remove('d-none');
+                } else {
+                    noResults.classList.add('d-none');
+                }
             }
         }
 
@@ -649,9 +716,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Configurar búsqueda en tiempo real
             const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', function(e) {
-                filterEmployees(e.target.value.toLowerCase());
-            });
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    filterEmployees(e.target.value.trim());
+                });
+            }
+
+            // Filtrar inicialmente para contar correctamente
+            filterEmployees('');
         });
     </script>
 </body>

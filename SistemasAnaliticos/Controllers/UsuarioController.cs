@@ -251,17 +251,27 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-
-        [HttpPost]
+        [HttpPost("Usuario/Inactivar/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Inactivar(long id)
+        public async Task<ActionResult> Inactivar(string id)
         {
-            var usuario = _context.Users.Find(id);
+            try
+            {
+                var usuario = await _context.Users.FindAsync(id);
+                if (usuario == null)
+                {
+                    return Json(new { success = false, message = "Usuario no encontrado" });
+                }
 
-            usuario.estado = false;
+                usuario.estado = !usuario.estado;
+                await _context.SaveChangesAsync();
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                return Json(new { success = true, redirectUrl = Url.Action(nameof(Index)) });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
     }
 }

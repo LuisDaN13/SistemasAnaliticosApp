@@ -101,6 +101,19 @@
                     </div>
                 </div>
             </div>
+
+            <script>
+                // Inicializar la animación
+                const animation = document.createElement('lottie-player');
+                animation.setAttribute('src', '/lottie/Empty Box.json'); // Ruta a tu JSON
+                animation.setAttribute('background', 'transparent');
+                animation.setAttribute('speed', '1');
+                animation.setAttribute('style', 'width: 240px; height: 240px;');
+                animation.setAttribute('loop', '');
+                animation.setAttribute('autoplay', '');
+
+                document.getElementById('lottie-animation').appendChild(animation);
+            </script>
         }
         else
         {
@@ -151,27 +164,27 @@
                                 <div class="col-md-4">
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-envelope info-icon me-3 fs-5"></i>
-                                        <div>
+                                        <div class="flex-grow-1 min-width-0">
                                             <p class="text-muted mb-0 small">Correo Empresarial</p>
-                                            <p class="fw-medium mb-0">@Model.correoEmpresa</p>
+                                            <p class="fw-medium mb-0 text-break">@Model.correoEmpresa</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-telephone info-icon me-3 fs-5"></i>
-                                        <div>
+                                        <div class="flex-grow-1 min-width-0">
                                             <p class="text-muted mb-0 small">Teléfono Empresarial</p>
-                                            <p class="fw-medium mb-0">+506 @Model.celularOficina</p>
+                                            <p class="fw-medium mb-0 text-break">+506 @Model.celularOficina</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-person-bounding-box info-icon me-3 fs-5"></i>
-                                        <div>
+                                        <div class="flex-grow-1 min-width-0">
                                             <p class="text-muted mb-0 small">Jefe</p>
-                                            <p class="fw-medium mb-0 @(Model.jefe == null ? "text-decoration-line-through text-danger" : "")">
+                                            <p class="fw-medium mb-0 text-break @(Model.jefe == null ? "text-decoration-line-through text-danger" : "")">
                                                 @(Model.jefe ?? "N/A")
                                             </p>
                                         </div>
@@ -180,27 +193,27 @@
                                 <div class="col-md-4">
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-envelope info-icon me-3 fs-5"></i>
-                                        <div>
+                                        <div class="flex-grow-1 min-width-0">
                                             <p class="text-muted mb-0 small">Correo Personal</p>
-                                            <p class="fw-medium mb-0">@Model.correoPersonal</p>
+                                            <p class="fw-medium mb-0 text-break">@Model.correoPersonal</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-telephone info-icon me-3 fs-5"></i>
-                                        <div>
+                                        <div class="flex-grow-1 min-width-0">
                                             <p class="text-muted mb-0 small">Teléfono Personal</p>
-                                            <p class="fw-medium mb-0">+506 @Model.celularPersonal</p>
+                                            <p class="fw-medium mb-0 text-break">+506 @Model.celularPersonal</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-telephone-plus info-icon me-3 fs-5"></i>
-                                        <div>
+                                        <div class="flex-grow-1 min-width-0">
                                             <p class="text-muted mb-0 small">Extensión</p>
-                                            <p class="fw-medium mb-0 @(Model.extension == null ? "text-decoration-line-through text-danger" : "")">
+                                            <p class="fw-medium mb-0 text-break @(Model.extension == null ? "text-decoration-line-through text-danger" : "")">
                                                 @(Model.extension ?? "N/A")
                                             </p>
                                         </div>
@@ -209,9 +222,9 @@
                                 <div class="col-md-3">
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-house-door info-icon me-3 fs-5"></i>
-                                        <div>
+                                        <div class="flex-grow-1 min-width-0">
                                             <p class="text-muted mb-0 small">Número de Habitación</p>
-                                            <p class="fw-medium mb-0 @(Model.telefonoHabitacion == null ? "text-decoration-line-through text-danger" : "")">
+                                            <p class="fw-medium mb-0 text-break @(Model.telefonoHabitacion == null ? "text-decoration-line-through text-danger" : "")">
                                                 @(Model.telefonoHabitacion ?? "N/A")
                                             </p>
                                         </div>
@@ -254,7 +267,7 @@
                                             </P>
                                             @if (Model.hijos == true)
                                             {
-                                                <p class="fw-medium">@Model.hijos</p>
+                                                <p class="fw-medium pe-5">Cantidad: @Model.cantidadHijos</p>
                                             }
                                         </div>
                                     </div>
@@ -286,9 +299,9 @@
                                         <p class="text-muted mb-1 small">Tipo de Sangre</p>
                                         <p class="fw-medium">@Model.tipoSangre</p>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="mb-3 flex-grow-1 min-width-0">
                                         <p class="text-muted mb-1 small">Padecimientos</p>
-                                        <p class="fw-medium mb-0 @(Model.padecimientosAlergias == null ? "text-decoration-line-through text-danger" : "")">
+                                        <p class="fw-medium mb-0 text-break @(Model.padecimientosAlergias == null ? "text-decoration-line-through text-danger" : "")">
                                             @(Model.padecimientosAlergias ?? "N/A")
                                         </p>
                                     </div>
@@ -366,9 +379,9 @@
 
                                 <!-- Columna derecha -->
                                 <div class="col-md-6">
-                                    <div class="mb-3">
+                                    <div class="mb-3 flex-grow-1 min-width-0">
                                         <p class="text-muted mb-1 small">Dirección Exacta</p>
-                                        <p class="fw-medium mb-0 @(Model.direccionExacta == null ? "text-decoration-line-through text-danger" : "")">
+                                        <p class="fw-medium mb-0 text-break @(Model.direccionExacta == null ? "text-decoration-line-through text-danger" : "")">
                                             @(Model.direccionExacta ?? "N/A")
                                         </p>
                                     </div>
@@ -412,18 +425,6 @@
     <!-- Incluir Lottie -->
     <script src="https://unpkg.com/@@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
-    <script>
-        // Inicializar la animación
-        const animation = document.createElement('lottie-player');
-        animation.setAttribute('src', '/lottie/Empty Box.json'); // Ruta a tu JSON
-        animation.setAttribute('background', 'transparent');
-        animation.setAttribute('speed', '1');
-        animation.setAttribute('style', 'width: 240px; height: 240px;');
-        animation.setAttribute('loop', '');
-        animation.setAttribute('autoplay', '');
-
-        document.getElementById('lottie-animation').appendChild(animation);
-    </script>
     <script>
         // Solo el código necesario para expandir la foto
         document.addEventListener('DOMContentLoaded', function() {

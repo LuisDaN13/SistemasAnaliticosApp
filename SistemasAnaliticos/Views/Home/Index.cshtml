@@ -1,5 +1,239 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@using System.Web
+@model IEnumerable<SistemasAnaliticos.DTO.CardsDTO>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+    </style>
+    <style>
+        .news-header {
+            background-color: #00BCD4;
+            color: white;
+            padding: 1rem 2rem;
+        }
+
+        .news-nav {
+            background-color: #012473;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+            .news-nav .btn {
+                color: white;
+                border: none;
+            }
+
+                .news-nav .btn:hover {
+                    background-color: #013599;
+                    color: white;
+                }
+
+        .news-card {
+            transition: box-shadow 0.3s;
+            cursor: pointer;
+            height: 100%;
+        }
+
+            .news-card:hover {
+                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+            }
+
+        .card-img-container {
+            overflow: hidden;
+        }
+
+        .news-card img {
+            transition: transform 0.3s;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .news-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .video-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .video-icon {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            padding: 12px;
+            transition: background-color 0.3s;
+        }
+
+        .news-card:hover .video-icon {
+            background-color: white;
+        }
+
+        .category-badge {
+            background-color: #00BCD4;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .author-info {
+            border-top: 1px solid #e9ecef;
+            padding-top: 0.75rem;
+            margin-top: 0.75rem;
+        }
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <!-- Main Content -->
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+
+        <!-- News Header -->
+        <div class="d-flex align-items-stretch mb-5 mt-4 overflow-hidden rounded-top shadow">
+            <div class="news-header d-flex align-items-center">
+                <h2 class="mb-0 fw-bold">NOTICIAS</h2>
+            </div>
+            <div class="news-nav flex-grow-1">
+                <button class="btn">
+                    Ver todas las noticias
+                    <i class="bi bi-chevron-right ms-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- News Grid -->
+        <div class="row g-4" id="news-grid">
+            <!-- Las tarjetas de noticias se generarán aquí con JavaScript -->
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Datos de ejemplo para las noticias
+        const news = [
+            {
+                id: 1,
+                title: "Nueva tecnología revoluciona el mercado de energías renovables",
+                category: "Tecnología",
+                author: "María González",
+                time: "2 horas",
+                image: "https://picsum.photos/400/300?random=1",
+                hasVideo: false
+            },
+            {
+                id: 2,
+                title: "Descubrimiento científico abre nuevas posibilidades en medicina",
+                category: "Ciencia",
+                author: "Carlos Rodríguez",
+                time: "5 horas",
+                image: "https://picsum.photos/400/300?random=2",
+                hasVideo: true
+            },
+            {
+                id: 3,
+                title: "Evento cultural reúne a artistas internacionales en la ciudad",
+                category: "Cultura",
+                author: "Ana Martínez",
+                time: "1 día",
+                image: "https://picsum.photos/400/300?random=3",
+                hasVideo: false
+            },
+            {
+                id: 4,
+                title: "Avances en inteligencia artificial transforman la industria",
+                category: "Tecnología",
+                author: "Pedro Sánchez",
+                time: "3 días",
+                image: "https://picsum.photos/400/300?random=4",
+                hasVideo: true
+            },
+            {
+                id: 5,
+                title: "Nuevo récord mundial en deportes extremos",
+                category: "Deportes",
+                author: "Laura Fernández",
+                time: "4 días",
+                image: "https://picsum.photos/400/300?random=5",
+                hasVideo: false
+            }
+        ];
+
+        // Función para generar las tarjetas de noticias
+        function renderNews() {
+            const newsGrid = document.getElementById('news-grid');
+
+            news.forEach(item => {
+                const col = document.createElement('div');
+                col.className = 'col-12 col-md-6 col-lg';
+
+                const card = document.createElement('div');
+                card.className = 'card news-card h-100';
+
+                // Contenido de la tarjeta
+                card.innerHTML = `
+                    <div class="card-img-container position-relative">
+                        <img src="${item.image}" class="card-img-top" alt="${item.title}">
+                        ${item.hasVideo ? `
+                            <div class="video-indicator">
+                                <div class="video-icon">
+                                    <i class="bi bi-play-fill text-dark fs-5"></i>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="card-body">
+                        <span class="badge category-badge mb-2">${item.category}</span>
+                        <h5 class="card-title line-clamp-3">${item.title}</h5>
+                        <div class="author-info">
+                            <p class="card-text small mb-1"><span class="fw-semibold">POR</span> ${item.author}</p>
+                            <p class="card-text small text-muted">Hace ${item.time}</p>
+                        </div>
+                    </div>
+                `;
+
+                col.appendChild(card);
+                newsGrid.appendChild(col);
+            });
+        }
+
+        // Ejecutar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', renderNews);
+    </script>
+</body>
+</html>
