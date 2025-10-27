@@ -116,11 +116,138 @@
             margin-top: 0.75rem;
         }
     </style>
+    <style>
+        .carousel-container {
+            position: relative;
+            margin-bottom: 2rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 0.7s ease-in-out;
+            opacity: 0;
+        }
+
+            .carousel-slide.active {
+                opacity: 1;
+            }
+
+        .carousel-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .carousel-container:hover .carousel-nav {
+            opacity: 1;
+        }
+
+        .carousel-nav:hover {
+            background-color: white;
+        }
+
+        .carousel-nav.prev {
+            left: 1rem;
+        }
+
+        .carousel-nav.next {
+            right: 1rem;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .carousel-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s;
+        }
+
+            .carousel-indicator:hover {
+                background-color: rgba(255, 255, 255, 0.75);
+            }
+
+            .carousel-indicator.active {
+                width: 32px;
+                border-radius: 4px;
+                background-color: white;
+            }
+    </style>
 </head>
 <body class="bg-gradient-custom min-vh-100">
 
     <!-- Main Content -->
-    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4 mt-4">
+
+        <!-- Carrusel de Imágenes -->
+        <div class="carousel-container">
+            <div class="carousel-inner" style="height: 500px; position: relative;">
+                <!-- Imágenes del carrusel -->
+                <div class="carousel-slide active">
+                    <img src="https://images.pexels.com/photos/34422195/pexels-photo-34422195.jpeg" alt="Imagen 1" class="carousel-image">
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://images.pexels.com/photos/34369684/pexels-photo-34369684.jpeg" alt="Imagen 2" class="carousel-image">
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://images.pexels.com/photos/132474/pexels-photo-132474.jpeg" alt="Imagen 3" class="carousel-image">
+                </div>
+                <div class="carousel-slide">
+                    <img src="https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg" alt="Imagen 4" class="carousel-image">
+                </div>
+
+                <!-- Flechas de navegación -->
+                <button class="carousel-nav prev" aria-label="Imagen anterior">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button class="carousel-nav next" aria-label="Siguiente imagen">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+
+                <!-- Indicadores de puntos -->
+                <div class="carousel-indicators">
+                    <button class="carousel-indicator active" aria-label="Ir a imagen 1"></button>
+                    <button class="carousel-indicator" aria-label="Ir a imagen 2"></button>
+                    <button class="carousel-indicator" aria-label="Ir a imagen 3"></button>
+                    <button class="carousel-indicator" aria-label="Ir a imagen 4"></button>
+                </div>
+            </div>
+        </div>
 
         <!-- News Header -->
         <div class="d-flex align-items-stretch mb-5 mt-4 overflow-hidden rounded-top shadow">
@@ -153,7 +280,7 @@
                 category: "Tecnología",
                 author: "María González",
                 time: "2 horas",
-                image: "https://picsum.photos/400/300?random=1",
+                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
                 hasVideo: false
             },
             {
@@ -162,7 +289,7 @@
                 category: "Ciencia",
                 author: "Carlos Rodríguez",
                 time: "5 horas",
-                image: "https://picsum.photos/400/300?random=2",
+                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
                 hasVideo: true
             },
             {
@@ -171,7 +298,7 @@
                 category: "Cultura",
                 author: "Ana Martínez",
                 time: "1 día",
-                image: "https://picsum.photos/400/300?random=3",
+                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
                 hasVideo: false
             },
             {
@@ -180,7 +307,7 @@
                 category: "Tecnología",
                 author: "Pedro Sánchez",
                 time: "3 días",
-                image: "https://picsum.photos/400/300?random=4",
+                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
                 hasVideo: true
             },
             {
@@ -189,7 +316,7 @@
                 category: "Deportes",
                 author: "Laura Fernández",
                 time: "4 días",
-                image: "https://picsum.photos/400/300?random=5",
+                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
                 hasVideo: false
             }
         ];
@@ -234,6 +361,82 @@
 
         // Ejecutar cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', renderNews);
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const indicators = document.querySelectorAll('.carousel-indicator');
+            const prevButton = document.querySelector('.carousel-nav.prev');
+            const nextButton = document.querySelector('.carousel-nav.next');
+            let currentSlide = 0;
+            let slideInterval;
+
+            // Función para mostrar una diapositiva específica
+            function showSlide(index) {
+                // Ocultar todas las diapositivas
+                slides.forEach(slide => slide.classList.remove('active'));
+                indicators.forEach(indicator => indicator.classList.remove('active'));
+
+                // Mostrar la diapositiva actual
+                slides[index].classList.add('active');
+                indicators[index].classList.add('active');
+
+                currentSlide = index;
+            }
+
+            // Función para ir a la siguiente diapositiva
+            function nextSlide() {
+                let nextIndex = (currentSlide + 1) % slides.length;
+                showSlide(nextIndex);
+            }
+
+            // Función para ir a la diapositiva anterior
+            function prevSlide() {
+                let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+                showSlide(prevIndex);
+            }
+
+            // Iniciar el carrusel automático
+            function startCarousel() {
+                slideInterval = setInterval(nextSlide, 5000); // Cambia cada 5 segundos
+            }
+
+            // Detener el carrusel automático
+            function stopCarousel() {
+                clearInterval(slideInterval);
+            }
+
+            // Event listeners para los botones de navegación
+            prevButton.addEventListener('click', function() {
+                stopCarousel();
+                prevSlide();
+                startCarousel();
+            });
+
+            nextButton.addEventListener('click', function() {
+                stopCarousel();
+                nextSlide();
+                startCarousel();
+            });
+
+            // Event listeners para los indicadores
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', function() {
+                    stopCarousel();
+                    showSlide(index);
+                    startCarousel();
+                });
+            });
+
+            // Pausar el carrusel cuando el ratón está sobre él
+            const carouselContainer = document.querySelector('.carousel-container');
+            carouselContainer.addEventListener('mouseenter', stopCarousel);
+            carouselContainer.addEventListener('mouseleave', startCarousel);
+
+            // Iniciar el carrusel automático
+            startCarousel();
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+        .header-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background-color: white;
+        }
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <!-- Main Content -->
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+
+        <!-- Header -->
+        <div class="header-card p-4 mt-4 mb-4">
+            <h1 class="h2 fw-bold text-gray-900 mb-2">Gestión de Permisos</h1>
+            <p class="text-muted">Solicita y gestiona todos los permisos relacionados de los empleados de la empresa</p>
+        </div>
+
+        <!-- Permission Types Grid -->
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#medicalModal">
+                            <i class="fa-solid fa-stethoscope fs-1 mb-3"></i>
+                            <h5 class="fw-bold mb-2">Permiso Médico</h5>
+                            <p class="mb-0 opacity-90">Solicita permiso por razones médicas</p>
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#vacationModal">
+                            <i class="fa-solid fa-plane-departure fs-1 mb-3"></i>
+                            <h5 class="fw-bold mb-2">Permiso de Vacaciones</h5>
+                            <p class="mb-0 opacity-90">Solicita días de vacaciones programadas</p>
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#bereavementModal">
+                            <i class="fa-brands fa-accessible-icon fs-1 mb-3"></i>
+                            <h5 class="fw-bold mb-2">Permiso por Incapacidades</h5>
+                            <p class="mb-0 opacity-90">Permiso por tiempos</p>
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#studyModal">
+                            <i class="fa-solid fa-house-laptop fs-1 mb-3"></i>
+                            <h5 class="fw-bold mb-2">Permiso por Teletrabajo</h5>
+                            <p class="mb-0 opacity-90">Permiso para actividades laborales</p>
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#studyModal">
+                            <i class="fa-solid fa-asterisk fs-1 mb-3"></i>
+                            <h5 class="fw-bold mb-2">Permiso Especial</h5>
+                            <p class="mb-0 opacity-90">Permiso para actividades laborales</p>
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-success w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#bereavementModal">
+                            <i class="fa-solid fa-file fs-1 mb-3 text-white"></i>
+                            <h5 class="fw-bold mb-2 text-white">Constancia Laboral</h5>
+                            <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-success w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#bereavementModal">
+                            <i class="fa-solid fa-file fs-1 mb-3 text-white"></i>
+                            <h5 class="fw-bold mb-2 text-white">Constancia Salarial</h5>
+                            <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#bereavementModal"
+                                style="background-color: #4EBBD6;">
+                            <i class="fa-solid fa-scale-unbalanced fs-1 mb-3 text-white"></i>
+                            <h5 class="fw-bold mb-2 text-white">Solicitud de Préstamo Laboral</h5>
+                            <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#bereavementModal"
+                                style="background-color: #4EBBD6;">
+                            <i class="fa-solid fa-sack-dollar fs-1 mb-3 text-white"></i>
+                            <h5 class="fw-bold mb-2 text-white">Solicitud de Adelanto</h5>
+                            <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Registro -->
+@*     @Html.Partial("modalRegistro", new SistemasAnaliticos.Entidades.Usuario()) *@
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- FontAwesome Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</body>
+</html>
