@@ -2,7 +2,7 @@
 
 namespace SistemasAnaliticos.Controllers
 {
-    public class CitaMedicaController : Controller
+    public class BeneficioController : Controller
     {
         public IActionResult Index()
         {

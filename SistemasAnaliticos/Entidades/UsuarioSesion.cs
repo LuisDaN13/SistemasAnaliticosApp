@@ -6,6 +6,7 @@ namespace SistemasAnaliticos.Entidades
     public class UsuarioSesion
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]

@@ -1,11 +1,10 @@
-﻿@model SistemasAnaliticos.Entidades.Permiso
+﻿@model SistemasAnaliticos.Entidades.Constancia
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modal de Permisos</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -38,107 +37,37 @@
     </style>
 </head>
 <body>
-    <!-- Botón para abrir el modal -->
-    <div class="container mt-5">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#permissionModal">
-            Abrir Modal de Permisos
-        </button>
-    </div>
-
     <!-- Modal -->
-    <div class="modal fade" id="createCitaModal" tabindex="-1" aria-labelledby="createCitaModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createConstanciaModal" tabindex="-1" aria-labelledby="createConstanciaModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <!-- Header -->
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="permissionModalLabel">Nueva Cita Médica</h5>
+                    <h5 class="modal-title fw-bold" id="permissionModalLabel">Nueva Constancia</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <!-- Form -->
-                <form id="citaForm" asp-controller="Permiso" asp-action="Create" method="post" enctype="multipart/form-data">
+                <form id="constanciaForm" asp-controller="Contancia" asp-action="Create" method="post" enctype="multipart/form-data">
                     <div class="modal-body">
                         <div>
-                            <!-- Fechas y Días -->
-                            <div class="row mb-3">
-                                <div class="col-md-6 mt-1">
-                                    <label for="startDate" class="form-label fw-semibold">
-                                        Fecha Inicio <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="date"
-                                           class="form-control"
-                                           required>
-                                </div>
-                                <div class="col-md-6 mt-1">
-                                    <label for="endDate" class="form-label fw-semibold">
-                                        Fecha Fin <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="date"
-                                           class="form-control"
-                                           required>
-                                </div>
-
-                                <div class="col-md-6 mt-4 mb-2">
-                                    <label for="endDate" class="form-label fw-semibold">
-                                        Fecha de Regreso Laboral <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="date"
-                                           class="form-control"
-                                           required>
-                                </div>
-                                <div class="col-md-6 mt-4 mb-2">
-                                    <label for="endTime" class="form-label fw-semibold">
-                                        Hora de la Cita
-                                        <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="time" class="form-control" id="endTime" name="endTime" required>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="section-divider p-0 row">
                             <!-- Motivo -->
-                            <div class="col-md-6 mt-3 mb-3">
+                            <div class="mb-3">
                                 <label for="reason" class="form-label fw-semibold">
-                                    Motivo <span class="text-danger">*</span>
+                                    Persona o Empresa a quien va dirijida <span class="text-danger">*</span>
                                 </label>
                                 <textarea class="form-control"
-                                          id="reason"
-                                          name="reason"
-                                          rows="3"
-                                          placeholder="Describe el motivo de la cita..."
+                                          rows="2"
+                                          placeholder="Ingresa el receptor de la constancia..."
                                           required></textarea>
                             </div>
-                            <div class="col-md-6 mt-3 mb-3">
-                                <label for="reason" class="form-label fw-semibold">
-                                    Comentarios
-                                </label>
+
+                            <!-- Notas -->
+                            <div class="mb-3">
+                                <label for="notes" class="form-label fw-semibold">Comentarios</label>
                                 <textarea class="form-control"
-                                          id="reason"
-                                          name="reason"
-                                          rows="3"
-                                          placeholder="Nota..."
-                                          required></textarea>
-                            </div>
-                        </div>
-
-                        <div class="section-divider">
-                            <!-- Foto -->
-                            <div>
-                                <div>
-                                    <label class="form-label fw-semibold">Foto relacionada</label>
-                                    <input asp-for="fotoFile" type="file" class="form-control" @* accept=".jpg,.jpeg,.png" *@ />
-                                    @*                                     <div class="form-text" style="">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
- *@                                </div>
-                            </div>
-
-                            <!-- Datos Adjuntos -->
-                            <div class="mt-4">
-                                <label class="form-label fw-semibold">Datos Adjuntos</label>
-                                <input type="file"
-                                       class="form-control"
-                                       id="notes"
-                                       name="notes">
+                                          rows="2"
+                                          placeholder="Información adicional..."></textarea>
                             </div>
                         </div>
                     </div>

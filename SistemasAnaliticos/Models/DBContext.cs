@@ -10,6 +10,7 @@ namespace SistemasAnaliticos.Models
         public DBContext(DbContextOptions<DBContext> options) : base(options) { }
 
         public DbSet<UsuarioSesion> UsuarioSesion { get; set; }
+        public DbSet<Permiso> Permiso { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

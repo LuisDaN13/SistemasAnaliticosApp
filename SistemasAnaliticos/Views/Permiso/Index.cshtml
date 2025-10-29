@@ -44,56 +44,68 @@
             <div class="card-body p-4">
                 <div class="row g-4">
                     <div class="col-md-4">
-                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#medicalModal">
+                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card"
+                                type="button" data-bs-toggle="modal" data-bs-target="#createCitaModal">
                             <i class="fa-solid fa-stethoscope fs-1 mb-3"></i>
                             <h5 class="fw-bold mb-2">Permiso Médico</h5>
                             <p class="mb-0 opacity-90">Solicita permiso por razones médicas</p>
-                        </button>
+                        </button>                        
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#vacationModal">
+                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card"
+                                type="button" data-bs-toggle="modal" data-bs-target="#createVacacionesModal">
                             <i class="fa-solid fa-plane-departure fs-1 mb-3"></i>
                             <h5 class="fw-bold mb-2">Permiso de Vacaciones</h5>
                             <p class="mb-0 opacity-90">Solicita días de vacaciones programadas</p>
                         </button>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#bereavementModal">
+                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card"
+                                type="button" data-bs-toggle="modal" data-bs-target="#createOtrosPermisosModal" data-tipo="Incapacidad">
                             <i class="fa-brands fa-accessible-icon fs-1 mb-3"></i>
                             <h5 class="fw-bold mb-2">Permiso por Incapacidades</h5>
                             <p class="mb-0 opacity-90">Permiso por tiempos</p>
                         </button>
-                    </div>
+                    </div>                    
                     <div class="col-md-4">
-                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#studyModal">
+                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card"
+                                type="button" data-bs-toggle="modal" data-bs-target="#createOtrosPermisosModal" data-tipo="Teletrabajo">
                             <i class="fa-solid fa-house-laptop fs-1 mb-3"></i>
                             <h5 class="fw-bold mb-2">Permiso por Teletrabajo</h5>
                             <p class="mb-0 opacity-90">Permiso para actividades laborales</p>
                         </button>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#studyModal">
+                        <button class="btn btn-primary w-100 h-100 p-4 text-start permission-card"
+                                type="button" data-bs-toggle="modal" data-bs-target="#createOtrosPermisosModal" data-tipo="Especial">
                             <i class="fa-solid fa-asterisk fs-1 mb-3"></i>
                             <h5 class="fw-bold mb-2">Permiso Especial</h5>
                             <p class="mb-0 opacity-90">Permiso para actividades laborales</p>
                         </button>
                     </div>
+
+                    <!-- CONSTANCIAS -->
                     <div class="col-md-4">
-                        <button class="btn btn-success w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#bereavementModal">
+                        <button class="btn btn-success w-100 h-100 p-4 text-start permission-card" 
+                                type="button" data-bs-toggle="modal" data-bs-target="#createConstanciaModal">
                             <i class="fa-solid fa-file fs-1 mb-3 text-white"></i>
                             <h5 class="fw-bold mb-2 text-white">Constancia Laboral</h5>
                             <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
                         </button>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-success w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#bereavementModal">
+                        <button class="btn btn-success w-100 h-100 p-4 text-start permission-card"
+                                type="button" data-bs-toggle="modal" data-bs-target="#createConstanciaModal">
                             <i class="fa-solid fa-file fs-1 mb-3 text-white"></i>
                             <h5 class="fw-bold mb-2 text-white">Constancia Salarial</h5>
                             <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
                         </button>
                     </div>
+
+                    <!-- BENEFICIO -->
                     <div class="col-md-4">
-                        <button class="btn w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#bereavementModal"
+                        <button class="btn w-100 h-100 p-4 text-start permission-card" 
+                                type="button" data-bs-toggle="modal" data-bs-target="#createBeneficioModal"
                                 style="background-color: #4EBBD6;">
                             <i class="fa-solid fa-scale-unbalanced fs-1 mb-3 text-white"></i>
                             <h5 class="fw-bold mb-2 text-white">Solicitud de Préstamo Laboral</h5>
@@ -101,7 +113,8 @@
                         </button>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn w-100 h-100 p-4 text-start permission-card" data-bs-toggle="modal" data-bs-target="#bereavementModal"
+                        <button class="btn w-100 h-100 p-4 text-start permission-card"
+                                type="button" data-bs-toggle="modal" data-bs-target="#createBeneficioModal"                                
                                 style="background-color: #4EBBD6;">
                             <i class="fa-solid fa-sack-dollar fs-1 mb-3 text-white"></i>
                             <h5 class="fw-bold mb-2 text-white">Solicitud de Adelanto</h5>
@@ -113,8 +126,20 @@
         </div>
     </main>
 
-    <!-- Modal de Registro -->
-@*     @Html.Partial("modalRegistro", new SistemasAnaliticos.Entidades.Usuario()) *@
+    <!-- Modal de Registro de Citas Medicas-->
+    @Html.Partial("~/Views/Permiso/modalRegistroCita.cshtml", new SistemasAnaliticos.Entidades.Permiso())
+
+    <!-- Modal de Registro de Vacaciones-->
+    @Html.Partial("~/Views/Permiso/modalRegistroVacaciones.cshtml", new SistemasAnaliticos.Entidades.Permiso())
+
+    <!-- Modal de Registro de Otros Permisos-->
+    @Html.Partial("~/Views/Permiso/modalRegistroOtros.cshtml", new SistemasAnaliticos.Entidades.Permiso())
+
+    <!-- Modal de Registro de Constancia-->
+    @Html.Partial("~/Views/Constancia/modalRegistroConstancia.cshtml", new SistemasAnaliticos.Entidades.Constancia())
+
+    <!-- Modal de Registro de Beneficio-->
+    @Html.Partial("~/Views/Beneficio/modalRegistroBeneficio.cshtml", new SistemasAnaliticos.Entidades.Beneficio())
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
