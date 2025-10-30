@@ -1,154 +1,896 @@
-﻿@model SistemasAnaliticos.Entidades.Permiso
+﻿@model SistemasAnaliticos.Entidades.Usuario
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modal de Permisos</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
     <style>
-        .modal-backdrop {
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
         }
 
-        .modal-header {
-            background: linear-gradient(to right, #012473, #013599);
-            color: white;
+        .modal-xl-custom {
+            max-width: 1000px;
         }
+
+        .stepper-sidebar {
+            background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+            color: white;
+            min-height: 600px;
+        }
+
+        .step-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+            .step-item:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .step-item.active {
+                background-color: rgba(255, 255, 255, 0.2);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .step-item.completed {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+            .step-icon.active {
+                background-color: white;
+                color: var(--primary-color);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .step-icon.completed {
+                background-color: var(--success-color);
+                color: white;
+            }
+
+            .step-icon.inactive {
+                background-color: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .step-description {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .required-field::after {
+            content: " *";
+            color: var(--danger-color);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-subtitle {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .emergency-contact-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .emergency-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--danger-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .currency-input {
+            position: relative;
+        }
+
+            .currency-input .input-group-text {
+                background-color: #e9ecef;
+                border-right: none;
+            }
+
+            .currency-input .form-control {
+                border-left: none;
+            }
 
         .btn-primary-custom {
-            background-color: #012473;
-            border-color: #012473;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
         }
 
             .btn-primary-custom:hover {
-                background-color: #013599;
-                border-color: #013599;
+                background-color: var(--secondary-color);
+                border-color: var(--secondary-color);
             }
 
-        .section-divider {
+        .btn-success-custom {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .modal-body {
+            padding: 0;
+        }
+
+        /* NUEVO ESTILO: Contenedor principal con flexbox */
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Altura fija del modal */
+        }
+
+        .form-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .modal-footer-custom {
+            background-color: #f8f9fa;
             border-top: 1px solid #dee2e6;
-            padding-top: 1.25rem;
+            padding: 1rem 2rem;
+            margin-top: auto; /* Empuja los botones hacia abajo */
+        }
+    </style>
+    <style>
+        .licencias-categorias {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+
+        .categoria-licencia {
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+            .categoria-licencia:last-child {
+                border-bottom: none;
+            }
+
+        .licencia-tag {
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin: 0.2rem;
+        }
+
+            .licencia-tag .btn-close {
+                filter: invert(1);
+                font-size: 0.7rem;
+                margin-left: 0.5rem;
+            }
+
+        .form-check {
+            margin-bottom: 0;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .form-check-label {
+            cursor: pointer;
+            user-select: none;
         }
     </style>
 </head>
 <body>
-    <!-- Botón para abrir el modal -->
-    <div class="container mt-5">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#permissionModal">
-            Abrir Modal de Permisos
-        </button>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="createCitaModal" tabindex="-1" aria-labelledby="createCitaModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+    <!-- Modal de Creación de Empleado -->
+    <div class="modal fade" id="createEmployeeModal" tabindex="-1" aria-labelledby="createEmployeeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl-custom">
             <div class="modal-content">
-                <!-- Header -->
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="permissionModalLabel">Nueva Cita Médica</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <!-- Form -->
-                <form id="citaForm" asp-controller="Permiso" asp-action="Create" method="post" enctype="multipart/form-data">
-                    <div class="modal-body">
-                        <div>
-                            <!-- Fechas y Días -->
-                            <div class="row mb-3">
-                                <div class="col-md-6 mt-1">
-                                    <label for="startDate" class="form-label fw-semibold">
-                                        Fecha Inicio <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="date"
-                                           class="form-control"
-                                           required>
-                                </div>
-                                <div class="col-md-6 mt-1">
-                                    <label for="endDate" class="form-label fw-semibold">
-                                        Fecha Fin <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="date"
-                                           class="form-control"
-                                           required>
+                <form id="employeeForm" asp-controller="Usuario" asp-action="Create" method="post" enctype="multipart/form-data">
+                    <div class="modal-body p-0">
+                        <div class="row g-0 h-100">
+                            <!-- Sidebar con Stepper -->
+                            <div class="col-md-4 stepper-sidebar p-4">
+                                <div class="mb-4">
+                                    <h4 class="text-white fw-bold mb-1">Nuevo Empleado</h4>
+                                    <p class="text-light mb-0 small">Complete todos los pasos para registrar al empleado</p>
                                 </div>
 
-                                <div class="col-md-6 mt-4 mb-2">
-                                    <label for="endDate" class="form-label fw-semibold">
-                                        Fecha de Regreso Laboral <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="date"
-                                           class="form-control"
-                                           required>
+                                <div class="stepper-steps mb-4">
+                                    <div class="step-item active p-3 rounded-3 mb-3" data-step="1">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <div class="step-icon active">
+                                                <i class="bi bi-person-fill"></i>
+                                            </div>
+                                            <div>
+                                                <div class="step-title">Información Personal</div>
+                                                <div class="step-description">Datos personales básicos</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="step-item p-3 rounded-3 mb-3" data-step="2">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <div class="step-icon inactive">
+                                                <i class="bi bi-person-lines-fill"></i>
+                                            </div>
+                                            <div>
+                                                <div class="step-title">Información Demográfica</div>
+                                                <div class="step-description">Datos característicos</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="step-item p-3 rounded-3 mb-3" data-step="3">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <div class="step-icon inactive">
+                                                <i class="bi bi-geo-alt-fill"></i>
+                                            </div>
+                                            <div>
+                                                <div class="step-title">Dirección</div>
+                                                <div class="step-description">Ubicación relacionada</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="step-item p-3 rounded-3 mb-3" data-step="4">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <div class="step-icon inactive">
+                                                <i class="bi bi-buildings"></i>
+                                            </div>
+                                            <div>
+                                                <div class="step-title">Información Laboral</div>
+                                                <div class="step-description">Empresa y puestos</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="step-item p-3 rounded-3 mb-3" data-step="5">
+                                        <div class="d-flex align-items-start gap-3">
+                                            <div class="step-icon inactive">
+                                                <i class="bi bi-telephone-fill"></i>
+                                            </div>
+                                            <div>
+                                                <div class="step-title">Contacto</div>
+                                                <div class="step-description">Información para contactar</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-6 mt-4 mb-2">
-                                    <label for="endTime" class="form-label fw-semibold">
-                                        Hora de la Cita
-                                        <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="time" class="form-control" id="endTime" name="endTime" required>
+
+                                <div class="stepper-progress mt-4 pt-3 border-top border-white border-opacity-25">
+                                    <div class="text-center">
+                                        <div class="h3 fw-bold mb-1" id="stepCounter">1/5</div>
+                                        <div class="text-light small">Pasos completados</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contenido del Formulario -->
+                            <div class="col-md-8">
+
+                                <!-- Contenedor principal con flexbox -->
+                                <div class="form-container">
+                                    <div class="form-content">
+
+                                        <!-- Paso 1: Información Personal -->
+                                        <div class="step-content" id="step1">
+                                            <h3 class="section-title">Información Personal</h3>
+                                            <p class="section-subtitle">Ingrese los datos básicos del empleado</p>
+
+                                            <div class="row g-3">
+                                                <div class="col-md-6" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field">Primer Nombre</label>
+                                                    <input class="form-control" asp-for="primerNombre" placeholder="Ingrese el primer nombre" required>
+                                                </div>
+                                                <div class="col-md-6" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label">Segundo Nombre</label>
+                                                    <input class="form-control" asp-for="segundoNombre" placeholder="Ingrese el segundo nombre">
+                                                </div>
+
+                                                <div class="col-md-6" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field">Primer Apellido</label>
+                                                    <input class="form-control" asp-for="primerApellido" placeholder="Ingrese el primer apellido" required>
+                                                </div>
+                                                <div class="col-md-6" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field">Segundo Apellido</label>
+                                                    <input class="form-control" asp-for="segundoApellido" placeholder="Ingrese el segundo apellido" required>
+                                                </div>
+
+                                                <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
+                                                    <label style="margin-top: 1.25rem" class="form-label required-field">No.Empleado</label>
+                                                    <input type="number" class="form-control" asp-for="noEmpleado" placeholder="Ej: 00000" required>
+                                                </div>
+                                                <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
+                                                    <label style="margin-top: 1.25rem" class="form-label required-field">No.Cédula</label>
+                                                    <input class="form-control" asp-for="cedula" placeholder="Ej: 0-0000-0000" required>
+                                                </div>
+
+                                                <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
+                                                    <label style="margin-top: 1.25rem" class="form-label required-field">Fecha de Nacimiento</label>
+                                                    <input type="date" class="form-control" asp-for="fechaNacimiento" required>
+                                                </div>
+                                                <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
+                                                    <label style="margin-top: 1.25rem" class="form-label required-field">Género</label>
+                                                    <select class="form-select" asp-for="genero" required>
+                                                        <option value="" selected disabled>Seleccione género</option>
+                                                        <option value="masculino">Masculino</option>
+                                                        <option value="femenino">Femenino</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-12 border-top" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field" style="margin-top: 1.25rem">Licencias de Conducir</label>
+                                                    <p class="text-muted small mb-3">Seleccione todas las licencias que posee</p>
+
+                                                    <!-- Contenedor de licencias seleccionadas -->
+                                                    <div class="mb-3 p-3 border rounded bg-light" id="licenciasSeleccionadasContainer">
+                                                        <div class="d-flex flex-wrap gap-2" id="licenciasSeleccionadas">
+                                                            <span class="text-muted">No hay licencias seleccionadas</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Categorías de licencias -->
+                                                    <div class="licencias-categorias">
+                                                        <!-- Clase A - Motocicletas -->
+                                                        <div class="categoria-licencia mb-4">
+                                                            <h6 class="fw-bold text-primary mb-2">🏍️ Clase A (Motocicletas)</h6>
+                                                            <div class="row g-2">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="A-1" id="licenciaA1">
+                                                                        <label class="form-check-label" for="licenciaA1">
+                                                                            <strong>A-1</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="A-2" id="licenciaA2">
+                                                                        <label class="form-check-label" for="licenciaA2">
+                                                                            <strong>A-2</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="A-3" id="licenciaA3">
+                                                                        <label class="form-check-label" for="licenciaA3">
+                                                                            <strong>A-3</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="A-4" id="licenciaA4">
+                                                                        <label class="form-check-label" for="licenciaA4">
+                                                                            <strong>A-4</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Clase B - Vehículos particulares -->
+                                                        <div class="categoria-licencia mb-4">
+                                                            <h6 class="fw-bold text-primary mb-2">🚗 Clase B (Vehículos particulares)</h6>
+                                                            <div class="row g-2">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="B-1" id="licenciaB1">
+                                                                        <label class="form-check-label" for="licenciaB1">
+                                                                            <strong>B-1</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="B-2" id="licenciaB2">
+                                                                        <label class="form-check-label" for="licenciaB2">
+                                                                            <strong>B-2</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="B-3" id="licenciaB3">
+                                                                        <label class="form-check-label" for="licenciaB3">
+                                                                            <strong>B-3</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="B-4" id="licenciaB4">
+                                                                        <label class="form-check-label" for="licenciaB4">
+                                                                            <strong>B-4</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- Otras clases -->
+                                                        <div class="categoria-licencia">
+                                                            <h6 class="fw-bold text-primary mb-2">🚌 Otras Clases</h6>
+                                                            <div class="row g-2">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="C-1" id="licenciaC1">
+                                                                        <label class="form-check-label" for="licenciaC1">
+                                                                            <strong>C-1</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="C-2" id="licenciaC2">
+                                                                        <label class="form-check-label" for="licenciaC2">
+                                                                            <strong>C-2</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="D" id="licenciaD">
+                                                                        <label class="form-check-label" for="licenciaD">
+                                                                            <strong>D</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input licencia-checkbox" type="checkbox" value="E" id="licenciaE">
+                                                                        <label class="form-check-label" for="licenciaE">
+                                                                            <strong>E</strong>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <script>
+                                                        document.addEventListener('DOMContentLoaded', function() {
+                                                            const checkboxes = document.querySelectorAll('.licencia-checkbox');
+                                                            const containerSeleccionadas = document.getElementById('licenciasSeleccionadas');
+                                                            const inputHidden = document.getElementById('licencias');
+                                                            const inputNuevaLicencia = document.getElementById('nuevaLicenciaInput');
+                                                            const btnAgregarLicencia = document.getElementById('btnAgregarLicencia');
+
+                                                            // Array para almacenar licencias seleccionadas
+                                                            let licenciasSeleccionadas = [];
+
+                                                            // Event listeners para checkboxes
+                                                            checkboxes.forEach(checkbox => {
+                                                                checkbox.addEventListener('change', function() {
+                                                                    if (this.checked) {
+                                                                        agregarLicencia(this.value, this.value);
+                                                                    } else {
+                                                                        removerLicencia(this.value);
+                                                                    }
+                                                                    actualizarInterfaz();
+                                                                });
+                                                            });
+
+                                                            function agregarLicencia(valor, texto) {
+                                                                if (!licenciasSeleccionadas.includes(valor)) {
+                                                                    licenciasSeleccionadas.push(valor);
+
+                                                                    // Si hay un checkbox correspondiente, marcarlo
+                                                                    const checkboxCorrespondiente = document.querySelector(`.licencia-checkbox[value="${valor}"]`);
+                                                                    if (checkboxCorrespondiente) {
+                                                                        checkboxCorrespondiente.checked = true;
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            function removerLicencia(valor) {
+                                                                licenciasSeleccionadas = licenciasSeleccionadas.filter(lic => lic !== valor);
+
+                                                                // Desmarcar checkbox si existe
+                                                                const checkboxCorrespondiente = document.querySelector(`.licencia-checkbox[value="${valor}"]`);
+                                                                if (checkboxCorrespondiente) {
+                                                                    checkboxCorrespondiente.checked = false;
+                                                                }
+                                                            }
+
+                                                            function actualizarInterfaz() {
+                                                                // Actualizar tags visuales
+                                                                if (licenciasSeleccionadas.length > 0) {
+                                                                    containerSeleccionadas.innerHTML = '';
+                                                                    licenciasSeleccionadas.forEach(licencia => {
+                                                                        const tag = document.createElement('span');
+                                                                        tag.className = 'licencia-tag';
+                                                                        tag.innerHTML = `
+                                                                            ${licencia}
+                                                                            <button type="button" class="btn-close btn-close-white"
+                                                                                    onclick="removerLicenciaDesdeTag('${licencia}')"></button>
+                                                                        `;
+                                                                        containerSeleccionadas.appendChild(tag);
+                                                                    });
+                                                                } else {
+                                                                    containerSeleccionadas.innerHTML = '<span class="text-muted">No hay licencias seleccionadas</span>';
+                                                                }
+
+                                                                // Actualizar campo hidden (separado por comas)
+                                                                inputHidden.value = licenciasSeleccionadas.join(',');
+
+                                                                // Actualizar validación
+                                                                validarLicencias();
+                                                            }
+
+                                                            function validarLicencias() {
+                                                                if (licenciasSeleccionadas.length > 0) {
+                                                                    inputHidden.classList.remove('is-invalid');
+                                                                } else {
+                                                                    inputHidden.classList.add('is-invalid');
+                                                                }
+                                                            }
+
+                                                            function mostrarMensajeTemporal(mensaje, tipo) {
+                                                                const alertDiv = document.createElement('div');
+                                                                alertDiv.className = `alert alert-${tipo} alert-dismissible fade show mt-2`;
+                                                                alertDiv.innerHTML = `
+                                                                    <i class="bi bi-check-circle-fill me-2"></i>${mensaje}
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                                `;
+
+                                                                const container = document.querySelector('.licencias-categorias');
+                                                                container.parentNode.insertBefore(alertDiv, container);
+
+                                                                setTimeout(() => {
+                                                                    alertDiv.remove();
+                                                                }, 3000);
+                                                            }
+
+                                                            // Hacer función global para los tags
+                                                            window.removerLicenciaDesdeTag = function(licencia) {
+                                                                removerLicencia(licencia);
+                                                                actualizarInterfaz();
+                                                            };
+
+                                                            // Validación inicial
+                                                            validarLicencias();
+                                                        });
+                                                    </script>
+
+                                                    <!-- Campo oculto para almacenar las licencias seleccionadas -->
+                                                    <input type="hidden" asp-for="licencias">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Paso 2: Información de Demográfica -->
+                                        <div class="step-content d-none" id="step2">
+                                            <h3 class="section-title">Información Demográfica</h3>
+                                            <p class="section-subtitle">Datos estadísticos que describen características del empleado</p>
+
+                                            <div class="row g-3">
+                                                <div class="col-6" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field">Estado Civil</label>
+                                                    <select class="form-select" required asp-for="estadoCivil">
+                                                        <option value="" selected disabled>Seleccione estado civil</option>
+                                                        <option value="Soltero">Soltero(a)</option>
+                                                        <option value="Casado">Casado(a)</option>
+                                                        <option value="Divorciado">Divorciado(a)</option>
+                                                        <option value="Viudo">Viudo(a)</option>
+                                                        <option value="Unión Libre">Unión Libre</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-6" style="margin-top: 2rem !important">
+                                                    <label class="form-label required-field">Tipo de Sangre</label>
+                                                    <select class="form-select" required asp-for="tipoSangre">
+                                                        <option value="" selected disabled>Seleccione el tipo de sangre</option>
+                                                        <option value="A+">A+</option>
+                                                        <option value="O+">O+</option>
+                                                        <option value="B+">B+</option>
+                                                        <option value="AB+">AB+</option>
+                                                        <option value="A-">A-</option>
+                                                        <option value="O-">O-</option>
+                                                        <option value="B-">B-</option>
+                                                        <option value="AB-">AB-</option>
+                                                    </select>
+                                                </div>
+
+
+                                                <!-- BLOQUE DE HIJOS CON JAVASCRIPT Y SU VALIDACION -->
+                                                <div class="col-md-12 border-top d-flex align-items-center" style="margin-top: 1rem !important; min-height: 80px;">
+                                                    <div class="d-flex justify-content-between w-100">
+                                                        <label for="hijosSwitch" class="form-label fw-semibold mb-0">¿Tiene Hijos?</label>
+                                                        <div class="form-check form-switch d-flex align-items-center" style="margin-bottom: 0;">
+                                                            <input class="form-check-input" type="checkbox" role="switch" id="hijosSwitch"
+                                                                asp-for="hijos" style="transform: scale(1.6); cursor: pointer;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12" style="margin-top: 0">
+                                                    <label class="form-label">Cantidad de Hijos</label>
+                                                    <input type="number" class="form-control" id="cantidadHijos" asp-for="cantidadHijos" placeholder="Ej: 0" disabled min="1">
+                                                </div>
+                                                <script>
+                                                    document.getElementById('hijosSwitch')?.addEventListener('change', function() {
+                                                        const cantidadHijos = document.getElementById('cantidadHijos');
+                                                        if (cantidadHijos) {
+                                                            cantidadHijos.disabled = !this.checked;
+                                                            cantidadHijos.required = this.checked;
+                                                            if (!this.checked) cantidadHijos.value = '';
+                                                        }
+                                                    });
+
+                                                    // Estado inicial
+                                                    document.addEventListener('DOMContentLoaded', function() {
+                                                        const hijosSwitch = document.getElementById('hijosSwitch');
+                                                        const cantidadHijos = document.getElementById('cantidadHijos');
+                                                        if (hijosSwitch && cantidadHijos) {
+                                                            cantidadHijos.disabled = !hijosSwitch.checked;
+                                                            cantidadHijos.required = hijosSwitch.checked;
+                                                        }
+                                                    });
+                                                </script>
+                                                
+
+                                                <div class="col-12 border-top" style="margin-top: 1rem !important; padding-top: 1rem;">
+                                                    <div>
+                                                        <label class="form-label fw-semibold">Subir Foto del Empleado</label>
+                                                        <input asp-for="fotoFile" type="file" class="form-control" accept=".jpg,.jpeg,.png" />
+                                                        <div class="form-text" style="">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-12 border-top" style="margin-top: 1.25rem !important; padding-top: 1rem;">
+                                                    <label class="form-label">Padecimientos / Alergias</label>
+                                                    <textarea asp-for="padecimientosAlergias"
+                                                              class="form-control"
+                                                              rows="3"
+                                                              cols="40"
+                                                              maxlength="254"
+                                                              placeholder="Ingrese aquí los padecimientos respectivos...">
+                                                    </textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Paso 3: Dirección -->
+                                        <div class="step-content d-none" id="step3">
+                                            <h3 class="section-title">Dirección</h3>
+                                            <p class="section-subtitle">Ubicaciones detalladas relacionadas</p>
+
+                                            <div class="row g-3">
+                                                <div class="col-8" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field">Provincia</label>
+                                                    <select class="form-select" required asp-for="provincia" onchange="cargarCantones()">
+                                                        <option value="" selected disabled>Cargando provincias</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-8" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field">Cantón</label>
+                                                    <select class="form-select" required asp-for="canton" onchange="cargarDistritos()">
+                                                        <option value="" selected disabled>Seleccione primero la provincia</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-8" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field">Distrito</label>
+                                                    <select class="form-select" required asp-for="distrito">
+                                                        <option value="" selected disabled>Seleccione primero el cantón</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-12" style="margin-top: 3rem !important">
+                                                    <label class="form-label">Ubicación Exacta</label>
+                                                    <textarea asp-for="direccionExacta" 
+                                                        class="form-control" 
+                                                        rows="5"
+                                                        cols="40"
+                                                        maxlength="254"
+                                                        placeholder="Ingrese aquí la dirección...">
+                                                    </textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Paso 4: Información Laboral -->
+                                        <div class="step-content d-none" id="step4">
+                                            <h3 class="section-title">Información Laboral</h3>
+                                            <p class="section-subtitle">Información relacionada con el puesto y otros</p>
+
+                                            <div class="row g-3">
+                                                <div class="col-md-6" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label">Profesión</label>
+                                                    <input asp-for="profesion" type="text" class="form-control" placeholder="Ingrese la profesión">
+                                                </div>
+                                                <div class="col-md-6" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field">Puesto</label>
+                                                    <input asp-for="puesto" type="text" class="form-control" placeholder="Ingrese el puesto" required>
+                                                </div>
+                                                <div class="col-12" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field">Departamento</label>
+                                                    <select class="form-select" required asp-for="departamento">
+                                                        <option value="" selected disabled>Seleccione el departmento</option>
+                                                        <option value="Bodega">Bodega</option>
+                                                        <option value="Comercial">Comercial</option>
+                                                        <option value="Compras e Importaciones">Compras e Importaciones</option>
+                                                        <option value="Contable">Contable</option>
+                                                        <option value="Informática">Informática</option>
+                                                        <option value="Legal y Gerencia">Legal y Gerencia</option>
+                                                        <option value="Operaciones">Operaciones</option>
+                                                        <option value="Recursos Humanos">Recursos Humanos</option>
+                                                        <option value="Servicios Generales">Servicios Generales</option>
+                                                        <option value="Software NCR">Software NCR</option>
+                                                        <option value="Técnico">Técnico</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
+                                                    <label style="margin-top: 1.25rem" class="form-label required-field">Fecha de Ingreso</label>
+                                                    <input type="date" class="form-control" asp-for="fechaIngreso" required>
+                                                </div>
+                                                <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
+                                                    <label style="margin-top: 1.25rem"  class="form-label required-field">Jefe</label>
+                                                    <select class="form-select" asp-for="jefe">
+                                                        <option value="Ninguno" selected disabled>Seleccione el jefe</option>
+                                                    </select>
+                                                </div>
+                                             
+                                                <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
+                                                    <label style="margin-top: 1.25rem"  class="form-label">Correo Empresarial</label>
+                                                    <input asp-for="correoEmpresa" type="text" class="form-control" placeholder="Ingrese el correo empresarial">
+                                                </div>
+                                                <div class="col-md-3 border-top" style="margin-top: 2.0rem !important">
+                                                    <label style="margin-top: 1.25rem" class="form-label">Celular Empr.</label>
+                                                    <input asp-for="celularOficina" type="text" class="form-control" placeholder="Ingrese el número empresarial">
+                                                </div>
+                                                <div class="col-md-3 border-top" style="margin-top: 2.0rem !important">
+                                                    <label style="margin-top: 1.25rem" class="form-label">Extensión</label>
+                                                    <div class="currency-input">
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">#</span>
+                                                            <input asp-for="extension" class="form-control" placeholder="00">
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-5 border-top" style="margin-top: 2.0rem !important">
+                                                    <label style="margin-top: 1.25rem" class="form-label required-field">Salario</label>
+                                                    <div class="currency-input">
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">₡</span>
+                                                            <input type="number" class="form-control" asp-for="salario" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-7 border-top" style="margin-top: 2.0rem !important">
+                                                    <label style="margin-top: 1.25rem" for="salary" class="form-label required-field">Cuenta IBAN</label>
+                                                    <div class="currency-input">
+                                                        <div class="input-group">
+                                                            <span class="input-group-text"><i class="bi bi-bank"></i> </span>
+                                                            <input asp-for="cuentaIBAN" class="form-control" placeholder="CR0000000000000000000" required>
+                                                        </div>
+                                                    </div>
+                                                </div>                                             
+                                            </div>
+                                        </div>
+
+                                        <!-- Paso 5: Contacto -->
+                                        <div class="step-content d-none" id="step5">
+                                            <h3 class="section-title">Contacto</h3>
+                                            <p class="section-subtitle">Información para el contacto del empleado</p>
+
+                                            <div class="row g-3">
+                                                <div class="col-md-6" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field">Celular Personal</label>
+                                                    <input class="form-control" asp-for="celularPersonal" placeholder="Ingrese el número celular" required>
+                                                </div>
+                                                <div class="col-md-6" style="margin-top: 2.0rem !important">
+                                                    <label class="form-label required-field">Correo Personal</label>
+                                                    <input class="form-control" asp-for="correoPersonal" placeholder="Ingrese el correo electrónico" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Teléfono de Habitación</label>
+                                                    <input class="form-control" asp-for="telefonoHabitacion" placeholder="Ingrese el teléfono">
+                                                </div>
+
+                                                <div class="mt-4 pt-3 border-top" style="margin-top: 2.0rem !important">
+                                                    <div class="emergency-contact-header">
+                                                        <div class="emergency-icon">
+                                                            <i class="bi bi-telephone-fill"></i>
+                                                        </div>
+                                                        <h5 class="fw-semibold mb-0">Contacto de Emergencia</h5>
+                                                    </div>
+
+                                                    <div class="row g-3">
+                                                        <div class="col-12">
+                                                            <label class="form-label required-field">Nombre Completo</label>
+                                                            <input type="text" class="form-control" asp-for="contactoEmergencia" placeholder="Nombre del contacto de emergencia" required>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label required-field">Teléfono</label>
+                                                            <input class="form-control" asp-for="telefonoEmergencia" placeholder="+506 1234 5678" required>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label required-field">Relación</label>
+                                                            <select class="form-select" asp-for="tipoPariente" required>
+                                                                <option value="" selected disabled>Seleccione relación</option>
+                                                                <option value="padre/madre">Padre/Madre</option>
+                                                                <option value="conyuge">Cónyuge</option>
+                                                                <option value="hermano">Hermano(a)</option>
+                                                                <option value="hijo">Hijo(a)</option>
+                                                                <option value="amigo">Amigo(a)</option>
+                                                                <option value="otro">Otro</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Botones de Navegación - SIEMPRE EN LA PARTE INFERIOR -->
+                                    <div class="modal-footer-custom">
+                                        <div class="d-flex justify-content-between w-100">
+                                            <button type="button" class="btn btn-outline-secondary" id="prevBtn">
+                                                <i class="bi bi-arrow-left me-2"></i>Anterior
+                                            </button>
+                                            <button type="button" class="btn btn-primary-custom text-white" id="nextBtn">
+                                                Siguiente<i class="bi bi-arrow-right ms-2"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-success-custom text-white d-none" id="submitBtn">
+                                                <i class="bi bi-check-lg me-2"></i>Crear Empleado
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="section-divider p-0 row">
-                            <!-- Motivo -->
-                            <div class="col-md-6 mt-3 mb-3">
-                                <label for="reason" class="form-label fw-semibold">
-                                    Motivo <span class="text-danger">*</span>
-                                </label>
-                                <textarea class="form-control"
-                                          id="reason"
-                                          name="reason"
-                                          rows="3"
-                                          placeholder="Describe el motivo de la cita..."
-                                          required></textarea>
-                            </div>
-                            <div class="col-md-6 mt-3 mb-3">
-                                <label for="reason" class="form-label fw-semibold">
-                                    Comentarios
-                                </label>
-                                <textarea class="form-control"
-                                          id="reason"
-                                          name="reason"
-                                          rows="3"
-                                          placeholder="Nota..."
-                                          required></textarea>
-                            </div>
-                        </div>
-
-                        <div class="section-divider">
-                            <!-- Foto -->
-                            <div>
-                                <div>
-                                    <label class="form-label fw-semibold">Foto relacionada</label>
-                                    <input asp-for="fotoFile" type="file" class="form-control" @* accept=".jpg,.jpeg,.png" *@ />
-                                    @*                                     <div class="form-text" style="">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
- *@                                </div>
-                            </div>
-
-                            <!-- Datos Adjuntos -->
-                            <div class="mt-4">
-                                <label class="form-label fw-semibold">Datos Adjuntos</label>
-                                <input type="file"
-                                       class="form-control"
-                                       id="notes"
-                                       name="notes">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="modal-footer bg-light">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary-custom text-white">
-                            <i class="bi bi-save me-2"></i>Guardar
-                        </button>
                     </div>
                 </form>
             </div>
@@ -158,62 +900,448 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- JavaScript para la funcionalidad -->
     <script>
+        // Provincias conocidas de CR
+        const provinciasCR = [
+            "San José", "Alajuela", "Cartago", "Heredia",
+            "Guanacaste", "Puntarenas", "Limón"
+        ];
+
+        // Funciones auxiliares seguras - DEFINIR PRIMERO
+        function getSafeValue(selector) {
+            try {
+                const element = document.querySelector(selector);
+                if (!element) {
+                    return '';
+                }
+                return element.value || '';
+            } catch (error) {
+                return '';
+            }
+        }
+
+        function getSafeChecked(selector) {
+            try {
+                const element = document.querySelector(selector);
+                return element ? element.checked : false;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // Función para recopilar datos del formulario - DEFINIR ANTES DE USAR
+        function collectFormData() {
+            try {
+                const formData = {
+                    // Paso 1: Información Personal
+                    primerNombre: getSafeValue('#primerNombre'),
+                    segundoNombre: getSafeValue('#segundoNombre'),
+                    primerApellido: getSafeValue('#primerApellido'),
+                    segundoApellido: getSafeValue('#segundoApellido'),
+                    noEmpleado: getSafeValue('#noEmpleado'),
+                    cedula: getSafeValue('#noCedula'),
+                    fechaNacimiento: getSafeValue('input[name="Usuario.fechaNacimiento"]'),
+                    genero: getSafeValue('#gender'),
+
+                    licencias: getSafeValue('#licencias'),
+
+                    // Paso 2: Información Demográfica
+                    estadoCivil: getSafeValue('#estadoCivil'),
+                    tipoSangre: getSafeValue('#tipoSangre'),
+                    tieneHijos: getSafeChecked('#hijosSwitch'),
+                    noHijos: getSafeValue('#noHijos'),
+                    padecimientosAlergias: getSafeValue('#padecimientosAlergias'),
+
+                    // Paso 3: Dirección
+                    provincia: getSafeValue('#provincia'),
+                    canton: getSafeValue('#canton'),
+                    distrito: getSafeValue('#distrito'),
+                    direccionExacta: getSafeValue('#direccionExacta'),
+
+                    // Paso 4: Información Laboral
+                    profesion: getSafeValue('#profesion'),
+                    puesto: getSafeValue('#puesto'),
+                    departamento: getSafeValue('#departamento'),
+                    fechaIngreso: getSafeValue('#fechaIngreso'),
+                    jefe: getSafeValue('#jefe'),
+                    salario: getSafeValue('#salario'),
+                    cuentaIBAN: getSafeValue('#cuentaIBAN'),
+                    extension: getSafeValue('#extension'),
+
+                    // Paso 5: Contacto
+                    celularPersonal: getSafeValue('#celularPersonal'),
+                    correoPersonal: getSafeValue('#correoPersonal'),
+                    contactoEmergencia: getSafeValue('#contactoEmergencia'),
+                    telefonoEmergencia: getSafeValue('#telefonoEmergencia'),
+                    tipoPariente: getSafeValue('#tipoPariente')
+                };
+
+                return formData;
+
+            } catch (error) {
+                return null;
+            }
+        }
+
+        // Esperar a que el DOM esté completamente cargado
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('permissionForm');
-            const startDateInput = document.getElementById('startDate');
-            const endDateInput = document.getElementById('endDate');
-            const daysInput = document.getElementById('days');
 
-            // Función para calcular días
-            function calculateDays() {
-                const startDate = new Date(startDateInput.value);
-                const endDate = new Date(endDateInput.value);
+            // Inicializar componentes en orden
+            inicializarStepper();
+            cargarProvincias();
+            inicializarLicencias();
+            inicializarSwitchHijos();
+        });
 
-                if (startDate && endDate && startDate <= endDate) {
-                    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    daysInput.value = diffDays;
+        function cargarProvincias() {
+            const selectProvincia = document.querySelector('select[asp-for="provincia"]');
+            if (!selectProvincia) {
+                console.error('❌ No se encontró el elemento provincia');
+                return;
+            }
+
+            selectProvincia.innerHTML = '<option value="">Seleccione una provincia</option>';
+            provinciasCR.forEach(provincia => {
+                const option = document.createElement('option');
+                option.value = provincia;
+                option.textContent = provincia;
+                selectProvincia.appendChild(option);
+            });
+        }
+
+        function inicializarStepper() {
+            let currentStep = 1;
+            const totalSteps = 5;
+
+            // Elementos del DOM
+            const stepCounter = document.getElementById('stepCounter');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const stepItems = document.querySelectorAll('.step-item');
+
+            // Inicializar
+            updateStepDisplay();
+
+            // Navegación entre pasos
+            prevBtn.addEventListener('click', function() {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateStepDisplay();
+                }
+            });
+
+            nextBtn.addEventListener('click', function() {
+                if (currentStep < totalSteps && validateCurrentStep()) {
+                    currentStep++;
+                    updateStepDisplay();
+                }
+            });
+
+            // Navegación por el stepper
+            stepItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const step = parseInt(this.getAttribute('data-step'));
+                    if (step <= currentStep) {
+                        currentStep = step;
+                        updateStepDisplay();
+                    }
+                });
+            });
+
+            function validateCurrentStep() {
+                const currentStepElement = document.getElementById(`step${currentStep}`);
+                if (!currentStepElement) {
+                    console.error(`❌ No se encontró el paso ${currentStep}`);
+                    return false;
+                }
+
+                const requiredFields = currentStepElement.querySelectorAll('[required]');
+                let isValid = true;
+                let firstInvalidField = null;
+
+                requiredFields.forEach(field => {
+                    const value = field.value ? field.value.trim() : '';
+                    const fieldType = field.type;
+                    const tagName = field.tagName.toLowerCase();
+
+                    field.classList.remove('is-invalid');
+
+                    let fieldValid = true;
+
+                    if (tagName === 'select') {
+                        fieldValid = field.value !== '' && field.value !== null;
+                    } else if (fieldType === 'number') {
+                        fieldValid = value !== '' && !isNaN(value);
+                    } else if (fieldType === 'date') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'checkbox') {
+                        fieldValid = field.checked;
+                    } else {
+                        fieldValid = value !== '';
+                    }
+
+                    if (!fieldValid) {
+                        isValid = false;
+                        field.classList.add('is-invalid');
+                        if (!firstInvalidField) {
+                            firstInvalidField = field;
+                        }
+                    }
+                });
+
+                if (!isValid) {
+                    showValidationError('Por favor complete todos los campos requeridos antes de continuar.');
+                    if (firstInvalidField) {
+                        firstInvalidField.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        firstInvalidField.focus();
+                    }
                 } else {
-                    daysInput.value = '';
+                    hideValidationError();
+                }
+
+                return isValid;
+            }
+
+            function showValidationError(message) {
+                hideValidationError();
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
+                errorDiv.innerHTML = `
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+
+                const currentStepContent = document.getElementById(`step${currentStep}`);
+                if (currentStepContent) {
+                    currentStepContent.appendChild(errorDiv);
                 }
             }
 
-            // Event listeners para calcular días cuando cambian las fechas
-            startDateInput.addEventListener('change', calculateDays);
-            endDateInput.addEventListener('change', calculateDays);
+            function hideValidationError() {
+                for (let i = 1; i <= totalSteps; i++) {
+                    const stepContent = document.getElementById(`step${i}`);
+                    if (stepContent) {
+                        const existingAlert = stepContent.querySelector('.alert');
+                        if (existingAlert) {
+                            existingAlert.remove();
+                        }
+                    }
+                }
+            }
 
-            // Manejar el envío del formulario
-            form.addEventListener('submit', function(e) {
+            function updateStepDisplay() {
+                // Actualizar contador
+                if (stepCounter) {
+                    stepCounter.textContent = `${currentStep}/${totalSteps}`;
+                }
+
+                // Mostrar/ocultar contenido de pasos
+                document.querySelectorAll('.step-content').forEach((content, index) => {
+                    if (index + 1 === currentStep) {
+                        content.classList.remove('d-none');
+                    } else {
+                        content.classList.add('d-none');
+                    }
+                });
+
+                // Actualizar estado de botones
+                prevBtn.disabled = currentStep === 1;
+
+                if (currentStep === totalSteps) {
+                    nextBtn.classList.add('d-none');
+                    submitBtn.classList.remove('d-none');
+                } else {
+                    nextBtn.classList.remove('d-none');
+                    submitBtn.classList.add('d-none');
+                }
+
+                // Actualizar estado visual del stepper
+                stepItems.forEach((item, index) => {
+                    const stepNumber = index + 1;
+                    const stepIcon = item.querySelector('.step-icon');
+                    const stepTitle = item.querySelector('.step-title');
+
+                    item.classList.remove('active', 'completed');
+                    stepIcon.classList.remove('active', 'completed', 'inactive');
+
+                    if (stepNumber === currentStep) {
+                        item.classList.add('active');
+                        stepIcon.classList.add('active');
+                    } else if (stepNumber < currentStep) {
+                        item.classList.add('completed');
+                        stepIcon.classList.add('completed');
+                    } else {
+                        stepIcon.classList.add('inactive');
+                    }
+                });
+
+                hideValidationError();
+                document.querySelectorAll('.is-invalid').forEach(field => {
+                    field.classList.remove('is-invalid');
+                });
+            }
+
+            // Agregar estilos CSS para los campos inválidos
+            const style = document.createElement('style');
+            style.textContent = `
+                .is-invalid {
+                    border-color: #dc3545 !important;
+                    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+                }
+                .alert {
+                    border-radius: 8px;
+                    margin-bottom: 1rem;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Manejar envío del formulario
+            submitBtn.addEventListener('click', function(e) {
                 e.preventDefault();
 
-                // Recopilar datos del formulario
-                const formData = {
-                    employeeId: document.getElementById('employeeId').value,
-                    employeeName: document.getElementById('employeeName').value,
-                    permissionType: document.getElementById('permissionType').value,
-                    startDate: startDateInput.value,
-                    endDate: endDateInput.value,
-                    days: daysInput.value,
-                    reason: document.getElementById('reason').value,
-                    status: document.getElementById('status').value,
-                    notes: document.getElementById('notes').value
-                };
+                // Validar TODOS los pasos antes de enviar
+                let allStepsValid = true;
+                const invalidFields = [];
 
-                console.log('Datos del permiso:', formData);
+                for (let step = 1; step <= totalSteps; step++) {
+                    const stepElement = document.getElementById(`step${step}`);
+                    if (!stepElement) continue;
 
-                // Aquí iría la lógica para guardar el permiso
-                // ...
+                    const requiredFields = stepElement.querySelectorAll('[required]');
 
-                // Cerrar el modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('permissionModal'));
-                modal.hide();
+                    requiredFields.forEach(field => {
+                        const value = field.value ? field.value.trim() : '';
+                        const fieldType = field.type;
+                        const tagName = field.tagName.toLowerCase();
 
-                // Resetear el formulario
-                form.reset();
+                        let fieldValid = true;
+
+                        if (tagName === 'select') {
+                            fieldValid = field.value !== '' && field.value !== null;
+                        } else if (fieldType === 'number') {
+                            fieldValid = value !== '' && !isNaN(value) && Number(value) > 0;
+                        } else if (fieldType === 'date') {
+                            fieldValid = value !== '';
+                        } else if (fieldType === 'checkbox') {
+                            fieldValid = field.checked;
+                        } else {
+                            fieldValid = value !== '';
+                        }
+
+                        if (!fieldValid) {
+                            allStepsValid = false;
+                            field.classList.add('is-invalid');
+                            invalidFields.push(field);
+                        } else {
+                            field.classList.remove('is-invalid');
+                        }
+                    });
+                }
+
+                if (allStepsValid) {
+                    const formData = collectFormData();
+
+                    if (formData) {
+                        // Aquí puedes enviar el formulario
+                        document.getElementById('employeeForm').submit();
+                    } else {
+                        showValidationError('Error al recolectar los datos del formulario.');
+                    }
+                } else {
+                    showValidationError('Por favor complete todos los campos requeridos en todos los pasos antes de enviar el formulario.');
+                    if (invalidFields.length > 0) {
+                        invalidFields[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        invalidFields[0].focus();
+                    }
+                }
             });
-        });
+        }
+
+        function inicializarLicencias() {
+            const checkboxes = document.querySelectorAll('.licencia-checkbox');
+            const containerSeleccionadas = document.getElementById('licenciasSeleccionadas');
+            const inputHidden = document.getElementById('licencias');
+
+            let licenciasSeleccionadas = [];
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        agregarLicencia(this.value);
+                    } else {
+                        removerLicencia(this.value);
+                    }
+                    actualizarInterfaz();
+                });
+            });
+
+            function agregarLicencia(licencia) {
+                if (!licenciasSeleccionadas.includes(licencia)) {
+                    licenciasSeleccionadas.push(licencia);
+                }
+            }
+
+            function removerLicencia(licencia) {
+                licenciasSeleccionadas = licenciasSeleccionadas.filter(lic => lic !== licencia);
+            }
+
+            function actualizarInterfaz() {
+                if (licenciasSeleccionadas.length > 0) {
+                    containerSeleccionadas.innerHTML = '';
+                    licenciasSeleccionadas.forEach(licencia => {
+                        const tag = document.createElement('span');
+                        tag.className = 'licencia-tag';
+                        tag.innerHTML = `
+                            ${licencia}
+                            <button type="button" class="btn-close btn-close-white"
+                                    onclick="removerLicenciaDesdeTag('${licencia}')"></button>
+                        `;
+                        containerSeleccionadas.appendChild(tag);
+                    });
+                } else {
+                    containerSeleccionadas.innerHTML = '<span class="text-muted">No hay licencias seleccionadas</span>';
+                }
+
+                inputHidden.value = licenciasSeleccionadas.join(',');
+                validarLicencias();
+            }
+
+            function validarLicencias() {
+                if (licenciasSeleccionadas.length > 0) {
+                    inputHidden.classList.remove('is-invalid');
+                } else {
+                    inputHidden.classList.add('is-invalid');
+                }
+            }
+
+            // Hacer función global para los tags
+            window.removerLicenciaDesdeTag = function(licencia) {
+                removerLicencia(licencia);
+                actualizarInterfaz();
+            };
+
+            validarLicencias();
+        }
+
+        function inicializarSwitchHijos() {
+            const hijosSwitch = document.getElementById('hijosSwitch');
+            const noHijosInput = document.getElementById('noHijos');
+
+            hijosSwitch.addEventListener('change', function() {
+                noHijosInput.disabled = !this.checked;
+                if (!this.checked) {
+                    noHijosInput.value = '';
+                }
+            });
+        }
     </script>
 </body>
 </html>

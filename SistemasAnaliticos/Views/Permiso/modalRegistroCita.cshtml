@@ -35,6 +35,28 @@
             border-top: 1px solid #dee2e6;
             padding-top: 1.25rem;
         }
+
+        /* ESTILOS IDÉNTICOS AL FORMULARIO DE EMPLEADOS */
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
     </style>
 </head>
 <body>
@@ -53,43 +75,48 @@
                     <input type="hidden" asp-for="tipo" value="Cita Médica" />
 
                     <div class="modal-body">
+                        <!-- Contenedor para mensajes de validación -->
+                        <div id="validationAlerts"></div>
+
                         <div>
                             <!-- Fechas y Días -->
                             <div class="row mb-3">
                                 <div class="col-md-6 mt-1">
-                                    <label for="startDate" class="form-label fw-semibold required-field">
-                                        Fecha Inicio
-                                    </label>
+                                    <label class="form-label required-field">Fecha Inicio</label>
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaInicio"
+                                           id="fechaInicio"
                                            required>
+                                    <div class="invalid-feedback">Por favor seleccione la fecha de inicio</div>
                                 </div>
                                 <div class="col-md-6 mt-1">
-                                    <label for="endDate" class="form-label fw-semibold required-field">
-                                        Fecha Fin 
-                                    </label>
+                                    <label class="form-label required-field">Fecha Fin</label>
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaFinalizacion"
+                                           id="fechaFinalizacion"
                                            required>
+                                    <div class="invalid-feedback">Por favor seleccione la fecha de finalización</div>
                                 </div>
 
                                 <div class="col-md-6 mt-4 mb-2">
-                                    <label for="endDate" class="form-label fw-semibold required-field">
-                                        Fecha de Regreso Laboral
-                                    </label>
+                                    <label class="form-label required-field">Fecha de Regreso Laboral</label>
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaRegresoLaboral"
+                                           id="fechaRegresoLaboral"
                                            required>
+                                    <div class="invalid-feedback">Por favor seleccione la fecha de regreso laboral</div>
                                 </div>
                                 <div class="col-md-6 mt-4 mb-2">
-                                    <label for="endTime" class="form-label fw-semibold">
-                                        Hora de la Cita
-                                        <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="time" class="form-control" asp-for="horaCita" required>
+                                    <label class="form-label required-field">Hora de la Cita</label>
+                                    <input type="time"
+                                           class="form-control"
+                                           asp-for="horaCita"
+                                           id="horaCita"
+                                           required>
+                                    <div class="invalid-feedback">Por favor seleccione la hora de la cita</div>
                                 </div>
                             </div>
                         </div>
@@ -97,24 +124,22 @@
                         <div class="section-divider p-0 row">
                             <!-- Motivo -->
                             <div class="col-md-6 mt-3 mb-3">
-                                <label for="reason" class="form-label fw-semibold">
-                                    Motivo <span class="text-danger">*</span>
-                                </label>
+                                <label class="form-label required-field">Motivo</label>
                                 <textarea class="form-control"
                                           asp-for="motivo"
+                                          id="motivo"
                                           rows="3"
                                           placeholder="Describe el motivo de la cita..."
                                           required></textarea>
+                                <div class="invalid-feedback">Por favor ingrese el motivo de la cita</div>
                             </div>
                             <div class="col-md-6 mt-3 mb-3">
-                                <label for="reason" class="form-label fw-semibold">
-                                    Comentarios
-                                </label>
+                                <label class="form-label">Comentarios</label>
                                 <textarea class="form-control"
                                           asp-for="comentarios"
+                                          id="comentarios"
                                           rows="3"
-                                          placeholder="Nota..."
-                                          required></textarea>
+                                          placeholder="Nota..."></textarea>
                             </div>
                         </div>
 
@@ -122,16 +147,23 @@
                             <!-- Foto -->
                             <div>
                                 <div>
-                                    <label asp-for="fotoFile" class="form-label fw-semibold">Foto relacionada</label>
-                                    <input asp-for="fotoFile" type="file" class="form-control" @* accept=".jpg,.jpeg,.png" *@ />
-@*                                     <div class="form-text" style="">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
- *@                                </div>
+                                    <label asp-for="fotoFile" class="form-label">Foto relacionada</label>
+                                    <input asp-for="fotoFile"
+                                           type="file"
+                                           class="form-control"
+                                           id="fotoFile"
+                                           accept=".jpg,.jpeg,.png" />
+                                    <div class="form-text">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
+                                </div>
                             </div>
 
                             <!-- Datos Adjuntos -->
                             <div class="mt-4">
-                                <label class="form-label fw-semibold">Datos Adjuntos</label>
-                                <input asp-for="adjuntoFile" type="file" class="form-control">
+                                <label class="form-label">Datos Adjuntos</label>
+                                <input asp-for="adjuntoFile"
+                                       type="file"
+                                       class="form-control"
+                                       id="adjuntoFile">
                             </div>
                         </div>
                     </div>
@@ -139,7 +171,7 @@
                     <!-- Footer -->
                     <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary-custom text-white">
+                        <button type="button" class="btn btn-primary-custom text-white" id="submitBtn">
                             <i class="bi bi-save me-2"></i>Guardar
                         </button>
                     </div>
@@ -150,5 +182,200 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // SISTEMA IDÉNTICO AL FORMULARIO DE EMPLEADOS
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarValidacion();
+        });
+
+        function inicializarValidacion() {
+            const submitBtn = document.getElementById('submitBtn');
+
+            // MANEJAR ENVÍO IDÉNTICO AL DE EMPLEADOS
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Validar TODOS los campos antes de enviar
+                let formularioValido = true;
+                const invalidFields = [];
+
+                // Obtener todos los campos requeridos
+                const requiredFields = document.querySelectorAll('[required]');
+
+                // Validar cada campo requerido
+                requiredFields.forEach(field => {
+                    const value = field.value ? field.value.trim() : '';
+                    const fieldType = field.type;
+                    const tagName = field.tagName.toLowerCase();
+
+                    // Limpiar estado previo
+                    field.classList.remove('is-invalid');
+
+                    let fieldValid = true;
+
+                    // MISMA LÓGICA DE VALIDACIÓN QUE EN EMPLEADOS
+                    if (tagName === 'select') {
+                        fieldValid = field.value !== '' && field.value !== null;
+                    } else if (fieldType === 'number') {
+                        fieldValid = value !== '' && !isNaN(value);
+                    } else if (fieldType === 'date') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'time') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'checkbox') {
+                        fieldValid = field.checked;
+                    } else {
+                        fieldValid = value !== '';
+                    }
+
+                    // Si el campo es inválido, marcar error
+                    if (!fieldValid) {
+                        formularioValido = false;
+                        field.classList.add('is-invalid');
+                        invalidFields.push(field);
+                    }
+                });
+
+                // Validación adicional de fechas
+                if (!validarFechas()) {
+                    formularioValido = false;
+                }
+
+                // MOSTRAR ERRORES COMO EN EMPLEADOS
+                if (!formularioValido) {
+                    showValidationError('Por favor complete todos los campos requeridos antes de enviar el formulario.');
+
+                    if (invalidFields.length > 0) {
+                        // Comportamiento idéntico: scroll y focus al primer error
+                        invalidFields[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        invalidFields[0].focus();
+                    }
+                } else {
+                    hideValidationError();
+                    // Si todo está válido, enviar el formulario
+                    document.getElementById('citaForm').submit();
+                }
+            });
+
+            // Validación en tiempo real (opcional, para mejor UX)
+            const requiredFields = document.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                field.addEventListener('blur', function() {
+                    validarCampoIndividual(this);
+                });
+            });
+        }
+
+        // FUNCIÓN PARA VALIDACIÓN INDIVIDUAL (MEJORA UX)
+        function validarCampoIndividual(campo) {
+            const valor = campo.value ? campo.value.trim() : '';
+            const tipo = campo.type;
+            const tagName = campo.tagName.toLowerCase();
+
+            let esValido = true;
+
+            if (tagName === 'select') {
+                esValido = campo.value !== '' && campo.value !== null;
+            } else if (tipo === 'number') {
+                esValido = valor !== '' && !isNaN(valor);
+            } else if (tipo === 'date' || tipo === 'time') {
+                esValido = valor !== '';
+            } else if (tipo === 'checkbox') {
+                esValido = campo.checked;
+            } else {
+                esValido = valor !== '';
+            }
+
+            if (esValido) {
+                campo.classList.remove('is-invalid');
+            } else {
+                campo.classList.add('is-invalid');
+            }
+
+            return esValido;
+        }
+
+        // VALIDACIÓN DE FECHAS ESPECÍFICA
+        function validarFechas() {
+            const fechaInicio = document.getElementById('fechaInicio');
+            const fechaFin = document.getElementById('fechaFinalizacion');
+            const fechaRegreso = document.getElementById('fechaRegresoLaboral');
+
+            let fechasValidas = true;
+
+            // Validar que fecha fin no sea anterior a fecha inicio
+            if (fechaInicio.value && fechaFin.value) {
+                const inicio = new Date(fechaInicio.value);
+                const fin = new Date(fechaFin.value);
+
+                if (fin < inicio) {
+                    showValidationError('La fecha de fin no puede ser anterior a la fecha de inicio.');
+                    fechaFin.classList.add('is-invalid');
+                    fechasValidas = false;
+                }
+            }
+
+            // Validar que fecha regreso no sea anterior a fecha fin
+            if (fechaRegreso.value && fechaFin.value) {
+                const fin = new Date(fechaFin.value);
+                const regreso = new Date(fechaRegreso.value);
+
+                if (regreso < fin) {
+                    showValidationError('La fecha de regreso laboral no puede ser anterior a la fecha de fin de la cita.');
+                    fechaRegreso.classList.add('is-invalid');
+                    fechasValidas = false;
+                }
+            }
+
+            return fechasValidas;
+        }
+
+        // FUNCIONES DE MENSAJES IDÉNTICAS
+        function showValidationError(mensaje) {
+            hideValidationError();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const validationContainer = document.getElementById('validationAlerts');
+            if (validationContainer) {
+                validationContainer.appendChild(alertDiv);
+            }
+        }
+
+        function hideValidationError() {
+            const validationContainer = document.getElementById('validationAlerts');
+            if (validationContainer) {
+                validationContainer.innerHTML = '';
+            }
+        }
+
+        // VALIDACIÓN EN TIEMPO REAL PARA FECHAS
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaFields = ['fechaInicio', 'fechaFinalizacion', 'fechaRegresoLaboral'];
+
+            fechaFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('change', function() {
+                        // Solo validar si el campo ya tenía error
+                        if (this.classList.contains('is-invalid')) {
+                            validarCampoIndividual(this);
+                        }
+                        validarFechas();
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
