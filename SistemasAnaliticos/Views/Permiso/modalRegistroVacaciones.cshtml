@@ -5,7 +5,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modal de Permisos</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -35,6 +34,28 @@
             border-top: 1px solid #dee2e6;
             padding-top: 1.25rem;
         }
+
+        /* ESTILOS IDÉNTICOS AL FORMULARIO DE EMPLEADOS */
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
     </style>
 </head>
 <body>
@@ -49,39 +70,39 @@
                 </div>
 
                 <!-- Form -->
-                <form id="citaForm" asp-controller="Permiso" asp-action="Create" method="post" enctype="multipart/form-data">
+                <form id="vacasForm" asp-controller="Permiso" asp-action="Create" method="post" enctype="multipart/form-data">
                     <input type="hidden" asp-for="tipo" value="Vacaciones" />
                     
                     <div class="modal-body">
+                        <!-- Contenedor para mensajes de validación -->
+                        <div id="validationAlertsVacas"></div>
+
                         <div>
                             <!-- Fechas y Días -->
                             <div class="row mb-3">
                                 <div class="col-md-4 mt-1 mb-2">
-                                    <label for="startDate" class="form-label fw-semibold">
-                                        Fecha Inicio <span class="text-danger">*</span>
-                                    </label>
+                                    <label class="form-label required-field">Fecha Inicio</label>
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaInicio"
+                                           id="fechaInicioVacas"
                                            required>
                                 </div>
                                 <div class="col-md-4 mt-1 mb-2">
-                                    <label for="endDate" class="form-label fw-semibold">
-                                        Fecha Fin <span class="text-danger">*</span>
-                                    </label>
+                                    <label class="form-label required-field">Fecha Fin</label>
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaFinalizacion"
+                                           id="fechaFinalizacionVacas"
                                            required>
                                 </div>
 
                                 <div class="col-md-4 mt-1 mb-2">
-                                    <label for="endDate" class="form-label fw-semibold">
-                                        Fecha de Regreso Laboral <span class="text-danger">*</span>
-                                    </label>
+                                    <label class="form-label required-field">Fecha de Regreso Laboral</label>
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaRegresoLaboral"
+                                           id="fechaRegresoLaboralVacas"
                                            required>
                                 </div>
                             </div>
@@ -90,31 +111,37 @@
                         <div class="section-divider">
                             <!-- Motivo -->
                             <div class="mb-3">
-                                <label for="reason" class="form-label fw-semibold">
-                                    Comentarios
-                                </label>
+                                <label class="form-label">Comentarios</label>
                                 <textarea class="form-control"
                                           rows="3"
                                           placeholder="Alguna nota..."
+                                          id="comentariosVacas"
                                           asp-for="comentarios"
                                           required></textarea>
                             </div>
                         </div>
 
                         <div class="section-divider">
-                            <!-- Foto -->
                             <div>
+                                <!-- Foto -->
                                 <div>
-                                    <label class="form-label fw-semibold">Foto relacionada</label>
-                                    <input asp-for="fotoFile" type="file" class="form-control" @* accept=".jpg,.jpeg,.png" *@ />
-@*                                     <div class="form-text" style="">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
- *@                                </div>
-                            </div>
+                                    <label asp-for="fotoFile" class="form-label">Foto relacionada</label>
+                                    <input asp-for="fotoFile"
+                                           type="file"
+                                           class="form-control"
+                                           id="fotoFileVacas"
+                                           accept=".jpg,.jpeg,.png" />
+                                    <div class="form-text">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
+                                </div>
 
-                            <!-- Datos Adjuntos -->
-                            <div class="mt-4">
-                                <label class="form-label fw-semibold">Dato Adjunto</label>
-                                <input asp-for="adjuntoFile" type="file" class="form-control">
+                                <!-- Datos Adjuntos -->
+                                <div class="mt-4">
+                                    <label class="form-label">Datos Adjuntos</label>
+                                    <input asp-for="adjuntoFile"
+                                           type="file"
+                                           class="form-control"
+                                           id="adjuntoFileVacas">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -122,7 +149,7 @@
                     <!-- Footer -->
                     <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary-custom text-white">
+                        <button type="button" class="btn btn-primary-custom text-white" id="submitBtnVacas">
                             <i class="bi bi-save me-2"></i>Guardar
                         </button>
                     </div>
@@ -134,5 +161,228 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script>
+        // SISTEMA DE VALIDACIÓN ESPECÍFICO
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarValidacionVacas();
+            inicializarResetVacas();
+        });
+
+        function inicializarResetVacas() {
+            const modal = document.getElementById('createVacacionesModal');
+            const form = document.getElementById('vacasForm');
+            const cancelBtn = document.querySelector('.btn-outline-secondary');
+
+            // Resetear cuando el modal se cierra
+            modal.addEventListener('hidden.bs.modal', resetearFormularioVacas);
+
+            // Resetear cuando se hace clic en Cancelar
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', resetearFormularioVacas);
+            }
+        }
+
+        function resetearFormularioVacas() {
+            const form = document.getElementById('vacasForm');
+
+            // 1. Resetear valores del formulario
+            form.reset();
+
+            // 2. Limpiar todas las clases de validación
+            const campos = form.querySelectorAll('.form-control, .form-select');
+            campos.forEach(campo => {
+                campo.classList.remove('is-invalid');
+                campo.classList.remove('is-valid');
+            });
+
+            // 3. Limpiar mensajes de validación
+            hideValidationErrorVacas();
+
+            // 4. Opcional: Limpiar el texto del tipo de permiso
+            const tipoTexto = document.getElementById('tipoTexto');
+            if (tipoTexto) tipoTexto.textContent = '';
+
+            console.log('Formulario de permisos reseteado');
+        }
+
+        function inicializarValidacionVacas() {
+            const submitBtn = document.getElementById('submitBtnVacas');
+
+            // MANEJAR ENVÍO
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Validar TODOS los campos antes de enviar
+                let formularioValido = true;
+                const invalidFields = [];
+
+                // Obtener todos los campos requeridos dentro de este modal
+                const requiredFields = document.querySelectorAll('#createVacacionesModal [required]');
+
+                // Validar cada campo requerido
+                requiredFields.forEach(field => {
+                    const value = field.value ? field.value.trim() : '';
+                    const fieldType = field.type;
+                    const tagName = field.tagName.toLowerCase();
+
+                    // Limpiar estado previo
+                    field.classList.remove('is-invalid');
+
+                    let fieldValid = true;
+
+                    if (tagName === 'select') {
+                        fieldValid = field.value !== '' && field.value !== null;
+                    } else if (fieldType === 'number') {
+                        fieldValid = value !== '' && !isNaN(value);
+                    } else if (fieldType === 'date') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'time') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'checkbox') {
+                        fieldValid = field.checked;
+                    } else {
+                        fieldValid = value !== '';
+                    }
+
+                    // Si el campo es inválido, marcar error
+                    if (!fieldValid) {
+                        formularioValido = false;
+                        field.classList.add('is-invalid');
+                        invalidFields.push(field);
+                    }
+                });
+
+                // Validación adicional de fechas específica
+                if (!validarFechasVacas()) {
+                    formularioValido = false;
+                }
+
+                // MOSTRAR ERRORES
+                if (!formularioValido) {
+                    showValidationErrorVacas('Por favor complete todos los campos requeridos antes de enviar el formulario.');
+
+                    if (invalidFields.length > 0) {
+                        invalidFields[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        invalidFields[0].focus();
+                    }
+                } else {
+                    hideValidationErrorVacas();
+                    document.getElementById('vacasForm').submit();
+                }
+            });
+
+            // Validación en tiempo real
+            const requiredFields = document.querySelectorAll('#createVacacionesModal [required]');
+            requiredFields.forEach(field => {
+                field.addEventListener('blur', function() {
+                    validarCampoIndividualVacas(this);
+                });
+            });
+        }
+
+        function validarCampoIndividualVacas(campo) {
+            const valor = campo.value ? campo.value.trim() : '';
+            const tipo = campo.type;
+            const tagName = campo.tagName.toLowerCase();
+
+            let esValido = true;
+
+            if (tagName === 'select') {
+                esValido = campo.value !== '' && campo.value !== null;
+            } else if (tipo === 'number') {
+                esValido = valor !== '' && !isNaN(valor);
+            } else if (tipo === 'date' || tipo === 'time') {
+                esValido = valor !== '';
+            } else if (tipo === 'checkbox') {
+                esValido = campo.checked;
+            } else {
+                esValido = valor !== '';
+            }
+
+            if (esValido) {
+                campo.classList.remove('is-invalid');
+            } else {
+                campo.classList.add('is-invalid');
+            }
+
+            return esValido;
+        }
+
+        function validarFechasVacas() {
+            const fechaInicio = document.getElementById('fechaInicioVacas');
+            const fechaFin = document.getElementById('fechaFinalizacionVacas');
+            const fechaRegreso = document.getElementById('fechaRegresoLaboralVacas');
+
+            let fechasValidas = true;
+
+            if (fechaInicio.value && fechaFin.value) {
+                const inicio = new Date(fechaInicio.value);
+                const fin = new Date(fechaFin.value);
+
+                if (fin < inicio) {
+                    showValidationErrorVacas('La fecha de fin no puede ser anterior a la fecha de inicio.');
+                    fechaFin.classList.add('is-invalid');
+                    fechasValidas = false;
+                }
+            }
+
+            if (fechaRegreso.value && fechaFin.value) {
+                const fin = new Date(fechaFin.value);
+                const regreso = new Date(fechaRegreso.value);
+
+                if (regreso < fin) {
+                    showValidationErrorVacas('La fecha de regreso laboral no puede ser anterior a la fecha de fin de las vacaciones.');
+                    fechaRegreso.classList.add('is-invalid');
+                    fechasValidas = false;
+                }
+            }
+
+            return fechasValidas;
+        }
+
+        function showValidationErrorVacas(mensaje) {
+            hideValidationErrorVacas();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const validationContainer = document.getElementById('validationAlertsVacas');
+            if (validationContainer) {
+                validationContainer.appendChild(alertDiv);
+            }
+        }
+
+        function hideValidationErrorVacas() {
+            const validationContainer = document.getElementById('validationAlertsVacas');
+            if (validationContainer) {
+                validationContainer.innerHTML = '';
+            }
+        }
+
+        // VALIDACIÓN EN TIEMPO REAL PARA FECHAS
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaFields = ['fechaInicioVacas', 'fechaFinalizacionVacas', 'fechaRegresoLaboralVacas'];
+
+            fechaFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('change', function() {
+                        if (this.classList.contains('is-invalid')) {
+                            validarCampoIndividualVacas(this);
+                        }
+                        validarFechasVacas();
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

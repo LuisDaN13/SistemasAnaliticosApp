@@ -34,6 +34,27 @@
             border-top: 1px solid #dee2e6;
             padding-top: 1.25rem;
         }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
     </style>
 </head>
 <body>
@@ -50,37 +71,37 @@
                 <!-- Form -->
                 <form id="otrosForm" asp-controller="Permiso" asp-action="Create" method="post" enctype="multipart/form-data">
                     <input type="hidden" asp-for="tipo" id="tipoPermiso" value="" />
-                    
+
                     <div class="modal-body">
+                        <!-- Contenedor para mensajes de validación -->
+                        <div id="validationAlertsOtros"></div>
+
                         <div>
                             <!-- Fechas y Días -->
                             <div class="row mb-3">
                                 <div class="col-md-4 mt-1 mb-2">
-                                    <label for="startDate" class="form-label fw-semibold">
-                                        Fecha Inicio <span class="text-danger">*</span>
-                                    </label>
+                                    <label class="form-label required-field">Fecha Inicio</label>
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaInicio"
+                                           id="fechaInicioOtros"
                                            required>
                                 </div>
                                 <div class="col-md-4 mt-1 mb-2">
-                                    <label for="endDate" class="form-label fw-semibold">
-                                        Fecha Fin <span class="text-danger">*</span>
-                                    </label>
+                                    <label class="form-label required-field">Fecha Fin</label>
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaFinalizacion"
+                                           id="fechaFinalizacionOtros"
                                            required>
                                 </div>
 
                                 <div class="col-md-4 mt-1 mb-2">
-                                    <label for="endDate" class="form-label fw-semibold">
-                                        Fecha de Regreso Laboral <span class="text-danger">*</span>
-                                    </label>
+                                    <label class="form-label required-field">Fecha de Regreso Laboral</label>
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaRegresoLaboral"
+                                           id="fechaRegresoLaboralOtros"
                                            required>
                                 </div>
                             </div>
@@ -89,24 +110,21 @@
                         <div class="section-divider p-0 row">
                             <!-- Motivo -->
                             <div class="col-md-6 mt-3 mb-3">
-                                <label for="reason" class="form-label fw-semibold">
-                                    Motivo <span class="text-danger">*</span>
-                                </label>
+                                <label class="form-label required-field">Motivo</label>
                                 <textarea class="form-control"
                                           asp-for="motivo"
+                                          id="motivoOtros"
                                           rows="3"
-                                          placeholder="Describe el motivo de la cita..."
+                                          placeholder="Describe el motivo del permiso..."
                                           required></textarea>
                             </div>
                             <div class="col-md-6 mt-3 mb-3">
-                                <label for="reason" class="form-label fw-semibold">
-                                    Comentarios
-                                </label>
+                                <label class="form-label">Comentarios</label>
                                 <textarea class="form-control"
                                           asp-for="comentarios"
+                                          id="comentariosOtros"
                                           rows="3"
-                                          placeholder="Nota..."
-                                          required></textarea>
+                                          placeholder="Nota..."></textarea>
                             </div>
                         </div>
 
@@ -114,16 +132,22 @@
                             <!-- Foto -->
                             <div>
                                 <div>
-                                    <label class="form-label fw-semibold">Foto relacionada</label>
-                                    <input asp-for="fotoFile" type="file" class="form-control" @* accept=".jpg,.jpeg,.png" *@ />
-                                    @*                                     <div class="form-text" style="">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
- *@                                </div>
+                                    <label class="form-label">Foto relacionada</label>
+                                    <input asp-for="fotoFile"
+                                           type="file"
+                                           class="form-control"
+                                           id="fotoFileOtros"
+                                           accept=".jpg,.jpeg,.png" />
+                                </div>
                             </div>
 
                             <!-- Datos Adjuntos -->
                             <div class="mt-4">
-                                <label class="form-label fw-semibold">Datos Adjuntos</label>
-                                <input asp-for="adjuntoFile" type="file" class="form-control">
+                                <label class="form-label">Datos Adjuntos</label>
+                                <input asp-for="adjuntoFile"
+                                       type="file"
+                                       class="form-control"
+                                       id="adjuntoFileOtros">
                             </div>
                         </div>
                     </div>
@@ -131,7 +155,7 @@
                     <!-- Footer -->
                     <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary-custom text-white">
+                        <button type="button" class="btn btn-primary-custom text-white" id="submitBtnOtros">
                             <i class="bi bi-save me-2"></i>Guardar
                         </button>
                     </div>
@@ -145,77 +169,228 @@
 
     <!-- Pasar palabra de los Botones -->
     <script>
-        const modal = document.getElementById('createOtrosPermisosModal');
+        const modalOtros = document.getElementById('createOtrosPermisosModal');
 
-        modal.addEventListener('show.bs.modal', function (event) {
-            // El botón que abrió el modal
+        modalOtros.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
-
-            // Obtiene el valor del atributo personalizado
             const tipo = button.getAttribute('data-tipo');
 
-            // Muestra el texto en el header del modal
             document.getElementById('tipoTexto').textContent = tipo;
-
-            // Asigna el valor al input hidden
             document.getElementById('tipoPermiso').value = tipo;
         });
     </script>
 
     <!-- JavaScript para la funcionalidad -->
     <script>
+        // SISTEMA DE VALIDACIÓN ESPECÍFICO PARA OTROS PERMISOS
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('permissionForm');
-            const startDateInput = document.getElementById('startDate');
-            const endDateInput = document.getElementById('endDate');
-            const daysInput = document.getElementById('days');
+            inicializarValidacionOtros();
+            inicializarResetOtros();
+        });
 
-            // Función para calcular días
-            function calculateDays() {
-                const startDate = new Date(startDateInput.value);
-                const endDate = new Date(endDateInput.value);
+        function inicializarResetOtros() {
+            const modal = document.getElementById('createOtrosPermisosModal');
+            const form = document.getElementById('otrosForm');
+            const cancelBtn = document.querySelector('.btn-outline-secondary');
 
-                if (startDate && endDate && startDate <= endDate) {
-                    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    daysInput.value = diffDays;
+            // Resetear cuando el modal se cierra
+            modal.addEventListener('hidden.bs.modal', resetearFormularioOtros);
+
+            // Resetear cuando se hace clic en Cancelar
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', resetearFormularioOtros);
+            }
+        }
+
+        function resetearFormularioOtros() {
+            const form = document.getElementById('otrosForm');
+
+            // 1. Resetear valores del formulario
+            form.reset();
+
+            // 2. Limpiar todas las clases de validación
+            const campos = form.querySelectorAll('.form-control, .form-select');
+            campos.forEach(campo => {
+                campo.classList.remove('is-invalid');
+                campo.classList.remove('is-valid');
+            });
+
+            // 3. Limpiar mensajes de validación
+            hideValidationErrorOtros();
+
+            // 4. Opcional: Limpiar el texto del tipo de permiso
+            const tipoTexto = document.getElementById('tipoTexto');
+            if (tipoTexto) tipoTexto.textContent = '';
+
+            console.log('Formulario de permisos reseteado');
+        }
+
+        function inicializarValidacionOtros() {
+            const submitBtn = document.getElementById('submitBtnOtros');
+
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                let formularioValido = true;
+                const invalidFields = [];
+
+                const requiredFields = document.querySelectorAll('#createOtrosPermisosModal [required]');
+
+                requiredFields.forEach(field => {
+                    const value = field.value ? field.value.trim() : '';
+                    const fieldType = field.type;
+                    const tagName = field.tagName.toLowerCase();
+
+                    field.classList.remove('is-invalid');
+
+                    let fieldValid = true;
+
+                    if (tagName === 'select') {
+                        fieldValid = field.value !== '' && field.value !== null;
+                    } else if (fieldType === 'number') {
+                        fieldValid = value !== '' && !isNaN(value);
+                    } else if (fieldType === 'date') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'time') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'checkbox') {
+                        fieldValid = field.checked;
+                    } else {
+                        fieldValid = value !== '';
+                    }
+
+                    if (!fieldValid) {
+                        formularioValido = false;
+                        field.classList.add('is-invalid');
+                        invalidFields.push(field);
+                    }
+                });
+
+                if (!validarFechasOtros()) {
+                    formularioValido = false;
+                }
+
+                if (!formularioValido) {
+                    showValidationErrorOtros('Por favor complete todos los campos requeridos antes de enviar el formulario.');
+
+                    if (invalidFields.length > 0) {
+                        invalidFields[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        invalidFields[0].focus();
+                    }
                 } else {
-                    daysInput.value = '';
+                    hideValidationErrorOtros();
+                    document.getElementById('otrosForm').submit();
+                }
+            });
+
+            const requiredFields = document.querySelectorAll('#createOtrosPermisosModal [required]');
+            requiredFields.forEach(field => {
+                field.addEventListener('blur', function() {
+                    validarCampoIndividualOtros(this);
+                });
+            });
+        }
+
+        function validarCampoIndividualOtros(campo) {
+            const valor = campo.value ? campo.value.trim() : '';
+            const tipo = campo.type;
+            const tagName = campo.tagName.toLowerCase();
+
+            let esValido = true;
+
+            if (tagName === 'select') {
+                esValido = campo.value !== '' && campo.value !== null;
+            } else if (tipo === 'number') {
+                esValido = valor !== '' && !isNaN(valor);
+            } else if (tipo === 'date' || tipo === 'time') {
+                esValido = valor !== '';
+            } else if (tipo === 'checkbox') {
+                esValido = campo.checked;
+            } else {
+                esValido = valor !== '';
+            }
+
+            if (esValido) {
+                campo.classList.remove('is-invalid');
+            } else {
+                campo.classList.add('is-invalid');
+            }
+
+            return esValido;
+        }
+
+        function validarFechasOtros() {
+            const fechaInicio = document.getElementById('fechaInicioOtros');
+            const fechaFin = document.getElementById('fechaFinalizacionOtros');
+            const fechaRegreso = document.getElementById('fechaRegresoLaboralOtros');
+
+            let fechasValidas = true;
+
+            if (fechaInicio.value && fechaFin.value) {
+                const inicio = new Date(fechaInicio.value);
+                const fin = new Date(fechaFin.value);
+
+                if (fin < inicio) {
+                    showValidationErrorOtros('La fecha de fin no puede ser anterior a la fecha de inicio.');
+                    fechaFin.classList.add('is-invalid');
+                    fechasValidas = false;
                 }
             }
 
-            // Event listeners para calcular días cuando cambian las fechas
-            startDateInput.addEventListener('change', calculateDays);
-            endDateInput.addEventListener('change', calculateDays);
+            if (fechaRegreso.value && fechaFin.value) {
+                const fin = new Date(fechaFin.value);
+                const regreso = new Date(fechaRegreso.value);
 
-            // Manejar el envío del formulario
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
+                if (regreso < fin) {
+                    showValidationErrorOtros('La fecha de regreso laboral no puede ser anterior a la fecha de fin del permiso.');
+                    fechaRegreso.classList.add('is-invalid');
+                    fechasValidas = false;
+                }
+            }
 
-                // Recopilar datos del formulario
-                const formData = {
-                    employeeId: document.getElementById('employeeId').value,
-                    employeeName: document.getElementById('employeeName').value,
-                    permissionType: document.getElementById('permissionType').value,
-                    startDate: startDateInput.value,
-                    endDate: endDateInput.value,
-                    days: daysInput.value,
-                    reason: document.getElementById('reason').value,
-                    status: document.getElementById('status').value,
-                    notes: document.getElementById('notes').value
-                };
+            return fechasValidas;
+        }
 
-                console.log('Datos del permiso:', formData);
+        function showValidationErrorOtros(mensaje) {
+            hideValidationErrorOtros();
 
-                // Aquí iría la lógica para guardar el permiso
-                // ...
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
 
-                // Cerrar el modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('permissionModal'));
-                modal.hide();
+            const validationContainer = document.getElementById('validationAlertsOtros');
+            if (validationContainer) {
+                validationContainer.appendChild(alertDiv);
+            }
+        }
 
-                // Resetear el formulario
-                form.reset();
+        function hideValidationErrorOtros() {
+            const validationContainer = document.getElementById('validationAlertsOtros');
+            if (validationContainer) {
+                validationContainer.innerHTML = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaFields = ['fechaInicioOtros', 'fechaFinalizacionOtros', 'fechaRegresoLaboralOtros'];
+
+            fechaFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('change', function() {
+                        if (this.classList.contains('is-invalid')) {
+                            validarCampoIndividualOtros(this);
+                        }
+                        validarFechasOtros();
+                    });
+                }
             });
         });
     </script>

@@ -11,6 +11,8 @@ namespace SistemasAnaliticos.Models
 
         public DbSet<UsuarioSesion> UsuarioSesion { get; set; }
         public DbSet<Permiso> Permiso { get; set; }
+        public DbSet<Constancia> Constancia { get; set; }
+        public DbSet<Beneficio> Beneficio { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

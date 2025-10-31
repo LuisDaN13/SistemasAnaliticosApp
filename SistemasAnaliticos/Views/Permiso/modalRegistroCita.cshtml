@@ -5,7 +5,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modal de Permisos</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -76,7 +75,7 @@
 
                     <div class="modal-body">
                         <!-- Contenedor para mensajes de validación -->
-                        <div id="validationAlerts"></div>
+                        <div id="validationAlertsCita"></div>
 
                         <div>
                             <!-- Fechas y Días -->
@@ -86,18 +85,16 @@
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaInicio"
-                                           id="fechaInicio"
+                                           id="fechaInicioCita"
                                            required>
-                                    <div class="invalid-feedback">Por favor seleccione la fecha de inicio</div>
                                 </div>
                                 <div class="col-md-6 mt-1">
                                     <label class="form-label required-field">Fecha Fin</label>
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaFinalizacion"
-                                           id="fechaFinalizacion"
+                                           id="fechaFinalizacionCita"
                                            required>
-                                    <div class="invalid-feedback">Por favor seleccione la fecha de finalización</div>
                                 </div>
 
                                 <div class="col-md-6 mt-4 mb-2">
@@ -105,18 +102,16 @@
                                     <input type="date"
                                            class="form-control"
                                            asp-for="fechaRegresoLaboral"
-                                           id="fechaRegresoLaboral"
+                                           id="fechaRegresoLaboralCita"
                                            required>
-                                    <div class="invalid-feedback">Por favor seleccione la fecha de regreso laboral</div>
                                 </div>
                                 <div class="col-md-6 mt-4 mb-2">
                                     <label class="form-label required-field">Hora de la Cita</label>
                                     <input type="time"
                                            class="form-control"
                                            asp-for="horaCita"
-                                           id="horaCita"
+                                           id="horaCitaInput"
                                            required>
-                                    <div class="invalid-feedback">Por favor seleccione la hora de la cita</div>
                                 </div>
                             </div>
                         </div>
@@ -127,17 +122,16 @@
                                 <label class="form-label required-field">Motivo</label>
                                 <textarea class="form-control"
                                           asp-for="motivo"
-                                          id="motivo"
+                                          id="motivoCita"
                                           rows="3"
                                           placeholder="Describe el motivo de la cita..."
                                           required></textarea>
-                                <div class="invalid-feedback">Por favor ingrese el motivo de la cita</div>
                             </div>
                             <div class="col-md-6 mt-3 mb-3">
                                 <label class="form-label">Comentarios</label>
                                 <textarea class="form-control"
                                           asp-for="comentarios"
-                                          id="comentarios"
+                                          id="comentariosCita"
                                           rows="3"
                                           placeholder="Nota..."></textarea>
                             </div>
@@ -151,7 +145,7 @@
                                     <input asp-for="fotoFile"
                                            type="file"
                                            class="form-control"
-                                           id="fotoFile"
+                                           id="fotoFileCita"
                                            accept=".jpg,.jpeg,.png" />
                                     <div class="form-text">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
                                 </div>
@@ -163,7 +157,7 @@
                                 <input asp-for="adjuntoFile"
                                        type="file"
                                        class="form-control"
-                                       id="adjuntoFile">
+                                       id="adjuntoFileCita">
                             </div>
                         </div>
                     </div>
@@ -171,7 +165,7 @@
                     <!-- Footer -->
                     <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary-custom text-white" id="submitBtn">
+                        <button type="button" class="btn btn-primary-custom text-white" id="submitBtnCita">
                             <i class="bi bi-save me-2"></i>Guardar
                         </button>
                     </div>
@@ -184,15 +178,53 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // SISTEMA IDÉNTICO AL FORMULARIO DE EMPLEADOS
+        // SISTEMA DE VALIDACIÓN ESPECÍFICO PARA CITAS MÉDICAS
         document.addEventListener('DOMContentLoaded', function() {
-            inicializarValidacion();
+            inicializarValidacionCita();
+            inicializarResetCita();
         });
 
-        function inicializarValidacion() {
-            const submitBtn = document.getElementById('submitBtn');
+        function inicializarResetCita() {
+            const modal = document.getElementById('createCitaModal');
+            const form = document.getElementById('citaForm');
+            const cancelBtn = document.querySelector('.btn-outline-secondary');
 
-            // MANEJAR ENVÍO IDÉNTICO AL DE EMPLEADOS
+            // Resetear cuando el modal se cierra
+            modal.addEventListener('hidden.bs.modal', resetearFormularioCita);
+
+            // Resetear cuando se hace clic en Cancelar
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', resetearFormularioCita);
+            }
+        }
+
+        function resetearFormularioCita() {
+            const form = document.getElementById('citaForm');
+
+            // 1. Resetear valores del formulario
+            form.reset();
+
+            // 2. Limpiar todas las clases de validación
+            const campos = form.querySelectorAll('.form-control, .form-select');
+            campos.forEach(campo => {
+                campo.classList.remove('is-invalid');
+                campo.classList.remove('is-valid');
+            });
+
+            // 3. Limpiar mensajes de validación
+            hideValidationErrorCita();
+
+            // 4. Opcional: Limpiar el texto del tipo de permiso
+            const tipoTexto = document.getElementById('tipoTexto');
+            if (tipoTexto) tipoTexto.textContent = '';
+
+            console.log('Formulario de permisos reseteado');
+        }
+
+        function inicializarValidacionCita() {
+            const submitBtn = document.getElementById('submitBtnCita');
+
+            // MANEJAR ENVÍO
             submitBtn.addEventListener('click', function(e) {
                 e.preventDefault();
 
@@ -200,8 +232,8 @@
                 let formularioValido = true;
                 const invalidFields = [];
 
-                // Obtener todos los campos requeridos
-                const requiredFields = document.querySelectorAll('[required]');
+                // Obtener todos los campos requeridos dentro de este modal
+                const requiredFields = document.querySelectorAll('#createCitaModal [required]');
 
                 // Validar cada campo requerido
                 requiredFields.forEach(field => {
@@ -214,7 +246,6 @@
 
                     let fieldValid = true;
 
-                    // MISMA LÓGICA DE VALIDACIÓN QUE EN EMPLEADOS
                     if (tagName === 'select') {
                         fieldValid = field.value !== '' && field.value !== null;
                     } else if (fieldType === 'number') {
@@ -237,17 +268,16 @@
                     }
                 });
 
-                // Validación adicional de fechas
-                if (!validarFechas()) {
+                // Validación adicional de fechas específica para cita
+                if (!validarFechasCita()) {
                     formularioValido = false;
                 }
 
-                // MOSTRAR ERRORES COMO EN EMPLEADOS
+                // MOSTRAR ERRORES
                 if (!formularioValido) {
-                    showValidationError('Por favor complete todos los campos requeridos antes de enviar el formulario.');
+                    showValidationErrorCita('Por favor complete todos los campos requeridos antes de enviar el formulario.');
 
                     if (invalidFields.length > 0) {
-                        // Comportamiento idéntico: scroll y focus al primer error
                         invalidFields[0].scrollIntoView({
                             behavior: 'smooth',
                             block: 'center'
@@ -255,23 +285,21 @@
                         invalidFields[0].focus();
                     }
                 } else {
-                    hideValidationError();
-                    // Si todo está válido, enviar el formulario
+                    hideValidationErrorCita();
                     document.getElementById('citaForm').submit();
                 }
             });
 
-            // Validación en tiempo real (opcional, para mejor UX)
-            const requiredFields = document.querySelectorAll('[required]');
+            // Validación en tiempo real
+            const requiredFields = document.querySelectorAll('#createCitaModal [required]');
             requiredFields.forEach(field => {
                 field.addEventListener('blur', function() {
-                    validarCampoIndividual(this);
+                    validarCampoIndividualCita(this);
                 });
             });
         }
 
-        // FUNCIÓN PARA VALIDACIÓN INDIVIDUAL (MEJORA UX)
-        function validarCampoIndividual(campo) {
+        function validarCampoIndividualCita(campo) {
             const valor = campo.value ? campo.value.trim() : '';
             const tipo = campo.type;
             const tagName = campo.tagName.toLowerCase();
@@ -299,33 +327,30 @@
             return esValido;
         }
 
-        // VALIDACIÓN DE FECHAS ESPECÍFICA
-        function validarFechas() {
-            const fechaInicio = document.getElementById('fechaInicio');
-            const fechaFin = document.getElementById('fechaFinalizacion');
-            const fechaRegreso = document.getElementById('fechaRegresoLaboral');
+        function validarFechasCita() {
+            const fechaInicio = document.getElementById('fechaInicioCita');
+            const fechaFin = document.getElementById('fechaFinalizacionCita');
+            const fechaRegreso = document.getElementById('fechaRegresoLaboralCita');
 
             let fechasValidas = true;
 
-            // Validar que fecha fin no sea anterior a fecha inicio
             if (fechaInicio.value && fechaFin.value) {
                 const inicio = new Date(fechaInicio.value);
                 const fin = new Date(fechaFin.value);
 
                 if (fin < inicio) {
-                    showValidationError('La fecha de fin no puede ser anterior a la fecha de inicio.');
+                    showValidationErrorCita('La fecha de fin no puede ser anterior a la fecha de inicio.');
                     fechaFin.classList.add('is-invalid');
                     fechasValidas = false;
                 }
             }
 
-            // Validar que fecha regreso no sea anterior a fecha fin
             if (fechaRegreso.value && fechaFin.value) {
                 const fin = new Date(fechaFin.value);
                 const regreso = new Date(fechaRegreso.value);
 
                 if (regreso < fin) {
-                    showValidationError('La fecha de regreso laboral no puede ser anterior a la fecha de fin de la cita.');
+                    showValidationErrorCita('La fecha de regreso laboral no puede ser anterior a la fecha de fin de la cita.');
                     fechaRegreso.classList.add('is-invalid');
                     fechasValidas = false;
                 }
@@ -334,9 +359,8 @@
             return fechasValidas;
         }
 
-        // FUNCIONES DE MENSAJES IDÉNTICAS
-        function showValidationError(mensaje) {
-            hideValidationError();
+        function showValidationErrorCita(mensaje) {
+            hideValidationErrorCita();
 
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-danger alert-dismissible fade show';
@@ -346,14 +370,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
 
-            const validationContainer = document.getElementById('validationAlerts');
+            const validationContainer = document.getElementById('validationAlertsCita');
             if (validationContainer) {
                 validationContainer.appendChild(alertDiv);
             }
         }
 
-        function hideValidationError() {
-            const validationContainer = document.getElementById('validationAlerts');
+        function hideValidationErrorCita() {
+            const validationContainer = document.getElementById('validationAlertsCita');
             if (validationContainer) {
                 validationContainer.innerHTML = '';
             }
@@ -361,17 +385,16 @@
 
         // VALIDACIÓN EN TIEMPO REAL PARA FECHAS
         document.addEventListener('DOMContentLoaded', function() {
-            const fechaFields = ['fechaInicio', 'fechaFinalizacion', 'fechaRegresoLaboral'];
+            const fechaFields = ['fechaInicioCita', 'fechaFinalizacionCita', 'fechaRegresoLaboralCita'];
 
             fechaFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
                     field.addEventListener('change', function() {
-                        // Solo validar si el campo ya tenía error
                         if (this.classList.contains('is-invalid')) {
-                            validarCampoIndividual(this);
+                            validarCampoIndividualCita(this);
                         }
-                        validarFechas();
+                        validarFechasCita();
                     });
                 }
             });
@@ -379,3 +402,4 @@
     </script>
 </body>
 </html>
+

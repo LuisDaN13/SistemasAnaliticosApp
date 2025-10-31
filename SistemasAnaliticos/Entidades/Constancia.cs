@@ -16,6 +16,19 @@ namespace SistemasAnaliticos.Entidades
 
         [StringLength(100)]
         public string dirijido { get; set; }
-        public string Comentarios { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime? fechaRequerida { get; set; }
+        public string? Comentarios { get; set; }
+
+
+        [Column(TypeName = "varbinary(max)")]
+        public byte[]? datosAdjuntos { get; set; }
+        public string? nombreArchivo { get; set; }
+        public string? tipoMIME { get; set; }
+        public long? tamanoArchivo { get; set; }
+
+        [Required]
+        public string estado { get; set; }
     }
 }

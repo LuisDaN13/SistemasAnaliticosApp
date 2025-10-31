@@ -34,6 +34,27 @@
             border-top: 1px solid #dee2e6;
             padding-top: 1.25rem;
         }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
     </style>
 </head>
 <body>
@@ -43,29 +64,46 @@
             <div class="modal-content">
                 <!-- Header -->
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="permissionModalLabel">Nueva Constancia</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold" id="permissionModalLabel">
+                        Nueva Constancia <span id="tipoDisplay"></span>
+                    </h5>
                 </div>
 
                 <!-- Form -->
                 <form id="constanciaForm" asp-controller="Contancia" asp-action="Create" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="tipo" id="tipoConstancia" value="" />
+
                     <div class="modal-body">
+                        <!-- Contenedor para mensajes de validación -->
+                        <div id="validationAlertsCons"></div>
+
                         <div>
                             <!-- Motivo -->
-                            <div class="mb-3">
-                                <label for="reason" class="form-label fw-semibold">
-                                    Persona o Empresa a quien va dirijida <span class="text-danger">*</span>
-                                </label>
+                            <div class="mb-4">
+                                <label class="form-label required-field">Persona o Empresa a quien va dirijida</label>
                                 <textarea class="form-control"
+                                          asp-for="dirijido"
+                                          id="dirijidoCons"
                                           rows="2"
                                           placeholder="Ingresa el receptor de la constancia..."
                                           required></textarea>
                             </div>
 
+                            <!-- Fecha a Requerir -->
+                            <div class="mb-4">
+                                <label class="form-label required-field">Fecha a Requerir la constancia</label>
+                                <input type="date"
+                                       class="form-control"
+                                       asp-for="fechaRequerida"
+                                       id="fechaRequeridaCons"
+                                       required>
+                            </div>
+
                             <!-- Notas -->
-                            <div class="mb-3">
-                                <label for="notes" class="form-label fw-semibold">Comentarios</label>
-                                <textarea class="form-control"
+                            <div class="mb-4">
+                                <label class="form-label">Comentarios</label>
+                                <textarea asp-for="Comentarios"
+                                          class="form-control"
                                           rows="2"
                                           placeholder="Información adicional..."></textarea>
                             </div>
@@ -75,7 +113,7 @@
                     <!-- Footer -->
                     <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary-custom text-white">
+                        <button type="submit" class="btn btn-primary-custom text-white" id="submitBtnCons">
                             <i class="bi bi-save me-2"></i>Guardar
                         </button>
                     </div>
@@ -87,62 +125,200 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- JavaScript para la funcionalidad -->
+    <!-- Pasar palabra de tipo -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('permissionForm');
-            const startDateInput = document.getElementById('startDate');
-            const endDateInput = document.getElementById('endDate');
-            const daysInput = document.getElementById('days');
+            const modalConstancia = document.getElementById('createConstanciaModal');
 
-            // Función para calcular días
-            function calculateDays() {
-                const startDate = new Date(startDateInput.value);
-                const endDate = new Date(endDateInput.value);
+            if (modalConstancia) {
+                modalConstancia.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const tipo = button.getAttribute('data-tipo');
 
-                if (startDate && endDate && startDate <= endDate) {
-                    const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    daysInput.value = diffDays;
-                } else {
-                    daysInput.value = '';
-                }
+                    // Actualizar el título completo
+                    const modalTitle = document.getElementById('permissionModalLabel');
+                    if (modalTitle) {
+                        modalTitle.innerHTML = `Nueva Constancia ${tipo}`;
+                    }
+
+                    // O si usas el span separado
+                    const tipoDisplay = document.getElementById('tipoDisplay');
+                    if (tipoDisplay) {
+                        tipoDisplay.textContent = tipo;
+                    }
+
+                    // Actualizar el campo hidden
+                    const tipoConstancia = document.getElementById('tipoConstancia');
+                    if (tipoConstancia) {
+                        tipoConstancia.value = tipo;
+                    }
+                });
             }
+        });
+    </script>
 
-            // Event listeners para calcular días cuando cambian las fechas
-            startDateInput.addEventListener('change', calculateDays);
-            endDateInput.addEventListener('change', calculateDays);
+    <!-- JavaScript para la funcionalidad -->
+    <script>
+        // SISTEMA DE VALIDACIÓN ESPECÍFICO
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarValidacionCons();
+            inicializarResetCons();
+        });
 
-            // Manejar el envío del formulario
-            form.addEventListener('submit', function(e) {
+        function inicializarResetCons() {
+            const modal = document.getElementById('createConstanciaModal');
+            const form = document.getElementById('constanciaForm');
+            const cancelBtn = document.querySelector('.btn-outline-secondary');
+
+            // Resetear cuando el modal se cierra
+            modal.addEventListener('hidden.bs.modal', resetearFormularioCons);
+
+            // Resetear cuando se hace clic en Cancelar
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', resetearFormularioCons);
+            }
+        }
+
+        function resetearFormularioCons() {
+            const form = document.getElementById('constanciaForm');
+
+            // 1. Resetear valores del formulario
+            form.reset();
+
+            // 2. Limpiar todas las clases de validación
+            const campos = form.querySelectorAll('.form-control, .form-select');
+            campos.forEach(campo => {
+                campo.classList.remove('is-invalid');
+                campo.classList.remove('is-valid');
+            });
+
+            // 3. Limpiar mensajes de validación
+            hideValidationErrorCons();
+
+            // 4. Opcional: Limpiar el texto del tipo de permiso
+            const tipoTexto = document.getElementById('tipoTexto');
+            if (tipoTexto) tipoTexto.textContent = '';
+
+            console.log('Formulario de permisos reseteado');
+        }
+
+        function inicializarValidacionCons() {
+            const submitBtn = document.getElementById('submitBtnCons');
+
+            submitBtn.addEventListener('click', function(e) {
                 e.preventDefault();
 
-                // Recopilar datos del formulario
-                const formData = {
-                    employeeId: document.getElementById('employeeId').value,
-                    employeeName: document.getElementById('employeeName').value,
-                    permissionType: document.getElementById('permissionType').value,
-                    startDate: startDateInput.value,
-                    endDate: endDateInput.value,
-                    days: daysInput.value,
-                    reason: document.getElementById('reason').value,
-                    status: document.getElementById('status').value,
-                    notes: document.getElementById('notes').value
-                };
+                let formularioValido = true;
+                const invalidFields = [];
 
-                console.log('Datos del permiso:', formData);
+                const requiredFields = document.querySelectorAll('#createConstanciaModal [required]');
 
-                // Aquí iría la lógica para guardar el permiso
-                // ...
+                requiredFields.forEach(field => {
+                    const value = field.value ? field.value.trim() : '';
+                    const fieldType = field.type;
+                    const tagName = field.tagName.toLowerCase();
 
-                // Cerrar el modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('permissionModal'));
-                modal.hide();
+                    field.classList.remove('is-invalid');
 
-                // Resetear el formulario
-                form.reset();
+                    let fieldValid = true;
+
+                    if (tagName === 'select') {
+                        fieldValid = field.value !== '' && field.value !== null;
+                    } else if (fieldType === 'number') {
+                        fieldValid = value !== '' && !isNaN(value);
+                    } else if (fieldType === 'date') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'time') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'checkbox') {
+                        fieldValid = field.checked;
+                    } else {
+                        fieldValid = value !== '';
+                    }
+
+                    if (!fieldValid) {
+                        formularioValido = false;
+                        field.classList.add('is-invalid');
+                        invalidFields.push(field);
+                    }
+                });
+
+                if (!formularioValido) {
+                    showValidationErrorCons('Por favor complete todos los campos requeridos antes de enviar el formulario.');
+
+                    if (invalidFields.length > 0) {
+                        invalidFields[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        invalidFields[0].focus();
+                    }
+                } else {
+                    hideValidationErrorCons();
+                    document.getElementById('constanciaForm').submit();
+                }
             });
-        });
+
+            const requiredFields = document.querySelectorAll('#createConstanciaModal [required]');
+            requiredFields.forEach(field => {
+                field.addEventListener('blur', function() {
+                    validarCampoIndividualCons(this);
+                });
+            });
+        }
+
+        function validarCampoIndividualCons(campo) {
+            const valor = campo.value ? campo.value.trim() : '';
+            const tipo = campo.type;
+            const tagName = campo.tagName.toLowerCase();
+
+            let esValido = true;
+
+            if (tagName === 'select') {
+                esValido = campo.value !== '' && campo.value !== null;
+            } else if (tipo === 'number') {
+                esValido = valor !== '' && !isNaN(valor);
+            } else if (tipo === 'date' || tipo === 'time') {
+                esValido = valor !== '';
+            } else if (tipo === 'checkbox') {
+                esValido = campo.checked;
+            } else {
+                esValido = valor !== '';
+            }
+
+            if (esValido) {
+                campo.classList.remove('is-invalid');
+            } else {
+                campo.classList.add('is-invalid');
+            }
+
+            return esValido;
+        }
+
+        function showValidationErrorCons(mensaje) {
+            hideValidationErrorCons();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const validationContainer = document.getElementById('validationAlertsCons');
+            if (validationContainer) {
+                validationContainer.appendChild(alertDiv);
+            }
+        }
+
+        function hideValidationErrorCons() {
+            const validationContainer = document.getElementById('validationAlertsCons');
+            if (validationContainer) {
+                validationContainer.innerHTML = '';
+            }
+        }
+
     </script>
 </body>
 </html>

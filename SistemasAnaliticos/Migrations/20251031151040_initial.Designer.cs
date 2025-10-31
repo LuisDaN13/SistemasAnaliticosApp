@@ -12,8 +12,8 @@ using SistemasAnaliticos.Models;
 namespace SistemasAnaliticos.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20251016224107_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251031151040_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -129,6 +129,119 @@ namespace SistemasAnaliticos.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("SistemasAnaliticos.Entidades.Constancia", b =>
+                {
+                    b.Property<long>("idConstancia")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("idConstancia"));
+
+                    b.Property<string>("Comentarios")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("datosAdjuntos")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("dirijido")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("estado")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("fechaPedido")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("fechaRequerida")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("nombreArchivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("nombrePersona")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("tamanoArchivo")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("tipo")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("tipoMIME")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("idConstancia");
+
+                    b.ToTable("Constancia");
+                });
+
+            modelBuilder.Entity("SistemasAnaliticos.Entidades.Permiso", b =>
+                {
+                    b.Property<long>("idPermiso")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("idPermiso"));
+
+                    b.Property<string>("comentarios")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("datosAdjuntos")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("estado")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("fechaFinalizacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("fechaIngreso")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("fechaInicio")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("fechaRegresoLaboral")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("foto")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<TimeSpan?>("horaCita")
+                        .HasColumnType("time");
+
+                    b.Property<string>("motivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("nombreArchivo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("nombreEmpleado")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("tamanoArchivo")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("tipo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("tipoMIME")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("idPermiso");
+
+                    b.ToTable("Permiso");
                 });
 
             modelBuilder.Entity("SistemasAnaliticos.Entidades.Rol", b =>
@@ -263,6 +376,9 @@ namespace SistemasAnaliticos.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("estado")
+                        .HasColumnType("bit");
+
                     b.Property<string>("estadoCivil")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -272,25 +388,35 @@ namespace SistemasAnaliticos.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime>("fechaIngreso")
+                    b.Property<DateTime?>("fechaIngreso")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("fechaNacimiento")
+                    b.Property<DateTime?>("fechaNacimiento")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("foto")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<byte[]>("foto")
+                        .HasColumnType("varbinary(max)");
 
-                    b.Property<bool?>("hijos")
+                    b.Property<string>("genero")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<bool>("hijos")
                         .HasColumnType("bit");
 
                     b.Property<string>("jefe")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int>("noEmpleado")
-                        .HasColumnType("int");
+                    b.Property<string>("licencias")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("noEmpleado")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("padecimientosAlergias")
                         .HasMaxLength(500)
@@ -307,7 +433,6 @@ namespace SistemasAnaliticos.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("profesion")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -321,8 +446,10 @@ namespace SistemasAnaliticos.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<decimal>("salario")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("salario")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("segundoApellido")
                         .IsRequired()
@@ -341,10 +468,6 @@ namespace SistemasAnaliticos.Migrations
                     b.Property<string>("telefonoHabitacion")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("tipoLicencia")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("tipoPariente")
                         .IsRequired()

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SistemasAnaliticos.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,36 +34,38 @@ namespace SistemasAnaliticos.Migrations
                     segundoNombre = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     primerApellido = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     segundoApellido = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    noEmpleado = table.Column<int>(type: "int", nullable: false),
-                    fechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    noEmpleado = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     cedula = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    fechaNacimiento = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    genero = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     estadoCivil = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    hijos = table.Column<bool>(type: "bit", nullable: true),
-                    cantidadHijos = table.Column<int>(type: "int", nullable: true),
                     tipoSangre = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
+                    hijos = table.Column<bool>(type: "bit", nullable: false),
+                    cantidadHijos = table.Column<int>(type: "int", nullable: true),
                     provincia = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     canton = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     distrito = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     direccionExacta = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    profesion = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    profesion = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     puesto = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     departamento = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    fechaIngreso = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    fechaIngreso = table.Column<DateTime>(type: "datetime2", nullable: true),
                     correoEmpresa = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     celularOficina = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: true),
                     jefe = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     extension = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    salario = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    salario = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     cuentaIBAN = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     celularPersonal = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     correoPersonal = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     telefonoHabitacion = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    tipoLicencia = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    licencias = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: true),
                     tipoPariente = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     contactoEmergencia = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     telefonoEmergencia = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    foto = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    foto = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     padecimientosAlergias = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    estado = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -82,6 +84,56 @@ namespace SistemasAnaliticos.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Constancia",
+                columns: table => new
+                {
+                    idConstancia = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    fechaPedido = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    nombrePersona = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    tipo = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    dirijido = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    fechaRequerida = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Comentarios = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    datosAdjuntos = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    nombreArchivo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    tipoMIME = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    tamanoArchivo = table.Column<long>(type: "bigint", nullable: true),
+                    estado = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Constancia", x => x.idConstancia);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Permiso",
+                columns: table => new
+                {
+                    idPermiso = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    fechaIngreso = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    nombreEmpleado = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    tipo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    fechaInicio = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    fechaFinalizacion = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    fechaRegresoLaboral = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    horaCita = table.Column<TimeSpan>(type: "time", nullable: true),
+                    motivo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    comentarios = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    foto = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    datosAdjuntos = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    nombreArchivo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    tipoMIME = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    tamanoArchivo = table.Column<long>(type: "bigint", nullable: true),
+                    estado = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Permiso", x => x.idPermiso);
                 });
 
             migrationBuilder.CreateTable(
@@ -274,6 +326,12 @@ namespace SistemasAnaliticos.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "Constancia");
+
+            migrationBuilder.DropTable(
+                name: "Permiso");
 
             migrationBuilder.DropTable(
                 name: "UsuarioSesion");
