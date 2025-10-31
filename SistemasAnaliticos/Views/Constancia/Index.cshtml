@@ -1,5 +1,739 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model SistemasAnaliticos.Entidades.Permiso
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal de Permisos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-header {
+            background: linear-gradient(to right, #012473, #013599);
+            color: white;
+        }
+
+        .btn-primary-custom {
+            background-color: #012473;
+            border-color: #012473;
+        }
+
+            .btn-primary-custom:hover {
+                background-color: #013599;
+                border-color: #013599;
+            }
+
+        .section-divider {
+            border-top: 1px solid #dee2e6;
+            padding-top: 1.25rem;
+        }
+
+        /* ESTILOS IDÉNTICOS AL FORMULARIO DE EMPLEADOS */
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal -->
+    <div class="modal fade" id="createCitaModal" tabindex="-1" aria-labelledby="createCitaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="permissionModalLabel">Nueva Cita Médica</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Form -->
+                <form id="citaForm" asp-controller="Permiso" asp-action="Create" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="tipo" value="Cita Médica" />
+
+                    <div class="modal-body">
+                        <!-- Contenedor para mensajes de validación -->
+                        <div id="validationAlertsCita"></div>
+
+                        <div>
+                            <!-- Fechas y Días -->
+                            <div class="row mb-3">
+                                <div class="col-md-6 mt-1">
+                                    <label class="form-label required-field">Fecha Inicio</label>
+                                    <input type="date"
+                                           class="form-control"
+                                           asp-for="fechaInicio"
+                                           id="fechaInicioCita"
+                                           required>
+                                    <div class="invalid-feedback">Por favor seleccione la fecha de inicio</div>
+                                </div>
+                                <div class="col-md-6 mt-1">
+                                    <label class="form-label required-field">Fecha Fin</label>
+                                    <input type="date"
+                                           class="form-control"
+                                           asp-for="fechaFinalizacion"
+                                           id="fechaFinalizacionCita"
+                                           required>
+                                    <div class="invalid-feedback">Por favor seleccione la fecha de finalización</div>
+                                </div>
+
+                                <div class="col-md-6 mt-4 mb-2">
+                                    <label class="form-label required-field">Fecha de Regreso Laboral</label>
+                                    <input type="date"
+                                           class="form-control"
+                                           asp-for="fechaRegresoLaboral"
+                                           id="fechaRegresoLaboralCita"
+                                           required>
+                                    <div class="invalid-feedback">Por favor seleccione la fecha de regreso laboral</div>
+                                </div>
+                                <div class="col-md-6 mt-4 mb-2">
+                                    <label class="form-label required-field">Hora de la Cita</label>
+                                    <input type="time"
+                                           class="form-control"
+                                           asp-for="horaCita"
+                                           id="horaCitaInput"
+                                           required>
+                                    <div class="invalid-feedback">Por favor seleccione la hora de la cita</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-divider p-0 row">
+                            <!-- Motivo -->
+                            <div class="col-md-6 mt-3 mb-3">
+                                <label class="form-label required-field">Motivo</label>
+                                <textarea class="form-control"
+                                          asp-for="motivo"
+                                          id="motivoCita"
+                                          rows="3"
+                                          placeholder="Describe el motivo de la cita..."
+                                          required></textarea>
+                                <div class="invalid-feedback">Por favor ingrese el motivo de la cita</div>
+                            </div>
+                            <div class="col-md-6 mt-3 mb-3">
+                                <label class="form-label">Comentarios</label>
+                                <textarea class="form-control"
+                                          asp-for="comentarios"
+                                          id="comentariosCita"
+                                          rows="3"
+                                          placeholder="Nota..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="section-divider">
+                            <!-- Foto -->
+                            <div>
+                                <div>
+                                    <label asp-for="fotoFile" class="form-label">Foto relacionada</label>
+                                    <input asp-for="fotoFile"
+                                           type="file"
+                                           class="form-control"
+                                           id="fotoFileCita"
+                                           accept=".jpg,.jpeg,.png" />
+                                    <div class="form-text">Solamente imagenes tipo (JPG, JPEG o PNG)</div>
+                                </div>
+                            </div>
+
+                            <!-- Datos Adjuntos -->
+                            <div class="mt-4">
+                                <label class="form-label">Datos Adjuntos</label>
+                                <input asp-for="adjuntoFile"
+                                       type="file"
+                                       class="form-control"
+                                       id="adjuntoFileCita">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary-custom text-white" id="submitBtnCita">
+                            <i class="bi bi-save me-2"></i>Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // SISTEMA DE VALIDACIÓN ESPECÍFICO PARA CITAS MÉDICAS
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarValidacionCita();
+        });
+
+        function inicializarValidacionCita() {
+            const submitBtn = document.getElementById('submitBtnCita');
+
+            // MANEJAR ENVÍO
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Validar TODOS los campos antes de enviar
+                let formularioValido = true;
+                const invalidFields = [];
+
+                // Obtener todos los campos requeridos dentro de este modal
+                const requiredFields = document.querySelectorAll('#createCitaModal [required]');
+
+                // Validar cada campo requerido
+                requiredFields.forEach(field => {
+                    const value = field.value ? field.value.trim() : '';
+                    const fieldType = field.type;
+                    const tagName = field.tagName.toLowerCase();
+
+                    // Limpiar estado previo
+                    field.classList.remove('is-invalid');
+
+                    let fieldValid = true;
+
+                    if (tagName === 'select') {
+                        fieldValid = field.value !== '' && field.value !== null;
+                    } else if (fieldType === 'number') {
+                        fieldValid = value !== '' && !isNaN(value);
+                    } else if (fieldType === 'date') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'time') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'checkbox') {
+                        fieldValid = field.checked;
+                    } else {
+                        fieldValid = value !== '';
+                    }
+
+                    // Si el campo es inválido, marcar error
+                    if (!fieldValid) {
+                        formularioValido = false;
+                        field.classList.add('is-invalid');
+                        invalidFields.push(field);
+                    }
+                });
+
+                // Validación adicional de fechas específica para cita
+                if (!validarFechasCita()) {
+                    formularioValido = false;
+                }
+
+                // MOSTRAR ERRORES
+                if (!formularioValido) {
+                    showValidationErrorCita('Por favor complete todos los campos requeridos antes de enviar el formulario.');
+
+                    if (invalidFields.length > 0) {
+                        invalidFields[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        invalidFields[0].focus();
+                    }
+                } else {
+                    hideValidationErrorCita();
+                    document.getElementById('citaForm').submit();
+                }
+            });
+
+            // Validación en tiempo real
+            const requiredFields = document.querySelectorAll('#createCitaModal [required]');
+            requiredFields.forEach(field => {
+                field.addEventListener('blur', function() {
+                    validarCampoIndividualCita(this);
+                });
+            });
+        }
+
+        function validarCampoIndividualCita(campo) {
+            const valor = campo.value ? campo.value.trim() : '';
+            const tipo = campo.type;
+            const tagName = campo.tagName.toLowerCase();
+
+            let esValido = true;
+
+            if (tagName === 'select') {
+                esValido = campo.value !== '' && campo.value !== null;
+            } else if (tipo === 'number') {
+                esValido = valor !== '' && !isNaN(valor);
+            } else if (tipo === 'date' || tipo === 'time') {
+                esValido = valor !== '';
+            } else if (tipo === 'checkbox') {
+                esValido = campo.checked;
+            } else {
+                esValido = valor !== '';
+            }
+
+            if (esValido) {
+                campo.classList.remove('is-invalid');
+            } else {
+                campo.classList.add('is-invalid');
+            }
+
+            return esValido;
+        }
+
+        function validarFechasCita() {
+            const fechaInicio = document.getElementById('fechaInicioCita');
+            const fechaFin = document.getElementById('fechaFinalizacionCita');
+            const fechaRegreso = document.getElementById('fechaRegresoLaboralCita');
+
+            let fechasValidas = true;
+
+            if (fechaInicio.value && fechaFin.value) {
+                const inicio = new Date(fechaInicio.value);
+                const fin = new Date(fechaFin.value);
+
+                if (fin < inicio) {
+                    showValidationErrorCita('La fecha de fin no puede ser anterior a la fecha de inicio.');
+                    fechaFin.classList.add('is-invalid');
+                    fechasValidas = false;
+                }
+            }
+
+            if (fechaRegreso.value && fechaFin.value) {
+                const fin = new Date(fechaFin.value);
+                const regreso = new Date(fechaRegreso.value);
+
+                if (regreso < fin) {
+                    showValidationErrorCita('La fecha de regreso laboral no puede ser anterior a la fecha de fin de la cita.');
+                    fechaRegreso.classList.add('is-invalid');
+                    fechasValidas = false;
+                }
+            }
+
+            return fechasValidas;
+        }
+
+        function showValidationErrorCita(mensaje) {
+            hideValidationErrorCita();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const validationContainer = document.getElementById('validationAlertsCita');
+            if (validationContainer) {
+                validationContainer.appendChild(alertDiv);
+            }
+        }
+
+        function hideValidationErrorCita() {
+            const validationContainer = document.getElementById('validationAlertsCita');
+            if (validationContainer) {
+                validationContainer.innerHTML = '';
+            }
+        }
+
+        // VALIDACIÓN EN TIEMPO REAL PARA FECHAS
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaFields = ['fechaInicioCita', 'fechaFinalizacionCita', 'fechaRegresoLaboralCita'];
+
+            fechaFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('change', function() {
+                        if (this.classList.contains('is-invalid')) {
+                            validarCampoIndividualCita(this);
+                        }
+                        validarFechasCita();
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+
+
+            @model SistemasAnaliticos.Entidades.Permiso
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-header {
+            background: linear-gradient(to right, #012473, #013599);
+            color: white;
+        }
+
+        .btn-primary-custom {
+            background-color: #012473;
+            border-color: #012473;
+        }
+
+            .btn-primary-custom:hover {
+                background-color: #013599;
+                border-color: #013599;
+            }
+
+        .section-divider {
+            border-top: 1px solid #dee2e6;
+            padding-top: 1.25rem;
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal -->
+    <div class="modal fade" id="createOtrosPermisosModal" tabindex="-1" aria-labelledby="createOtrosPermisosModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="permissionModalLabel">Nueva Solicitud de Permiso <span id="tipoTexto"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Form -->
+                <form id="otrosForm" asp-controller="Permiso" asp-action="Create" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="tipo" id="tipoPermiso" value="" />
+                    
+                    <div class="modal-body">
+                        <!-- Contenedor para mensajes de validación -->
+                        <div id="validationAlertsOtros"></div>
+
+                        <div>
+                            <!-- Fechas y Días -->
+                            <div class="row mb-3">
+                                <div class="col-md-4 mt-1 mb-2">
+                                    <label class="form-label required-field">Fecha Inicio</label>
+                                    <input type="date"
+                                           class="form-control"
+                                           asp-for="fechaInicio"
+                                           id="fechaInicioOtros"
+                                           required>
+                                    <div class="invalid-feedback">Por favor seleccione la fecha de inicio</div>
+                                </div>
+                                <div class="col-md-4 mt-1 mb-2">
+                                    <label class="form-label required-field">Fecha Fin</label>
+                                    <input type="date"
+                                           class="form-control"
+                                           asp-for="fechaFinalizacion"
+                                           id="fechaFinalizacionOtros"
+                                           required>
+                                    <div class="invalid-feedback">Por favor seleccione la fecha de finalización</div>
+                                </div>
+
+                                <div class="col-md-4 mt-1 mb-2">
+                                    <label class="form-label required-field">Fecha de Regreso Laboral</label>
+                                    <input type="date"
+                                           class="form-control"
+                                           asp-for="fechaRegresoLaboral"
+                                           id="fechaRegresoLaboralOtros"
+                                           required>
+                                    <div class="invalid-feedback">Por favor seleccione la fecha de regreso laboral</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-divider p-0 row">
+                            <!-- Motivo -->
+                            <div class="col-md-6 mt-3 mb-3">
+                                <label class="form-label required-field">Motivo</label>
+                                <textarea class="form-control"
+                                          asp-for="motivo"
+                                          id="motivoOtros"
+                                          rows="3"
+                                          placeholder="Describe el motivo del permiso..."
+                                          required></textarea>
+                                <div class="invalid-feedback">Por favor ingrese el motivo del permiso</div>
+                            </div>
+                            <div class="col-md-6 mt-3 mb-3">
+                                <label class="form-label">Comentarios</label>
+                                <textarea class="form-control"
+                                          asp-for="comentarios"
+                                          id="comentariosOtros"
+                                          rows="3"
+                                          placeholder="Nota..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="section-divider">
+                            <!-- Foto -->
+                            <div>
+                                <div>
+                                    <label class="form-label">Foto relacionada</label>
+                                    <input asp-for="fotoFile" 
+                                           type="file" 
+                                           class="form-control" 
+                                           id="fotoFileOtros"
+                                           accept=".jpg,.jpeg,.png" />
+                                </div>
+                            </div>
+
+                            <!-- Datos Adjuntos -->
+                            <div class="mt-4">
+                                <label class="form-label">Datos Adjuntos</label>
+                                <input asp-for="adjuntoFile" 
+                                       type="file" 
+                                       class="form-control"
+                                       id="adjuntoFileOtros">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary-custom text-white" id="submitBtnOtros">
+                            <i class="bi bi-save me-2"></i>Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Pasar palabra de los Botones -->
+    <script>
+        const modalOtros = document.getElementById('createOtrosPermisosModal');
+
+        modalOtros.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const tipo = button.getAttribute('data-tipo');
+
+            document.getElementById('tipoTexto').textContent = tipo;
+            document.getElementById('tipoPermiso').value = tipo;
+        });
+    </script>
+
+    <!-- JavaScript para la funcionalidad -->
+    <script>
+        // SISTEMA DE VALIDACIÓN ESPECÍFICO PARA OTROS PERMISOS
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarValidacionOtros();
+        });
+
+        function inicializarValidacionOtros() {
+            const submitBtn = document.getElementById('submitBtnOtros');
+
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                let formularioValido = true;
+                const invalidFields = [];
+
+                const requiredFields = document.querySelectorAll('#createOtrosPermisosModal [required]');
+
+                requiredFields.forEach(field => {
+                    const value = field.value ? field.value.trim() : '';
+                    const fieldType = field.type;
+                    const tagName = field.tagName.toLowerCase();
+
+                    field.classList.remove('is-invalid');
+
+                    let fieldValid = true;
+
+                    if (tagName === 'select') {
+                        fieldValid = field.value !== '' && field.value !== null;
+                    } else if (fieldType === 'number') {
+                        fieldValid = value !== '' && !isNaN(value);
+                    } else if (fieldType === 'date') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'time') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'checkbox') {
+                        fieldValid = field.checked;
+                    } else {
+                        fieldValid = value !== '';
+                    }
+
+                    if (!fieldValid) {
+                        formularioValido = false;
+                        field.classList.add('is-invalid');
+                        invalidFields.push(field);
+                    }
+                });
+
+                if (!validarFechasOtros()) {
+                    formularioValido = false;
+                }
+
+                if (!formularioValido) {
+                    showValidationErrorOtros('Por favor complete todos los campos requeridos antes de enviar el formulario.');
+
+                    if (invalidFields.length > 0) {
+                        invalidFields[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        invalidFields[0].focus();
+                    }
+                } else {
+                    hideValidationErrorOtros();
+                    document.getElementById('otrosForm').submit();
+                }
+            });
+
+            const requiredFields = document.querySelectorAll('#createOtrosPermisosModal [required]');
+            requiredFields.forEach(field => {
+                field.addEventListener('blur', function() {
+                    validarCampoIndividualOtros(this);
+                });
+            });
+        }
+
+        function validarCampoIndividualOtros(campo) {
+            const valor = campo.value ? campo.value.trim() : '';
+            const tipo = campo.type;
+            const tagName = campo.tagName.toLowerCase();
+
+            let esValido = true;
+
+            if (tagName === 'select') {
+                esValido = campo.value !== '' && campo.value !== null;
+            } else if (tipo === 'number') {
+                esValido = valor !== '' && !isNaN(valor);
+            } else if (tipo === 'date' || tipo === 'time') {
+                esValido = valor !== '';
+            } else if (tipo === 'checkbox') {
+                esValido = campo.checked;
+            } else {
+                esValido = valor !== '';
+            }
+
+            if (esValido) {
+                campo.classList.remove('is-invalid');
+            } else {
+                campo.classList.add('is-invalid');
+            }
+
+            return esValido;
+        }
+
+        function validarFechasOtros() {
+            const fechaInicio = document.getElementById('fechaInicioOtros');
+            const fechaFin = document.getElementById('fechaFinalizacionOtros');
+            const fechaRegreso = document.getElementById('fechaRegresoLaboralOtros');
+
+            let fechasValidas = true;
+
+            if (fechaInicio.value && fechaFin.value) {
+                const inicio = new Date(fechaInicio.value);
+                const fin = new Date(fechaFin.value);
+
+                if (fin < inicio) {
+                    showValidationErrorOtros('La fecha de fin no puede ser anterior a la fecha de inicio.');
+                    fechaFin.classList.add('is-invalid');
+                    fechasValidas = false;
+                }
+            }
+
+            if (fechaRegreso.value && fechaFin.value) {
+                const fin = new Date(fechaFin.value);
+                const regreso = new Date(fechaRegreso.value);
+
+                if (regreso < fin) {
+                    showValidationErrorOtros('La fecha de regreso laboral no puede ser anterior a la fecha de fin del permiso.');
+                    fechaRegreso.classList.add('is-invalid');
+                    fechasValidas = false;
+                }
+            }
+
+            return fechasValidas;
+        }
+
+        function showValidationErrorOtros(mensaje) {
+            hideValidationErrorOtros();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const validationContainer = document.getElementById('validationAlertsOtros');
+            if (validationContainer) {
+                validationContainer.appendChild(alertDiv);
+            }
+        }
+
+        function hideValidationErrorOtros() {
+            const validationContainer = document.getElementById('validationAlertsOtros');
+            if (validationContainer) {
+                validationContainer.innerHTML = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaFields = ['fechaInicioOtros', 'fechaFinalizacionOtros', 'fechaRegresoLaboralOtros'];
+
+            fechaFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('change', function() {
+                        if (this.classList.contains('is-invalid')) {
+                            validarCampoIndividualOtros(this);
+                        }
+                        validarFechasOtros();
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
