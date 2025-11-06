@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using SistemasAnaliticos.Entidades;
+using System.Reflection.Emit;
 
 namespace SistemasAnaliticos.Models
 {
@@ -19,7 +20,18 @@ namespace SistemasAnaliticos.Models
             // LLAMAR PRIMERO AL MÉTODO BASE
             base.OnModelCreating(builder);
 
-            // LUEGO TU CONFIGURACIÓN PERSONALIZADA
+            builder.Entity<Usuario>(entity =>
+            {
+                entity.HasIndex(u => u.primerNombre);
+                entity.HasIndex(u => u.noEmpleado).IsUnique();
+                entity.HasIndex(u => u.cedula).IsUnique();
+                entity.HasIndex(u => u.departamento);       
+                entity.HasIndex(u => u.puesto);         
+                entity.HasIndex(u => u.correoEmpresa).IsUnique();
+                entity.HasIndex(u => u.estado);         
+                entity.HasIndex(u => u.fechaIngreso);    
+            });
+
             builder.Entity<UsuarioSesion>(entity =>
             {
                 entity.ToTable("UsuarioSesion"); // Nombre de tabla

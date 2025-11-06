@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.DTO;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using static SistemasAnaliticos.Models.codigoFotos;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SistemasAnaliticos.Controllers
 {
@@ -27,6 +29,8 @@ namespace SistemasAnaliticos.Controllers
         // INDEX = PRESENTAR A LOS EMPLEADOS CON CARDS PARA SCINICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
         public async Task<ActionResult> Index()
         {
+            var sw = Stopwatch.StartNew();
+
             var cards = await _context.Users
                 .AsNoTracking()
                 .OrderByDescending(x => x.primerNombre)
@@ -45,7 +49,9 @@ namespace SistemasAnaliticos.Controllers
                 })
                 .ToListAsync();
 
-                return View(cards);
+            sw.Stop();
+            Debug.WriteLine($"⏱ Consulta tardó: {sw.ElapsedMilliseconds} ms");
+            return View(cards);
         }
 
 
@@ -57,7 +63,7 @@ namespace SistemasAnaliticos.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginDTO model)
+        public async Task<ActionResult> Login(LoginDTO model)
         {
             if (ModelState.IsValid)
             {
@@ -141,7 +147,6 @@ namespace SistemasAnaliticos.Controllers
 
         }
 
-
         // CREATE = REGISTRAR EMPLEADO CON FORMULARIO Y TODO
         public ActionResult Create()
         {
@@ -214,11 +219,8 @@ namespace SistemasAnaliticos.Controllers
                 }
                 else
                 {
-                    foreach (var error in resultado.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
-                    return View(model);
+                    TempData["ErrorMessage"] = "Error en la creación del empleado.";
+                    return RedirectToAction("Index", "Usuario");
                 }
 
             }
@@ -230,24 +232,117 @@ namespace SistemasAnaliticos.Controllers
 
 
         // GET: UsuarioController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(string id)
         {
-            return View();
+            if (string.IsNullOrEmpty(id))
+            {
+                TempData["ErrorMessage"] = "No se proporcionó un identificador de usuario válido.";
+                return RedirectToAction("Index", "Usuario");
+            }
+
+            var usuario = await _context.Users.FindAsync(id);
+
+            if (usuario == null)
+            {
+                TempData["ErrorMessage"] = "El usuario que intentas editar no existe o fue eliminado.";
+                return RedirectToAction("Index", "Usuario");
+            }
+
+            return View(usuario);
         }
 
 
         // POST: UsuarioController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(string id, Usuario model)
         {
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "No se proporcionó un identificador de usuario válido.";
+                return RedirectToAction("Index", "Usuario");
+            }
+
+            var usuario = await _context.Users.FindAsync(id);
+            if (usuario == null)
+            {
+                TempData["ErrorMessage"] = "El usuario que intentas editar no existe o fue eliminado.";
+                return RedirectToAction("Index", "Usuario");
+            }
+
             try
             {
+                var fotoService = new CodigoFotos();
+
+                // 🔹 Actualizar campos personales
+                usuario.primerNombre = model.primerNombre;
+                usuario.segundoNombre = model.segundoNombre;
+                usuario.primerApellido = model.primerApellido;
+                usuario.segundoApellido = model.segundoApellido;
+
+                usuario.noEmpleado = model.noEmpleado;
+                usuario.cedula = model.cedula;
+                usuario.fechaNacimiento = model.fechaNacimiento;
+                usuario.genero = model.genero;
+                usuario.estadoCivil = model.estadoCivil;
+                usuario.tipoSangre = model.tipoSangre;
+
+                usuario.hijos = model.hijos;
+                usuario.cantidadHijos = model.cantidadHijos;
+
+                // 🔹 Dirección
+                usuario.provincia = model.provincia;
+                usuario.canton = model.canton;
+                usuario.distrito = model.distrito;
+                usuario.direccionExacta = model.direccionExacta;
+
+                // 🔹 Laboral
+                usuario.profesion = model.profesion;
+                usuario.puesto = model.puesto;
+                usuario.departamento = model.departamento;
+                usuario.fechaIngreso = model.fechaIngreso;
+                usuario.correoEmpresa = model.correoEmpresa;
+
+                // 🔹 Credenciales (opcionalmente se pueden actualizar)
+                usuario.Email = model.correoEmpresa;
+                usuario.UserName = model.correoEmpresa;
+
+                usuario.celularOficina = model.celularOficina;
+                usuario.jefe = model.jefe;
+                usuario.extension = model.extension;
+                usuario.salario = model.salario;
+                usuario.cuentaIBAN = model.cuentaIBAN;
+                usuario.celularPersonal = model.celularPersonal;
+                usuario.correoPersonal = model.correoPersonal;
+                usuario.telefonoHabitacion = model.telefonoHabitacion;
+
+                usuario.licencias = model.licencias;
+                usuario.tipoPariente = model.tipoPariente;
+                usuario.contactoEmergencia = model.contactoEmergencia;
+                usuario.telefonoEmergencia = model.telefonoEmergencia;
+                usuario.padecimientosAlergias = model.padecimientosAlergias;
+
+                // 🔹 Estado
+                usuario.estado = model.estado;
+
+                // 🔹 Foto (solo si subió una nueva)
+                if (model.fotoFile != null)
+                {
+                    usuario.foto = await fotoService.ConvertFileToByteArrayAsync(model.fotoFile);
+                }
+
+                // 🔹 Guardar cambios
+                _context.Update(usuario);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "El usuario se actualizó correctamente.";
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                // 🧩 Manejo de error
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el usuario: " + ex.Message;
+                return RedirectToAction("Index", "Usuario");
             }
         }
 
