@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using SistemasAnaliticos.DTO;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
@@ -159,6 +160,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
+                string email = model.correoEmpresa ?? "sinCorreoAun@mailcom";
+                string userName = model.correoEmpresa ?? "sinCorreoAun@mailcom";
                 var fotoService = new CodigoFotos();
 
                 var nuevo = new Usuario
@@ -188,8 +191,9 @@ namespace SistemasAnaliticos.Controllers
                     departamento = model.departamento,
                     fechaIngreso = model.fechaIngreso,
                     correoEmpresa = model.correoEmpresa,
-                    Email = model.correoEmpresa,
-                    UserName = model.correoEmpresa,
+
+                    Email = email,
+                    UserName = userName,
 
                     celularOficina = model.celularOficina,
                     jefe = model.jefe,
@@ -215,6 +219,7 @@ namespace SistemasAnaliticos.Controllers
                 var resultado = await userManager.CreateAsync(nuevo, pass);
                 if (resultado.Succeeded)
                 {
+                    TempData["SuccessMessage"] = "El empleado se creó correctamente.";
                     return RedirectToAction(nameof(Index));
                 }
                 else
@@ -226,6 +231,7 @@ namespace SistemasAnaliticos.Controllers
             }
             catch
             {
+                TempData["ErrorMessage"] = "Error en el proceso.";
                 return RedirectToAction("Usuario", "Index");
             }
         }
@@ -259,14 +265,14 @@ namespace SistemasAnaliticos.Controllers
         {
             if (id == null)
             {
-                TempData["ErrorMessage"] = "No se proporcionó un identificador de usuario válido.";
+                TempData["ErrorMessage"] = "No se proporcionó un identificador de empleado válido.";
                 return RedirectToAction("Index", "Usuario");
             }
 
             var usuario = await _context.Users.FindAsync(id);
             if (usuario == null)
             {
-                TempData["ErrorMessage"] = "El usuario que intentas editar no existe o fue eliminado.";
+                TempData["ErrorMessage"] = "El empleado que intentas editar no existe o fue eliminado.";
                 return RedirectToAction("Index", "Usuario");
             }
 
@@ -322,9 +328,6 @@ namespace SistemasAnaliticos.Controllers
                 usuario.telefonoEmergencia = model.telefonoEmergencia;
                 usuario.padecimientosAlergias = model.padecimientosAlergias;
 
-                // 🔹 Estado
-                usuario.estado = model.estado;
-
                 // 🔹 Foto (solo si subió una nueva)
                 if (model.fotoFile != null)
                 {
@@ -335,17 +338,18 @@ namespace SistemasAnaliticos.Controllers
                 _context.Update(usuario);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "El usuario se actualizó correctamente.";
+                TempData["SuccessMessage"] = "El empleado se actualizó correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 // 🧩 Manejo de error
-                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el usuario: " + ex.Message;
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el empleado: " + ex.Message;
                 return RedirectToAction("Index", "Usuario");
             }
         }
 
+        // POST: UsuarioController/Inactivar/5
         [HttpPost("Usuario/Inactivar/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Inactivar(string id)

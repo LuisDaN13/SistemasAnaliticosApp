@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SistemasAnaliticos.DTO;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using static SistemasAnaliticos.Models.codigoFotos;
 
@@ -71,6 +74,30 @@ namespace SistemasAnaliticos.Controllers
             {
                 return RedirectToAction("Usuario", "Index");
             }
+        }
+
+        public async Task<List<Permiso>> TraerIncapacidades()
+        {
+            var incapacidades = await _context.Permiso
+                .AsNoTracking()
+                .Where(p => p.tipo == "Incapacidad" && p.estado == "Creada")
+                .OrderByDescending(x => x.fechaIngreso)
+                .Select(x => new Permiso
+                {
+                    idPermiso = x.idPermiso,
+                    nombreEmpleado = x.nombreEmpleado,
+                    fechaIngreso = x.fechaIngreso,
+                    fechaInicio = x.fechaInicio,
+                    fechaFinalizacion = x.fechaFinalizacion,
+                    fechaRegresoLaboral = x.fechaRegresoLaboral,
+                    motivo = x.motivo,
+                    comentarios = x.comentarios,
+                    foto = x.foto,
+                    estado = x.estado
+                })
+                .ToListAsync();
+
+            return incapacidades;
         }
     }
 }

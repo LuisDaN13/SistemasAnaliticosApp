@@ -369,15 +369,8 @@
                                                 </div>
 
                                                 <div class="col-12 border-top" style="margin-top: 2.0rem !important">
-                                                    <label class="form-label required-field" style="margin-top: 1.25rem">Licencias de Conducir</label>
+                                                    <label class="form-label" style="margin-top: 1.25rem">Licencias de Conducir</label>
                                                     <p class="text-muted small mb-3">Seleccione todas las licencias que posee</p>
-
-                                                    <!-- Contenedor de licencias seleccionadas -->
-                                                    <div class="mb-3 p-3 border rounded bg-light" id="licenciasSeleccionadasContainer">
-                                                        <div class="d-flex flex-wrap gap-2" id="licenciasSeleccionadas">
-                                                            <span class="text-muted">No hay licencias seleccionadas</span>
-                                                        </div>
-                                                    </div>
 
                                                     <!-- Categorías de licencias -->
                                                     <div class="licencias-categorias">
@@ -996,7 +989,6 @@
         function cargarProvincias() {
             const selectProvincia = document.querySelector('select[asp-for="provincia"]');
             if (!selectProvincia) {
-                console.error('❌ No se encontró el elemento provincia');
                 return;
             }
 
@@ -1267,7 +1259,6 @@
 
         function inicializarLicencias() {
             const checkboxes = document.querySelectorAll('.licencia-checkbox');
-            const containerSeleccionadas = document.getElementById('licenciasSeleccionadas');
             const inputHidden = document.getElementById('licencias');
 
             let licenciasSeleccionadas = [];
@@ -1295,7 +1286,6 @@
 
             function actualizarInterfaz() {
                 if (licenciasSeleccionadas.length > 0) {
-                    containerSeleccionadas.innerHTML = '';
                     licenciasSeleccionadas.forEach(licencia => {
                         const tag = document.createElement('span');
                         tag.className = 'licencia-tag';
@@ -1304,10 +1294,7 @@
                             <button type="button" class="btn-close btn-close-white"
                                     onclick="removerLicenciaDesdeTag('${licencia}')"></button>
                         `;
-                        containerSeleccionadas.appendChild(tag);
                     });
-                } else {
-                    containerSeleccionadas.innerHTML = '<span class="text-muted">No hay licencias seleccionadas</span>';
                 }
 
                 inputHidden.value = licenciasSeleccionadas.join(',');

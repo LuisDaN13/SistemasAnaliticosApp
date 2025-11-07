@@ -609,22 +609,38 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Error de Edit -->
+    <!-- Respuestas de los Formularios -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Para mensajes de error
             @if (TempData["ErrorMessage"] != null)
             {
-                <text>
-                    const mensaje = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(TempData["ErrorMessage"]));
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: mensaje
-                    });
-                </text>
+                    <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: '@Html.Raw(TempData["ErrorMessage"])',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    </text>
+            }
+
+            // Para mensajes de éxito
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: '@Html.Raw(TempData["SuccessMessage"])',
+                            confirmButtonText: 'Aceptar',
+                            timer: 3000
+                        });
+                    </text>
             }
         });
     </script>
+
     <!-- Codigo sobre el modal de inactivar -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -634,9 +650,7 @@
             modalInactivar.addEventListener('show.bs.modal', function (event) {
                 const button = event.relatedTarget;
                 const id = button.getAttribute('data-id');
-                console.log(1 + id);
                 const nombre = button.getAttribute('data-nombre');
-                console.log(nombre);
                 document.getElementById('idEmpleadoInactivar').value = id;
                 document.getElementById('nombreInactivar').textContent = nombre;
             });
@@ -657,18 +671,36 @@
 
                     if (result.success) {
                         const modal = bootstrap.Modal.getInstance(modalInactivar);
-                        modal.hide();
+                        modal.hide();                                                
 
-                        // Redirigir usando la URL proporcionada por el servidor
-                        window.location.href = result.redirectUrl;
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: 'El estado del empleado fue cambiado correctamente',
+                            timer: 6000
+                        }).then(() => {
+                            window.location.href = result.redirectUrl;
+                        });
+
                     } else {
-                        console.error("Error al inactivar el usuario:", result.message);
-                        // Mostrar mensaje de error al usuario
-                        alert("Error: " + result.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al inactivar el usuario: ' + (result.message || 'Error desconocido'),
+                            timer: 6000
+                        }).then(() => {
+                            window.location.href = result.redirectUrl;
+                        });
                     }
                 } catch (error) {
-                    console.error("Error de red:", error);
-                    alert("Error de red: " + error.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error de red: ' + (result.message || 'Error desconocido'),
+                        timer: 6000
+                    }).then(() => {
+                        window.location.href = result.redirectUrl;
+                    });
                 }
             });
         });
