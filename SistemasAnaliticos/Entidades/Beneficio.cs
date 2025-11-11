@@ -19,7 +19,9 @@ namespace SistemasAnaliticos.Entidades
 
         [Column(TypeName = "decimal(12,2)")]
         public decimal restante { get; set; }
-
         public string Comentarios { get; set; }
+
+        [Required]
+        public string estado { get; set; }
     }
 }

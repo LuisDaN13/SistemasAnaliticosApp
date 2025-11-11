@@ -21,6 +21,8 @@ namespace SistemasAnaliticos.Entidades
         public DateTime? fechaRequerida { get; set; }
         public string? Comentarios { get; set; }
 
+        [NotMapped]
+        public IFormFile fotoFile { get; set; } = null!;
 
         [Column(TypeName = "varbinary(max)")]
         public byte[]? datosAdjuntos { get; set; }

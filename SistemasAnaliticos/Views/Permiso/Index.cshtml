@@ -47,6 +47,12 @@
             border-left-color: #0d6efd;
             border-left-width: 4px !important;
             border-left-style: solid;
+        }        
+        
+        .border-left-accent2 {
+            border-left-color: #146c43;
+            border-left-width: 4px !important;
+            border-left-style: solid;
         }
 
         .badge-status {
@@ -308,7 +314,7 @@
                                 aria-expanded="false"
                                 aria-controls="vacacionesCollapse">
                             <div class="d-flex align-items-center gap-3">
-                                <i class="fa-solid fa-stethoscope fs-3"></i>
+                                <i class="fa-solid fa-plane-departure fs-3"></i>
                                 <div class="text-start">
                                     <h3 class="fw-bold mb-0">Vacaciones</h3>
                                 </div>
@@ -526,7 +532,7 @@
                                 aria-expanded="false"
                                 aria-controls="teletrajoCollapse">
                             <div class="d-flex align-items-center gap-3">
-                                <i class="fa-brands fa-accessible-icon fs-3"></i>
+                                <i class="fa-solid fa-house-laptop fs-3"></i>
                                 <div class="text-start">
                                     <h3 class="fw-bold mb-0">Teletrabajo</h3>
                                 </div>
@@ -636,7 +642,7 @@
                                 aria-expanded="false"
                                 aria-controls="especialCollapse">
                             <div class="d-flex align-items-center gap-3">
-                                <i class="fa-brands fa-accessible-icon fs-3"></i>
+                                <i class="fa-solid fa-asterisk fs-3"></i>
                                 <div class="text-start">
                                     <h3 class="fw-bold mb-0">Especial</h3>
                                 </div>
@@ -738,42 +744,42 @@
             </div>
         </div>
 
-@*         <!-- Titulo de Constancias Activos -->
+        <!-- Titulo de Constancias Activos -->
         <div class="header-card p-4 mb-4" style="margin-top: 4rem">
             <h1 class="h2 fw-bold text-gray-900 mb-4">Constancias Activas</h1>
 
             <div class="accordion" id="permissionsAccordion">
                 <!-- LABORAL -->
                 <div class="accordion-item border-0 mb-3">
-                    <div class="border-left-accent1">
+                    <div class="border-left-accent2">
                         <button class="category-header collapsed d-flex justify-content-between align-items-center w-100 px-4 py-3 bg-light rounded-end border"
                                 type="button"
                                 data-bs-toggle="collapse"
-                                data-bs-target="#medicalCollapse"
+                                data-bs-target="#consLaboralCollapse"
                                 aria-expanded="false"
-                                aria-controls="medicalCollapse">
+                                aria-controls="consLaboralCollapse">
                             <div class="d-flex align-items-center gap-3">
-                                <i class="fa-solid fa-stethoscope fs-3"></i>
+                                <i class="fa-solid fa-briefcase fs-3"></i>
                                 <div class="text-start">
-                                    <h3 class="fw-bold mb-0">Citas Médicas</h3>
+                                    <h3 class="fw-bold mb-0">Laborales</h3>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <span class="badge rounded-pill text-white px-3 py-2" style="background-color: #0d6efd;">
-                                    @Model.Citas?.Count()
+                                <span class="badge rounded-pill text-white px-3 py-2" style="background-color: #146c43;">
+                                    @Model.Laboral?.Count()
                                 </span>
-                                <i class="bi bi-chevron-down chevron-icon"></i>
+                                <i class="bi bi-chevron-down chevron-icon" style="color: #146c43"></i>
                             </div>
                         </button>
                     </div>
 
-                    <div id="medicalCollapse" class="accordion-collapse collapse" data-bs-parent="#permissionsAccordion">
+                    <div id="consLaboralCollapse" class="accordion-collapse collapse" data-bs-parent="#permissionsAccordion">
                         <div class="accordion-body p-0">
-                            @if (Model.Citas != null && Model.Citas.Any())
+                            @if (Model.Laboral != null && Model.Laboral.Any())
                             {
-                                @foreach (var item in Model.Citas)
+                                @foreach (var item in Model.Laboral)
                                 {
-                                    <div class="permission-details mt-2">
+@*                                     <div class="permission-details mt-2">
                                         <div class="permission-card m-3 p-3 pb-0" style="background-color: #dae9ff; border-bottom: 1px solid #d7d7d7; border-radius: 9px;">
                                             <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
                                                 <div class="d-flex align-items-start gap-3 flex-grow-1">
@@ -847,12 +853,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                }
+ *@                                }
                             }
                             else
                             {
                                 <div class="permission-card text-center text-muted m-3 p-3" style="background-color: #dae9ff; border-radius: 9px;">
-                                    No hay citas médicas registradas.
+                                    No hay constancias laborales registradas.
                                 </div>
                             }
                         </div>
@@ -861,35 +867,35 @@
 
                 <!-- SALARIAL -->
                 <div class="accordion-item border-0 mb-3">
-                    <div class="border-left-accent1">
+                    <div class="border-left-accent2">
                         <button class="category-header collapsed d-flex justify-content-between align-items-center w-100 px-4 py-3 bg-light rounded-end border"
                                 type="button"
                                 data-bs-toggle="collapse"
-                                data-bs-target="#vacacionesCollapse"
+                                data-bs-target="#consSalarialCollapse"
                                 aria-expanded="false"
-                                aria-controls="vacacionesCollapse">
+                                aria-controls="consSalarialCollapse">
                             <div class="d-flex align-items-center gap-3">
-                                <i class="fa-solid fa-stethoscope fs-3"></i>
+                                <i class="fa-solid fa-money-bills fs-3"></i>
                                 <div class="text-start">
-                                    <h3 class="fw-bold mb-0">Vacaciones</h3>
+                                    <h3 class="fw-bold mb-0">Salarial</h3>
                                 </div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
-                                <span class="badge rounded-pill text-white px-3 py-2" style="background-color: #0d6efd;">
-                                    @Model.Vacaciones?.Count()
+                                <span class="badge rounded-pill text-white px-3 py-2" style="background-color: #146c43;">
+                                    @Model.Salarial?.Count()
                                 </span>
-                                <i class="bi bi-chevron-down chevron-icon"></i>
+                                <i class="bi bi-chevron-down chevron-icon" style="color: #146c43"></i>
                             </div>
                         </button>
                     </div>
 
-                    <div id="vacacionesCollapse" class="accordion-collapse collapse" data-bs-parent="#permissionsAccordion">
+                    <div id="consSalarialCollapse" class="accordion-collapse collapse" data-bs-parent="#permissionsAccordion">
                         <div class="accordion-body p-0">
-                            @if (Model.Vacaciones != null && Model.Vacaciones.Any())
+                            @if (Model.Salarial != null && Model.Salarial.Any())
                             {
-                                @foreach (var item in Model.Vacaciones)
+                                @foreach (var item in Model.Salarial)
                                 {
-                                    <div class="permission-details mt-2">
+@*                                     <div class="permission-details mt-2">
                                         <div class="permission-card m-3 p-3 pb-0" style="background-color: #dae9ff; border-bottom: 1px solid #d7d7d7; border-radius: 9px;">
                                             <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
                                                 <div class="d-flex align-items-start gap-3 flex-grow-1">
@@ -955,12 +961,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                }
+ *@                                }
                             }
                             else
                             {
                                 <div class="permission-card text-center text-muted m-3 p-3" style="background-color: #dae9ff; border-radius: 9px;">
-                                    No hay vacaciones registradas.
+                                    No hay constancias salariales registradas.
                                 </div>
                             }
                         </div>
@@ -968,7 +974,7 @@
                 </div>
             </div>
         </div>
- *@    </main>
+    </main>
 
     <!-- Modal de la Foto -->
     <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">

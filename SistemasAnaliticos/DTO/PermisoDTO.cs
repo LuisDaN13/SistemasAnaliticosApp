@@ -12,5 +12,6 @@ namespace SistemasAnaliticos.DTO
 
         public List<Constancia> Laboral { get; set; }
         public List<Constancia> Salarial { get; set; }
+
     }
 }
