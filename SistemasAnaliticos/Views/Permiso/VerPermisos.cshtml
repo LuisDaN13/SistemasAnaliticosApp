@@ -1,0 +1,305 @@
+﻿@model SistemasAnaliticos.DTO.PaginacionPermisosDTO
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+        .header-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background-color: white;
+        }
+    </style>
+    <style>
+        .category-header {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .category-header:hover {
+                background-color: #f8f9fa !important;
+            }
+
+        .border-left-accent1 {
+            border-left-color: #0d6efd;
+            border-left-width: 4px !important;
+            border-left-style: solid;
+        }
+
+        .border-left-accent2 {
+            border-left-color: #146c43;
+            border-left-width: 4px !important;
+            border-left-style: solid;
+        }
+
+        .badge-status {
+            font-size: 0.75rem;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .permission-item {
+            transition: background-color 0.3s;
+        }
+
+            .permission-item:hover {
+                background-color: #f8f9fa;
+            }
+
+        .action-btn {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s;
+        }
+
+        .chevron-icon {
+            color: #0d6efd;
+            transition: transform 0.3s;
+        }
+
+        .chevron-rotated {
+            transform: rotate(180deg);
+        }
+    </style>
+    <style>
+        .permission-card {
+            transition: all 0.3s ease;
+            border: 1px solid #dee2e6;
+        }
+
+            .permission-card:hover {
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+                border-color: var(--primary-color);
+            }
+
+        .filter-section {
+            position: sticky;
+            top: 5rem;
+        }
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <!-- Main Content -->
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+
+        <!-- Titulo de Permisos -->
+        <div class="header-card p-4 mt-4 mb-4">
+            <h1 class="h2 fw-bold text-gray-900 mb-2">Ver Todos los Permisos</h1>
+            <p class="text-muted mb-0">Filtrado y observación de los permisos relacionados de los empleados de la empresa</p>
+        </div>
+
+        <!-- Permission Types Grid -->
+        <div class="container my-4">
+            <div class="row">
+                <!-- FILTROS PARA CARDS -->
+                <div class="col-lg-3">
+                    <div class="card filter-section">
+                        <div class="card-body">
+                            <h2 class="h5 card-title fw-bold text-dark mb-4">Filtrar por</h2>
+
+                            <!-- Type Filter -->
+                            <div class="mb-4 pb-3 border-bottom">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#typeFilter" aria-expanded="true" aria-controls="typeFilter">
+                                    Tipo de Permiso
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                                <div class="collapse show mt-3" id="typeFilter">
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Vacaciones" id="type-vacation">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-vacation">
+                                                <span>Vacaciones</span>
+                                                <span class="text-muted">(12)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Permiso Médico" id="type-medical">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-medical">
+                                                <span>Permiso Médico</span>
+                                                <span class="text-muted">(8)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Día Personal" id="type-personal">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-personal">
+                                                <span>Día Personal</span>
+                                                <span class="text-muted">(5)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Permiso Parental" id="type-parental">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-parental">
+                                                <span>Permiso Parental</span>
+                                                <span class="text-muted">(3)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Permiso por Duelo" id="type-bereavement">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-bereavement">
+                                                <span>Permiso por Duelo</span>
+                                                <span class="text-muted">(2)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Permiso por Estudios" id="type-study">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-study">
+                                                <span>Permiso por Estudios</span>
+                                                <span class="text-muted">(4)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div class="mb-4 pb-3 border-bottom">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#statusFilter" aria-expanded="true" aria-controls="statusFilter">
+                                    Estado
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                                <div class="collapse show mt-3" id="statusFilter">
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Aprobado" id="status-approved">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-approved">
+                                                <span>Aprobado</span>
+                                                <span class="text-muted">(18)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Pendiente" id="status-pending">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-pending">
+                                                <span>Pendiente</span>
+                                                <span class="text-muted">(10)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Rechazado" id="status-rejected">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-rejected">
+                                                <span>Rechazado</span>
+                                                <span class="text-muted">(2)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Clear Filters -->
+                            <button class="btn w-100 text-primary-custom fw-medium pt-3 border-top" id="clear-filters">
+                                Limpiar filtros
+                            </button>
+                        </div>
+                    </div>
+                </div> <!-- Cierre correcto del col-lg-3 -->
+                <!-- CONTENIDO DE CARDS -->
+                <div class="col-lg-9">
+                    <div id="permissionsContainer">
+                        <!-- Permissions will be dynamically loaded here -->
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center" id="pagination">
+                            <!-- Pagination will be dynamically generated here -->
+                        </ul>
+                    </nav>
+                </div> <!-- Cierre correcto del col-lg-9 -->
+
+            </div> <!-- Cierre del row -->
+        </div> <!-- Cierre del container -->
+    </main>
+
+    <script>
+        const permisos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Permisos));
+        const totalPaginas = @Model.TotalPaginas;
+        let paginaActual = @Model.PaginaActual;
+
+        const permissionsContainer = document.getElementById("permissionsContainer");
+        const pagination = document.getElementById("pagination");
+
+        function renderPermissions(data) {
+            permissionsContainer.innerHTML = data.map(permission => `
+                <div class="card permission-card mb-3">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <div class="d-flex align-items-start gap-1 mb-2 flex-wrap">
+                                <h3 class="h6 fw-bold text-dark mb-0">${permission.employee}</h3>
+                            </div>
+                            <div class="d-flex gap-1 flex-wrap mb-2">
+                                <span class="badge custom-badge ${
+                                    permission.status === "Aprobada"
+                                        ? "bg-success"
+                                        : permission.status === "Creada"
+                                            ? "bg-warning"
+                                            : "bg-danger"
+                                }">
+                                    ${permission.status}
+                                </span>
+                                <span class="badge custom-badge bg-info">${permission.type}</span>
+                            </div>
+                            <p class="text-muted small mb-0">${permission.reason ?? ""}</p>
+                        </div>
+
+                        <div class="pt-2 border-top">
+                            <div class="row small">
+                                <div class="col-6">
+                                    <span class="text-muted fw-semibold">Inicio:</span>
+                                    <span class="text-dark fw-medium ms-1">${permission.startDate}</span>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted fw-semibold">Fin:</span>
+                                    <span class="text-dark fw-medium ms-1">${permission.endDate}</span>
+                                </div>
+                                <div class="col-6 mt-1">
+                                    <span class="text-muted fw-semibold">Días:</span>
+                                    <span class="text-dark fw-medium ms-1">${permission.days}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${permission.attachment ? `
+                            <div class="mt-2 pt-2 border-top">
+                                <div class="d-flex align-items-center gap-1 small">
+                                    <i class="bi bi-download text-primary"></i>
+                                    <a href="${permission.attachment}" class="text-primary text-decoration-none fw-medium" target="_blank">
+                                        Descargar adjunto
+                                    </a>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPagination() {
+            pagination.innerHTML = '';
+            for (let i = 1; i <= totalPaginas; i++) {
+                pagination.innerHTML += `
+                    <li class="page-item ${i === paginaActual ? 'active' : ''}">
+                        <a class="page-link" href="?page=${i}">${i}</a>
+                    </li>
+                `;
+            }
+        }
+
+        // Render inicial
+        renderPermissions(permisos);
+        renderPagination();
+    </script>
+</body>
+</html>

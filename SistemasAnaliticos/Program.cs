@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
+using SistemasAnaliticos.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

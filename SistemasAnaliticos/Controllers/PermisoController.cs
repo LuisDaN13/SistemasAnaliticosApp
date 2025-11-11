@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.DTO;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
+using SistemasAnaliticos.Services;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -15,7 +16,6 @@ namespace SistemasAnaliticos.Controllers
     {
         private readonly DBContext _context;
 
-
         public PermisoController(DBContext context)
         {
             _context = context;
@@ -23,19 +23,33 @@ namespace SistemasAnaliticos.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var model = new PermisoDTO
-            {
-                Incapacidades = await TraerIncapacidades(),
-                Citas = await TraerCitas(),
-                Vacaciones = await TraerVacaciones(),
-                Teletrabajo = await TraerTeletrabjo(),
-                Especial = await TraerPerEspecial(), 
+            return View();
+        }
 
-                Laboral = await TraerConstanciaLaboral(),
-                Salarial = await TraerConstanciaSalarial()
+        public async Task<IActionResult> VerPermisos(int page = 1)
+        {
+            int pageSize = 4; // 👈 cantidad fija de registros por página
+
+            var totalPermisos = await _context.Permiso
+                .Where(p => p.estado == "Creada")
+                .CountAsync();
+
+            var permisos = await _context.Permiso
+                .AsNoTracking()
+                .Where(p => p.estado == "Creada")
+                .OrderByDescending(x => x.fechaIngreso)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var viewModel = new PaginacionPermisosDTO
+            {
+                Permisos = permisos,
+                PaginaActual = page,
+                TotalPaginas = (int)Math.Ceiling(totalPermisos / (double)pageSize)
             };
 
-            return View(model);
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -81,173 +95,14 @@ namespace SistemasAnaliticos.Controllers
 
                 _context.Permiso.Add(nuevo);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Se creó el permiso correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
+                TempData["ErrorMessage"] = "Error en la creación del permiso.";
                 return RedirectToAction("Usuario", "Index");
             }
         }
-
-
-
-        //ACCIONES PARA VER PERMISOS DESPLEGADOS EN LA VISTA INDEX
-        public async Task<List<Permiso>> TraerCitas()
-        {
-            var citas = await _context.Permiso
-                .AsNoTracking()
-                .Where(p => p.tipo == "Cita Médica" && p.estado == "Creada")
-                .OrderByDescending(x => x.fechaIngreso)
-                .Select(x => new Permiso
-                {
-                    idPermiso = x.idPermiso,
-                    nombreEmpleado = x.nombreEmpleado,
-                    fechaIngreso = x.fechaIngreso,
-                    fechaInicio = x.fechaInicio,
-                    fechaFinalizacion = x.fechaFinalizacion,
-                    fechaRegresoLaboral = x.fechaRegresoLaboral,
-                    horaCita = x.horaCita,
-                    motivo = x.motivo,
-                    comentarios = x.comentarios,
-                    foto = x.foto,
-                    estado = x.estado
-                })
-                .ToListAsync();
-
-            return citas;
-        }
-        public async Task<List<Permiso>> TraerVacaciones()
-        {
-            var vacaciones = await _context.Permiso
-                .AsNoTracking()
-                .Where(p => p.tipo == "Vacaciones" && p.estado == "Creada")
-                .OrderByDescending(x => x.fechaIngreso)
-                .Select(x => new Permiso
-                {
-                    idPermiso = x.idPermiso,
-                    nombreEmpleado = x.nombreEmpleado,
-                    fechaIngreso = x.fechaIngreso,
-                    fechaInicio = x.fechaInicio,
-                    fechaFinalizacion = x.fechaFinalizacion,
-                    fechaRegresoLaboral = x.fechaRegresoLaboral,
-                    comentarios = x.comentarios,
-                    foto = x.foto,
-                    estado = x.estado
-                })
-                .ToListAsync();
-
-            return vacaciones;
-        }
-        public async Task<List<Permiso>> TraerIncapacidades()
-        {
-            var incapacidades = await _context.Permiso
-                .AsNoTracking()
-                .Where(p => p.tipo == "Incapacidad" && p.estado == "Creada")
-                .OrderByDescending(x => x.fechaIngreso)
-                .Select(x => new Permiso
-                {
-                    idPermiso = x.idPermiso,
-                    nombreEmpleado = x.nombreEmpleado,
-                    fechaIngreso = x.fechaIngreso,
-                    fechaInicio = x.fechaInicio,
-                    fechaFinalizacion = x.fechaFinalizacion,
-                    fechaRegresoLaboral = x.fechaRegresoLaboral,
-                    motivo = x.motivo,
-                    comentarios = x.comentarios,
-                    foto = x.foto,
-                    estado = x.estado
-                })
-                .ToListAsync();
-
-            return incapacidades;
-        }
-        public async Task<List<Permiso>> TraerTeletrabjo()
-        {
-            var teletrabajo = await _context.Permiso
-                .AsNoTracking()
-                .Where(p => p.tipo == "Teletrabajo" && p.estado == "Creada")
-                .OrderByDescending(x => x.fechaIngreso)
-                .Select(x => new Permiso
-                {
-                    idPermiso = x.idPermiso,
-                    nombreEmpleado = x.nombreEmpleado,
-                    fechaIngreso = x.fechaIngreso,
-                    fechaInicio = x.fechaInicio,
-                    fechaFinalizacion = x.fechaFinalizacion,
-                    fechaRegresoLaboral = x.fechaRegresoLaboral,
-                    motivo = x.motivo,
-                    comentarios = x.comentarios,
-                    foto = x.foto,
-                    estado = x.estado
-                })
-                .ToListAsync();
-
-            return teletrabajo;
-        }
-        public async Task<List<Permiso>> TraerPerEspecial()
-        {
-            var teletrabajo = await _context.Permiso
-                .AsNoTracking()
-                .Where(p => p.tipo == "Especial" && p.estado == "Creada")
-                .OrderByDescending(x => x.fechaIngreso)
-                .Select(x => new Permiso
-                {
-                    idPermiso = x.idPermiso,
-                    nombreEmpleado = x.nombreEmpleado,
-                    fechaIngreso = x.fechaIngreso,
-                    fechaInicio = x.fechaInicio,
-                    fechaFinalizacion = x.fechaFinalizacion,
-                    fechaRegresoLaboral = x.fechaRegresoLaboral,
-                    motivo = x.motivo,
-                    comentarios = x.comentarios,
-                    foto = x.foto,
-                    estado = x.estado
-                })
-                .ToListAsync();
-
-            return teletrabajo;
-        }
-
-        public async Task<List<Constancia>> TraerConstanciaLaboral()
-        {
-            var laboral = await _context.Constancia
-                .AsNoTracking()
-                .Where(p => p.tipo == "Laboral" && p.estado == "Creada")
-                .OrderByDescending(x => x.fechaPedido)
-                .Select(x => new Constancia
-                {
-                    idConstancia = x.idConstancia,
-                    nombrePersona = x.nombrePersona,
-                    fechaPedido = x.fechaPedido,
-                    dirijido = x.dirijido,
-                    fechaRequerida = x.fechaRequerida,
-                    Comentarios = x.Comentarios,
-                    estado = x.estado
-                })
-                .ToListAsync();
-
-            return laboral;
-        }
-        public async Task<List<Constancia>> TraerConstanciaSalarial()
-        {
-            var laboral = await _context.Constancia
-                .AsNoTracking()
-                .Where(p => p.tipo == "Salarial" && p.estado == "Creada")
-                .OrderByDescending(x => x.fechaPedido)
-                .Select(x => new Constancia
-                {
-                    idConstancia = x.idConstancia,
-                    nombrePersona = x.nombrePersona,
-                    fechaPedido = x.fechaPedido,
-                    dirijido = x.dirijido,
-                    fechaRequerida = x.fechaRequerida,
-                    Comentarios = x.Comentarios,
-                    estado = x.estado
-                })
-                .ToListAsync();
-
-            return laboral;
-        }
-
     }
 }

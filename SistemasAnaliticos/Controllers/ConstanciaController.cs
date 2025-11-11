@@ -48,17 +48,12 @@ namespace SistemasAnaliticos.Controllers
                     fechaRequerida = model.fechaRequerida,
                     Comentarios = model.Comentarios,
 
-                    datosAdjuntos = await adjuntoService.ProcesarArchivoAdjunto(model.fotoFile),
-                    nombreArchivo = model.fotoFile?.FileName,
-                    tipoMIME = model.fotoFile?.ContentType,
-                    tamanoArchivo = model.fotoFile?.Length,
-
                     estado = "Creada"
                 };
 
                 _context.Constancia.Add(nuevo);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Permiso", "Index");
             }
             catch
             {
