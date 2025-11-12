@@ -89,6 +89,12 @@
             position: sticky;
             top: 5rem;
         }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
     </style>
 </head>
 <body class="bg-gradient-custom min-vh-100">
@@ -120,45 +126,38 @@
                                 <div class="collapse show mt-3" id="typeFilter">
                                     <div class="d-flex flex-column gap-2">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="Vacaciones" id="type-vacation">
+                                            <input class="form-check-input filter-type" type="checkbox" value="Cita Médica" id="type-medical">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-medical">
+                                                <span>Citas Médicas</span>
+                                                <span class="text-muted" id="count-medical">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-type" type="checkbox" value="Vacaciones" id="type-vacation">
                                             <label class="form-check-label d-flex justify-content-between w-100" for="type-vacation">
                                                 <span>Vacaciones</span>
-                                                <span class="text-muted">(12)</span>
+                                                <span class="text-muted" id="count-vacation">(0)</span>
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="Permiso Médico" id="type-medical">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-medical">
-                                                <span>Permiso Médico</span>
-                                                <span class="text-muted">(8)</span>
+                                            <input class="form-check-input filter-type" type="checkbox" value="Incapacidad" id="type-incapacidad">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-incapacidad">
+                                                <span>Incapacidad</span>
+                                                <span class="text-muted" id="count-incapacidad">(0)</span>
+                                            </label>
+                                        </div>                                        
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-type" type="checkbox" value="Teletrabajo" id="type-teletrabajo">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-teletrabajo">
+                                                <span>Teletrabajo</span>
+                                                <span class="text-muted" id="count-teletrabajo">(0)</span>
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="Día Personal" id="type-personal">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-personal">
-                                                <span>Día Personal</span>
-                                                <span class="text-muted">(5)</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="Permiso Parental" id="type-parental">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-parental">
-                                                <span>Permiso Parental</span>
-                                                <span class="text-muted">(3)</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="Permiso por Duelo" id="type-bereavement">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-bereavement">
-                                                <span>Permiso por Duelo</span>
-                                                <span class="text-muted">(2)</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="Permiso por Estudios" id="type-study">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-study">
-                                                <span>Permiso por Estudios</span>
-                                                <span class="text-muted">(4)</span>
+                                            <input class="form-check-input filter-type" type="checkbox" value="Especial" id="type-especial">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-especial">
+                                                <span>Teletrabajo</span>
+                                                <span class="text-muted" id="count-especial">(0)</span>
                                             </label>
                                         </div>
                                     </div>
@@ -166,7 +165,7 @@
                             </div>
 
                             <!-- Status Filter -->
-                            <div class="mb-4 pb-3 border-bottom">
+                            <div class="pb-3">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#statusFilter" aria-expanded="true" aria-controls="statusFilter">
                                     Estado
                                     <i class="bi bi-chevron-down"></i>
@@ -174,24 +173,24 @@
                                 <div class="collapse show mt-3" id="statusFilter">
                                     <div class="d-flex flex-column gap-2">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="Aprobado" id="status-approved">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Aprobado" id="status-approved">
                                             <label class="form-check-label d-flex justify-content-between w-100" for="status-approved">
                                                 <span>Aprobado</span>
-                                                <span class="text-muted">(18)</span>
+                                                <span class="text-muted" id="count-approved">(0)</span>
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="Pendiente" id="status-pending">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Pendiente" id="status-pending">
                                             <label class="form-check-label d-flex justify-content-between w-100" for="status-pending">
                                                 <span>Pendiente</span>
-                                                <span class="text-muted">(10)</span>
+                                                <span class="text-muted" id="count-pending">(0)</span>
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" value="Rechazado" id="status-rejected">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Rechazado" id="status-rejected">
                                             <label class="form-check-label d-flex justify-content-between w-100" for="status-rejected">
                                                 <span>Rechazado</span>
-                                                <span class="text-muted">(2)</span>
+                                                <span class="text-muted" id="count-rejected">(0)</span>
                                             </label>
                                         </div>
                                     </div>
@@ -204,7 +203,8 @@
                             </button>
                         </div>
                     </div>
-                </div> <!-- Cierre correcto del col-lg-3 -->
+                </div>
+
                 <!-- CONTENIDO DE CARDS -->
                 <div class="col-lg-9">
                     <div id="permissionsContainer">
@@ -217,10 +217,10 @@
                             <!-- Pagination will be dynamically generated here -->
                         </ul>
                     </nav>
-                </div> <!-- Cierre correcto del col-lg-9 -->
+                </div>
 
-            </div> <!-- Cierre del row -->
-        </div> <!-- Cierre del container -->
+            </div>
+        </div>
     </main>
 
     <script>
@@ -231,42 +231,151 @@
         const permissionsContainer = document.getElementById("permissionsContainer");
         const pagination = document.getElementById("pagination");
 
+        // Estado de los filtros
+        let filtrosActivos = {
+            tipos: [],
+            estados: []
+        };
+
+        // Inicializar contadores
+        function inicializarContadores() {
+            const contadoresTipo = {
+                'Cita Médica': 0,
+                'Vacaciones': 0,
+                'Incapacidad': 0,
+                'Teletrabajo': 0,
+                'Especial': 0
+            };
+
+            const contadoresEstado = {
+                'Aprobado': 0,
+                'Pendiente': 0,
+                'Rechazado': 0
+            };
+
+            // Contar permisos por tipo y estado
+            permisos.forEach(permiso => {
+                if (contadoresTipo.hasOwnProperty(permiso.tipo)) {
+                    contadoresTipo[permiso.tipo]++;
+                }
+
+                // Mapear estados del backend a los del frontend
+                let estadoFrontend = '';
+                if (permiso.estado === "Creada" || permiso.estado === "Aprobada") {
+                    estadoFrontend = "Aprobado";
+                } else if (permiso.estado === "Pendiente") {
+                    estadoFrontend = "Pendiente";
+                } else if (permiso.estado === "Rechazada") {
+                    estadoFrontend = "Rechazado";
+                }
+
+                if (contadoresEstado.hasOwnProperty(estadoFrontend)) {
+                    contadoresEstado[estadoFrontend]++;
+                }
+            });
+
+            // Actualizar contadores en la UI
+            document.getElementById('count-medical').textContent = `(${contadoresTipo['Cita Médica']})`;
+            document.getElementById('count-vacation').textContent = `(${contadoresTipo['Vacaciones']})`;
+            document.getElementById('count-incapacidad').textContent = `(${contadoresTipo['Incapacidad']})`;
+            document.getElementById('count-teletrabajo').textContent = `(${contadoresTipo['Teletrabajo']})`;
+            document.getElementById('count-especial').textContent = `(${contadoresTipo['Especial']})`;
+
+            document.getElementById('count-approved').textContent = `(${contadoresEstado['Aprobado']})`;
+            document.getElementById('count-pending').textContent = `(${contadoresEstado['Pendiente']})`;
+            document.getElementById('count-rejected').textContent = `(${contadoresEstado['Rechazado']})`;
+        }
+
+        // Función para filtrar permisos
+        function filtrarPermisos() {
+            let permisosFiltrados = permisos.filter(permiso => {
+                // Filtrar por tipo
+                const coincideTipo = filtrosActivos.tipos.length === 0 ||
+                                   filtrosActivos.tipos.includes(permiso.tipo);
+
+                // Filtrar por estado (mapear estados del backend)
+                let estadoFrontend = '';
+                if (permiso.estado === "Creada" || permiso.estado === "Aprobada") {
+                    estadoFrontend = "Aprobado";
+                } else if (permiso.estado === "Pendiente") {
+                    estadoFrontend = "Pendiente";
+                } else if (permiso.estado === "Rechazada") {
+                    estadoFrontend = "Rechazado";
+                }
+
+                const coincideEstado = filtrosActivos.estados.length === 0 ||
+                                     filtrosActivos.estados.includes(estadoFrontend);
+
+                return coincideTipo && coincideEstado;
+            });
+
+            return permisosFiltrados;
+        }
+
+        // Función para renderizar permisos
         function renderPermissions(data) {
+            if (data.length === 0) {
+                permissionsContainer.innerHTML = `
+                    <div class="no-results">
+                        <i class="bi bi-inbox display-1 d-block mb-3"></i>
+                        <h3 class="h4 text-muted">No se encontraron permisos</h3>
+                        <p class="text-muted">Intenta ajustar los filtros para ver más resultados.</p>
+                    </div>
+                `;
+                return;
+            }
+
             permissionsContainer.innerHTML = data.map(permission => `
                 <div class="card permission-card mb-3">
                     <div class="card-body">
                         <div class="mb-2">
                             <div class="d-flex align-items-start gap-1 mb-2 flex-wrap">
-                                <h3 class="h6 fw-bold text-dark mb-0">${permission.employee}</h3>
+                                <h3 class="h6 fw-bold text-dark mb-0">${permission.nombreEmpleado}</h3>
                             </div>
                             <div class="d-flex gap-1 flex-wrap mb-2">
                                 <span class="badge custom-badge ${
-                                    permission.status === "Aprobada"
+                                    permission.estado === "Creada" || permission.estado === "Aprobada"
                                         ? "bg-success"
-                                        : permission.status === "Creada"
+                                        : permission.estado === "Pendiente"
                                             ? "bg-warning"
-                                            : "bg-danger"
+                                            : permission.estado === "Rechazada"
+                                                ? "bg-danger"
+                                                : "bg-secondary"
                                 }">
-                                    ${permission.status}
+                                    ${permission.estado}
                                 </span>
-                                <span class="badge custom-badge bg-info">${permission.type}</span>
+                                <span class="badge custom-badge bg-info">${permission.tipo}</span>
+
+                                <div class="row small">
+                                    <div class="col-6">
+                                        <span class="text-muted fw-semibold">Creación:</span>
+                                        <span class="text-dark fw-medium ms-1">${new Date(permission.fechaIngreso).toLocaleDateString('es-CR')}</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-muted fw-semibold">Inicio:</span>
+                                        <span class="text-dark fw-medium ms-1">${new Date(permission.fechaInicio).toLocaleDateString('es-CR')}</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-muted fw-semibold">Fin:</span>
+                                        <span class="text-dark fw-medium ms-1">${new Date(permission.fechaFinalizacion).toLocaleDateString('es-CR')}</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-muted fw-semibold">Regreso:</span>
+                                        <span class="text-dark fw-medium ms-1">${new Date(permission.fechaRegresoLaboral).toLocaleDateString('es-CR')}</span>
+                                    </div>
+                                </div>
                             </div>
-                            <p class="text-muted small mb-0">${permission.reason ?? ""}</p>
                         </div>
 
                         <div class="pt-2 border-top">
                             <div class="row small">
                                 <div class="col-6">
-                                    <span class="text-muted fw-semibold">Inicio:</span>
-                                    <span class="text-dark fw-medium ms-1">${permission.startDate}</span>
-                                </div>
-                                <div class="col-6">
-                                    <span class="text-muted fw-semibold">Fin:</span>
-                                    <span class="text-dark fw-medium ms-1">${permission.endDate}</span>
-                                </div>
-                                <div class="col-6 mt-1">
-                                    <span class="text-muted fw-semibold">Días:</span>
-                                    <span class="text-dark fw-medium ms-1">${permission.days}</span>
+                                    <span class="text-muted fw-semibold">Motivo:</span>
+                                    <span class="text-dark fw-medium ms-1">${permission.motivo}</span>
+                                </div>                                
+                                <div class="col-6" style="padding-left: 0px">
+                                    <span class="text-muted fw-semibold">Comentarios:</span>
+                                    <span class="text-dark fw-medium ms-1">${permission.comentarios}</span>
                                 </div>
                             </div>
                         </div>
@@ -297,9 +406,52 @@
             }
         }
 
-        // Render inicial
-        renderPermissions(permisos);
-        renderPagination();
+        // Event listeners para filtros
+        document.querySelectorAll('.filter-type').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    filtrosActivos.tipos.push(this.value);
+                } else {
+                    filtrosActivos.tipos = filtrosActivos.tipos.filter(tipo => tipo !== this.value);
+                }
+                const permisosFiltrados = filtrarPermisos();
+                renderPermissions(permisosFiltrados);
+            });
+        });
+
+        document.querySelectorAll('.filter-status').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    filtrosActivos.estados.push(this.value);
+                } else {
+                    filtrosActivos.estados = filtrosActivos.estados.filter(estado => estado !== this.value);
+                }
+                const permisosFiltrados = filtrarPermisos();
+                renderPermissions(permisosFiltrados);
+            });
+        });
+
+        // Limpiar filtros
+        document.getElementById('clear-filters').addEventListener('click', function() {
+            // Desmarcar todos los checkboxes
+            document.querySelectorAll('.filter-type, .filter-status').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Limpiar filtros activos
+            filtrosActivos.tipos = [];
+            filtrosActivos.estados = [];
+
+            // Renderizar todos los permisos
+            renderPermissions(permisos);
+        });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarContadores();
+            renderPermissions(permisos);
+            renderPagination();
+        });
     </script>
 </body>
 </html>
