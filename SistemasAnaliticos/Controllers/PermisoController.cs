@@ -52,6 +52,18 @@ namespace SistemasAnaliticos.Controllers
             return View(viewModel);
         }
 
+        //METODO SEGUIDO DE LA PAGINACION PARA FILTROS JUNTOS
+        public async Task<IActionResult> ObtenerTodosLosPermisos()
+        {
+            var todosLosPermisos = await _context.Permiso
+                .AsNoTracking()
+                .Where(p => p.estado == "Creada") // Mantener el mismo filtro que en VerPermisos
+                .OrderByDescending(x => x.fechaIngreso)
+                .ToListAsync();
+
+            return Json(todosLosPermisos);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(Permiso model)
         {

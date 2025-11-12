@@ -75,15 +75,46 @@
         }
     </style>
     <style>
+        .custom-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        #permissionsContainer {
+            transition: opacity 0.3s ease;
+            opacity: 1;
+        }
+
         .permission-card {
             transition: all 0.3s ease;
             border: 1px solid #dee2e6;
         }
 
             .permission-card:hover {
+                transform: translateY(-2px);
                 box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
                 border-color: var(--primary-color);
             }
+
+        .no-results {
+            transition: opacity 0.3s ease;
+        }
+
+        .card {
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         .filter-section {
             position: sticky;
@@ -128,7 +159,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input filter-type" type="checkbox" value="Cita Médica" id="type-medical">
                                             <label class="form-check-label d-flex justify-content-between w-100" for="type-medical">
-                                                <span>Citas Médicas</span>
+                                                <span>Cita Médica</span>
                                                 <span class="text-muted" id="count-medical">(0)</span>
                                             </label>
                                         </div>
@@ -145,7 +176,7 @@
                                                 <span>Incapacidad</span>
                                                 <span class="text-muted" id="count-incapacidad">(0)</span>
                                             </label>
-                                        </div>                                        
+                                        </div>
                                         <div class="form-check">
                                             <input class="form-check-input filter-type" type="checkbox" value="Teletrabajo" id="type-teletrabajo">
                                             <label class="form-check-label d-flex justify-content-between w-100" for="type-teletrabajo">
@@ -156,7 +187,7 @@
                                         <div class="form-check">
                                             <input class="form-check-input filter-type" type="checkbox" value="Especial" id="type-especial">
                                             <label class="form-check-label d-flex justify-content-between w-100" for="type-especial">
-                                                <span>Teletrabajo</span>
+                                                <span>Especial</span>
                                                 <span class="text-muted" id="count-especial">(0)</span>
                                             </label>
                                         </div>
@@ -224,12 +255,16 @@
     </main>
 
     <script>
-        const permisos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Permisos));
+        const permisosPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Permisos));
         const totalPaginas = @Model.TotalPaginas;
         let paginaActual = @Model.PaginaActual;
 
         const permissionsContainer = document.getElementById("permissionsContainer");
         const pagination = document.getElementById("pagination");
+
+        // Estado global
+        let todosLosPermisos = [];
+        let permisosFiltrados = [];
 
         // Estado de los filtros
         let filtrosActivos = {
@@ -237,8 +272,41 @@
             estados: []
         };
 
-        // Inicializar contadores
-        function inicializarContadores() {
+        // Cargar todos los permisos del servidor
+        async function cargarTodosLosPermisos() {
+            try {
+                const response = await fetch('/Permiso/ObtenerTodosLosPermisos');
+                if (response.ok) {
+                    const todosLosPermisos = await response.json();
+                    return todosLosPermisos;
+                } else {
+                    console.error('Error al cargar permisos:', response.status);
+                    return permisosPaginaActual;
+                }
+            } catch (error) {
+                console.error('Error cargando permisos:', error);
+                return permisosPaginaActual;
+            }
+        }
+
+        // Mapear estado del backend al frontend
+        function mapearEstado(estadoBackend) {
+            if (estadoBackend === "Creada" || estadoBackend === "Aprobada") {
+                return "Aprobado";
+            } else if (estadoBackend === "Pendiente") {
+                return "Pendiente";
+            } else if (estadoBackend === "Rechazada") {
+                return "Rechazado";
+            }
+            return estadoBackend;
+        }
+
+        // Inicializar contadores con TODOS los permisos
+        async function inicializarContadores() {
+            if (todosLosPermisos.length === 0) {
+                todosLosPermisos = await cargarTodosLosPermisos();
+            }
+
             const contadoresTipo = {
                 'Cita Médica': 0,
                 'Vacaciones': 0,
@@ -253,22 +321,13 @@
                 'Rechazado': 0
             };
 
-            // Contar permisos por tipo y estado
-            permisos.forEach(permiso => {
+            // Contar TODOS los permisos, no solo los de la página actual
+            todosLosPermisos.forEach(permiso => {
                 if (contadoresTipo.hasOwnProperty(permiso.tipo)) {
                     contadoresTipo[permiso.tipo]++;
                 }
 
-                // Mapear estados del backend a los del frontend
-                let estadoFrontend = '';
-                if (permiso.estado === "Creada" || permiso.estado === "Aprobada") {
-                    estadoFrontend = "Aprobado";
-                } else if (permiso.estado === "Pendiente") {
-                    estadoFrontend = "Pendiente";
-                } else if (permiso.estado === "Rechazada") {
-                    estadoFrontend = "Rechazado";
-                }
-
+                const estadoFrontend = mapearEstado(permiso.estado);
                 if (contadoresEstado.hasOwnProperty(estadoFrontend)) {
                     contadoresEstado[estadoFrontend]++;
                 }
@@ -286,23 +345,19 @@
             document.getElementById('count-rejected').textContent = `(${contadoresEstado['Rechazado']})`;
         }
 
-        // Función para filtrar permisos
-        function filtrarPermisos() {
-            let permisosFiltrados = permisos.filter(permiso => {
+        // Función para filtrar permisos (usa TODOS los permisos)
+        async function filtrarPermisos() {
+            if (todosLosPermisos.length === 0) {
+                todosLosPermisos = await cargarTodosLosPermisos();
+            }
+
+            permisosFiltrados = todosLosPermisos.filter(permiso => {
                 // Filtrar por tipo
                 const coincideTipo = filtrosActivos.tipos.length === 0 ||
                                    filtrosActivos.tipos.includes(permiso.tipo);
 
-                // Filtrar por estado (mapear estados del backend)
-                let estadoFrontend = '';
-                if (permiso.estado === "Creada" || permiso.estado === "Aprobada") {
-                    estadoFrontend = "Aprobado";
-                } else if (permiso.estado === "Pendiente") {
-                    estadoFrontend = "Pendiente";
-                } else if (permiso.estado === "Rechazada") {
-                    estadoFrontend = "Rechazado";
-                }
-
+                // Filtrar por estado
+                const estadoFrontend = mapearEstado(permiso.estado);
                 const coincideEstado = filtrosActivos.estados.length === 0 ||
                                      filtrosActivos.estados.includes(estadoFrontend);
 
@@ -310,6 +365,38 @@
             });
 
             return permisosFiltrados;
+        }
+
+        // Función para aplicar fade out
+        function fadeOut(element, callback) {
+            element.style.transition = 'opacity 0.3s ease';
+            element.style.opacity = '0';
+
+            setTimeout(() => {
+                callback();
+                // Restaurar opacidad después de cambiar el contenido
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                }, 50);
+            }, 300);
+        }
+
+        // Función para aplicar fade in
+        function fadeIn(element) {
+            element.style.transition = 'opacity 0.3s ease';
+            element.style.opacity = '0';
+
+            // Pequeño delay para que el fade out termine
+            setTimeout(() => {
+                element.style.opacity = '1';
+            }, 50);
+        }
+
+        // Función para renderizar permisos con efectos de fade
+        async function renderPermissionsWithFade(data) {
+            fadeOut(permissionsContainer, () => {
+                renderPermissions(data);
+            });
         }
 
         // Función para renderizar permisos
@@ -322,6 +409,8 @@
                         <p class="text-muted">Intenta ajustar los filtros para ver más resultados.</p>
                     </div>
                 `;
+                // Aplicar fade in al contenido vacío
+                fadeIn(permissionsContainer);
                 return;
             }
 
@@ -329,10 +418,15 @@
                 <div class="card permission-card mb-3">
                     <div class="card-body">
                         <div class="mb-2">
-                            <div class="d-flex align-items-start gap-1 mb-2 flex-wrap">
-                                <h3 class="h6 fw-bold text-dark mb-0">${permission.nombreEmpleado}</h3>
+                            <div class="d-flex align-items-start justify-content-between gap-1 mb-2 flex-wrap">
+                                <h3 class="h6 fw-bold text-dark mb-0" style="padding: 5px">
+                                    <i class="fa-solid fa-user me-3"></i>${permission.nombreEmpleado}
+                                </h3>
+                                <h5 class="h6 text-white small mb-0" style="padding: 5px; background-color: #012473; border-radius: 5px">
+                                    #${permission.idPermiso}
+                                </h5>
                             </div>
-                            <div class="d-flex gap-1 flex-wrap mb-2">
+                            <div class="d-flex align-items-center flex-wrap mb-2" style="gap: 1.5rem; padding-left: 5%; padding-right: 5%;">
                                 <span class="badge custom-badge ${
                                     permission.estado === "Creada" || permission.estado === "Aprobada"
                                         ? "bg-success"
@@ -344,22 +438,35 @@
                                 }">
                                     ${permission.estado}
                                 </span>
-                                <span class="badge custom-badge bg-info">${permission.tipo}</span>
+                                <span class="badge custom-badge"
+                                      style="
+                                        background-color: ${
+                                            permission.tipo === 'Cita Médica' ? '#F58E53' :
+                                            permission.tipo === 'Vacaciones' ? '#dc3545' :
+                                            permission.tipo === 'Incapacidad' ? '#ffc107' :
+                                            permission.tipo === 'Teletrabajo' ? '#17a2b8' :
+                                            permission.tipo === 'Especial' ? '#AA80D9' :
+                                            '#6c757d'
+                                        };
+                                        color: #fff;
+                                      ">
+                                    ${permission.tipo}
+                                </span>
 
-                                <div class="row small">
-                                    <div class="col-6">
+                                <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
+                                    <div class="col-2">
                                         <span class="text-muted fw-semibold">Creación:</span>
                                         <span class="text-dark fw-medium ms-1">${new Date(permission.fechaIngreso).toLocaleDateString('es-CR')}</span>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-2">
                                         <span class="text-muted fw-semibold">Inicio:</span>
                                         <span class="text-dark fw-medium ms-1">${new Date(permission.fechaInicio).toLocaleDateString('es-CR')}</span>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-2">
                                         <span class="text-muted fw-semibold">Fin:</span>
                                         <span class="text-dark fw-medium ms-1">${new Date(permission.fechaFinalizacion).toLocaleDateString('es-CR')}</span>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-2">
                                         <span class="text-muted fw-semibold">Regreso:</span>
                                         <span class="text-dark fw-medium ms-1">${new Date(permission.fechaRegresoLaboral).toLocaleDateString('es-CR')}</span>
                                     </div>
@@ -368,13 +475,21 @@
                         </div>
 
                         <div class="pt-2 border-top">
-                            <div class="row small">
-                                <div class="col-6">
+                            <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
+                                <div class="col-2">
                                     <span class="text-muted fw-semibold">Motivo:</span>
                                     <span class="text-dark fw-medium ms-1">${permission.motivo}</span>
-                                </div>                                
-                                <div class="col-6" style="padding-left: 0px">
+                                </div>
+                                <div class="col-2">
                                     <span class="text-muted fw-semibold">Comentarios:</span>
+                                    <span class="text-dark fw-medium ms-1">${permission.comentarios}</span>
+                                </div>
+                                <div class="col-2">
+                                    <span class="text-muted fw-semibold">Foto:</span>
+                                    <span class="text-dark fw-medium ms-1">${permission.comentarios}</span>
+                                </div>
+                                <div class="col-2">
+                                    <span class="text-muted fw-semibold">Adjunto:</span>
                                     <span class="text-dark fw-medium ms-1">${permission.comentarios}</span>
                                 </div>
                             </div>
@@ -393,6 +508,9 @@
                     </div>
                 </div>
             `).join('');
+
+            // Aplicar fade in al nuevo contenido
+            fadeIn(permissionsContainer);
         }
 
         function renderPagination() {
@@ -406,32 +524,36 @@
             }
         }
 
-        // Event listeners para filtros
+        // Event listeners para filtros con efectos de fade
         document.querySelectorAll('.filter-type').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', async function() {
                 if (this.checked) {
                     filtrosActivos.tipos.push(this.value);
                 } else {
                     filtrosActivos.tipos = filtrosActivos.tipos.filter(tipo => tipo !== this.value);
                 }
-                const permisosFiltrados = filtrarPermisos();
-                renderPermissions(permisosFiltrados);
+                const permisosFiltrados = await filtrarPermisos();
+                await renderPermissionsWithFade(permisosFiltrados);
+                // Ocultar paginación cuando hay filtros activos
+                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0) ? 'none' : 'flex';
             });
         });
 
         document.querySelectorAll('.filter-status').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
+            checkbox.addEventListener('change', async function() {
                 if (this.checked) {
                     filtrosActivos.estados.push(this.value);
                 } else {
                     filtrosActivos.estados = filtrosActivos.estados.filter(estado => estado !== this.value);
                 }
-                const permisosFiltrados = filtrarPermisos();
-                renderPermissions(permisosFiltrados);
+                const permisosFiltrados = await filtrarPermisos();
+                await renderPermissionsWithFade(permisosFiltrados);
+                // Ocultar paginación cuando hay filtros activos
+                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0) ? 'none' : 'flex';
             });
         });
 
-        // Limpiar filtros
+        // Limpiar filtros con efecto de fade
         document.getElementById('clear-filters').addEventListener('click', function() {
             // Desmarcar todos los checkboxes
             document.querySelectorAll('.filter-type, .filter-status').forEach(checkbox => {
@@ -442,14 +564,17 @@
             filtrosActivos.tipos = [];
             filtrosActivos.estados = [];
 
-            // Renderizar todos los permisos
-            renderPermissions(permisos);
+            // Renderizar todos los permisos de la página actual con fade
+            renderPermissionsWithFade(permisosPaginaActual);
+            pagination.style.display = 'flex';
         });
 
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', function() {
-            inicializarContadores();
-            renderPermissions(permisos);
+        // Inicializar con efecto de fade
+        document.addEventListener('DOMContentLoaded', async function() {
+            await inicializarContadores();
+            // Aplicar fade in al contenido inicial
+            permissionsContainer.style.opacity = '0';
+            renderPermissions(permisosPaginaActual);
             renderPagination();
         });
     </script>
