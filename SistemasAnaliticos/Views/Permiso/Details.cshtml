@@ -1,0 +1,345 @@
+﻿@model SistemasAnaliticos.Entidades.Permiso
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+        .badge-department {
+            background-color: #e3f2fd;
+            color: #0d6efd;
+            border: 1px solid #bbdefb;
+        }
+
+        .badge-active {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .badge-inactive {
+            background-color: #e7d1d1;
+            color: #c74854;
+        }
+
+        .avatar-large {
+            width: 160px;
+            height: 160px;
+            border-radius: 40%;
+            object-fit: cover;
+            border: 4px solid var(--primary-color);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+            .avatar-large:hover {
+                transform: scale(1.05);
+            }
+
+        .employee-id {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .info-icon {
+            color: var(--primary-color);
+        }
+
+        .card-title-custom {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Modal para imagen ampliada */
+        .modal-image {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <!-- Main Content -->
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+        @if (Model == null)
+        {
+            <!-- Employee Not Found -->
+            <div class="d-flex align-items-center justify-content-center" style="min-height: 68vh !important;">
+                <div class="card shadow-sm border-0" style="max-width: 700px">
+                    <div class="card-body p-5 pt-2 pb-0 text-center" style="display: flex; justify-content: center;">
+                        <div class="flex-shrink-0">
+                            <div id="lottie-animation" style="width: 240px; height: 240px;"></div>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; align-content: center;">
+                            <h2 class="h3 fw-bold text-dark mb-3 mt-3">Permiso no encontrado</h2>
+                            <p class="text-muted mb-4">El permiso que buscas no existe en nuestro sistema.</p>
+                        </div>
+                    </div>
+                    <div style="gap: 9%; padding-bottom: 4%; display: flex; justify-content: center; align-items: center;">
+                        <a asp-controller="Permiso" asp-action="VerPermisos" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Volver a Permisos
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Inicializar la animación
+                const animation = document.createElement('lottie-player');
+                animation.setAttribute('src', '/lottie/Empty Box.json'); // Ruta a tu JSON
+                animation.setAttribute('background', 'transparent');
+                animation.setAttribute('speed', '1');
+                animation.setAttribute('style', 'width: 240px; height: 240px;');
+                animation.setAttribute('loop', '');
+                animation.setAttribute('autoplay', '');
+
+                document.getElementById('lottie-animation').appendChild(animation);
+            </script>
+        }
+        else
+        {
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a asp-controller="Permiso" asp-action="VerPermisos" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Volver a los Permisos
+                </a>
+            </div>
+
+            <!-- Employee Header Card -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row g-4 align-items-start">
+                        <div class="col-md">
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                                <div class="mb-3 mb-md-0">
+                                    <h1 class="display-6 fw-bold text-dark mb-2">@Model.nombreEmpleado</h1>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge badge-department">Permiso de @Model.tipo</span>
+                                    </div>
+                                </div>
+                                <div class="text-md-end">
+                                    <p class="text-muted mb-1">Número de Permiso</p>
+                                    <p class="fs-3 fw-bold employee-id">#@Model.idPermiso</p>
+                                </div>
+                            </div>
+
+                            <!-- Quick Contact Info -->
+                            <div class="row g-3 mt-3">
+                                <div class="col-md">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1 min-width-0 text-center">
+                                            <p class="text-muted mb-0 small">Fecha de Creación de Permiso</p>
+                                            <p class="fw-medium mb-0 text-break">@Model.fechaIngreso.ToString("dd MMM yyyy")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1 min-width-0 text-center">
+                                            <p class="text-muted mb-0 small">Fecha de Inicio</p>
+                                            <p class="fw-medium mb-0 text-break">@Model.fechaInicio?.ToString("dd MMM yyyy")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1 min-width-0 text-center">
+                                            <p class="text-muted mb-0 small">Fecha de Finalización</p>
+                                            <p class="fw-medium mb-0 text-break">@Model.fechaFinalizacion?.ToString("dd MMM yyyy")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1 min-width-0 text-center">
+                                            <p class="text-muted mb-0 small">Fecha de Regreso Laboral</p>
+                                            <p class="fw-medium mb-0 text-break">@Model.fechaRegresoLaboral?.ToString("dd MMM yyyy")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Information Grid -->
+            <div class="row g-4">
+                <!-- Directions -->
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0 card-title-custom">
+                                <i class="bi bi-pin-map-fill info-icon"></i>
+                                Información
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Columna izquierda -->
+                                <div class="col-md-12">
+                                    <div class="mb-3 justify-content-center">
+                                        <p class="text-muted mb-1 small">Motivo</p>
+                                        <p class="fw-medium mb-0 text-break @(Model.motivo == null ? "text-decoration-line-through text-danger" : "")">
+                                            @(Model.motivo ?? "N/A")
+                                        </p>
+                                    </div>
+                                    <div class="mb-3 justify-content-center">
+                                        <p class="text-muted mb-1 small">Comentarios</p>
+                                        <p class="fw-medium mb-0 text-break @(Model.comentarios == null ? "text-decoration-line-through text-danger" : "")">
+                                            @(Model.comentarios ?? "N/A")
+                                        </p>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ARCHIVOS -->
+                <div class="col-lg-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0 card-title-custom">
+                                <i class="bi bi-file-text info-icon"></i>
+                                Archivos
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3 d-flex justify-content-center" style="gap: 40%; align-items: center;">
+                                <p class="text-muted mb-1 small">Foto</p>
+                                @if (Model.foto != null && Model.foto.Length > 0)
+                                {
+                                    var base64foto = Convert.ToBase64String(Model.foto);
+                                    <img src="data:image/jpeg;base64,@base64foto"
+                                         alt="foto"
+                                         style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; cursor: pointer;"
+                                         data-bs-toggle="modal"
+                                         data-bs-target="#fotoModal"
+                                         onclick="mostrarImagenModal('@base64foto')" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted d-inline-block text-center"
+                                          style="width: 70px; height: 70px; line-height: 70px; background: #f0f0f0; border-radius: 5px;">
+                                        Sin Foto
+                                    </span>
+                                }
+                            </div>
+                            <div class="mb-3 d-flex justify-content-center" style="gap: 40%; align-items: center;">
+                                <p class="text-muted mb-1 small">Archivo adjunto</p>
+                                @if (!string.IsNullOrWhiteSpace(Model.nombreArchivo))
+                                {
+                                    <div class="mt-1">
+                                        <a href="/Permiso/descargar-adjunto/@Model.idPermiso"
+                                           class="btn btn-sm btn-outline-primary d-flex align-items-center archivo-adjunto"
+                                           style="font-size: 0.75rem; padding: 0.25rem 0.5rem;"
+                                           title="Descargar @Model.nombreArchivo"
+                                           data-nombre-archivo="@Model.nombreArchivo"
+                                           data-tipo-mime="@Model.tipoMIME"
+                                           data-tamano-archivo="@Model.tamanoArchivo">
+                                            <!-- El icono se insertará con JavaScript -->
+                                            <span class="text-truncate d-block" style="max-width: 80px;">
+                                                @Model.nombreArchivo
+                                            </span>
+                                        </a>
+                                        <small class="text-muted text-center d-block mt-1 tamano-archivo">
+                                            <!-- El tamaño se mostrará con JavaScript -->
+                                        </small>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted d-inline-block text-center small"
+                                          style="width:100%; padding: 0.25rem; background:#f0f0f0; border-radius:5px;">
+                                        Sin archivo
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </main>
+    <script>
+        // Función para obtener icono según tipo de archivo
+        function obtenerIconoArchivo(nombreArchivo, tipoMIME) {
+            const extension = obtenerExtension(nombreArchivo).toLowerCase();
+
+            const iconos = {
+                'pdf': 'bi-file-pdf',
+                'doc': 'bi-file-word',
+                'docx': 'bi-file-word',
+                'xls': 'bi-file-excel',
+                'xlsx': 'bi-file-excel',
+                'ppt': 'bi-file-ppt',
+                'pptx': 'bi-file-ppt',
+                'jpg': 'bi-file-image',
+                'jpeg': 'bi-file-image',
+                'png': 'bi-file-image',
+                'gif': 'bi-file-image',
+                'zip': 'bi-file-zip',
+                'rar': 'bi-file-zip'
+            };
+
+            const icono = iconos[extension] || 'bi-file-earmark';
+            return `<i class="bi ${icono} me-1"></i>`;
+        }
+
+        // Función para obtener extensión del archivo
+        function obtenerExtension(nombreArchivo) {
+            return nombreArchivo.split('.').pop() || 'file';
+        }
+
+        // Función para formatear tamaño de archivo
+        function formatearTamanoArchivo(bytes) {
+            if (bytes === 0 || !bytes) return '0 B';
+
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Inicializar los archivos adjuntos cuando el documento esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Procesar todos los elementos de archivo adjunto
+            document.querySelectorAll('.archivo-adjunto').forEach(function(elemento) {
+                const nombreArchivo = elemento.getAttribute('data-nombre-archivo');
+                const tipoMIME = elemento.getAttribute('data-tipo-mime');
+                const tamanoArchivo = elemento.getAttribute('data-tamano-archivo');
+
+                // Insertar el icono al principio del enlace
+                const iconoHTML = obtenerIconoArchivo(nombreArchivo, tipoMIME);
+                elemento.innerHTML = iconoHTML + elemento.innerHTML;
+
+                // Actualizar el elemento del tamaño del archivo
+                const tamanoElemento = elemento.parentElement.querySelector('.tamano-archivo');
+                if (tamanoElemento) {
+                    tamanoElemento.textContent =
+                        `${formatearTamanoArchivo(parseInt(tamanoArchivo))} • ${obtenerExtension(nombreArchivo)}`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -131,12 +131,11 @@
 <body class="bg-gradient-custom min-vh-100">
 
     <!-- Main Content -->
-    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4 pb-0">
 
         <!-- Titulo de Permisos -->
         <div class="header-card p-4 mt-4 mb-4">
-            <h1 class="h2 fw-bold text-gray-900 mb-2">Ver Todos los Permisos</h1>
-            <p class="text-muted mb-0">Filtrado y observación de los permisos relacionados de los empleados de la empresa</p>
+            <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todos los Permisos</h1>
         </div>
 
         <!-- Permission Types Grid -->
@@ -244,7 +243,7 @@
 
                     <!-- Pagination -->
                     <nav class="mt-4">
-                        <ul class="pagination justify-content-center" id="pagination">
+                        <ul class="pagination justify-content-center mb-0" id="pagination">
                             <!-- Pagination will be dynamically generated here -->
                         </ul>
                     </nav>
@@ -254,6 +253,63 @@
         </div>
     </main>
 
+    <!-- Modal de la Foto -->
+    <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <img id="modalFoto" src="" alt="Foto ampliada" class="img-fluid rounded" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function mostrarImagenModal(base64) {
+            var modalImg = document.getElementById("modalFoto");
+            modalImg.src = "data:image/jpeg;base64," + base64;
+        }
+    </script>
+    <script>
+        // Función para obtener icono según tipo de archivo
+        function obtenerIconoArchivo(nombreArchivo, tipoMIME) {
+            const extension = obtenerExtension(nombreArchivo).toLowerCase();
+
+            const iconos = {
+                'pdf': 'bi-file-pdf',
+                'doc': 'bi-file-word',
+                'docx': 'bi-file-word',
+                'xls': 'bi-file-excel',
+                'xlsx': 'bi-file-excel',
+                'ppt': 'bi-file-ppt',
+                'pptx': 'bi-file-ppt',
+                'jpg': 'bi-file-image',
+                'jpeg': 'bi-file-image',
+                'png': 'bi-file-image',
+                'gif': 'bi-file-image',
+                'zip': 'bi-file-zip',
+                'rar': 'bi-file-zip'
+            };
+
+            const icono = iconos[extension] || 'bi-file-earmark';
+            return `<i class="bi ${icono} me-1"></i>`;
+        }
+
+        // Función para obtener extensión del archivo
+        function obtenerExtension(nombreArchivo) {
+            return nombreArchivo.split('.').pop() || 'file';
+        }
+
+        // Función para formatear tamaño de archivo
+        function formatearTamanoArchivo(bytes) {
+            if (bytes === 0 || !bytes) return '0 B';
+
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
     <script>
         const permisosPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Permisos));
         const totalPaginas = @Model.TotalPaginas;
@@ -262,7 +318,7 @@
         const permissionsContainer = document.getElementById("permissionsContainer");
         const pagination = document.getElementById("pagination");
 
-        // Estado global
+        // Estado global - cargar TODOS los permisos una sola vez
         let todosLosPermisos = [];
         let permisosFiltrados = [];
 
@@ -271,23 +327,6 @@
             tipos: [],
             estados: []
         };
-
-        // Cargar todos los permisos del servidor
-        async function cargarTodosLosPermisos() {
-            try {
-                const response = await fetch('/Permiso/ObtenerTodosLosPermisos');
-                if (response.ok) {
-                    const todosLosPermisos = await response.json();
-                    return todosLosPermisos;
-                } else {
-                    console.error('Error al cargar permisos:', response.status);
-                    return permisosPaginaActual;
-                }
-            } catch (error) {
-                console.error('Error cargando permisos:', error);
-                return permisosPaginaActual;
-            }
-        }
 
         // Mapear estado del backend al frontend
         function mapearEstado(estadoBackend) {
@@ -301,10 +340,30 @@
             return estadoBackend;
         }
 
+        // Cargar TODOS los permisos del servidor (solo una vez)
+        async function cargarTodosLosPermisos() {
+            try {
+                const response = await fetch('/Permiso/ObtenerTodosLosPermisos');
+                if (response.ok) {
+                    todosLosPermisos = await response.json();
+                    return todosLosPermisos;
+                } else {
+                    console.error('Error al cargar permisos:', response.status);
+                    // Si falla, usar solo los de la página actual
+                    todosLosPermisos = permisosPaginaActual;
+                    return todosLosPermisos;
+                }
+            } catch (error) {
+                console.error('Error cargando permisos:', error);
+                todosLosPermisos = permisosPaginaActual;
+                return todosLosPermisos;
+            }
+        }
+
         // Inicializar contadores con TODOS los permisos
         async function inicializarContadores() {
             if (todosLosPermisos.length === 0) {
-                todosLosPermisos = await cargarTodosLosPermisos();
+                await cargarTodosLosPermisos();
             }
 
             const contadoresTipo = {
@@ -321,7 +380,7 @@
                 'Rechazado': 0
             };
 
-            // Contar TODOS los permisos, no solo los de la página actual
+            // Contar TODOS los permisos
             todosLosPermisos.forEach(permiso => {
                 if (contadoresTipo.hasOwnProperty(permiso.tipo)) {
                     contadoresTipo[permiso.tipo]++;
@@ -348,7 +407,7 @@
         // Función para filtrar permisos (usa TODOS los permisos)
         async function filtrarPermisos() {
             if (todosLosPermisos.length === 0) {
-                todosLosPermisos = await cargarTodosLosPermisos();
+                await cargarTodosLosPermisos();
             }
 
             permisosFiltrados = todosLosPermisos.filter(permiso => {
@@ -415,7 +474,9 @@
             }
 
             permissionsContainer.innerHTML = data.map(permission => `
-                <div class="card permission-card mb-3">
+            <div class="card permission-card mb-3"
+                 style="cursor: pointer;"
+                 onclick="window.location.href='/Permiso/Details/${permission.idPermiso}'">
                     <div class="card-body">
                         <div class="mb-2">
                             <div class="d-flex align-items-start justify-content-between gap-1 mb-2 flex-wrap">
@@ -475,36 +536,61 @@
                         </div>
 
                         <div class="pt-2 border-top">
-                            <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
+                            <div class="row small d-flex align-items-center flex-wrap justify-content-around" style="gap: 0.5rem; padding-left: 5%; padding-right: 5%;">
                                 <div class="col-2">
-                                    <span class="text-muted fw-semibold">Motivo:</span>
-                                    <span class="text-dark fw-medium ms-1">${permission.motivo}</span>
+                                    <span class="text-muted fw-semibold d-block">Motivo:</span>
+                                    <span class="text-dark fw-medium ms-1" d-block>${permission.motivo ?? 'Sin motivo'}</span>
                                 </div>
                                 <div class="col-2">
-                                    <span class="text-muted fw-semibold">Comentarios:</span>
-                                    <span class="text-dark fw-medium ms-1">${permission.comentarios}</span>
+                                    <span class="text-muted fw-semibold d-block">Comentarios:</span>
+                                    <span class="text-dark fw-medium ms-1" d-block>${permission.comentarios ?? 'Sin comentario'}</span>
                                 </div>
                                 <div class="col-2">
-                                    <span class="text-muted fw-semibold">Foto:</span>
-                                    <span class="text-dark fw-medium ms-1">${permission.comentarios}</span>
+                                    <span class="text-muted fw-semibold d-block">Foto:</span>
+                                    ${
+                                    permission.foto && permission.foto.trim() !== ''
+                                        ? `<img src="data:image/jpeg;base64,${permission.foto}"
+                                                alt="foto"
+                                                style="width:25px; height:25px; object-fit:cover; border-radius:5px; cursor:pointer;"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#fotoModal"
+                                                onclick="mostrarImagenModal('${permission.foto}')">`
+                                        : `<span class="text-muted d-inline-block text-center"
+                                                style="width:25px; height:25px; line-height:25px; background:#f0f0f0; border-radius:5px;">
+                                            Sin foto
+                                            </span>`
+                                    }
                                 </div>
                                 <div class="col-2">
-                                    <span class="text-muted fw-semibold">Adjunto:</span>
-                                    <span class="text-dark fw-medium ms-1">${permission.comentarios}</span>
+                                    ${
+                                        permission.nombreArchivo && permission.nombreArchivo.trim() !== ''
+                                            ? `
+                                                <div class="mt-1">
+                                                    <a href="/Permiso/descargar-adjunto/${permission.idPermiso}"
+                                                        class="btn btn-sm btn-outline-primary d-flex align-items-center"
+                                                        style="font-size: 0.75rem; padding: 0.25rem 0.5rem;"
+                                                        title="Descargar ${permission.nombreArchivo}">
+                                                        ${obtenerIconoArchivo(permission.nombreArchivo, permission.tipoMIME)}
+                                                        <span class="text-truncate d-block" style="max-width: 80px;">
+                                                            ${permission.nombreArchivo}
+                                                        </span>
+                                                    </a>
+                                                    <small class="text-muted text-center d-block mt-1">
+                                                        ${formatearTamanoArchivo(permission.tamanoArchivo)} •
+                                                        ${obtenerExtension(permission.nombreArchivo)}
+                                                    </small>
+                                                </div>
+                                            `
+                                            : `
+                                                <span class="text-muted d-inline-block text-center small"
+                                                        style="width:100%; padding: 0.25rem; background:#f0f0f0; border-radius:5px;">
+                                                    Sin archivo
+                                                </span>
+                                            `
+                                        }
                                 </div>
                             </div>
                         </div>
-
-                        ${permission.attachment ? `
-                            <div class="mt-2 pt-2 border-top">
-                                <div class="d-flex align-items-center gap-1 small">
-                                    <i class="bi bi-download text-primary"></i>
-                                    <a href="${permission.attachment}" class="text-primary text-decoration-none fw-medium" target="_blank">
-                                        Descargar adjunto
-                                    </a>
-                                </div>
-                            </div>
-                        ` : ''}
                     </div>
                 </div>
             `).join('');
@@ -571,7 +657,10 @@
 
         // Inicializar con efecto de fade
         document.addEventListener('DOMContentLoaded', async function() {
+            // Cargar todos los permisos primero
+            await cargarTodosLosPermisos();
             await inicializarContadores();
+
             // Aplicar fade in al contenido inicial
             permissionsContainer.style.opacity = '0';
             renderPermissions(permisosPaginaActual);

@@ -511,7 +511,6 @@
                                                                     } else {
                                                                         removerLicencia(this.value);
                                                                     }
-                                                                    actualizarInterfaz();
                                                                 });
                                                             });
 
@@ -535,31 +534,6 @@
                                                                 if (checkboxCorrespondiente) {
                                                                     checkboxCorrespondiente.checked = false;
                                                                 }
-                                                            }
-
-                                                            function actualizarInterfaz() {
-                                                                // Actualizar tags visuales
-                                                                if (licenciasSeleccionadas.length > 0) {
-                                                                    containerSeleccionadas.innerHTML = '';
-                                                                    licenciasSeleccionadas.forEach(licencia => {
-                                                                        const tag = document.createElement('span');
-                                                                        tag.className = 'licencia-tag';
-                                                                        tag.innerHTML = `
-                                                                            ${licencia}
-                                                                            <button type="button" class="btn-close btn-close-white"
-                                                                                    onclick="removerLicenciaDesdeTag('${licencia}')"></button>
-                                                                        `;
-                                                                        containerSeleccionadas.appendChild(tag);
-                                                                    });
-                                                                } else {
-                                                                    containerSeleccionadas.innerHTML = '<span class="text-muted">No hay licencias seleccionadas</span>';
-                                                                }
-
-                                                                // Actualizar campo hidden (separado por comas)
-                                                                inputHidden.value = licenciasSeleccionadas.join(',');
-
-                                                                // Actualizar validación
-                                                                validarLicencias();
                                                             }
 
                                                             function validarLicencias() {
@@ -589,7 +563,6 @@
                                                             // Hacer función global para los tags
                                                             window.removerLicenciaDesdeTag = function(licencia) {
                                                                 removerLicencia(licencia);
-                                                                actualizarInterfaz();
                                                             };
 
                                                             // Validación inicial
@@ -1270,7 +1243,6 @@
                     } else {
                         removerLicencia(this.value);
                     }
-                    actualizarInterfaz();
                 });
             });
 
@@ -1284,23 +1256,6 @@
                 licenciasSeleccionadas = licenciasSeleccionadas.filter(lic => lic !== licencia);
             }
 
-            function actualizarInterfaz() {
-                if (licenciasSeleccionadas.length > 0) {
-                    licenciasSeleccionadas.forEach(licencia => {
-                        const tag = document.createElement('span');
-                        tag.className = 'licencia-tag';
-                        tag.innerHTML = `
-                            ${licencia}
-                            <button type="button" class="btn-close btn-close-white"
-                                    onclick="removerLicenciaDesdeTag('${licencia}')"></button>
-                        `;
-                    });
-                }
-
-                inputHidden.value = licenciasSeleccionadas.join(',');
-                validarLicencias();
-            }
-
             function validarLicencias() {
                 if (licenciasSeleccionadas.length > 0) {
                     inputHidden.classList.remove('is-invalid');
@@ -1312,7 +1267,6 @@
             // Hacer función global para los tags
             window.removerLicenciaDesdeTag = function(licencia) {
                 removerLicencia(licencia);
-                actualizarInterfaz();
             };
 
             validarLicencias();

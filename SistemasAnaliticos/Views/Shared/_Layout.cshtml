@@ -144,23 +144,16 @@
                             </ul>
                         </li>
 
-                        <!-- Permisos -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                Permisos
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="Permiso" asp-action="Index"><i class="bi-plus-square me-2"></i>Nuevo</a></li>
-                                <li><a class="dropdown-item" asp-controller="Permiso" asp-action="VerPermisos"><i class="bi-plus-square me-2"></i>Consulta</a></li>
-                            </ul>
-                        </li>
-
                         <!-- Acciones -->
                         <li class="nav-item dropdown">
                             <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 Acciones
                             </a>
                             <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-controller="Permiso" asp-action="Index"><i class="bi-plus-square me-2"></i>Nuevo Permiso</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-controller="Permiso" asp-action="VerPermisos"><i class="bi-plus-square me-2"></i>Ver Permisos</a></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="#"><i class="bi bi-people me-2"></i>Incapacidades</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="bi bi-person-plus me-2"></i>Licencias</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="bi bi-people me-2"></i>Vacaciones</a></li>
