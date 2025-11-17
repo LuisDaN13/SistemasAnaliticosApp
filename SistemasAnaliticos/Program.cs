@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IConstanciaService, ConstanciaService>();
+builder.Services.AddScoped<IFechaLargaService, FechaLargaService>();
 
 // Base de Datos a Usar
 builder.Services.AddDbContext<DBContext>(o =>

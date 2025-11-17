@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SistemasAnaliticos.DTO;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
+using SistemasAnaliticos.Services;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using static SistemasAnaliticos.Models.codigoFotos;
-using SistemasAnaliticos.Services;
 
 namespace SistemasAnaliticos.Controllers
 {
@@ -23,9 +26,178 @@ namespace SistemasAnaliticos.Controllers
             _constanciaService = constanciaService;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> VerConstancias(int page = 1)
         {
-            return View();
+            int pageSize = 3;
+
+            var totalConstancias = await _context.Constancia
+                .Where(p => p.estado == "Creada")
+                .CountAsync();
+
+            var constancias = await _context.Constancia
+                .AsNoTracking()
+                .Where(p => p.estado == "Creada")
+                .OrderByDescending(x => x.fechaPedido)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new ConstanciaDTO
+                {
+                    idConstancia = p.idConstancia,
+                    fechaPedido = p.fechaPedido,
+                    nombreEmpleado = p.nombrePersona,
+                    tipo = p.tipo,
+                    dirijido = p.dirijido,
+                    fechaRequerida = p.fechaRequerida,
+                    comentarios = p.Comentarios,
+                    nombreArchivo = p.nombreArchivo,
+                    tipoMIME = p.tipoMIME,
+                    tamanoArchivo = p.tamanoArchivo,
+                    estado = p.estado
+                })
+                .ToListAsync();
+
+            var viewModel = new PaginacionConstanciasDTO
+            {
+                Constancias = constancias,
+                PaginaActual = page,
+                TotalPaginas = (int)Math.Ceiling(totalConstancias / (double)pageSize)
+            };
+
+            return View(viewModel);
+        }
+
+        // ENDPOINT PARA TENER TODAS LAS CONSTANCIAS (sin paginación)
+        public async Task<IActionResult> ObtenerTodasLasConstancias()
+        {
+            try
+            {
+                var todosLasConstancias = await _context.Constancia
+                    .AsNoTracking()
+                    .OrderByDescending(x => x.fechaPedido)
+                    .Select(p => new {
+                        p.idConstancia,
+                        p.fechaPedido,
+                        p.nombrePersona,
+                        p.tipo,
+                        p.dirijido,
+                        p.fechaRequerida,
+                        p.Comentarios,
+                        p.nombreArchivo,
+                        p.tipoMIME,
+                        p.tamanoArchivo,
+                        p.estado,
+                    })
+                    .ToListAsync();
+
+                return Ok(todosLasConstancias);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Error interno del servidor");
+            }
+        }
+
+        //METODO SEGUIDO DE LA PAGINACION PARA FILTROS JUNTOS
+        public async Task<IActionResult> ObtenerConstanciasFiltrados([FromQuery] string[] tipos, [FromQuery] string[] estados)
+        {
+            var query = _context.Constancia.AsNoTracking().AsQueryable();
+
+            // Aplicar filtros
+            if (tipos != null && tipos.Length > 0)
+            {
+                query = query.Where(p => tipos.Contains(p.tipo));
+            }
+
+            if (estados != null && estados.Length > 0)
+            {
+                var estadosMapeados = estados.Select(e =>
+                    e == "Aprobado" ? "Creada" :
+                    e == "Pendiente" ? "Pendiente" :
+                    "Rechazada").ToArray();
+
+                query = query.Where(p => estadosMapeados.Contains(p.estado));
+            }
+
+            var permisos = await query
+                .OrderByDescending(x => x.fechaPedido )
+                .Select(p => new {
+                    p.idConstancia,
+                    p.fechaPedido,
+                    p.nombrePersona,
+                    p.tipo,
+                    p.dirijido,
+                    p.fechaRequerida,
+                    p.Comentarios,
+                    p.nombreArchivo,
+                    p.tipoMIME,
+                    p.tamanoArchivo,
+                    p.estado,
+                })
+                .ToListAsync();
+
+            return Ok(permisos);
+        }
+
+        // ENDPOINT PARA OBTENER CONTADORES DE FILTROS
+        public async Task<IActionResult> ObtenerContadoresFiltros()
+        {
+            try
+            {
+                var contadores = await _context.Constancia
+                    .AsNoTracking()
+                    .GroupBy(p => 1)
+                    .Select(g => new
+                    {
+                        Laboral = g.Count(p => p.tipo == "Laboral"),
+                        Salarial = g.Count(p => p.tipo == "Salarial"),
+                        Aprobado = g.Count(p => p.estado == "Aprobada"),
+                        Pendiente = g.Count(p => p.estado == "Pendiente"),
+                        Rechazado = g.Count(p => p.estado == "Rechazada")
+                    })
+                    .FirstOrDefaultAsync();
+
+                return Ok(contadores ?? new
+                {
+                    Laboral = 0,
+                    Salarial = 0,
+                    Aprobado = 0,
+                    Pendiente = 0,
+                    Rechazado = 0
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    Laboral = 0,
+                    Salarial = 0,
+                    Aprobado = 0,
+                    Pendiente = 0,
+                    Rechazado = 0
+                });
+            }
+        }
+
+
+        [HttpGet]
+        [Route("Constancia/descargar-adjunto/{id}")]
+        public async Task<IActionResult> DescargarAdjunto(long id)
+        {
+            var constancia = await _context.Constancia
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.idConstancia == id);
+
+            if (constancia?.datosAdjuntos == null || constancia.datosAdjuntos.Length == 0)
+            {
+                return NotFound("No se encontró el archivo adjunto");
+            }
+
+            // Retornar el archivo
+            return File(
+                constancia.datosAdjuntos,
+                constancia.tipoMIME ?? "application/octet-stream",
+                constancia.nombreArchivo ?? "archivo_adjunto"
+            );
         }
 
         public async Task<IActionResult> Create(Constancia model)
@@ -46,59 +218,69 @@ namespace SistemasAnaliticos.Controllers
 
                 var user = await _userManager.GetUserAsync(User);
 
-                var pdfBytes = await _constanciaService.GenerarConstanciaLaboral(user.nombreCompleto, user.cedula, user.departamento, user.puesto);
-
-                var nuevo = new Constancia
+                if (model.tipo == "Laboral")
                 {
-                    fechaPedido = ahoraCR,
-                    nombrePersona = "Luis",
-                    tipo = model.tipo,
+                    var pdfBytes = await _constanciaService.GenerarConstanciaLaboral(user.nombreCompleto, user.cedula, user.departamento, user.fechaIngreso, user.puesto, model.dirijido);
 
-                    dirijido = model.dirijido,
-                    fechaRequerida = model.fechaRequerida,
-                    Comentarios = model.Comentarios,
+                    var nuevo = new Constancia
+                    {
+                        fechaPedido = ahoraCR,
+                        nombrePersona = user.nombreCompleto,
+                        tipo = model.tipo,
 
-                    datosAdjuntos = pdfBytes,
-                    nombreArchivo = $"Constancia_Laboral_{user.nombreCompleto}.pdf",
-                    tipoMIME = "application/pdf",
-                    tamanoArchivo = pdfBytes.Length,
+                        dirijido = model.dirijido,
+                        fechaRequerida = model.fechaRequerida,
+                        Comentarios = model.Comentarios,
 
-                    estado = "Creada"
-                };
+                        datosAdjuntos = pdfBytes,
+                        nombreArchivo = $"Constancia_Laboral_{user.primerNombre}{user.primerApellido}.pdf",
+                        tipoMIME = "application/pdf",
+                        tamanoArchivo = pdfBytes.Length,
 
-                _context.Constancia.Add(nuevo);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Permiso", "Index");
+                        estado = "Creada"
+                    };
+
+                    _context.Constancia.Add(nuevo);
+                    await _context.SaveChangesAsync();
+                } else
+                {
+                    int salarioBruto = 100000;
+                    int deducciones = 200000;
+                    int salarioNeto = 300000;
+
+                    var pdfBytes = await _constanciaService.GenerarConstanciaSalarial(user.nombreCompleto, user.cedula, user.departamento, user.fechaIngreso, user.puesto, salarioBruto, deducciones, salarioNeto);
+
+                    var nuevo = new Constancia
+                    {
+                        fechaPedido = ahoraCR,
+                        nombrePersona = user.nombreCompleto,
+                        tipo = model.tipo,
+
+                        dirijido = model.dirijido,
+                        fechaRequerida = model.fechaRequerida,
+                        Comentarios = model.Comentarios,
+
+                        datosAdjuntos = pdfBytes,
+                        nombreArchivo = $"Constancia_Salarial_{user.primerNombre}{user.primerApellido}.pdf",
+                        tipoMIME = "application/pdf",
+                        tamanoArchivo = pdfBytes.Length,
+
+                        estado = "Creada"
+                    };
+
+                    _context.Constancia.Add(nuevo);
+                    await _context.SaveChangesAsync();
+                }
+
+                TempData["SuccessMessage"] = "Se creó la constancia correctamente.";
+                return RedirectToAction("Index", "Permiso");
             }
             catch
             {
-                return RedirectToAction("Usuario", "Index");
+                TempData["ErrorMessage"] = "Error en la creación de la constancia.";
+                return RedirectToAction("Index", "Permiso");
             }
         }
 
-
-
-        public async Task<IActionResult> ProbarPDF()
-        {
-            try
-            {
-                var constanciaService = new ConstanciaService();
-
-                // Datos de prueba
-                var pdfBytes = await constanciaService.GenerarConstanciaLaboral(
-                    "Juan Pérez García",
-                    "1-2345-6789",
-                    "Recursos Humanos",
-                    "Analista Senior"
-                );
-
-                // Retornar el PDF directamente para visualizarlo
-                return File(pdfBytes, "application/pdf", "Constancia_Prueba.pdf");
-            }
-            catch (Exception ex)
-            {
-                return Content($"Error al generar PDF: {ex.Message}");
-            }
-        }
     }
 }

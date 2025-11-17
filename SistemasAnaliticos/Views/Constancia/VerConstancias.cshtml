@@ -1,0 +1,626 @@
+﻿@model SistemasAnaliticos.DTO.PaginacionConstanciasDTO
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+        .header-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background-color: white;
+        }
+    </style>
+    <style>
+        .category-header {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .category-header:hover {
+                background-color: #f8f9fa !important;
+            }
+
+        .border-left-accent1 {
+            border-left-color: #0d6efd;
+            border-left-width: 4px !important;
+            border-left-style: solid;
+        }
+
+        .border-left-accent2 {
+            border-left-color: #146c43;
+            border-left-width: 4px !important;
+            border-left-style: solid;
+        }
+
+        .badge-status {
+            font-size: 0.75rem;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .constanciaas-item {
+            transition: background-color 0.3s;
+        }
+
+            .constanciaas-item:hover {
+                background-color: #f8f9fa;
+            }
+
+        .action-btn {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s;
+        }
+
+        .chevron-icon {
+            color: #0d6efd;
+            transition: transform 0.3s;
+        }
+
+        .chevron-rotated {
+            transform: rotate(180deg);
+        }
+    </style>
+    <style>
+        .custom-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        #constanciasContainer {
+            transition: opacity 0.3s ease;
+            opacity: 1;
+        }
+
+        .constancia-card {
+            transition: all 0.3s ease;
+            border: 1px solid #dee2e6;
+        }
+
+            .constancia-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+                border-color: var(--primary-color);
+            }
+
+        .no-results {
+            transition: opacity 0.3s ease;
+        }
+
+        .card {
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .filter-section {
+            position: sticky;
+            top: 5rem;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <!-- Main Content -->
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4 pb-0">
+
+        <!-- Titulo de Constancias -->
+        <div class="header-card p-4 mt-4 mb-4">
+            <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todas las Constancias</h1>
+        </div>
+
+        <!-- constanciaas Types Grid -->
+        <div class="container my-4">
+            <div class="row">
+                <!-- FILTROS PARA CARDS -->
+                <div class="col-lg-3">
+                    <div class="card filter-section">
+                        <div class="card-body">
+                            <h2 class="h5 card-title fw-bold text-dark mb-4">Filtrar por</h2>
+
+                            <!-- Type Filter -->
+                            <div class="mb-4 pb-3 border-bottom">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#typeFilter" aria-expanded="true" aria-controls="typeFilter">
+                                    Tipo de Constancia
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                                <div class="collapse show mt-3" id="typeFilter">
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-type" type="checkbox" value="Laboral" id="type-laboral">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-laboral">
+                                                <span>Laboral</span>
+                                                <span class="text-muted" id="count-laboral">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-type" type="checkbox" value="Salarial" id="type-salarial">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-salarial">
+                                                <span>Salarial</span>
+                                                <span class="text-muted" id="count-salarial">(0)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div class="pb-3">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#statusFilter" aria-expanded="true" aria-controls="statusFilter">
+                                    Estado
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                                <div class="collapse show mt-3" id="statusFilter">
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Aprobado" id="status-approved">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-approved">
+                                                <span>Aprobado</span>
+                                                <span class="text-muted" id="count-approved">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Pendiente" id="status-pending">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-pending">
+                                                <span>Pendiente</span>
+                                                <span class="text-muted" id="count-pending">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Rechazado" id="status-rejected">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-rejected">
+                                                <span>Rechazado</span>
+                                                <span class="text-muted" id="count-rejected">(0)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Clear Filters -->
+                            <button class="btn w-100 text-primary-custom fw-medium pt-3 border-top" id="clear-filters">
+                                Limpiar filtros
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO DE CARDS -->
+                <div class="col-lg-9">
+                    <div id="constanciasContainer">
+                        <!-- constanciaass will be dynamically loaded here -->
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center mb-0" id="pagination">
+                            <!-- Pagination will be dynamically generated here -->
+                        </ul>
+                    </nav>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de la Foto -->
+    <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <img id="modalFoto" src="" alt="Foto ampliada" class="img-fluid rounded" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function mostrarImagenModal(base64) {
+            var modalImg = document.getElementById("modalFoto");
+            modalImg.src = "data:image/jpeg;base64," + base64;
+        }
+    </script>
+    <script>
+        // Función para obtener icono según tipo de archivo
+        function obtenerIconoArchivo(nombreArchivo, tipoMIME) {
+            const extension = obtenerExtension(nombreArchivo).toLowerCase();
+
+            const iconos = {
+                'pdf': 'bi-file-pdf',
+                'doc': 'bi-file-word',
+                'docx': 'bi-file-word',
+                'xls': 'bi-file-excel',
+                'xlsx': 'bi-file-excel',
+                'ppt': 'bi-file-ppt',
+                'pptx': 'bi-file-ppt',
+                'jpg': 'bi-file-image',
+                'jpeg': 'bi-file-image',
+                'png': 'bi-file-image',
+                'gif': 'bi-file-image',
+                'zip': 'bi-file-zip',
+                'rar': 'bi-file-zip'
+            };
+
+            const icono = iconos[extension] || 'bi-file-earmark';
+            return `<i class="bi ${icono} me-1"></i>`;
+        }
+
+        // Función para obtener extensión del archivo
+        function obtenerExtension(nombreArchivo) {
+            return nombreArchivo.split('.').pop() || 'file';
+        }
+
+        // Función para formatear tamaño de archivo
+        function formatearTamanoArchivo(bytes) {
+            if (bytes === 0 || !bytes) return '0 B';
+
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+    <script>
+        const constanciasPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Constancias));
+        const totalPaginas = @Model.TotalPaginas;
+        let paginaActual = @Model.PaginaActual;
+
+        const constanciasContainer = document.getElementById("constanciasContainer");
+        const pagination = document.getElementById("pagination");
+
+        // Estado global - cargar TODAS las constancias una sola vez
+        let todosLasConstancias = [];
+        let constanciasFiltradas = [];
+
+        // Estado de los filtros
+        let filtrosActivos = {
+            tipos: [],
+            estados: []
+        };
+
+        // Mapear estado del backend al frontend
+        function mapearEstado(estadoBackend) {
+            if (estadoBackend === "Creada" || estadoBackend === "Aprobada") {
+                return "Aprobado";
+            } else if (estadoBackend === "Pendiente") {
+                return "Pendiente";
+            } else if (estadoBackend === "Rechazada") {
+                return "Rechazado";
+            }
+            return estadoBackend;
+        }
+
+        // Cargar TODAS las constancias del servidor (solo una vez)
+        async function cargarTodasLasConstancias() {
+            try {
+                const response = await fetch('/Constancia/ObtenertodasLasConstancias');
+                if (response.ok) {
+                    todasLasConstancias = await response.json();
+                    return todasLasConstancias;
+                } else {
+                    console.error('Error al cargar constancias:', response.status);
+                    // Si falla, usar solo los de la página actual
+                    todasLasConstancias = constanciasPaginaActual;
+                    return todasLasConstancias;
+                }
+            } catch (error) {
+                console.error('Error cargando constancias:', error);
+                todasLasConstancias = constanciasPaginaActual;
+                return todasLasConstancias;
+            }
+        }
+
+        // Inicializar contadores con TODAS las constancias
+        async function inicializarContadores() {
+            if (todasLasConstancias.length === 0) {
+                await cargarTodasLasConstancias();
+            }
+
+            const contadoresTipo = {
+                'Laboral': 0,
+                'Salarial': 0
+            };
+
+            const contadoresEstado = {
+                'Aprobado': 0,
+                'Pendiente': 0,
+                'Rechazado': 0
+            };
+
+            // Contar TODAS las constancias
+            todasLasConstancias.forEach(constancia => {
+                if (contadoresTipo.hasOwnProperty(constancia.tipo)) {
+                    contadoresTipo[constancia.tipo]++;
+                }
+
+                const estadoFrontend = mapearEstado(constancia.estado);
+                if (contadoresEstado.hasOwnProperty(estadoFrontend)) {
+                    contadoresEstado[estadoFrontend]++;
+                }
+            });
+
+            // Actualizar contadores en la UI
+            document.getElementById('count-laboral').textContent = `(${contadoresTipo['Laboral']})`;
+            document.getElementById('count-salarial').textContent = `(${contadoresTipo['Salarial']})`;
+
+            document.getElementById('count-approved').textContent = `(${contadoresEstado['Aprobado']})`;
+            document.getElementById('count-pending').textContent = `(${contadoresEstado['Pendiente']})`;
+            document.getElementById('count-rejected').textContent = `(${contadoresEstado['Rechazado']})`;
+        }
+
+        // Función para filtrar constancias (usa TODAS las constancias)
+        async function filtrarConstancias() {
+            if (todasLasConstancias.length === 0) {
+                await cargarTodasLasConstancias();
+            }
+
+            constanciasFiltradas = todasLasConstancias.filter(constancia => {
+                // Filtrar por tipo
+                const coincideTipo = filtrosActivos.tipos.length === 0 ||
+                                   filtrosActivos.tipos.includes(constancia.tipo);
+
+                // Filtrar por estado
+                const estadoFrontend = mapearEstado(constancia.estado);
+                const coincideEstado = filtrosActivos.estados.length === 0 ||
+                                     filtrosActivos.estados.includes(estadoFrontend);
+
+                return coincideTipo && coincideEstado;
+            });
+
+            return constanciasFiltradas;
+        }
+
+        // Función para aplicar fade out
+        function fadeOut(element, callback) {
+            element.style.transition = 'opacity 0.3s ease';
+            element.style.opacity = '0';
+
+            setTimeout(() => {
+                callback();
+                // Restaurar opacidad después de cambiar el contenido
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                }, 50);
+            }, 300);
+        }
+
+        // Función para aplicar fade in
+        function fadeIn(element) {
+            element.style.transition = 'opacity 0.3s ease';
+            element.style.opacity = '0';
+
+            // Pequeño delay para que el fade out termine
+            setTimeout(() => {
+                element.style.opacity = '1';
+            }, 50);
+        }
+
+        // Función para renderizar constancias con efectos de fade
+        async function renderConstanciasWithFade(data) {
+            fadeOut(constanciasContainer, () => {
+                renderConstancias(data);
+            });
+        }
+
+        // Función para renderizar constancias
+        function renderConstancias(data) {
+            if (data.length === 0) {
+                constanciasContainer.innerHTML = `
+                    <div class="no-results">
+                        <i class="bi bi-inbox display-1 d-block mb-3"></i>
+                        <h3 class="h4 text-muted">No se encontraron constancias</h3>
+                        <p class="text-muted">Intenta ajustar los filtros para ver más resultados.</p>
+                    </div>
+                `;
+                // Aplicar fade in al contenido vacío
+                fadeIn(constanciasContainer);
+                return;
+            }
+
+            constanciasContainer.innerHTML = data.map(constanciaas => `
+            <div class="card constancia-card mb-3"
+                 style="cursor: pointer;"
+                 onclick="window.location.href='/Constancia/Details/${constanciaas.idConstancia}'">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <div class="d-flex align-items-start justify-content-between gap-1 mb-2 flex-wrap">
+                                <h3 class="h6 fw-bold text-dark mb-0" style="padding: 5px">
+                                    <i class="fa-solid fa-user me-3"></i>${constanciaas.nombreEmpleado}
+                                </h3>
+                                <h5 class="h6 text-white small mb-0" style="padding: 5px; background-color: #012473; border-radius: 5px">
+                                    #${constanciaas.idConstancia}
+                                </h5>
+                            </div>
+                            <div class="d-flex align-items-center flex-wrap mb-2" style="gap: 1.5rem; padding-left: 5%; padding-right: 5%;">
+                                <span class="badge custom-badge ${
+                                    constanciaas.estado === "Creada" || constanciaas.estado === "Aprobada"
+                                        ? "bg-success"
+                                        : constanciaas.estado === "Pendiente"
+                                            ? "bg-warning"
+                                            : constanciaas.estado === "Rechazada"
+                                                ? "bg-danger"
+                                                : "bg-secondary"
+                                }">
+                                    ${constanciaas.estado}
+                                </span>
+                                <span class="badge custom-badge"
+                                      style="
+                                        background-color: ${
+                                            constanciaas.tipo === 'Laboral' ? '#F58E53' :
+                                            constanciaas.tipo === 'Salarial' ? '#dc3545' :
+                                            '#6c757d'
+                                        };
+                                        color: #fff;
+                                      ">
+                                    ${constanciaas.tipo}
+                                </span>
+
+                                <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
+                                    <div class="col d-flex align-items-center gap-1">
+                                        <span class="text-muted fw-semibold">Creación:</span>
+                                        <span class="text-dark fw-medium ms-1">${new Date(constanciaas.fechaPedido).toLocaleDateString('es-CR')}</span>
+                                    </div>
+                                    <div class="col d-flex align-items-center gap-1">
+                                        <span class="text-muted fw-semibold">Dirijido:</span>
+                                        <span class="text-dark fw-medium ms-1">${constanciaas.comentarios ?? 'Sin comentario'}</span>
+                                    </div>
+                                    <div class="col d-flex align-items-center gap-1">
+                                        <span class="text-muted fw-semibold">Requerida:</span>
+                                        <span class="text-dark fw-medium ms-1">${new Date(constanciaas.fechaRequerida).toLocaleDateString('es-CR')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-top">
+                            <div class="row small d-flex align-items-center flex-wrap justify-content-around" style="gap: 0.5rem; padding-left: 5%; padding-right: 5%;">
+                                <div class="col d-flex align-items-center gap-1">
+                                    <span class="text-muted fw-semibold d-block">Comentarios:</span>
+                                    <span class="text-dark fw-medium ms-1" d-block>${constanciaas.comentarios ?? 'Sin comentario'}</span>
+                                </div>
+                                <div class="col">
+                                    ${
+                                        constanciaas.nombreArchivo && constanciaas.nombreArchivo.trim() !== ''
+                                            ? `
+                                                <div class="mt-1 d-flex align-items-center gap-1">
+                                                    <a href="/Constancia/descargar-adjunto/${constanciaas.idConstancia}"
+                                                        class="btn btn-sm btn-outline-primary d-flex align-items-center"
+                                                        style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: 80%"
+                                                        title="Descargar ${constanciaas.nombreArchivo}">
+                                                        ${obtenerIconoArchivo(constanciaas.nombreArchivo, constanciaas.tipoMIME)}
+                                                        <span class="text-truncate d-block" style="max-width: 220px;">
+                                                            ${constanciaas.nombreArchivo}
+                                                        </span>
+                                                    </a>
+                                                    <small class="text-muted text-center d-block mt-1">
+                                                        ${formatearTamanoArchivo(constanciaas.tamanoArchivo)} •
+                                                        ${obtenerExtension(constanciaas.nombreArchivo)}
+                                                    </small>
+                                                </div>
+                                            `
+                                            : (
+                                                constanciaas.tipo === "Salarial"
+                                                ? `
+                                                    <button class="btn btn-sm btn-warning w-100"
+                                                            onclick="abrirModalSalarios(${constanciaas.idConstancia})">
+                                                        Ingresar montos salariales
+                                                    </button>
+                                                `
+                                                : `
+                                                    <span class="text-muted d-inline-block text-center small"
+                                                            style="width:100%; padding: 0.25rem; background:#f0f0f0; border-radius:5px;">
+                                                        Sin archivo
+                                                    </span>
+                                                `
+                                            )
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Aplicar fade in al nuevo contenido
+            fadeIn(constanciasContainer);
+        }
+
+        function renderPagination() {
+            pagination.innerHTML = '';
+            for (let i = 1; i <= totalPaginas; i++) {
+                pagination.innerHTML += `
+                    <li class="page-item ${i === paginaActual ? 'active' : ''}">
+                        <a class="page-link" href="?page=${i}">${i}</a>
+                    </li>
+                `;
+            }
+        }
+
+        // Event listeners para filtros con efectos de fade
+        document.querySelectorAll('.filter-type').forEach(checkbox => {
+            checkbox.addEventListener('change', async function() {
+                if (this.checked) {
+                    filtrosActivos.tipos.push(this.value);
+                } else {
+                    filtrosActivos.tipos = filtrosActivos.tipos.filter(tipo => tipo !== this.value);
+                }
+                const constanciasFiltradas = await filtrarConstancias();
+                await renderConstanciasWithFade(constanciasFiltradas);
+                // Ocultar paginación cuando hay filtros activos
+                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0) ? 'none' : 'flex';
+            });
+        });
+
+        document.querySelectorAll('.filter-status').forEach(checkbox => {
+            checkbox.addEventListener('change', async function() {
+                if (this.checked) {
+                    filtrosActivos.estados.push(this.value);
+                } else {
+                    filtrosActivos.estados = filtrosActivos.estados.filter(estado => estado !== this.value);
+                }
+                const constanciasFiltradas = await filtrarConstancias();
+                await renderConstanciasWithFade(constanciasFiltradas);
+                // Ocultar paginación cuando hay filtros activos
+                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0) ? 'none' : 'flex';
+            });
+        });
+
+        // Limpiar filtros con efecto de fade
+        document.getElementById('clear-filters').addEventListener('click', function() {
+            // Desmarcar todos los checkboxes
+            document.querySelectorAll('.filter-type, .filter-status').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Limpiar filtros activos
+            filtrosActivos.tipos = [];
+            filtrosActivos.estados = [];
+
+            // Renderizar todas las constancias de la página actual con fade
+            renderConstanciasWithFade(constanciasPaginaActual);
+            pagination.style.display = 'flex';
+        });
+
+        // Inicializar con efecto de fade
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Cargar todas las constancias primero
+            await cargarTodasLasConstancias();
+            await inicializarContadores();
+
+            // Aplicar fade in al contenido inicial
+            constanciasContainer.style.opacity = '0';
+            renderConstancias(constanciasPaginaActual);
+            renderPagination();
+        });
+    </script>
+</body>
+</html>

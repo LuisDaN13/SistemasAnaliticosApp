@@ -1,14 +1,9 @@
-﻿using iText.Kernel.Pdf;
-using iText.Layout;
-using iText.Layout.Element;
-using iText.Layout.Properties;
-using Microsoft.AspNetCore.Mvc;
-
-namespace SistemasAnaliticos.Services
+﻿namespace SistemasAnaliticos.Services
 {
     public interface IConstanciaService
     {
-        Task<byte[]> GenerarConstanciaLaboral(string nombrePersona, string cedula, string departamento, string puesto);
+        Task<byte[]> GenerarConstanciaLaboral(string nombrePersona, string cedula, string departamento, DateTime? fechaIngreso, string puesto, string dirjido);
+        Task<byte[]> GenerarConstanciaSalarial(string nombrePersona, string cedula, string departamento, DateTime? fechaIngreso, string puesto, int salarioBruto, int deducciones, int salarioNeto);
 
     }
 }

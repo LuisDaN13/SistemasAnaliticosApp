@@ -158,7 +158,9 @@ namespace SistemasAnaliticos.Entidades
 
 
         // PROPIEDADES CALCULADAS
-        public string nombreCompleto => $"{primerNombre} {segundoNombre} {primerApellido} {segundoApellido}";
+        public string nombreCompleto =>
+            string.Join(" ", new[] { primerNombre, segundoNombre, primerApellido, segundoApellido }
+                .Where(x => !string.IsNullOrWhiteSpace(x)));
 
         public int? edad => fechaNacimiento.HasValue ? DateTime.Now.Year - fechaNacimiento.Value.Year - (DateTime.Now.Date < fechaNacimiento.Value.AddYears(DateTime.Now.Year - fechaNacimiento.Value.Year) ? 1 : 0) : null;
 

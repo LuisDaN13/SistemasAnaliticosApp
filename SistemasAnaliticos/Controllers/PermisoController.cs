@@ -46,10 +46,9 @@ namespace SistemasAnaliticos.Controllers
                 .Select(p => new PermisoDTO
                 {
                     idPermiso = p.idPermiso,
+                    fechaIngreso = p.fechaIngreso,
                     nombreEmpleado = p.nombreEmpleado,
                     tipo = p.tipo,
-                    estado = p.estado,
-                    fechaIngreso = p.fechaIngreso,
                     fechaInicio = p.fechaInicio,
                     fechaFinalizacion = p.fechaFinalizacion,
                     fechaRegresoLaboral = p.fechaRegresoLaboral,
@@ -58,7 +57,8 @@ namespace SistemasAnaliticos.Controllers
                     foto = p.foto,
                     nombreArchivo = p.nombreArchivo,
                     tipoMIME = p.tipoMIME,
-                    tamanoArchivo = p.tamanoArchivo
+                    tamanoArchivo = p.tamanoArchivo,
+                    estado = p.estado
                 })
                 .ToListAsync();
 
@@ -293,7 +293,7 @@ namespace SistemasAnaliticos.Controllers
             catch
             {
                 TempData["ErrorMessage"] = "Error en la creación del permiso.";
-                return RedirectToAction("Usuario", "Index");
+                return RedirectToAction(nameof(Index));
             }
         }
     }
