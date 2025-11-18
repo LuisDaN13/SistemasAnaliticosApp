@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.DTO;
@@ -244,12 +245,6 @@ namespace SistemasAnaliticos.Controllers
                     await _context.SaveChangesAsync();
                 } else
                 {
-                    int salarioBruto = 100000;
-                    int deducciones = 200000;
-                    int salarioNeto = 300000;
-
-                    var pdfBytes = await _constanciaService.GenerarConstanciaSalarial(user.nombreCompleto, user.cedula, user.departamento, user.fechaIngreso, user.puesto, salarioBruto, deducciones, salarioNeto);
-
                     var nuevo = new Constancia
                     {
                         fechaPedido = ahoraCR,
@@ -259,11 +254,6 @@ namespace SistemasAnaliticos.Controllers
                         dirijido = model.dirijido,
                         fechaRequerida = model.fechaRequerida,
                         Comentarios = model.Comentarios,
-
-                        datosAdjuntos = pdfBytes,
-                        nombreArchivo = $"Constancia_Salarial_{user.primerNombre}{user.primerApellido}.pdf",
-                        tipoMIME = "application/pdf",
-                        tamanoArchivo = pdfBytes.Length,
 
                         estado = "Creada"
                     };
@@ -282,5 +272,47 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> HacerConstanciaSalarial(string id, int salarioBruto, int deducciones, int salarioNeto)
+        {
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "No se proporcionó un identificador de empleado válido.";
+                return RedirectToAction("Index", "Usuario");
+            }
+
+            var constancia = await _context.Constancia.FindAsync(id);
+            if (constancia == null)
+            {
+                TempData["ErrorMessage"] = "El empleado que intentas editar no existe o fue eliminado.";
+                return RedirectToAction("Index", "Usuario");
+            }
+
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var pdfBytes = await _constanciaService.GenerarConstanciaSalarial(user.nombreCompleto, user.cedula, user.departamento, user.fechaIngreso, user.puesto, salarioBruto, deducciones, salarioNeto);
+
+                // 🔹 Actualizar campos personales
+                constancia.datosAdjuntos = pdfBytes;
+                constancia.nombreArchivo = $"Constancia_Salarial_{user.primerNombre}{user.primerApellido}.pdf",;
+                constancia.tipoMIME = "application/pdf";
+                constancia.tamanoArchivo = pdfBytes.Length;
+
+                // 🔹 Guardar cambios
+                _context.Update(constancia);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Se cre[o correctamente la constancia salarial.";
+                return RedirectToAction("VerConstancias", "Constancia");
+            }
+            catch (Exception ex)
+            {
+                // 🧩 Manejo de error
+                TempData["ErrorMessage"] = "Ocurrió un error al crear la constancia: " + ex.Message;
+                return RedirectToAction("VerConstancias", "Constancia");
+            }
+        }
     }
 }

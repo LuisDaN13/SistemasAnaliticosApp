@@ -372,5 +372,14 @@ namespace SistemasAnaliticos.Controllers
                 return Json(new { success = false, message = ex.Message });
             }
         }
+
+        // LOG OUT
+        public async Task<IActionResult> LogOut()
+        {
+            await signInManager.SignOutAsync();
+            HttpContext.Session.Clear(); // Limpiar la sesión
+            return RedirectToAction("Login", "Usuario");
+        }
+
     }
 }
