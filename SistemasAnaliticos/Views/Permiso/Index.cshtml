@@ -135,7 +135,7 @@
                     <!-- CONSTANCIAS -->
                     <div class="col-md-4">
                         <button class="btn btn-success w-100 h-100 p-4 text-start permission-card" 
-                                type="button" data-bs-toggle="modal" data-bs-target="#createConstanciaModal" data-tipo="Laboral">
+                                type="button" data-bs-toggle="modal" data-bs-target="#createConstanciaLModal" data-tipo="Laboral">
                             <i class="fa-solid fa-file fs-1 mb-3 text-white"></i>
                             <h5 class="fw-bold mb-2 text-white">Constancia Laboral</h5>
                             <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
@@ -143,7 +143,7 @@
                     </div>
                     <div class="col-md-4">
                         <button class="btn btn-success w-100 h-100 p-4 text-start permission-card"
-                                type="button" data-bs-toggle="modal" data-bs-target="#createConstanciaModal" data-tipo="Salarial">
+                                type="button" data-bs-toggle="modal" data-bs-target="#createConstanciaSModal" data-tipo="Salarial">
                             <i class="fa-solid fa-file fs-1 mb-3 text-white"></i>
                             <h5 class="fw-bold mb-2 text-white">Constancia Salarial</h5>
                             <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
@@ -206,19 +206,22 @@
         });
     </script>
         
-    <!-- Modal de Registro de Citas Medicas-->
+    <!-- Modal de Registro de Citas Medicas -->
     @Html.Partial("~/Views/Permiso/modalRegistroCita.cshtml", new SistemasAnaliticos.Entidades.Permiso())
 
-    <!-- Modal de Registro de Vacaciones-->
+    <!-- Modal de Registro de Vacaciones -->
     @Html.Partial("~/Views/Permiso/modalRegistroVacaciones.cshtml", new SistemasAnaliticos.Entidades.Permiso())
 
-    <!-- Modal de Registro de Otros Permisos-->
+    <!-- Modal de Registro de Otros Permisos -->
     @Html.Partial("~/Views/Permiso/modalRegistroOtros.cshtml", new SistemasAnaliticos.Entidades.Permiso())
 
-    <!-- Modal de Registro de Constancia-->
-    @Html.Partial("~/Views/Constancia/modalRegistroConstancia.cshtml", new SistemasAnaliticos.Entidades.Constancia())
+    <!-- Modal de Registro de Constancia Laboral -->
+    @Html.Partial("~/Views/Constancia/modalRegistroConstanciaL.cshtml", new SistemasAnaliticos.Entidades.Constancia())
 
-    <!-- Modal de Registro de Beneficio-->
+    <!-- Modal de Registro de Constancia Salarial -->
+    @Html.Partial("~/Views/Constancia/modalRegistroConstanciaS.cshtml", new SistemasAnaliticos.Entidades.Constancia())
+
+    <!-- Modal de Registro de Beneficio -->
     @Html.Partial("~/Views/Beneficio/modalRegistroBeneficio.cshtml", new SistemasAnaliticos.Entidades.Beneficio())
 </body>
 </html>

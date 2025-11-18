@@ -474,11 +474,11 @@
             }
 
             permissionsContainer.innerHTML = data.map(permission => `
-            <div class="card permission-card mb-3"
-                 style="cursor: pointer;"
-                 onclick="window.location.href='/Permiso/Details/${permission.idPermiso}'">
+            <div class="card permission-card mb-3">
                     <div class="card-body">
-                        <div class="mb-2">
+                        <div class="mb-2"
+                         style="cursor: pointer;"
+                         onclick="window.location.href='/Permiso/Details/${permission.idPermiso}'">
                             <div class="d-flex align-items-start justify-content-between gap-1 mb-2 flex-wrap">
                                 <h3 class="h6 fw-bold text-dark mb-0" style="padding: 5px">
                                     <i class="fa-solid fa-user me-3"></i>${permission.nombreEmpleado}

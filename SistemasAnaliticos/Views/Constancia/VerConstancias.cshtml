@@ -232,6 +232,93 @@
         </div>
     </main>
 
+    <!-- Respuestas de los Formularios -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Para mensajes de error
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: '@Html.Raw(TempData["ErrorMessageCons"])',
+                        confirmButtonText: 'Aceptar'
+                    });
+                </text>
+            }
+
+            // Para mensajes de éxito
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                            text: '@Html.Raw(TempData["ErrorMessageCons"])',
+                        confirmButtonText: 'Aceptar',
+                        timer: 3000
+                    });
+                </text>
+            }
+        });
+    </script>
+    <!-- Modal de Constancia Salarial -->
+    <div class="modal fade" id="modalSalarial" tabindex="-1" aria-labelledby="modalSalarialLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalSalarialLabel">Campos a Llenar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formSalarial" action="@Url.Action("HacerConstanciaSalarial", "Constancia")" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="idConstancia" name="idConstancia">
+
+                        <div class="mb-3">
+                            <label for="salarioBruto" class="form-label">Salario Bruto</label>
+                            <input type="number" class="form-control" id="salarioBruto" name="salarioBruto" min="0" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="deducciones" class="form-label">Deducciones</label>
+                            <input type="number" class="form-control" id="deducciones" name="deducciones" min="0" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="salarioNeto" class="form-label">Salario Neto</label>
+                            <input type="number" class="form-control" id="salarioNeto" name="salarioNeto" min="0" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning" onclick="enviarFormulario()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function abrirModalSalarial(idConstancia) {
+            // Guardar el ID en el hidden field
+            document.getElementById('idConstancia').value = idConstancia;
+
+            // Limpiar campos
+            document.getElementById('salarioBruto').value = '';
+            document.getElementById('deducciones').value = '';
+            document.getElementById('salarioNeto').value = '';
+
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById('modalSalarial'));
+            modal.show();
+        }
+
+        function enviarFormulario() {
+            // Enviar el formulario directamente al controlador
+            document.getElementById('formSalarial').submit();
+        }
+    </script>
     <!-- Modal de la Foto -->
     <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -447,11 +534,11 @@
             }
 
             constanciasContainer.innerHTML = data.map(constanciaas => `
-            <div class="card constancia-card mb-3"
-                 style="cursor: pointer;"
-                 onclick="window.location.href='/Constancia/Details/${constanciaas.idConstancia}'">
+            <div class="card constancia-card mb-3">
                     <div class="card-body">
-                        <div class="mb-2">
+                        <div class="mb-2"
+                         style="cursor: pointer;"
+                         onclick="window.location.href='/Constancia/Details/${constanciaas.idConstancia}'">
                             <div class="d-flex align-items-start justify-content-between gap-1 mb-2 flex-wrap">
                                 <h3 class="h6 fw-bold text-dark mb-0" style="padding: 5px">
                                     <i class="fa-solid fa-user me-3"></i>${constanciaas.nombreEmpleado}
@@ -489,10 +576,12 @@
                                         <span class="text-muted fw-semibold">Creación:</span>
                                         <span class="text-dark fw-medium ms-1">${new Date(constanciaas.fechaPedido).toLocaleDateString('es-CR')}</span>
                                     </div>
-                                    <div class="col d-flex align-items-center gap-1">
-                                        <span class="text-muted fw-semibold">Dirijido:</span>
-                                        <span class="text-dark fw-medium ms-1">${constanciaas.comentarios ?? 'Sin comentario'}</span>
-                                    </div>
+                                    ${constanciaas.tipo === "Laboral" ? `
+                                      <div class="col d-flex align-items-center gap-1">
+                                        <span class="text-muted fw-semibold">Dirigido:</span>
+                                        <span class="text-dark fw-medium ms-1">${constanciaas.dirijido ?? 'Sin dirigido'}</span>
+                                      </div>
+                                    ` : ''}
                                     <div class="col d-flex align-items-center gap-1">
                                         <span class="text-muted fw-semibold">Requerida:</span>
                                         <span class="text-dark fw-medium ms-1">${new Date(constanciaas.fechaRequerida).toLocaleDateString('es-CR')}</span>
@@ -531,8 +620,8 @@
                                                 constanciaas.tipo === "Salarial"
                                                 ? `
                                                     <button class="btn btn-sm btn-warning w-100"
-                                                            onclick="abrirModalSalarios(${constanciaas.idConstancia})">
-                                                        Ingresar montos salariales
+                                                            onclick="abrirModalSalarial(${constanciaas.idConstancia})">
+                                                        Crear Constancia Salarial
                                                     </button>
                                                 `
                                                 : `

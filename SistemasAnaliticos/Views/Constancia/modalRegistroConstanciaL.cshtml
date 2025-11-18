@@ -1,0 +1,303 @@
+﻿@model SistemasAnaliticos.Entidades.Constancia
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        }
+
+        .modal-header {
+        background: linear-gradient(to right, #012473, #013599);
+        color: white;
+        }
+
+        .btn-primary-custom {
+        background-color: #012473;
+        border-color: #012473;
+        }
+
+        .btn-primary-custom:hover {
+        background-color: #013599;
+        border-color: #013599;
+        }
+
+        .section-divider {
+        border-top: 1px solid #dee2e6;
+        padding-top: 1.25rem;
+        }
+
+        .is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        .alert {
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        }
+
+        .required-field::after {
+        content: " *";
+        color: #dc3545;
+        }
+
+        .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal -->
+    <div class="modal fade" id="createConstanciaLModal" tabindex="-1" aria-labelledby="createConstanciaLModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="permissionModalLabel">
+                        Nueva Constancia <span id="tipoDisplayL"></span>
+                    </h5>
+                </div>
+
+                <!-- Form -->
+                <form id="constanciaLForm" asp-controller="Constancia" asp-action="Create" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="tipo" id="tipoConstanciaL" value="" />
+
+                    <div class="modal-body">
+                        <!-- Contenedor para mensajes de validación -->
+                        <div id="validationAlertsConsL"></div>
+
+                        <div>
+                            <!-- Dirijido -->
+                            <div class="mb-4">
+                                <label class="form-label required-field">Persona o Empresa a quien va dirijida</label>
+                                <textarea class="form-control"
+                                asp-for="dirijido"
+                                id="dirijidoCons"
+                                rows="2"
+                                placeholder="Ingresa el receptor de la constancia..."
+                                required></textarea>
+                            </div>
+
+                            <!-- Fecha a Requerir -->
+                            <div class="mb-4">
+                                <label class="form-label required-field">Fecha a Requerir la constancia</label>
+                                <input type="date"
+                                       class="form-control"
+                                       asp-for="fechaRequerida"
+                                       id="fechaRequeridaCons"
+                                       required>
+                            </div>
+
+                            <!-- Notas -->
+                            <div class="mb-4">
+                                <label class="form-label">Comentarios</label>
+                                <textarea asp-for="Comentarios"
+                                          class="form-control"
+                                          rows="2"
+                                          placeholder="Información adicional..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary-custom text-white" id="submitBtnConsL">
+                            <i class="bi bi-save me-2"></i>Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pasar palabra de tipo -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalConstancia = document.getElementById('createConstanciaLModal');
+
+            if (modalConstancia) {
+                modalConstancia.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const tipo = button.getAttribute('data-tipo');
+
+                    // PARA MOSTRAR EN EL TÍTULO DEL MODAL
+                    const tipoDisplayL = document.getElementById('tipoDisplayL');
+                    if (tipoDisplayL) {
+                        tipoDisplayL.textContent = tipo;
+                    }
+
+                    // PARA GUARDAR EN LA VARIABLE DEL MODEL
+                    const tipoConstanciaL = document.getElementById('tipoConstanciaL');
+                    if (tipoConstanciaL) {
+                        tipoConstanciaL.value = tipo;
+                    }
+                });
+            }
+        });
+    </script>
+    <script>
+        // SISTEMA DE VALIDACIÓN ESPECÍFICO
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarValidacionCons();
+            inicializarResetCons();
+        });
+
+        function inicializarResetCons() {
+            const modal = document.getElementById('createConstanciaLModal');
+            const form = document.getElementById('constanciaLForm');
+            const cancelBtn = document.querySelector('.btn-outline-secondary');
+
+            // Resetear cuando el modal se cierra
+            modal.addEventListener('hidden.bs.modal', resetearFormularioConsL);
+
+            // Resetear cuando se hace clic en Cancelar
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', resetearFormularioConsL);
+            }
+        }
+
+        function resetearFormularioConsL() {
+            const form = document.getElementById('constanciaLForm');
+
+            // 1. Resetear valores del formulario
+            form.reset();
+
+            // 2. Limpiar todas las clases de validación
+            const campos = form.querySelectorAll('.form-control, .form-select');
+            campos.forEach(campo => {
+                campo.classList.remove('is-invalid');
+                campo.classList.remove('is-valid');
+            });
+
+            // 3. Limpiar mensajes de validación
+            hideValidationErrorCons();
+
+        }
+
+        function inicializarValidacionConsL() {
+            const submitBtn = document.getElementById('submitBtnConsL');
+
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                let formularioValido = true;
+                const invalidFields = [];
+
+                const requiredFields = document.querySelectorAll('#createConstanciaLModal [required]');
+
+                requiredFields.forEach(field => {
+                    const value = field.value ? field.value.trim() : '';
+                    const fieldType = field.type;
+                    const tagName = field.tagName.toLowerCase();
+
+                    field.classList.remove('is-invalid');
+
+                    let fieldValid = true;
+
+                    if (tagName === 'select') {
+                        fieldValid = field.value !== '' && field.value !== null;
+                    } else if (fieldType === 'number') {
+                        fieldValid = value !== '' && !isNaN(value);
+                    } else if (fieldType === 'date') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'time') {
+                        fieldValid = value !== '';
+                    } else if (fieldType === 'checkbox') {
+                        fieldValid = field.checked;
+                    } else {
+                        fieldValid = value !== '';
+                    }
+
+                    if (!fieldValid) {
+                        formularioValido = false;
+                        field.classList.add('is-invalid');
+                        invalidFields.push(field);
+                    }
+                });
+
+                if (!formularioValido) {
+                    showValidationErrorCons('Por favor complete todos los campos requeridos antes de enviar el formulario.');
+
+                    if (invalidFields.length > 0) {
+                        invalidFields[0].scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                        invalidFields[0].focus();
+                    }
+                } else {
+                    hideValidationErrorCons();
+                    document.getElementById('constanciaLForm').submit();
+                }
+            });
+
+            const requiredFields = document.querySelectorAll('#createConstanciaLModal [required]');
+            requiredFields.forEach(field => {
+                field.addEventListener('blur', function() {
+                    validarCampoIndividualCons(this);
+                });
+            });
+        }
+
+        function validarCampoIndividualCons(campo) {
+            const valor = campo.value ? campo.value.trim() : '';
+            const tipo = campo.type;
+            const tagName = campo.tagName.toLowerCase();
+
+            let esValido = true;
+
+            if (tagName === 'select') {
+                esValido = campo.value !== '' && campo.value !== null;
+            } else if (tipo === 'number') {
+                esValido = valor !== '' && !isNaN(valor);
+            } else if (tipo === 'date' || tipo === 'time') {
+                esValido = valor !== '';
+            } else if (tipo === 'checkbox') {
+                esValido = campo.checked;
+            } else {
+                esValido = valor !== '';
+            }
+
+            if (esValido) {
+                campo.classList.remove('is-invalid');
+            } else {
+                campo.classList.add('is-invalid');
+            }
+
+            return esValido;
+        }
+
+        function showValidationErrorCons(mensaje) {
+            hideValidationErrorCons();
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const validationContainer = document.getElementById('validationAlertsConsL');
+            if (validationContainer) {
+                validationContainer.appendChild(alertDiv);
+            }
+        }
+
+        function hideValidationErrorCons() {
+            const validationContainer = document.getElementById('validationAlertsConsL');
+            if (validationContainer) {
+                validationContainer.innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>

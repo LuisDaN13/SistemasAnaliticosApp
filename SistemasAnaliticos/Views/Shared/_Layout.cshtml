@@ -194,12 +194,19 @@
                     <!-- Controles de usuario -->
                     <form asp-action="LogOut" asp-controller="Usuario" method="post">
                     <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
-                            <div class="d-flex align-items-center gap-2 ps-3 border-start border-primary">
-                                <span class="small">Admin</span>
-                            </div>
-                            <button class="btn p-2 text-white border-0">
-                                <i class="bi bi-box-arrow-right fs-5"></i>
-                            </button>
+                        <div class="d-flex align-items-center gap-2 ps-3 border-start border-primary">
+                            @if (User.Identity.IsAuthenticated)
+                                {
+                                    <span class="small">@User.Identity.Name</span>
+                                }
+                                else
+                                {
+                                    <span class="small">Usuario No Logueado</span>
+                                }
+                        </div>
+                        <button class="btn p-2 text-white border-0">
+                            <i class="bi bi-box-arrow-right fs-5"></i>
+                        </button>
                     </div>
                     </form>
                 </div>

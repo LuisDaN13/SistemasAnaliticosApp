@@ -28,6 +28,7 @@ public class ConstanciaService : IConstanciaService
         {
             string templatePath = "wwwroot/word/Laboral.docx";
             string fechaIngresoTexto = $"{fechaIngreso?.Day} de {fechaIngreso?.ToString("MMMM")} del año {fechaIngreso?.Year}";
+            string cedulaFormateada = $"{cedula[0]}-{cedula.Substring(1, 4)}-{cedula.Substring(5, 4)}";
             string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? "Central America Standard Time"
                 : "America/Costa_Rica";
@@ -44,10 +45,10 @@ public class ConstanciaService : IConstanciaService
             // Reemplazar los placeholders
             doc.Replace("dirijido", dirijido, false, true);
             doc.Replace("nombrePersona", nombrePersona, false, true);
-            doc.Replace("cedula", cedula, false, true);
+            doc.Replace("cedula", cedulaFormateada, false, true);
             doc.Replace("departamento", departamento, false, true);
             doc.Replace("fechaIngresoEmpleado", fechaIngresoTexto, false, true);
-            doc.Replace("puesto", puesto, false, true);
+            doc.Replace("puestoEmpleado", puesto, false, true);
             doc.Replace("fechaHoy", _fechaLargaService.FechaEnPalabras(hoy), false, true);
 
             // Convertir directamente a PDF y retornar como byte[]
@@ -76,6 +77,7 @@ public class ConstanciaService : IConstanciaService
         {
             string templatePath = "wwwroot/word/Salarial.docx";
             string fechaIngresoTexto = $"{fechaIngreso?.Day} de {fechaIngreso?.ToString("MMMM")} del año {fechaIngreso?.Year}";
+            string cedulaFormateada = cedula.Length == 9 ? $"{cedula[0]}-{cedula.Substring(1, 4)}-{cedula.Substring(5, 4)}" : cedula;
             string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? "Central America Standard Time"
                 : "America/Costa_Rica";
@@ -91,10 +93,10 @@ public class ConstanciaService : IConstanciaService
 
             // Reemplazar los placeholders
             doc.Replace("nombrePersona", nombrePersona, false, true);
-            doc.Replace("cedula", cedula, false, true);
+            doc.Replace("cedula", cedulaFormateada, false, true);
             doc.Replace("departamento", departamento, false, true);
             doc.Replace("fechaIngresoEmpleado", fechaIngresoTexto, false, true);
-            doc.Replace("puesto", puesto, false, true);
+            doc.Replace("puestoEmpleado", puesto, false, true);
 
             doc.Replace("salarioBruto", salarioBruto.ToString("C"), false, true);
             doc.Replace("numeroLargoSalarioBruto", $"{_fechaLargaService.SalarioEnPalabras(salarioBruto)} colones", false, true);

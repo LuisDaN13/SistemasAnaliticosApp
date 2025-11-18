@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\js\overpassAPIEdit.js" />
+    <Content Remove="wwwroot\js\costaricaLocalEdit.js" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\js\overpassAPIEdit.js" />
-    <None Include="wwwroot\js\overpassAPI.js" />
+    <None Include="wwwroot\js\costaricaLocalEdit.js" />
+    <None Include="wwwroot\js\costaricaLocal.js" />
   </ItemGroup>
 
   <ItemGroup>

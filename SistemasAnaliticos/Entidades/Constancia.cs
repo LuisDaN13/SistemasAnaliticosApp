@@ -15,7 +15,7 @@ namespace SistemasAnaliticos.Entidades
         public string tipo { get; set; }
 
         [StringLength(100)]
-        public string dirijido { get; set; }
+        public string? dirijido { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime? fechaRequerida { get; set; }

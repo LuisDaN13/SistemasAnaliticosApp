@@ -55,39 +55,25 @@
 </head>
 <body>
     <!-- Modal -->
-    <div class="modal fade" id="createConstanciaModal" tabindex="-1" aria-labelledby="createConstanciaModalLabel" aria-hidden="true">
+    <div class="modal fade" id="createConstanciaSModal" tabindex="-1" aria-labelledby="createConstanciaSModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <!-- Header -->
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold" id="permissionModalLabel">
-                        Nueva Constancia <span id="tipoDisplay"></span>
+                        Nueva Constancia <span id="tipoDisplayS"></span>
                     </h5>
                 </div>
 
                 <!-- Form -->
-                <form id="constanciaForm" asp-controller="Constancia" asp-action="Create" method="post" enctype="multipart/form-data">
-                    <input type="hidden" asp-for="tipo" id="tipoConstancia" value="" />
+                <form id="constanciaSForm" asp-controller="Constancia" asp-action="Create" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="tipo" id="tipoConstanciaS" value="" />
 
                     <div class="modal-body">
                         <!-- Contenedor para mensajes de validación -->
-                        <div id="validationAlertsCons"></div>
+                        <div id="validationAlertsConsS"></div>
 
                         <div>
-
-                            <!-- Dirijido -->
-                            @if (Model.tipo == "Laboral")
-                            {
-                                <div class="mb-4">
-                                    <label class="form-label required-field">Persona o Empresa a quien va dirijida</label>
-                                    <textarea class="form-control"
-                                    asp-for="dirijido"
-                                    id="dirijidoCons"
-                                    rows="2"
-                                    placeholder="Ingresa el receptor de la constancia..."
-                                    required></textarea>
-                                </div>
-                            }
                             <!-- Fecha a Requerir -->
                             <div class="mb-4">
                                 <label class="form-label required-field">Fecha a Requerir la constancia</label>
@@ -112,7 +98,7 @@
                     <!-- Footer -->
                     <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary-custom text-white" id="submitBtnCons">
+                        <button type="submit" class="btn btn-primary-custom text-white" id="submitBtnConsS">
                             <i class="bi bi-save me-2"></i>Guardar
                         </button>
                     </div>
@@ -124,35 +110,28 @@
     <!-- Pasar palabra de tipo -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const modalConstancia = document.getElementById('createConstanciaModal');
+            const modalConstancia = document.getElementById('createConstanciaSModal');
 
             if (modalConstancia) {
                 modalConstancia.addEventListener('show.bs.modal', function (event) {
                     const button = event.relatedTarget;
                     const tipo = button.getAttribute('data-tipo');
 
-                    // Actualizar el título completo
-                    const modalTitle = document.getElementById('permissionModalLabel');
-                    if (modalTitle) {
-                        modalTitle.innerHTML = `Nueva Constancia ${tipo}`;
+                    // PARA MOSTRAR EN EL TÍTULO DEL MODAL
+                    const tipoDisplayS = document.getElementById('tipoDisplayS');
+                    if (tipoDisplayS) {
+                        tipoDisplayS.textContent = tipo;
                     }
 
-                    // O si usas el span separado
-                    const tipoDisplay = document.getElementById('tipoDisplay');
-                    if (tipoDisplay) {
-                        tipoDisplay.textContent = tipo;
-                    }
-
-                    // Actualizar el campo hidden
-                    const tipoConstancia = document.getElementById('tipoConstancia');
-                    if (tipoConstancia) {
-                        tipoConstancia.value = tipo;
+                    // PARA GUARDAR EN LA VARIABLE DEL MODEL
+                    const tipoConstanciaS = document.getElementById('tipoConstanciaS');
+                    if (tipoConstanciaS) {
+                        tipoConstanciaS.value = tipo;
                     }
                 });
             }
         });
     </script>
-
     <script>
         // SISTEMA DE VALIDACIÓN ESPECÍFICO
         document.addEventListener('DOMContentLoaded', function() {
@@ -161,21 +140,21 @@
         });
 
         function inicializarResetCons() {
-            const modal = document.getElementById('createConstanciaModal');
-            const form = document.getElementById('constanciaForm');
+            const modal = document.getElementById('createConstanciaSModal');
+            const form = document.getElementById('constanciaSForm');
             const cancelBtn = document.querySelector('.btn-outline-secondary');
 
             // Resetear cuando el modal se cierra
-            modal.addEventListener('hidden.bs.modal', resetearFormularioCons);
+            modal.addEventListener('hidden.bs.modal', resetearFormularioConsS);
 
             // Resetear cuando se hace clic en Cancelar
             if (cancelBtn) {
-                cancelBtn.addEventListener('click', resetearFormularioCons);
+                cancelBtn.addEventListener('click', resetearFormularioConsS);
             }
         }
 
-        function resetearFormularioCons() {
-            const form = document.getElementById('constanciaForm');
+        function resetearFormularioConsS() {
+            const form = document.getElementById('constanciaSForm');
 
             // 1. Resetear valores del formulario
             form.reset();
@@ -190,15 +169,10 @@
             // 3. Limpiar mensajes de validación
             hideValidationErrorCons();
 
-            // 4. Opcional: Limpiar el texto del tipo de permiso
-            const tipoTexto = document.getElementById('tipoTexto');
-            if (tipoTexto) tipoTexto.textContent = '';
-
-            console.log('Formulario de permisos reseteado');
         }
 
         function inicializarValidacionCons() {
-            const submitBtn = document.getElementById('submitBtnCons');
+            const submitBtn = document.getElementById('submitBtnConsS');
 
             submitBtn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -206,7 +180,7 @@
                 let formularioValido = true;
                 const invalidFields = [];
 
-                const requiredFields = document.querySelectorAll('#createConstanciaModal [required]');
+                const requiredFields = document.querySelectorAll('#createConstanciaSModal [required]');
 
                 requiredFields.forEach(field => {
                     const value = field.value ? field.value.trim() : '';
@@ -250,11 +224,11 @@
                     }
                 } else {
                     hideValidationErrorCons();
-                    document.getElementById('constanciaForm').submit();
+                    document.getElementById('constanciaSForm').submit();
                 }
             });
 
-            const requiredFields = document.querySelectorAll('#createConstanciaModal [required]');
+            const requiredFields = document.querySelectorAll('#createConstanciaSModal [required]');
             requiredFields.forEach(field => {
                 field.addEventListener('blur', function() {
                     validarCampoIndividualCons(this);
@@ -301,14 +275,14 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
 
-            const validationContainer = document.getElementById('validationAlertsCons');
+            const validationContainer = document.getElementById('validationAlertsConsSS');
             if (validationContainer) {
                 validationContainer.appendChild(alertDiv);
             }
         }
 
         function hideValidationErrorCons() {
-            const validationContainer = document.getElementById('validationAlertsCons');
+            const validationContainer = document.getElementById('validationAlertsConsSS');
             if (validationContainer) {
                 validationContainer.innerHTML = '';
             }
