@@ -1,0 +1,258 @@
+﻿@using System.Web
+@model IEnumerable<SistemasAnaliticos.DTO.FotoDTO>
+
+@{
+    var listaFotos = Model ?? Enumerable.Empty<FotoDTO>();
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .btn-custom-primary {
+            background-color: #012473;
+            border-color: #012473;
+            color: white;
+        }
+
+            .btn-custom-primary:hover {
+                background-color: #013599;
+                border-color: #013599;
+                color: white;
+            }
+
+        .header-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background-color: white;
+        }
+
+        /* Estilos para la tabla */
+        .table-custom {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .table-custom th {
+                background-color: #f8f9fa;
+                padding: 12px;
+                text-align: center;
+                border-bottom: 2px solid #dee2e6;
+                font-weight: 600;
+            }
+
+            .table-custom td {
+                padding: 12px;
+                text-align: center;
+                border-bottom: 1px solid #dee2e6;
+                vertical-align: middle;
+            }
+
+            .table-custom tr:hover {
+                background-color: #f8f9fa;
+            }
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+
+        <!-- Header -->
+        <div class="header-card p-4 mt-4 d-flex justify-content-between gap-2 mb-4">
+            <h1 class="h2 fw-bold text-gray-900 mb-0">
+                Galería de Fotos SASA
+                <span class="small fw-light" id="photo-count">(@(Model?.Count() ?? 0))</span>
+            </h1>
+
+            <button class="btn btn-custom-primary text-white d-flex align-items-center"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalNuevaFoto">
+                <i class="bi bi-plus me-2"></i>
+                Nueva Foto
+            </button>
+        </div>
+
+        <!-- Tabla de Fotos -->
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                @if (!listaFotos.Any())
+                {
+                    <div id="emptyState">
+                        <div style="border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); background-color: white;">
+                            <div style="display: flex; align-items: center; justify-content: space-around; padding: 2rem;">
+                                <p style="color: #6c757d; margin: 0; text-align: left; font-size: 1rem;">
+                                    No se encontraron fotos de la empresa que coincidan con la búsqueda.
+                                </p>
+
+                                <div id="lottie-animation" style="width: 110px; height: 110px; flex-shrink: 0;"></div>
+
+                                <script>
+                                    const animation = document.createElement('lottie-player');
+                                    animation.setAttribute('src', '/lottie/loading.json');
+                                    animation.setAttribute('background', 'transparent');
+                                    animation.setAttribute('speed', '1');
+                                    animation.setAttribute('style', 'width: 110px; height: 110px;');
+                                    animation.setAttribute('loop', '');
+                                    animation.setAttribute('autoplay', '');
+                                    document.getElementById('lottie-animation').appendChild(animation);
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-custom table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Foto</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in listaFotos)
+                                {
+                                    <tr class="align-middle">
+                                        <td class="text-center">
+                                            @if (item.foto != null && item.foto.Length > 0)
+                                            {
+                                                var base64foto = Convert.ToBase64String(item.foto);
+                                                <img src="data:image/jpeg;base64,@base64foto"
+                                                     alt="foto"
+                                                     style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; cursor: pointer;"
+                                                     data-bs-toggle="modal"
+                                                     data-bs-target="#fotoModal"
+                                                     onclick="mostrarImagenModal('@base64foto')" />
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted d-inline-block text-center"
+                                                      style="width: 70px; height: 70px; line-height: 70px; background: #f0f0f0; border-radius: 5px;">
+                                                    Sin Foto
+                                                </span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            @if (item.estado)
+                                            {
+                                                <i class="fa fa-check-circle" style="color: green;"></i> <span class="text-success">Activo</span>
+                                            }
+                                            else
+                                            {
+                                                <i class="fa fa-times-circle" style="color: red;"></i> <span class="text-danger">Inactivo</span>
+                                            }
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="@Url.Action("Delete", new { id = item.idFoto })"
+                                               class="btn btn-danger btn-sm">
+                                                <i class="bi bi-trash"></i> Eliminar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Nueva Foto -->
+    <div class="modal fade" id="modalNuevaFoto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Nueva Foto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="text-center">
+                            <i class="bi bi-cloud-arrow-up text-primary fs-1 mb-3"></i>
+                            <h5 class="mb-2">Subir Nueva Foto</h5>
+                            <p class="text-muted mb-3">Selecciona una imagen para subir</p>
+
+                            <input type="file"
+                                   name="foto"
+                                   accept=".jpg, .jpeg, .png"
+                                   class="form-control" required />
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="submit" class="btn btn-custom-primary text-white">
+                            Subir Foto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de la Foto -->
+    <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <img id="modalFoto" src="" alt="Foto ampliada" class="img-fluid rounded" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function mostrarImagenModal(base64) {
+            var modalImg = document.getElementById("modalFoto");
+            modalImg.src = "data:image/jpeg;base64," + base64;
+        }
+    </script>
+    <!-- Respuestas de los Formularios -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Para mensajes de error
+            @if (TempData["ErrorMessage"] != null)
+            {
+                    <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: '@Html.Raw(TempData["ErrorMessage"])',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    </text>
+            }
+
+            // Para mensajes de éxito
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: '@Html.Raw(TempData["SuccessMessage"])',
+                            confirmButtonText: 'Aceptar',
+                            timer: 3000
+                        });
+                    </text>
+            }
+        });
+    </script>
+</body>
+</html>

@@ -30,8 +30,6 @@ namespace SistemasAnaliticos.Controllers
         // INDEX = PRESENTAR A LOS EMPLEADOS CON CARDS PARA SCINICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
         public async Task<ActionResult> Index()
         {
-            var sw = Stopwatch.StartNew();
-
             var cards = await _context.Users
                 .AsNoTracking()
                 .OrderByDescending(x => x.primerNombre)
@@ -49,9 +47,6 @@ namespace SistemasAnaliticos.Controllers
                     Foto = x.foto
                 })
                 .ToListAsync();
-
-            sw.Stop();
-            Debug.WriteLine($"⏱ Consulta tardó: {sw.ElapsedMilliseconds} ms");
             return View(cards);
         }
 

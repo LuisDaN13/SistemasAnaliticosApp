@@ -1,5 +1,10 @@
 ﻿@using System.Web
-@model IEnumerable<SistemasAnaliticos.DTO.CardsDTO>
+@model IEnumerable<SistemasAnaliticos.DTO.FotoDTO>
+
+@{
+    var listaFotos = Model ?? Enumerable.Empty<FotoDTO>();
+    var tieneFotos = listaFotos.Any(f => f.foto != null && f.foto.Length > 0);
+}
 
 <!DOCTYPE html>
 <html lang="es">
@@ -217,35 +222,52 @@
         <!-- Carrusel de Imágenes -->
         <div class="carousel-container">
             <div class="carousel-inner" style="height: 500px; position: relative;">
-                <!-- Imágenes del carrusel -->
-                <div class="carousel-slide active">
-                    <img src="https://images.pexels.com/photos/34422195/pexels-photo-34422195.jpeg" alt="Imagen 1" class="carousel-image">
-                </div>
-                <div class="carousel-slide">
-                    <img src="https://images.pexels.com/photos/34369684/pexels-photo-34369684.jpeg" alt="Imagen 2" class="carousel-image">
-                </div>
-                <div class="carousel-slide">
-                    <img src="https://images.pexels.com/photos/132474/pexels-photo-132474.jpeg" alt="Imagen 3" class="carousel-image">
-                </div>
-                <div class="carousel-slide">
-                    <img src="https://images.pexels.com/photos/3783471/pexels-photo-3783471.jpeg" alt="Imagen 4" class="carousel-image">
-                </div>
+                @if (tieneFotos)
+                {
+                    <!-- Imágenes del carrusel desde la base de datos -->
+                    @for (int i = 0; i < listaFotos.Count(); i++)
+                    {
+                        var foto = listaFotos.ElementAt(i);
+                        @if (foto.foto != null && foto.foto.Length > 0)
+                        {
+                            var base64foto = Convert.ToBase64String(foto.foto);
+                            <div class="carousel-slide @(i == 0 ? "active" : "")">
+                                <img src="data:image/jpeg;base64,@base64foto"
+                                     alt="Foto SASA @(i + 1)"
+                                     class="carousel-image">
+                            </div>
+                        }
+                    }
 
-                <!-- Flechas de navegación -->
-                <button class="carousel-nav prev" aria-label="Imagen anterior">
-                    <i class="bi bi-chevron-left"></i>
-                </button>
-                <button class="carousel-nav next" aria-label="Siguiente imagen">
-                    <i class="bi bi-chevron-right"></i>
-                </button>
+                    <!-- Flechas de navegación -->
+                    <button class="carousel-nav prev" aria-label="Imagen anterior">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button class="carousel-nav next" aria-label="Siguiente imagen">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
 
-                <!-- Indicadores de puntos -->
-                <div class="carousel-indicators">
-                    <button class="carousel-indicator active" aria-label="Ir a imagen 1"></button>
-                    <button class="carousel-indicator" aria-label="Ir a imagen 2"></button>
-                    <button class="carousel-indicator" aria-label="Ir a imagen 3"></button>
-                    <button class="carousel-indicator" aria-label="Ir a imagen 4"></button>
-                </div>
+                    <!-- Indicadores de puntos -->
+                    <div class="carousel-indicators">
+                        @for (int i = 0; i < listaFotos.Count(f => f.foto != null && f.foto.Length > 0); i++)
+                        {
+                            <button class="carousel-indicator @(i == 0 ? "active" : "")"
+                                    aria-label="Ir a imagen @(i + 1)"></button>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <!-- Placeholder cuando no hay fotos -->
+                    <div class="carousel-slide active">
+                        <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #012473 0%, #013599 100%); display: flex; align-items: center; justify-content: center; color: white;">
+                            <div class="text-center">
+                                <i class="bi bi-image fs-1 mb-3"></i>
+                                <p>No hay fotos disponibles para mostrar</p>
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
 
@@ -268,174 +290,120 @@
         </div>
     </main>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    <!-- Respuestas de los Formularios -->
     <script>
-        // Datos de ejemplo para las noticias
-        const news = [
+        document.addEventListener("DOMContentLoaded", function () {
+            // Para mensajes de error
+            @if (TempData["ErrorMessage"] != null)
             {
-                id: 1,
-                title: "Nueva tecnología revoluciona el mercado de energías renovables",
-                category: "Tecnología",
-                author: "María González",
-                time: "2 horas",
-                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
-                hasVideo: false
-            },
-            {
-                id: 2,
-                title: "Descubrimiento científico abre nuevas posibilidades en medicina",
-                category: "Ciencia",
-                author: "Carlos Rodríguez",
-                time: "5 horas",
-                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
-                hasVideo: true
-            },
-            {
-                id: 3,
-                title: "Evento cultural reúne a artistas internacionales en la ciudad",
-                category: "Cultura",
-                author: "Ana Martínez",
-                time: "1 día",
-                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
-                hasVideo: false
-            },
-            {
-                id: 4,
-                title: "Avances en inteligencia artificial transforman la industria",
-                category: "Tecnología",
-                author: "Pedro Sánchez",
-                time: "3 días",
-                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
-                hasVideo: true
-            },
-            {
-                id: 5,
-                title: "Nuevo récord mundial en deportes extremos",
-                category: "Deportes",
-                author: "Laura Fernández",
-                time: "4 días",
-                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
-                hasVideo: false
+                        <text>
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: '@Html.Raw(TempData["ErrorMessageHome"])',
+                                confirmButtonText: 'Aceptar'
+                            });
+                        </text>
             }
-        ];
 
-        // Función para generar las tarjetas de noticias
-        function renderNews() {
-            const newsGrid = document.getElementById('news-grid');
-
-            news.forEach(item => {
-                const col = document.createElement('div');
-                col.className = 'col-12 col-md-6 col-lg';
-
-                const card = document.createElement('div');
-                card.className = 'card news-card h-100';
-
-                // Contenido de la tarjeta
-                card.innerHTML = `
-                    <div class="card-img-container position-relative">
-                        <img src="${item.image}" class="card-img-top" alt="${item.title}">
-                        ${item.hasVideo ? `
-                            <div class="video-indicator">
-                                <div class="video-icon">
-                                    <i class="bi bi-play-fill text-dark fs-5"></i>
-                                </div>
-                            </div>
-                        ` : ''}
-                    </div>
-                    <div class="card-body">
-                        <span class="badge category-badge mb-2">${item.category}</span>
-                        <h5 class="card-title line-clamp-3">${item.title}</h5>
-                        <div class="author-info">
-                            <p class="card-text small mb-1"><span class="fw-semibold">POR</span> ${item.author}</p>
-                            <p class="card-text small text-muted">Hace ${item.time}</p>
-                        </div>
-                    </div>
-                `;
-
-                col.appendChild(card);
-                newsGrid.appendChild(col);
-            });
-        }
-
-        // Ejecutar cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', renderNews);
+            // Para mensajes de éxito
+            @if (TempData["SuccessMessage"] != null)
+            {
+                        <text>
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Éxito',
+                                text: '@Html.Raw(TempData["SuccessMessageHome"])',
+                                confirmButtonText: 'Aceptar',
+                                timer: 3000
+                            });
+                        </text>
+            }
+        });
     </script>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', function() {
             const slides = document.querySelectorAll('.carousel-slide');
-            const indicators = document.querySelectorAll('.carousel-indicator');
-            const prevButton = document.querySelector('.carousel-nav.prev');
-            const nextButton = document.querySelector('.carousel-nav.next');
-            let currentSlide = 0;
-            let slideInterval;
 
-            // Función para mostrar una diapositiva específica
-            function showSlide(index) {
-                // Ocultar todas las diapositivas
-                slides.forEach(slide => slide.classList.remove('active'));
-                indicators.forEach(indicator => indicator.classList.remove('active'));
+            // Solo inicializar el carousel si hay slides
+            if (slides.length > 0) {
+                const indicators = document.querySelectorAll('.carousel-indicator');
+                const prevButton = document.querySelector('.carousel-nav.prev');
+                const nextButton = document.querySelector('.carousel-nav.next');
+                let currentSlide = 0;
+                let slideInterval;
 
-                // Mostrar la diapositiva actual
-                slides[index].classList.add('active');
-                indicators[index].classList.add('active');
+                // Función para mostrar una diapositiva específica
+                function showSlide(index) {
+                    // Ocultar todas las diapositivas
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    indicators.forEach(indicator => indicator.classList.remove('active'));
 
-                currentSlide = index;
-            }
+                    // Mostrar la diapositiva actual
+                    slides[index].classList.add('active');
+                    indicators[index].classList.add('active');
 
-            // Función para ir a la siguiente diapositiva
-            function nextSlide() {
-                let nextIndex = (currentSlide + 1) % slides.length;
-                showSlide(nextIndex);
-            }
+                    currentSlide = index;
+                }
 
-            // Función para ir a la diapositiva anterior
-            function prevSlide() {
-                let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
-                showSlide(prevIndex);
-            }
+                // Función para ir a la siguiente diapositiva
+                function nextSlide() {
+                    let nextIndex = (currentSlide + 1) % slides.length;
+                    showSlide(nextIndex);
+                }
 
-            // Iniciar el carrusel automático
-            function startCarousel() {
-                slideInterval = setInterval(nextSlide, 5000); // Cambia cada 5 segundos
-            }
+                // Función para ir a la diapositiva anterior
+                function prevSlide() {
+                    let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+                    showSlide(prevIndex);
+                }
 
-            // Detener el carrusel automático
-            function stopCarousel() {
-                clearInterval(slideInterval);
-            }
+                // Iniciar el carrusel automático
+                function startCarousel() {
+                    slideInterval = setInterval(nextSlide, 5000); // Cambia cada 5 segundos
+                }
 
-            // Event listeners para los botones de navegación
-            prevButton.addEventListener('click', function() {
-                stopCarousel();
-                prevSlide();
-                startCarousel();
-            });
+                // Detener el carrusel automático
+                function stopCarousel() {
+                    clearInterval(slideInterval);
+                }
 
-            nextButton.addEventListener('click', function() {
-                stopCarousel();
-                nextSlide();
-                startCarousel();
-            });
+                // Event listeners para los botones de navegación
+                if (prevButton) {
+                    prevButton.addEventListener('click', function() {
+                        stopCarousel();
+                        prevSlide();
+                        startCarousel();
+                    });
+                }
 
-            // Event listeners para los indicadores
-            indicators.forEach((indicator, index) => {
-                indicator.addEventListener('click', function() {
-                    stopCarousel();
-                    showSlide(index);
-                    startCarousel();
+                if (nextButton) {
+                    nextButton.addEventListener('click', function() {
+                        stopCarousel();
+                        nextSlide();
+                        startCarousel();
+                    });
+                }
+
+                // Event listeners para los indicadores
+                indicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', function() {
+                        stopCarousel();
+                        showSlide(index);
+                        startCarousel();
+                    });
                 });
-            });
 
-            // Pausar el carrusel cuando el ratón está sobre él
-            const carouselContainer = document.querySelector('.carousel-container');
-            carouselContainer.addEventListener('mouseenter', stopCarousel);
-            carouselContainer.addEventListener('mouseleave', startCarousel);
+                // Pausar el carrusel cuando el ratón está sobre él
+                const carouselContainer = document.querySelector('.carousel-container');
+                if (carouselContainer) {
+                    carouselContainer.addEventListener('mouseenter', stopCarousel);
+                    carouselContainer.addEventListener('mouseleave', startCarousel);
+                }
 
-            // Iniciar el carrusel automático
-            startCarousel();
+                // Iniciar el carrusel automático
+                startCarousel();
+            }
         });
     </script>
 </body>

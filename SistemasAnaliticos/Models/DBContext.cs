@@ -15,6 +15,8 @@ namespace SistemasAnaliticos.Models
         public DbSet<Constancia> Constancia { get; set; }
         public DbSet<Beneficio> Beneficio { get; set; }
 
+        public DbSet<Fotos> Fotos { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             // LLAMAR PRIMERO AL MÉTODO BASE
