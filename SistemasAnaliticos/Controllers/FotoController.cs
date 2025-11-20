@@ -17,27 +17,6 @@ namespace SistemasAnaliticos.Controllers
             _context = context;
         }
 
-        public async Task<ActionResult> TraerFotosCarousel()
-        {
-            try
-            {
-                var fotosCarousel = await _context.Fotos
-                    .Where(f => f.estado == true)
-                    .Select(f => new FotoDTO
-                    {
-                        foto = f.foto
-                    })
-                    .ToListAsync();
-
-                return View(fotosCarousel);
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessageHome"] = ("Error al obtener las fotos para el carousel");
-                return View(new List<FotoDTO>());
-            }
-        }
-
         public async Task<ActionResult> Index()
         {
             var fotos = await _context.Fotos
@@ -108,23 +87,58 @@ namespace SistemasAnaliticos.Controllers
                 return RedirectToAction("Index");
             }
         }
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
 
-        // POST: FotoController/Delete/5
-        [HttpPost]
+
+        [HttpPost("Foto/Delete/{id}")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(long id)
         {
             try
             {
+                var foto = await _context.Fotos.FindAsync(id);
+                if (foto == null)
+                {
+                    TempData["ErrorMessageFotos"] = "Foto no encontrada";
+                    return RedirectToAction("Index");
+                }
+
+                _context.Fotos.Remove(foto);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessageFotos"] = "Se eliminó correctamente.";
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                TempData["ErrorMessageFotos"] = "Ocurrió un error al agregar la foto: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+
+        [HttpPost("Foto/Inactivar/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Inactivar(long id)
+        {
+            try
+            {
+                var foto = await _context.Fotos.FindAsync(id);
+                if (foto == null)
+                {
+                    TempData["ErrorMessageFotos"] = "Foto no encontrada";
+                    return RedirectToAction("Index");
+                }
+
+                foto.estado = !foto.estado;
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessageFotos"] ="Se cambió correctamente.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessageFotos"] = "Ocurrió un error al agregar la foto: " + ex.Message;
+                return RedirectToAction(nameof(Index));
             }
         }
     }

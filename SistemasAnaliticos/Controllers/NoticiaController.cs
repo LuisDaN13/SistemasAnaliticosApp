@@ -2,54 +2,50 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.DTO;
-using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 
 namespace SistemasAnaliticos.Controllers
 {
-    public class HomeController : Controller
+    public class NoticiaController : Controller
     {
         private readonly DBContext _context;
 
-        public HomeController(DBContext context)
+        public NoticiaController(DBContext context)
         {
             _context = context;
         }
 
         public async Task<ActionResult> Index()
         {
-            try
-            {
-                var fotosCarousel = await _context.Fotos
-                    .Where(f => f.estado == true)
-                    .Select(f => new FotoDTO
-                    {
-                        foto = f.foto
-                    })
-                    .ToListAsync();
+            var fotos = await _context.Noticias
+                .AsNoTracking()
+                .Select(x => new NoticiaDTO
+                {
+                    idNoticia = x.idNoticia,
+                    titulo = x.titulo,
+                    categoria = x.categoria,
+                    foto = x.foto,
+                    fechaPublicacion = x.fechaPublicacion,
+                    horaPublicacion = x.horaPublicacion,
+                    autor = x.autor,
+                    contenidoTexto = x.contenidoTexto
+                })
+                .ToListAsync();
 
-                return View(fotosCarousel);
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessageHome"] = ("Error al obtener las fotos para el carousel");
-                return View(new List<FotoDTO>());
-            }
+            return View(fotos);
         }
 
-        // GET: HomeController/Details/5
         public ActionResult Details(int id)
         {
             return View();
         }
 
-        // GET: HomeController/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: HomeController/Create
+        // POST: NoticiaController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
@@ -64,13 +60,13 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-        // GET: HomeController/Edit/5
+        // GET: NoticiaController/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: HomeController/Edit/5
+        // POST: NoticiaController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -85,13 +81,13 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-        // GET: HomeController/Delete/5
+        // GET: NoticiaController/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: HomeController/Delete/5
+        // POST: NoticiaController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)

@@ -16,6 +16,7 @@ namespace SistemasAnaliticos.Models
         public DbSet<Beneficio> Beneficio { get; set; }
 
         public DbSet<Fotos> Fotos { get; set; }
+        public DbSet<Noticias> Noticias { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

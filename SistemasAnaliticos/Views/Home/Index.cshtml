@@ -263,7 +263,7 @@
                         <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #012473 0%, #013599 100%); display: flex; align-items: center; justify-content: center; color: white;">
                             <div class="text-center">
                                 <i class="bi bi-image fs-1 mb-3"></i>
-                                <p>No hay fotos disponibles para mostrar</p>
+                                <p>No hay fotos disponibles de SASA para mostrar</p>
                             </div>
                         </div>
                     </div>
@@ -289,6 +289,98 @@
             <!-- Las tarjetas de noticias se generarán aquí con JavaScript -->
         </div>
     </main>
+
+    <script>
+        // Datos de ejemplo para las noticias
+        const news = [
+            {
+                id: 1,
+                title: "Nueva tecnología revoluciona el mercado de energías renovables",
+                category: "Tecnología",
+                author: "María González",
+                time: "2 horas",
+                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
+                hasVideo: false
+            },
+            {
+                id: 2,
+                title: "Descubrimiento científico abre nuevas posibilidades en medicina",
+                category: "Ciencia",
+                author: "Carlos Rodríguez",
+                time: "5 horas",
+                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
+                hasVideo: true
+            },
+            {
+                id: 3,
+                title: "Evento cultural reúne a artistas internacionales en la ciudad",
+                category: "Cultura",
+                author: "Ana Martínez",
+                time: "1 día",
+                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
+                hasVideo: false
+            },
+            {
+                id: 4,
+                title: "Avances en inteligencia artificial transforman la industria",
+                category: "Tecnología",
+                author: "Pedro Sánchez",
+                time: "3 días",
+                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
+                hasVideo: true
+            },
+            {
+                id: 5,
+                title: "Nuevo récord mundial en deportes extremos",
+                category: "Deportes",
+                author: "Laura Fernández",
+                time: "4 días",
+                image: "https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg",
+                hasVideo: false
+            }
+        ];
+
+        // Función para generar las tarjetas de noticias
+        function renderNews() {
+            const newsGrid = document.getElementById('news-grid');
+
+            news.forEach(item => {
+                const col = document.createElement('div');
+                col.className = 'col-12 col-md-6 col-lg';
+
+                const card = document.createElement('div');
+                card.className = 'card news-card h-100';
+
+                // Contenido de la tarjeta
+                card.innerHTML = `
+                    <div class="card-img-container position-relative">
+                        <img src="${item.image}" class="card-img-top" alt="${item.title}">
+                        ${item.hasVideo ? `
+                            <div class="video-indicator">
+                                <div class="video-icon">
+                                    <i class="bi bi-play-fill text-dark fs-5"></i>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="card-body">
+                        <span class="badge category-badge mb-2">${item.category}</span>
+                        <h5 class="card-title line-clamp-3">${item.title}</h5>
+                        <div class="author-info">
+                            <p class="card-text small mb-1"><span class="fw-semibold">POR</span> ${item.author}</p>
+                            <p class="card-text small text-muted">Hace ${item.time}</p>
+                        </div>
+                    </div>
+                `;
+
+                col.appendChild(card);
+                newsGrid.appendChild(col);
+            });
+        }
+
+        // Ejecutar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', renderNews);
+    </script>
 
     <!-- Respuestas de los Formularios -->
     <script>
@@ -360,7 +452,7 @@
 
                 // Iniciar el carrusel automático
                 function startCarousel() {
-                    slideInterval = setInterval(nextSlide, 5000); // Cambia cada 5 segundos
+                    slideInterval = setInterval(nextSlide, 25000); // Cambia cada 5 segundos
                 }
 
                 // Detener el carrusel automático
