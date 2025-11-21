@@ -1,15 +1,11 @@
 ﻿@using System.Web
-@model IEnumerable<SistemasAnaliticos.DTO.CardsDTO>
+@model IEnumerable<SistemasAnaliticos.ViewModels.CardsViewModel>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
 
         .bg-gradient-custom {
@@ -571,7 +567,7 @@
     </main>
 
     <!-- Modal de Registro -->
-    @Html.Partial("modalRegistro", new SistemasAnaliticos.Entidades.Usuario())
+    <partial name="modalRegistro" model="new SistemasAnaliticos.Entidades.Usuario()" />
 
     <!-- Modal de Inactivar -->
     <div class="modal fade" id="modalInactivar" tabindex="-1" aria-labelledby="modalInactivarLabel" aria-hidden="true">
@@ -603,37 +599,35 @@
     <!-- SCRIPT DE LA API DE LA UBICACION -->
     <script src='~/JS/costaricaLocal.js'></script>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <!-- Respuestas de los Formularios -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () 
+        {
             // Para mensajes de error
             @if (TempData["ErrorMessage"] != null)
             {
-                    <text>
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: '@Html.Raw(TempData["ErrorMessage"])',
-                            confirmButtonText: 'Aceptar'
-                        });
-                    </text>
+                <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: '@Html.Raw(TempData["ErrorMessage"])',
+                        confirmButtonText: 'Aceptar'
+                    });
+                </text>
             }
 
             // Para mensajes de éxito
             @if (TempData["SuccessMessage"] != null)
             {
-                    <text>
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Éxito',
-                            text: '@Html.Raw(TempData["SuccessMessage"])',
-                            confirmButtonText: 'Aceptar',
-                            timer: 3000
-                        });
-                    </text>
+                <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: '@Html.Raw(TempData["SuccessMessage"])',
+                        confirmButtonText: 'Aceptar',
+                        timer: 3000
+                    });
+                </text>
             }
         });
     </script>

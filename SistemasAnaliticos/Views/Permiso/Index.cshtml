@@ -1,4 +1,4 @@
-﻿@model SistemasAnaliticos.DTO.PermisoDTO
+﻿@model SistemasAnaliticos.ViewModels.PermisoViewModel
 
 <!DOCTYPE html>
 <html lang="es">
@@ -207,21 +207,21 @@
     </script>
         
     <!-- Modal de Registro de Citas Medicas -->
-    @Html.Partial("~/Views/Permiso/modalRegistroCita.cshtml", new SistemasAnaliticos.Entidades.Permiso())
+    <partial name="~/Views/Permiso/modalRegistroCita.cshtml" model="new SistemasAnaliticos.Entidades.Permiso()" />
 
     <!-- Modal de Registro de Vacaciones -->
-    @Html.Partial("~/Views/Permiso/modalRegistroVacaciones.cshtml", new SistemasAnaliticos.Entidades.Permiso())
+    <partial name="~/Views/Permiso/modalRegistroVacaciones.cshtml" model="new SistemasAnaliticos.Entidades.Permiso()" />
 
     <!-- Modal de Registro de Otros Permisos -->
-    @Html.Partial("~/Views/Permiso/modalRegistroOtros.cshtml", new SistemasAnaliticos.Entidades.Permiso())
+    <partial name="~/Views/Permiso/modalRegistroOtros.cshtml" model="new SistemasAnaliticos.Entidades.Permiso()" />
 
     <!-- Modal de Registro de Constancia Laboral -->
-    @Html.Partial("~/Views/Constancia/modalRegistroConstanciaL.cshtml", new SistemasAnaliticos.Entidades.Constancia())
+    <partial name="~/Views/Constancia/modalRegistroConstanciaL.cshtml" model="new SistemasAnaliticos.Entidades.Constancia()" />
 
     <!-- Modal de Registro de Constancia Salarial -->
-    @Html.Partial("~/Views/Constancia/modalRegistroConstanciaS.cshtml", new SistemasAnaliticos.Entidades.Constancia())
+    <partial name="~/Views/Constancia/modalRegistroConstanciaS.cshtml" model="new SistemasAnaliticos.Entidades.Constancia()" />
 
     <!-- Modal de Registro de Beneficio -->
-    @Html.Partial("~/Views/Beneficio/modalRegistroBeneficio.cshtml", new SistemasAnaliticos.Entidades.Beneficio())
+    <partial name="~/Views/Beneficio/modalRegistroBeneficio.cshtml" model="new SistemasAnaliticos.Entidades.Beneficio()" />
 </body>
 </html>

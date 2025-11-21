@@ -1,6 +1,6 @@
-﻿namespace SistemasAnaliticos.DTO
+﻿namespace SistemasAnaliticos.ViewModels
 {
-    public class FotoDTO
+    public class FotoViewModel
     {
         public long idFoto { get; set; }
         public byte[]? foto { get; set; }

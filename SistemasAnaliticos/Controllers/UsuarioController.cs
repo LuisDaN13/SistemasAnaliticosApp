@@ -1,16 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-using SistemasAnaliticos.DTO;
+using SistemasAnaliticos.ViewModels;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text;
 using static SistemasAnaliticos.Models.codigoFotos;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SistemasAnaliticos.Controllers
 {
@@ -27,13 +22,14 @@ namespace SistemasAnaliticos.Controllers
             _context = context;
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX = PRESENTAR A LOS EMPLEADOS CON CARDS PARA SCINICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
         public async Task<ActionResult> Index()
         {
             var cards = await _context.Users
                 .AsNoTracking()
                 .OrderByDescending(x => x.primerNombre)
-                .Select(x => new CardsDTO
+                .Select(x => new CardsViewModel
                 {
                     Id = x.Id,
                     Nombre = x.primerNombre + " " + x.primerApellido + " " + x.segundoApellido,
@@ -50,7 +46,7 @@ namespace SistemasAnaliticos.Controllers
             return View(cards);
         }
 
-
+        // -------------------------------------------------------------------------------------------------------------------------------
         // LOGIN = INICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
         [HttpGet]
         public ActionResult Login()
@@ -59,7 +55,7 @@ namespace SistemasAnaliticos.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Login(LoginDTO model)
+        public async Task<ActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -130,7 +126,7 @@ namespace SistemasAnaliticos.Controllers
             return View(model);
         }
 
-
+        // -------------------------------------------------------------------------------------------------------------------------------
         // DETAILS = VER MÁS INFORMACIÓN DEL EMPLEADO
         public async Task<ActionResult> Details(string id)
         {
@@ -143,12 +139,8 @@ namespace SistemasAnaliticos.Controllers
 
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
         // CREATE = REGISTRAR EMPLEADO CON FORMULARIO Y TODO
-        public ActionResult Create()
-        {
-            return View();
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Usuario model)
@@ -231,8 +223,8 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-
-        // GET: UsuarioController/Edit/5
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // EDIT = MODIFICAR INFORMACIÓN DEL EMPLEADO
         public async Task<ActionResult> Edit(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -252,8 +244,6 @@ namespace SistemasAnaliticos.Controllers
             return View(usuario);
         }
 
-
-        // POST: UsuarioController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(string id, Usuario model)
@@ -344,7 +334,8 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-        // POST: UsuarioController/Inactivar/5
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // INACTIVAR = CAMBIO DE ESTADO DEL EMPLEADO (ACTIVO / INACTIVO)
         [HttpPost("Usuario/Inactivar/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Inactivar(string id)
@@ -368,6 +359,7 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
         // LOG OUT
         public async Task<IActionResult> LogOut()
         {
@@ -375,6 +367,5 @@ namespace SistemasAnaliticos.Controllers
             HttpContext.Session.Clear(); // Limpiar la sesión
             return RedirectToAction("Login", "Usuario");
         }
-
     }
 }

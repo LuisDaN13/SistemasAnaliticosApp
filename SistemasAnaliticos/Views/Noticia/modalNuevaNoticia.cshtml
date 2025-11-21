@@ -1,0 +1,398 @@
+﻿@model SistemasAnaliticos.Entidades.Noticias
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        .modal-xl {
+            max-width: 800px;
+        }
+
+        .image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+        }
+
+        .image-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.15s ease-in-out;
+        }
+
+            .image-upload-area:hover {
+                border-color: #012473;
+            }
+
+        .btn-primary-custom {
+            background-color: #012473;
+            border-color: #012473;
+        }
+
+            .btn-primary-custom:hover {
+                background-color: #013599;
+                border-color: #013599;
+            }
+
+        .close-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            font-size: 12px;
+        }
+
+        /* Estilos para validación */
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        .invalid-feedback {
+            display: none;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
+
+        .was-validated .form-control:invalid ~ .invalid-feedback,
+        .was-validated .form-select:invalid ~ .invalid-feedback {
+            display: block;
+        }
+
+        .alert-validation {
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal -->
+    <div class="modal fade" id="addNewsModal" tabindex="-1" aria-labelledby="addNewsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header text-white" style="background-color: var(--primary-color);">
+                    <h5 class="modal-title fw-bold" id="addNewsModalLabel">Agregar Nueva Noticia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-4">Completa los campos para crear una nueva noticia corporativa</p>
+
+                    <!-- Alerta de validación general -->
+                    <div class="alert alert-danger alert-validation d-none" id="generalAlert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span id="alertMessage">Por favor complete todos los campos requeridos.</span>
+                    </div>
+
+                    <!-- Cambio importante: Form con action y method -->
+                    <form id="newsForm" asp-action="Create" asp-controller="Noticia" method="post" enctype="multipart/form-data" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <!-- Título -->
+                        <div class="mb-3">
+                            <label for="Titulo" class="form-label required-field">Título</label>
+                            <input type="text" class="form-control" id="Titulo" name="Titulo" asp-for="Titulo" placeholder="Ingresa el título de la noticia" required>
+                            <div class="invalid-feedback">
+                                El título es obligatorio.
+                            </div>
+                        </div>
+
+                        <!-- Contenido -->
+                        <div class="mb-3">
+                            <label for="Contenido" class="form-label required-field">Contenido</label>
+                            <textarea class="form-control" id="Contenido" name="Contenido" asp-for="Contenido" rows="5" placeholder="Escribe el contenido de la noticia" required></textarea>
+                            <div class="invalid-feedback">
+                                El contenido es obligatorio.
+                            </div>
+                        </div>
+
+                        <!-- Categoría y Autor -->
+                        <div class="row mb-5">
+                            <div class="col-md-5">
+                                <label for="Categoria" class="form-label required-field">Categoría</label>
+                                <select class="form-select" id="Categoria" name="Categoria" asp-for="Categoria" required>
+                                    <option value="" selected disabled>Selecciona categoría</option>
+                                    <option value="IMPORTANTE">IMPORTANTE</option>
+                                    <option value="CELEBRACIÓN">CELEBRACIÓN</option>
+                                    <option value="LOGROS">LOGROS</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor seleccione una categoría.
+                                </div>
+                            </div>
+
+                            <!-- Imagen -->
+                            <div class="col-md-7">
+                                <label class="form-label">Imagen</label>
+
+                                <!-- Área para seleccionar o arrastrar -->
+                                <div class="image-upload-area text-center border rounded d-flex justify-content-around" id="imageUploadArea">
+                                    <i class="bi bi-upload fs-3 text-muted mb-2"></i>
+                                    <p class="text-muted mb-0" id="uploadText">Arrastra o haz clic para seleccionar una imagen</p>
+
+                                    <!-- SOLO IMÁGENES -->
+                                    <input type="file" id="imageInput" name="ImagenArchivo" accept=".jpg,.jpeg,.png" class="d-none">
+                                </div>
+
+                                <!-- Vista previa -->
+                                <div id="imagePreview" class="mt-3 d-none">
+                                    <div class="position-relative d-inline-block">
+                                        <img id="previewImage" class="image-preview rounded" src="" alt="Vista previa" style="max-width: 150px;">
+                                        <button type="button" class="close-btn btn btn-danger btn-sm position-absolute top-0 end-0" id="removeImageBtn">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary-custom text-white">Agregar Noticia</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Elementos del DOM
+        const imageUploadArea = document.getElementById("imageUploadArea");
+        const imageInput = document.getElementById("imageInput");
+        const imagePreview = document.getElementById("imagePreview");
+        const previewImage = document.getElementById("previewImage");
+        const removeImageBtn = document.getElementById("removeImageBtn");
+        const newsForm = document.getElementById("newsForm");
+        const generalAlert = document.getElementById("generalAlert");
+        const alertMessage = document.getElementById("alertMessage");
+
+        // Manejo de imagen
+        imageUploadArea.addEventListener("click", () => {
+            imageInput.click();
+        });
+
+        imageInput.addEventListener("change", function () {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+
+                if (!file.type.startsWith("image/")) {
+                    showAlert("Por favor seleccione solo imágenes.", "danger");
+                    this.value = "";
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImage.src = e.target.result;
+                    imagePreview.classList.remove("d-none");
+                    imageUploadArea.classList.add("d-none");
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        removeImageBtn.addEventListener("click", function () {
+            imageInput.value = "";
+            imagePreview.classList.add("d-none");
+            imageUploadArea.classList.remove("d-none");
+        });
+
+        // Validación del formulario
+        newsForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Ocultar alerta general al intentar enviar de nuevo
+            hideAlert();
+
+            // Validar formulario
+            if (!validateForm()) {
+                // Mostrar alerta general
+                showAlert("Por favor complete todos los campos requeridos correctamente.", "danger");
+
+                // Enfocar el primer campo inválido
+                const firstInvalidField = newsForm.querySelector('.is-invalid');
+                if (firstInvalidField) {
+                    firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalidField.focus();
+                }
+                return;
+            }
+
+            // Si la validación pasa, enviar el formulario
+            submitForm();
+        });
+
+        // Validación en tiempo real para campos requeridos
+        document.querySelectorAll('#newsForm [required]').forEach(field => {
+            field.addEventListener('blur', function() {
+                validateField(this);
+            });
+
+            field.addEventListener('input', function() {
+                // Remover estado inválido mientras el usuario escribe
+                if (this.classList.contains('is-invalid')) {
+                    this.classList.remove('is-invalid');
+                    hideAlert();
+                }
+            });
+        });
+
+        // Función para validar un campo individual
+        function validateField(field) {
+            const value = field.value ? field.value.trim() : '';
+            const fieldType = field.type;
+            const tagName = field.tagName.toLowerCase();
+
+            let isValid = true;
+
+            if (tagName === 'select') {
+                isValid = field.value !== '' && field.value !== null;
+            } else {
+                isValid = value !== '';
+            }
+
+            if (!isValid) {
+                field.classList.add('is-invalid');
+            } else {
+                field.classList.remove('is-invalid');
+            }
+
+            return isValid;
+        }
+
+        // Función para validar todo el formulario
+        function validateForm() {
+            let isValid = true;
+            const requiredFields = newsForm.querySelectorAll('[required]');
+
+            // Validar cada campo requerido
+            requiredFields.forEach(field => {
+                if (!validateField(field)) {
+                    isValid = false;
+                }
+            });
+
+            // Agregar clase de validación para mostrar mensajes de error
+            if (!isValid) {
+                newsForm.classList.add('was-validated');
+            } else {
+                newsForm.classList.remove('was-validated');
+            }
+
+            return isValid;
+        }
+
+        // Función para mostrar alertas
+        function showAlert(message, type = 'danger') {
+            alertMessage.textContent = message;
+            generalAlert.className = `alert alert-${type} alert-validation`;
+            generalAlert.classList.remove('d-none');
+        }
+
+        // Función para ocultar alertas
+        function hideAlert() {
+            generalAlert.classList.add('d-none');
+        }
+
+        // Función para enviar el formulario
+        function submitForm() {
+            // Crear FormData para enviar archivos
+            const formData = new FormData(newsForm);
+
+            // Mostrar loading en el botón
+            const submitBtn = newsForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+            submitBtn.disabled = true;
+
+            // Enviar formulario via AJAX
+            fetch(newsForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                }
+            })
+            .then(response => {
+                if (response.redirected) {
+                    // Si hay redirección, seguirla
+                    window.location.href = response.url;
+                } else {
+                    return response.json();
+                }
+            })
+            .then(data => {
+                if (data) {
+                    if (data.success) {
+                        showAlert("¡Noticia creada exitosamente!", "success");
+                        // Cerrar modal después de 2 segundos
+                        setTimeout(() => {
+                            $('#addNewsModal').modal('hide');
+                            newsForm.reset();
+                            // Recargar la página o actualizar la lista de noticias
+                            window.location.reload();
+                        }, 2000);
+                    } else {
+                        showAlert("Error al crear la noticia: " + (data.message || "Error desconocido"), "danger");
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert("Error de conexión: " + error.message, "danger");
+            })
+            .finally(() => {
+                // Restaurar botón
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        }
+
+        // Limpiar validación al cerrar el modal
+        document.getElementById('addNewsModal').addEventListener('hidden.bs.modal', function () {
+            newsForm.reset();
+            newsForm.classList.remove('was-validated');
+            hideAlert();
+            document.querySelectorAll('.is-invalid').forEach(field => {
+                field.classList.remove('is-invalid');
+            });
+
+            // Resetear imagen
+            imageInput.value = "";
+            imagePreview.classList.add("d-none");
+            imageUploadArea.classList.remove("d-none");
+        });
+    </script>
+</body>
+</html>

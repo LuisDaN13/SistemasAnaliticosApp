@@ -1,8 +1,6 @@
-﻿using SistemasAnaliticos.Entidades;
-
-namespace SistemasAnaliticos.DTO
+﻿namespace SistemasAnaliticos.ViewModels
 {
-    public class PermisoDTO
+    public class PermisoViewModel
     {
         public long idPermiso { get; set; }
         public string nombreEmpleado { get; set; }

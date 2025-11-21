@@ -25,5 +25,7 @@ namespace SistemasAnaliticos.Entidades
         [NotMapped]
         [MaxFileSize(5)]
         public IFormFile? fotoFile { get; set; } = null!;
+
+        public bool estado { get; set; }
     }
 }

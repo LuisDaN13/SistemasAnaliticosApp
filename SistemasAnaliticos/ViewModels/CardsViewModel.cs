@@ -1,6 +1,6 @@
-﻿namespace SistemasAnaliticos.DTO
+﻿namespace SistemasAnaliticos.ViewModels
 {
-    public class CardsDTO
+    public class CardsViewModel
     {
         public string Id { get; set; }
         public string Nombre { get; set; }

@@ -1,6 +1,6 @@
-﻿namespace SistemasAnaliticos.DTO
+﻿namespace SistemasAnaliticos.ViewModels
 {
-    public class NoticiaDTO
+    public class NoticiaViewModel
     {
         public long idNoticia { get; set; }
         public string titulo { get; set; }

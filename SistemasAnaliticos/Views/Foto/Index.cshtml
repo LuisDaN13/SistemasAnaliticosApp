@@ -1,8 +1,8 @@
 ﻿@using System.Web
-@model IEnumerable<SistemasAnaliticos.DTO.FotoDTO>
+@model IEnumerable<SistemasAnaliticos.ViewModels.FotoViewModel>
 
 @{
-    var listaFotos = Model ?? Enumerable.Empty<FotoDTO>();
+    var listaFotos = Model ?? Enumerable.Empty<FotoViewModel>();
 }
 
 <!DOCTYPE html>
@@ -11,6 +11,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
         .bg-gradient-custom {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         }
@@ -234,9 +241,9 @@
 
                 <form asp-action="Create" method="post" enctype="multipart/form-data">
 
-                    <div class="modal-header">
-                        <h5 class="modal-title">Agregar Nueva Foto</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <div class="modal-header" style="background-color: var(--primary-color);">
+                        <h5 class="modal-title text-white">Agregar Nueva Foto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: invert(1);"></button>
                     </div>
 
                     <div class="modal-body">
@@ -289,28 +296,28 @@
             // Para mensajes de error
             @if (TempData["ErrorMessageFotos"] != null)
             {
-                    <text>
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: '@Html.Raw(TempData["ErrorMessageFotos"])',
-                            confirmButtonText: 'Aceptar'
-                        });
-                    </text>
+                <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: '@Html.Raw(TempData["ErrorMessageFotos"])',
+                        confirmButtonText: 'Aceptar'
+                    });
+                </text>
             }
 
             // Para mensajes de éxito
             @if (TempData["SuccessMessageFotos"] != null)
             {
-                    <text>
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Éxito',
-                            text: '@Html.Raw(TempData["SuccessMessageFotos"])',
-                            confirmButtonText: 'Aceptar',
-                            timer: 3000
-                        });
-                    </text>
+                <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: '@Html.Raw(TempData["SuccessMessageFotos"])',
+                        confirmButtonText: 'Aceptar',
+                        timer: 3000
+                    });
+                </text>
             }
         });
     </script>

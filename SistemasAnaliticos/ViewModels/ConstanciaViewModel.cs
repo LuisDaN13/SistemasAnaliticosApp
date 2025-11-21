@@ -1,8 +1,6 @@
-﻿using System.Data;
-
-namespace SistemasAnaliticos.DTO
+﻿namespace SistemasAnaliticos.ViewModels
 {
-    public class ConstanciaDTO
+    public class ConstanciaViewModel
     {
         public long idConstancia { get; set; }
         public DateTime? fechaPedido { get; set; }

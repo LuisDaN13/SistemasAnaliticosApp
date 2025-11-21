@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SistemasAnaliticos.DTO;
+using SistemasAnaliticos.ViewModels;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 
@@ -17,11 +15,13 @@ namespace SistemasAnaliticos.Controllers
             _context = context;
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // INDEX
         public async Task<ActionResult> Index()
         {
             var fotos = await _context.Fotos
                 .AsNoTracking()
-                .Select(x => new FotoDTO
+                .Select(x => new FotoViewModel
                 {
                     idFoto = x.idFoto,
                     foto = x.foto,
@@ -32,6 +32,8 @@ namespace SistemasAnaliticos.Controllers
             return View(fotos);
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // HACER REGISTRO DE FOTOS
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(IFormFile foto)
@@ -88,7 +90,8 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // ELIMINAR FOTOS
         [HttpPost("Foto/Delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(long id)
@@ -115,7 +118,8 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // INACTIVAR FOTOS
         [HttpPost("Foto/Inactivar/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Inactivar(long id)

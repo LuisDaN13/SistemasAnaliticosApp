@@ -1,13 +1,10 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SistemasAnaliticos.DTO;
+using SistemasAnaliticos.ViewModels;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
-using SistemasAnaliticos.Services;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using static SistemasAnaliticos.Models.codigoFotos;
 
@@ -27,6 +24,8 @@ namespace SistemasAnaliticos.Controllers
             _constanciaService = constanciaService;
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // INDEX
         public async Task<IActionResult> VerConstancias(int page = 1)
         {
             int pageSize = 3;
@@ -41,7 +40,7 @@ namespace SistemasAnaliticos.Controllers
                 .OrderByDescending(x => x.fechaPedido)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(p => new ConstanciaDTO
+                .Select(p => new ConstanciaViewModel
                 {
                     idConstancia = p.idConstancia,
                     fechaPedido = p.fechaPedido,
@@ -57,7 +56,7 @@ namespace SistemasAnaliticos.Controllers
                 })
                 .ToListAsync();
 
-            var viewModel = new PaginacionConstanciasDTO
+            var viewModel = new PaginacionConstanciasViewModel
             {
                 Constancias = constancias,
                 PaginaActual = page,
@@ -67,6 +66,7 @@ namespace SistemasAnaliticos.Controllers
             return View(viewModel);
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
         // ENDPOINT PARA TENER TODAS LAS CONSTANCIAS (sin paginación)
         public async Task<IActionResult> ObtenerTodasLasConstancias()
         {
@@ -98,7 +98,8 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-        //METODO SEGUIDO DE LA PAGINACION PARA FILTROS JUNTOS
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // METODO SEGUIDO DE LA PAGINACION PARA FILTROS JUNTOS
         public async Task<IActionResult> ObtenerConstanciasFiltrados([FromQuery] string[] tipos, [FromQuery] string[] estados)
         {
             var query = _context.Constancia.AsNoTracking().AsQueryable();
@@ -139,6 +140,7 @@ namespace SistemasAnaliticos.Controllers
             return Ok(permisos);
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
         // ENDPOINT PARA OBTENER CONTADORES DE FILTROS
         public async Task<IActionResult> ObtenerContadoresFiltros()
         {
@@ -179,7 +181,8 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // DESCARGAR ADJUNTO
         [HttpGet]
         [Route("Constancia/descargar-adjunto/{id}")]
         public async Task<IActionResult> DescargarAdjunto(long id)
@@ -201,6 +204,8 @@ namespace SistemasAnaliticos.Controllers
             );
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // HACER REGISTROS DE CONSTANCIAS
         public async Task<IActionResult> Create(Constancia model)
         {
             // Detectar sistema operativo y usar el ID de zona horaria adecuado
@@ -272,6 +277,8 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // CREAR DOCUMENTO DE CONSTANCIA SALARIAL
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> HacerConstanciaSalarial(long idConstancia, int salarioBruto, int deducciones, int salarioNeto)

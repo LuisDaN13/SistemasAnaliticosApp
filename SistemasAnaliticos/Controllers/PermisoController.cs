@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SistemasAnaliticos.DTO;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
-using System.Diagnostics;
+using SistemasAnaliticos.ViewModels;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using static SistemasAnaliticos.Models.codigoFotos;
 
 namespace SistemasAnaliticos.Controllers
@@ -15,22 +13,25 @@ namespace SistemasAnaliticos.Controllers
     public class PermisoController : Controller
     {
         private readonly DBContext _context;
+        private readonly UserManager<Usuario> _userManager;
 
-        public PermisoController(DBContext context)
+        public PermisoController(DBContext context, UserManager<Usuario> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // INDEX DONDE SE OCUPAN CREAR PERMISOS
         public async Task<IActionResult> Index()
         {
             return View();
         }
 
-
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // INDEX DONDE SE VEN LOS PERMISOS
         public async Task<IActionResult> VerPermisos(int page = 1)
         {
-            var sw = Stopwatch.StartNew();
-
             int pageSize = 3;
 
             var totalPermisos = await _context.Permiso
@@ -43,7 +44,7 @@ namespace SistemasAnaliticos.Controllers
                 .OrderByDescending(x => x.fechaIngreso)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(p => new PermisoDTO
+                .Select(p => new PermisoViewModel
                 {
                     idPermiso = p.idPermiso,
                     fechaIngreso = p.fechaIngreso,
@@ -62,18 +63,17 @@ namespace SistemasAnaliticos.Controllers
                 })
                 .ToListAsync();
 
-            var viewModel = new PaginacionPermisosDTO
+            var viewModel = new PaginacionPermisosViewModel
             {
                 Permisos = permisos,
                 PaginaActual = page,
                 TotalPaginas = (int)Math.Ceiling(totalPermisos / (double)pageSize)
             };
 
-            sw.Stop();
-            Debug.WriteLine($"⏱ Consulta tardó: {sw.ElapsedMilliseconds} ms");
             return View(viewModel);
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
         // ENDPOINT PARA TENER TODOS LO PERMISOS (sin paginación)
         public async Task<IActionResult> ObtenerTodosLosPermisos()
         {
@@ -108,6 +108,7 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
         //METODO SEGUIDO DE LA PAGINACION PARA FILTROS JUNTOS
         public async Task<IActionResult> ObtenerPermisosFiltrados([FromQuery] string[] tipos, [FromQuery] string[] estados)
         {
@@ -152,6 +153,7 @@ namespace SistemasAnaliticos.Controllers
             return Ok(permisos);
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
         // ENDPOINT PARA OBTENER CONTADORES DE FILTROS
         public async Task<IActionResult> ObtenerContadoresFiltros()
         {
@@ -201,6 +203,8 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // VER DETALLES DE PERMISOS
         [HttpGet]
         [Route("Permiso/Details/{id}")]
         public async Task<ActionResult> Details(long id)
@@ -222,7 +226,8 @@ namespace SistemasAnaliticos.Controllers
             return View(permiso);
         }
 
-
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // DESCARGAR ADJUNTO DE PERMISO
         [HttpGet]
         [Route("Permiso/descargar-adjunto/{id}")]
         public async Task<IActionResult> DescargarAdjunto(long id)
@@ -244,6 +249,8 @@ namespace SistemasAnaliticos.Controllers
             );
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // HACER REGISTRO DE UN NUEVO PERMISO
         [HttpPost]
         public async Task<IActionResult> Create(Permiso model)
         {
@@ -260,11 +267,12 @@ namespace SistemasAnaliticos.Controllers
             {
                 var fotoService = new CodigoFotos();
                 var adjuntoService = new ProcesarAdjuntos();
+                var user = await _userManager.GetUserAsync(User);
 
                 var nuevo = new Permiso
                 {
                     fechaIngreso = ahoraCR,
-                    nombreEmpleado = "Luis",
+                    nombreEmpleado = user.nombreCompleto,
                     tipo = model.tipo,
 
                     fechaInicio = model.fechaInicio,

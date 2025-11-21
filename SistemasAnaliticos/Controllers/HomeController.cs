@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SistemasAnaliticos.DTO;
-using SistemasAnaliticos.Entidades;
+using SistemasAnaliticos.ViewModels;
 using SistemasAnaliticos.Models;
 
 namespace SistemasAnaliticos.Controllers
@@ -16,13 +14,15 @@ namespace SistemasAnaliticos.Controllers
             _context = context;
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // INDEX
         public async Task<ActionResult> Index()
         {
             try
             {
                 var fotosCarousel = await _context.Fotos
                     .Where(f => f.estado == true)
-                    .Select(f => new FotoDTO
+                    .Select(f => new FotoViewModel
                     {
                         foto = f.foto
                     })
@@ -33,76 +33,7 @@ namespace SistemasAnaliticos.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessageHome"] = ("Error al obtener las fotos para el carousel");
-                return View(new List<FotoDTO>());
-            }
-        }
-
-        // GET: HomeController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: HomeController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: HomeController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: HomeController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: HomeController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: HomeController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: HomeController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
+                return View(new List<FotoViewModel>());
             }
         }
     }
