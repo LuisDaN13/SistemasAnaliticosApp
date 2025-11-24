@@ -28,11 +28,151 @@
                 color: white;
             }
 
+        .card-employee {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            margin: 2%;
+            overflow: hidden;
+        }
+
+            .card-employee:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            }
+
+        .card-employee-header {
+            color: white;
+            position: relative;
+        }
+
+        .employee-avatar {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .employee-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 0.8rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            color: black;
+        }
+
+        .employee-tags {
+            display: flex;
+            gap: 0.5rem; /* espacio entre las burbujas */
+            flex-wrap: wrap; /* por si se hace muy pequeño el contenedor */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .employee-tag {
+            background-color: rgba(1, 36, 115, 0.1);
+            font-size: 0.9rem;
+            color: black;
+            margin: 0;
+            padding: 4px 10px;
+            border-radius: 20px; /* forma de burbuja */
+            display: inline-block;
+            font-weight: 500;
+        }
+
         .header-card {
             border-radius: 12px;
             border: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             background-color: white;
+        }
+
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card-employee-footer {
+            margin-top: auto;
+            padding: 0.1rem 0.1rem;
+        }
+
+        /* Contenedor principal del footer */
+        .footer-actions {
+            display: flex;
+            width: 100%;
+        }
+
+        /* Cada “slot” de botón ocupa el mismo espacio */
+        .footer-slot-details {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-slot-edit {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-slot-delete {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .action-btn {
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .action-btn:hover {
+                background-color: rgba(108, 117, 125, 0.1);
+                color: var(--dark-color);
+            }
+
+        .btn-details {
+            color: #64B5F6;
+        }
+
+        .btn-edit {
+            color: #ffc107;
+        }
+
+        .btn-delete {
+            color: #dc3545;
+        }
+
+        .corner-triangle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50px; /* tamaño de la esquina */
+            height: 50px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%); /* forma de “doblez” */
+            z-index: 2;
+        }
+
+        /* Colores según estado */
+        .corner-green {
+            background-color: #2dbd4d; /* verde */
+        }
+
+        .corner-red {
+            background-color: #dc3545; /* rojo */
         }
     </style>
 </head>
@@ -125,23 +265,18 @@
                                         <div class="footer-slot-details">
                                             <a asp-action="Details" asp-controller="Noticia" asp-route-id="@noticia.Id"
                                                class="action-btn btn-details" title="Detalles">
-                                                <i class="bi bi-file-text"></i>
+                                                <i class="fa-solid fa-eye"></i>
                                             </a>
                                         </div>
                                         <div class="footer-slot-edit">
-                                            <a asp-action="Edit" asp-controller="Noticia" asp-route-id="@noticia.Id"
-                                               class="action-btn btn-edit" title="Editar">
-                                                <i class="bi bi-pencil"></i>
+                                            <a class="action-btn btn-edit" onclick="abrirModalInactivar('@Url.Action("Inactivar", "Noticia", new { id = @noticia.Id })')">
+                                                <i class="fa-solid fa-ban"></i>
                                             </a>
                                         </div>
                                         <div class="footer-slot-delete">
-                                            <button class="action-btn btn-delete"
-                                                    title="Inactivar"
-                                                    data-id="@noticia.Id"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#modalInactivar">
-                                                <i class="bi bi-slash-circle"></i>
-                                            </button>
+                                            <a class="action-btn btn-delete" onclick="abrirModalEliminar('@Url.Action("Delete", "Noticia", new { id = @noticia.Id })')">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -156,30 +291,96 @@
     <!-- Modal de Registro -->
     <partial name="modalNuevaNoticia" model="new SistemasAnaliticos.Entidades.Noticias()" />
 
+    <!-- Modal de Inactivar -->
+    <div class="modal fade" id="modalInactivar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Inactivar Noticia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    ¿Seguro que deseas inactivar este noticia?
+                </div>
+                
+                <form id="formInactivar" asp-action="Inactivar" asp-controller="Noticia" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="idNoticiaInactivar" name="idNoticia" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning">Inactivar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Eliminar -->
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">Eliminar Noticia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    ¿Seguro que deseas eliminar este noticia? Esta acción no se puede deshacer.
+                </div>
+
+                <form id="formEliminar" asp-action="Delete" asp-controller="Noticia" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="idNoticiaDelete" name="idNoticia" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function abrirModalInactivar(url) {
+            document.getElementById("formInactivar").action = url;
+            var modal = new bootstrap.Modal(document.getElementById("modalInactivar"));
+            modal.show();
+        }
+
+        function abrirModalEliminar(url) {
+            document.getElementById("formEliminar").action = url;
+            var modal = new bootstrap.Modal(document.getElementById("modalEliminar"));
+            modal.show();
+        }
+    </script>
+
     <!-- Respuestas de los Formularios -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Para mensajes de error
-            @if (TempData["ErrorMessage"] != null)
+            @if (TempData["ErrorMessageNoticias"] != null)
             {
                 <text>
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: '@Html.Raw(TempData["ErrorMessageNoticia"])',
+                            text: '@Html.Raw(TempData["ErrorMessageNoticias"])',
                         confirmButtonText: 'Aceptar'
                     });
                 </text>
             }
 
             // Para mensajes de éxito
-            @if (TempData["SuccessMessageNoticia"] != null)
+            @if (TempData["SuccessMessageNoticias"] != null)
             {
                 <text>
                     Swal.fire({
                         icon: 'success',
                         title: 'Éxito',
-                        text: '@Html.Raw(TempData["SuccessMessage"])',
+                                text: '@Html.Raw(TempData["SuccessMessageNoticias"])',
                         confirmButtonText: 'Aceptar',
                         timer: 3000
                     });

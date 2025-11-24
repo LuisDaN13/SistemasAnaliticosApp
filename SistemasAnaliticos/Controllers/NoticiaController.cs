@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
@@ -28,6 +29,8 @@ namespace SistemasAnaliticos.Controllers
         {
             var fotos = await _context.Noticias
                 .AsNoTracking()
+                .OrderByDescending(x => x.fechaPublicacion)
+                .ThenByDescending(x => x.horaPublicacion)
                 .Select(x => new NoticiasCardsViewModel
                 {
                     Id = x.idNoticia,
@@ -43,9 +46,23 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // VER DETALLES DE NOTICIAS
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(long id)
         {
-            return View();
+            if (id == null)
+            {
+                TempData["ErrorMessageHome"] = "No se proporcionó un identificador de noticia válido.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var noticia = await _context.Noticias.FindAsync(id);
+
+            if (noticia == null)
+            {
+                TempData["ErrorMessageHome"] = "La noticia que intentas editar no existe o fue eliminado.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View(noticia);
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
@@ -74,10 +91,10 @@ namespace SistemasAnaliticos.Controllers
                     categoria = model.categoria,
                     fechaPublicacion = hoy,
                     horaPublicacion = ahoraCR.TimeOfDay,
-                    //autor = $"{user.primerNombre} {user.primerApellido}",
-                    autor = "Luis",
+                    autor = $"{user.primerNombre} {user.primerApellido}",
+                    departamento = user.departamento,
                     contenidoTexto = model.contenidoTexto,
-                    foto = await fotoService.ProcesarArchivo(model.fotoFile, null),
+                    foto = fotoService.ConvertFileToByteArrayAsync(model.fotoFile).Result,
                     estado = true
                 };
                 _context.Noticias.Add(nuevo);
@@ -92,28 +109,6 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
-
-        // -------------------------------------------------------------------------------------------------------------------------------
-        // EDITAR UNA NOTICIA
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
         // -------------------------------------------------------------------------------------------------------------------------------
         // INACTIVAR NOTICIAS
         [HttpPost("Noticia/Inactivar/{id}")]
@@ -122,22 +117,50 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var foto = await _context.Fotos.FindAsync(id);
-                if (foto == null)
+                var noticia = await _context.Noticias.FindAsync(id);
+                if (noticia == null)
                 {
-                    TempData["ErrorMessageFotos"] = "Foto no encontrada";
+                    TempData["ErrorMessageNoticias"] = "Noticia no encontrada";
                     return RedirectToAction("Index");
                 }
 
-                foto.estado = !foto.estado;
+                noticia.estado = !noticia.estado;
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessageFotos"] = "Se cambió correctamente.";
+                TempData["SuccessMessageNoticias"] = "Se cambió correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessageFotos"] = "Ocurrió un error al agregar la foto: " + ex.Message;
+                TempData["ErrorMessageNoticias"] = "Ocurrió un error al inactivar la noticia: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // EIMI NOTICIAS
+        [HttpPost("Noticia/Delete/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Delete(long id)
+        {
+            try
+            {
+                var noticia = await _context.Noticias.FindAsync(id);
+                if (noticia == null)
+                {
+                    TempData["ErrorMessageNoticias"] = "Noticia no encontrada.";
+                    return RedirectToAction("Index");
+                }
+
+                _context.Noticias.Remove(noticia);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessageNoticias"] = "Se eliminó correctamente la noticia.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessageNoticias"] = "Ocurrió un error al eliminar la noticia: " + ex.Message;
                 return RedirectToAction(nameof(Index));
             }
         }

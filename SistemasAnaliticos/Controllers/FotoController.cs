@@ -113,7 +113,7 @@ namespace SistemasAnaliticos.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessageFotos"] = "Ocurrió un error al agregar la foto: " + ex.Message;
+                TempData["ErrorMessageFotos"] = "Ocurrió un error al eliminar la foto: " + ex.Message;
                 return RedirectToAction(nameof(Index));
             }
         }
@@ -141,7 +141,7 @@ namespace SistemasAnaliticos.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessageFotos"] = "Ocurrió un error al agregar la foto: " + ex.Message;
+                TempData["ErrorMessageFotos"] = "Ocurrió un error al inactivar la foto: " + ex.Message;
                 return RedirectToAction(nameof(Index));
             }
         }

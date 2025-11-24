@@ -28,12 +28,40 @@ namespace SistemasAnaliticos.Controllers
                     })
                     .ToListAsync();
 
-                return View(fotosCarousel);
+                var noticias = await _context.Noticias
+                    .Where(t => t.estado == true)
+                    .Take(5)
+                    .OrderByDescending(t => t.fechaPublicacion)
+                    .ThenByDescending(t => t.horaPublicacion)
+                    .Select(t => new NoticiaViewModel
+                    {
+                        idNoticia = t.idNoticia,
+                        titulo = t.titulo,
+                        categoria = t.categoria,
+                        foto = t.foto,
+                        autor = t.autor,
+                        fechaPublicacion = t.fechaPublicacion,
+                        horaPublicacion = t.horaPublicacion,
+                    })
+                    .ToListAsync();
+
+                var vm = new HomeIndexViewModel
+                {
+                    FotosCarousel = fotosCarousel,
+                    Noticias = noticias
+                };
+
+                return View(vm);
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessageHome"] = ("Error al obtener las fotos para el carousel");
-                return View(new List<FotoViewModel>());
+                TempData["ErrorMessageHome"] = "Error al obtener los datos.";
+
+                return View(new HomeIndexViewModel
+                {
+                    FotosCarousel = new List<FotoViewModel>(),
+                    Noticias = new List<NoticiaViewModel>()
+                });
             }
         }
     }

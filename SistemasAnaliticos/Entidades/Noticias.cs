@@ -15,9 +15,10 @@ namespace SistemasAnaliticos.Entidades
         public DateOnly fechaPublicacion { get; set; }
         public TimeSpan horaPublicacion { get; set; }
         public string autor { get; set; } = null!;
+        public string departamento { get; set; } = null!;
 
         [Column(TypeName = "varchar(max)")]
-        public string contenidoTexto { get; set; } = null!;
+        public string? contenidoTexto { get; set; }
 
         [Column(TypeName = "varbinary(max)")]
         public byte[]? foto { get; set; }

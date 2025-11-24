@@ -119,7 +119,7 @@
                         <!-- Título -->
                         <div class="mb-3">
                             <label for="Titulo" class="form-label required-field">Título</label>
-                            <input type="text" class="form-control" id="Titulo" name="Titulo" asp-for="Titulo" placeholder="Ingresa el título de la noticia" required>
+                            <input type="text" class="form-control" id="titulo" name="titulo" asp-for="titulo" placeholder="Ingresa el título de la noticia" required>
                             <div class="invalid-feedback">
                                 El título es obligatorio.
                             </div>
@@ -127,8 +127,8 @@
 
                         <!-- Contenido -->
                         <div class="mb-3">
-                            <label for="Contenido" class="form-label required-field">Contenido</label>
-                            <textarea class="form-control" id="Contenido" name="Contenido" asp-for="Contenido" rows="5" placeholder="Escribe el contenido de la noticia" required></textarea>
+                            <label for="Contenido" class="form-label">Contenido</label>
+                            <textarea class="form-control" id="contenidoTexto" name="contenidoTexto" asp-for="contenidoTexto" rows="5" placeholder="Escribe el contenido de la noticia"></textarea>
                             <div class="invalid-feedback">
                                 El contenido es obligatorio.
                             </div>
@@ -137,8 +137,8 @@
                         <!-- Categoría y Autor -->
                         <div class="row mb-5">
                             <div class="col-md-5">
-                                <label for="Categoria" class="form-label required-field">Categoría</label>
-                                <select class="form-select" id="Categoria" name="Categoria" asp-for="Categoria" required>
+                                <label for="categoria" class="form-label required-field">Categoría</label>
+                                <select class="form-select" id="categoria" name="categoria" asp-for="categoria" required>
                                     <option value="" selected disabled>Selecciona categoría</option>
                                     <option value="IMPORTANTE">IMPORTANTE</option>
                                     <option value="CELEBRACIÓN">CELEBRACIÓN</option>
@@ -159,7 +159,7 @@
                                     <p class="text-muted mb-0" id="uploadText">Arrastra o haz clic para seleccionar una imagen</p>
 
                                     <!-- SOLO IMÁGENES -->
-                                    <input type="file" id="imageInput" name="ImagenArchivo" accept=".jpg,.jpeg,.png" class="d-none">
+                                    <input asp-for="fotoFile" type="file" id="imageInput" name="fotoFile" accept=".jpg,.jpeg,.png" class="d-none">
                                 </div>
 
                                 <!-- Vista previa -->

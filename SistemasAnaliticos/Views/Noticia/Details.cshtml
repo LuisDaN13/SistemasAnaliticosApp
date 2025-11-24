@@ -1,0 +1,217 @@
+﻿@model SistemasAnaliticos.Entidades.Noticias
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+        /* Botón peligro (eliminar) */
+        .btn-custom {
+            background-color: #6c757d;
+            color: white;
+            border: 1px solid #6c757d;
+        }
+
+            .btn-custom:hover {
+                background-color: #3A3B3D;
+                border-color: #3A3B3D;
+                color: white;
+            }
+
+        .news-image {
+            height: 384px;
+            object-fit: fill;
+        }
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <!-- Main Content -->
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+        @if (Model == null)
+        {
+            <!-- Employee Not Found -->
+            <div class="d-flex align-items-center justify-content-center" style="min-height: 68vh !important;">
+                <div class="card shadow-sm border-0" style="max-width: 700px">
+                    <div class="card-body p-5 pt-2 pb-0 text-center" style="display: flex; justify-content: center;">
+                        <div class="flex-shrink-0">
+                            <div id="lottie-animation" style="width: 240px; height: 240px;"></div>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; align-content: center; justify-content: center">
+                            <h2 class="h3 fw-bold text-dark mb-3 mt-3">Noticia no encontrada</h2>
+                            <p class="text-muted mb-4">La noticia que buscas no existe en nuestro sistema.</p>
+                        </div>
+                    </div>
+                    <div style="gap: 9%; padding-bottom: 4%; display: flex; justify-content: center; align-items: center;">
+                        <a asp-controller="Usuario" asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Volver a Noticias
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Inicializar la animación
+                const animation = document.createElement('lottie-player');
+                animation.setAttribute('src', '/lottie/Empty Box.json'); // Ruta a tu JSON
+                animation.setAttribute('background', 'transparent');
+                animation.setAttribute('speed', '1');
+                animation.setAttribute('style', 'width: 240px; height: 240px;');
+                animation.setAttribute('loop', '');
+                animation.setAttribute('autoplay', '');
+
+                document.getElementById('lottie-animation').appendChild(animation);
+            </script>
+        }
+        else
+        {
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a asp-controller="Noticia" asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Volver a Noticias
+                </a>
+            </div>
+
+            <!-- Employee Header Card -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row g-4 align-items-start">
+                        <!-- Main Image -->
+                        <div class="card-img-top">
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.foto)"
+                                 class="w-100 news-image"
+                                 alt="Imagen de la Noticia">
+                        </div>
+
+                        <div class="card-body p-4 p-md-5">
+                            <!-- Category and Date -->
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="badge text-white me-3" style="background-color: @(
+                                    Model.categoria == "IMPORTANTE" ? "#dc3545" :
+                                    Model.categoria == "CELEBRACIÓN" ? "#198754" :
+                                    Model.categoria == "LOGRO" ? "#198754" : "#6c757d")">
+                                    @Model.categoria
+                                </span>
+                                <span class="text-muted">
+                                    @(
+                                        Model.fechaPublicacion
+                                        .ToDateTime(TimeOnly.FromTimeSpan(Model.horaPublicacion))
+                                        .ToString("dd MMM yyyy HH:mm", new System.Globalization.CultureInfo("es-ES"))
+                                    )
+                                </span>
+                            </div>
+
+                            <!-- Title -->
+                            <h1 class="card-title mb-4 fs-2 fw-bold">@Model.titulo</h1>
+
+                            <!-- Author Info -->
+                            <div class="d-flex align-items-center pb-4 border-bottom mb-4">
+                                <span class="badge text-white me-3" style="background-color: #6c757d">Por @Model.autor</span>
+                                <p class="fw-semibold mb-0">Por el Departamento de @Model.departamento</p>
+                            </div>
+
+                            <!-- Content -->
+                            <div class="mb-4">
+                                <p class="card-text fs-6 @(Model.contenidoTexto == null ? "text-decoration-line-through text-danger" : "")">
+                                    @(Model.contenidoTexto ?? "Sin Comentario de la Noticia")
+                                </p>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex gap-3 pt-4 border-top">
+                                <a class="btn btn-custom d-flex align-items-center" onclick="abrirModalInactivar('@Url.Action("Inactivar", "Noticia", new { id = Model.idNoticia })')">
+                                    Inactivar Noticia
+                                </a>
+                                <a class="btn btn-custom d-flex align-items-center" onclick="abrirModalEliminar('@Url.Action("Delete", "Noticia", new { id = Model.idNoticia })')">
+                                    Eliminar Noticia
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </main>
+
+    <!-- Modal de Inactivar -->
+    <div class="modal fade" id="modalInactivar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Inactivar Noticia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    ¿Seguro que deseas inactivar este noticia?
+                </div>
+
+                <form id="formInactivar" asp-action="Inactivar" asp-controller="Noticia" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="idNoticiaInactivar" name="idNoticia" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning">Inactivar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Eliminar -->
+    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">Eliminar Noticia</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    ¿Seguro que deseas eliminar este noticia? Esta acción no se puede deshacer.
+                </div>
+
+                <form id="formEliminar" asp-action="Delete" asp-controller="Noticia" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="idNoticiaDelete" name="idNoticia" />
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function abrirModalInactivar(url) {
+            document.getElementById("formInactivar").action = url;
+            var modal = new bootstrap.Modal(document.getElementById("modalInactivar"));
+            modal.show();
+        }
+
+        function abrirModalEliminar(url) {
+            document.getElementById("formEliminar").action = url;
+            var modal = new bootstrap.Modal(document.getElementById("modalEliminar"));
+            modal.show();
+        }
+    </script>
+</body>
+</html>
