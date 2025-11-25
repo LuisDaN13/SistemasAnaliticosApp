@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using ClosedXML.Excel;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
@@ -41,14 +42,15 @@ namespace SistemasAnaliticos.Controllers
             var permisos = await _context.Permiso
                 .AsNoTracking()
                 .Where(p => p.estado == "Creada")
-                .OrderByDescending(x => x.fechaIngreso)
+                .OrderByDescending(x => x.fechaCreacion)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(p => new PermisoViewModel
                 {
                     idPermiso = p.idPermiso,
-                    fechaIngreso = p.fechaIngreso,
+                    fechaIngreso = p.fechaCreacion,
                     nombreEmpleado = p.nombreEmpleado,
+                    departamento = p.departamento,
                     tipo = p.tipo,
                     fechaInicio = p.fechaInicio,
                     fechaFinalizacion = p.fechaFinalizacion,
@@ -81,13 +83,14 @@ namespace SistemasAnaliticos.Controllers
             {
                 var todosLosPermisos = await _context.Permiso
                     .AsNoTracking()
-                    .OrderByDescending(x => x.fechaIngreso)
+                    .OrderByDescending(x => x.fechaCreacion)
                     .Select(p => new {
                         p.idPermiso,
                         p.nombreEmpleado,
+                        p.departamento,
                         p.tipo,
                         p.estado,
-                        p.fechaIngreso,
+                        p.fechaCreacion,
                         p.fechaInicio,
                         p.fechaFinalizacion,
                         p.fechaRegresoLaboral,
@@ -110,47 +113,235 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         //METODO SEGUIDO DE LA PAGINACION PARA FILTROS JUNTOS
-        public async Task<IActionResult> ObtenerPermisosFiltrados([FromQuery] string[] tipos, [FromQuery] string[] estados)
+        public async Task<IActionResult> ObtenerPermisosFiltradosCompletos(
+            [FromQuery] string[] tipos,
+            [FromQuery] string[] estados,
+            [FromQuery] string[] departamentos,
+            [FromQuery] string fechaTipo = null, // "single" o "range"
+            [FromQuery] string fechaUnica = null,
+            [FromQuery] string fechaDesde = null,
+            [FromQuery] string fechaHasta = null)
         {
-            var query = _context.Permiso.AsNoTracking().AsQueryable();
-
-            // Aplicar filtros
-            if (tipos != null && tipos.Length > 0)
+            try
             {
-                query = query.Where(p => tipos.Contains(p.tipo));
-            }
+                var query = _context.Permiso.AsNoTracking().AsQueryable();
 
-            if (estados != null && estados.Length > 0)
+                // Aplicar filtros de tipo
+                if (tipos != null && tipos.Length > 0)
+                {
+                    query = query.Where(p => tipos.Contains(p.tipo));
+                }
+
+                // Aplicar filtros de estado
+                if (estados != null && estados.Length > 0)
+                {
+                    var estadosMapeados = estados.Select(e =>
+                        e == "Aprobado" ? "Creada" :
+                        e == "Pendiente" ? "Pendiente" :
+                        "Rechazada").ToArray();
+
+                    query = query.Where(p => estadosMapeados.Contains(p.estado));
+                }
+
+                // Aplicar filtros de departamento
+                if (departamentos != null && departamentos.Length > 0)
+                {
+                    query = query.Where(p => departamentos.Contains(p.departamento));
+                }
+
+                // Aplicar filtros de fecha
+                if (!string.IsNullOrEmpty(fechaTipo))
+                {
+                    if (fechaTipo == "single" && !string.IsNullOrEmpty(fechaUnica))
+                    {
+                        if (DateTime.TryParse(fechaUnica, out DateTime fechaUnicaDate))
+                        {
+                            query = query.Where(p =>
+                                p.fechaCreacion.Date == fechaUnicaDate.Date ||
+                                p.fechaCreacion.Date == fechaUnicaDate.Date);
+                        }
+                    }
+                    else if (fechaTipo == "range" && !string.IsNullOrEmpty(fechaDesde) && !string.IsNullOrEmpty(fechaHasta))
+                    {
+                        if (DateTime.TryParse(fechaDesde, out DateTime desdeDate) &&
+                            DateTime.TryParse(fechaHasta, out DateTime hastaDate))
+                        {
+                            query = query.Where(p =>
+                                (p.fechaCreacion.Date >= desdeDate.Date && p.fechaCreacion.Date <= hastaDate.Date) ||
+                                (p.fechaCreacion.Date >= desdeDate.Date && p.fechaCreacion.Date <= hastaDate.Date));
+                        }
+                    }
+                }
+
+                var permisos = await query
+                    .OrderByDescending(x => x.fechaCreacion)
+                    .Select(p => new {
+                        p.idPermiso,
+                        p.nombreEmpleado,
+                        p.departamento,
+                        p.tipo,
+                        p.estado,
+                        p.fechaCreacion,
+                        p.fechaInicio,
+                        p.fechaFinalizacion,
+                        p.fechaRegresoLaboral,
+                        p.motivo,
+                        p.comentarios,
+                        p.foto,
+                        p.nombreArchivo,
+                        p.tipoMIME,
+                        p.tamanoArchivo
+                    })
+                    .ToListAsync();
+
+                return Ok(permisos);
+            }
+            catch (Exception ex)
             {
-                var estadosMapeados = estados.Select(e =>
-                    e == "Aprobado" ? "Creada" :
-                    e == "Pendiente" ? "Pendiente" :
-                    "Rechazada").ToArray();
-
-                query = query.Where(p => estadosMapeados.Contains(p.estado));
+                return StatusCode(500, "Error interno del servidor al aplicar filtros");
             }
+        }
 
-            var permisos = await query
-                .OrderByDescending(x => x.fechaIngreso)
-                .Select(p => new {
-                    p.idPermiso,
-                    p.nombreEmpleado,
-                    p.tipo,
-                    p.estado,
-                    p.fechaIngreso,
-                    p.fechaInicio,
-                    p.fechaFinalizacion,
-                    p.fechaRegresoLaboral,
-                    p.motivo,
-                    p.comentarios,
-                    p.foto,
-                    p.nombreArchivo,
-                    p.tipoMIME,
-                    p.tamanoArchivo
-                })
-                .ToListAsync();
+        //
+        //
+        public async Task<IActionResult> ExportarPermisosExcel(
+        [FromQuery] string[] tipos,
+        [FromQuery] string[] estados,
+        [FromQuery] string[] departamentos,
+        [FromQuery] string fechaTipo = null,
+        [FromQuery] string fechaUnica = null,
+        [FromQuery] string fechaDesde = null,
+        [FromQuery] string fechaHasta = null)
+        {
+            try
+            {
+                var query = _context.Permiso.AsNoTracking().AsQueryable();
 
-            return Ok(permisos);
+                // Aplicar filtros de tipo
+                if (tipos != null && tipos.Length > 0)
+                {
+                    query = query.Where(p => tipos.Contains(p.tipo));
+                }
+
+                // Aplicar filtros de estado - SIN mapeo, directo
+                if (estados != null && estados.Length > 0)
+                {
+                    query = query.Where(p => estados.Contains(p.estado));
+                }
+
+                // Aplicar filtros de departamento
+                if (departamentos != null && departamentos.Length > 0)
+                {
+                    query = query.Where(p => departamentos.Contains(p.departamento));
+                }
+
+                // Aplicar filtros de fecha
+                if (!string.IsNullOrEmpty(fechaTipo))
+                {
+                    if (fechaTipo == "single" && !string.IsNullOrEmpty(fechaUnica))
+                    {
+                        if (DateTime.TryParse(fechaUnica, out DateTime fechaUnicaDate))
+                        {
+                            query = query.Where(p =>
+                                p.fechaCreacion.Date == fechaUnicaDate.Date ||
+                                p.fechaCreacion.Date == fechaUnicaDate.Date);
+                        }
+                    }
+                    else if (fechaTipo == "range" && !string.IsNullOrEmpty(fechaDesde) && !string.IsNullOrEmpty(fechaHasta))
+                    {
+                        if (DateTime.TryParse(fechaDesde, out DateTime desdeDate) &&
+                            DateTime.TryParse(fechaHasta, out DateTime hastaDate))
+                        {
+                            query = query.Where(p =>
+                                (p.fechaCreacion.Date >= desdeDate.Date && p.fechaCreacion.Date <= hastaDate.Date) ||
+                                (p.fechaCreacion.Date >= desdeDate.Date && p.fechaCreacion.Date <= hastaDate.Date));
+                        }
+                    }
+                }
+
+                var permisos = await query
+                    .OrderByDescending(x => x.fechaCreacion)
+                    .Select(p => new
+                    {
+                        p.idPermiso,
+                        p.nombreEmpleado,
+                        p.departamento,
+                        p.tipo,
+                        p.estado,
+                        p.fechaCreacion,
+                        p.fechaInicio,
+                        p.fechaFinalizacion,
+                        p.fechaRegresoLaboral,
+                        p.motivo,
+                        p.comentarios,
+                        p.nombreArchivo
+                    })
+                    .ToListAsync();
+
+                // Crear el libro de Excel
+                using var workbook = new ClosedXML.Excel.XLWorkbook();
+                var worksheet = workbook.Worksheets.Add("Permisos");
+
+                // Estilos para el encabezado
+                var headerStyle = workbook.Style;
+                headerStyle.Font.Bold = true;
+                headerStyle.Fill.BackgroundColor = XLColor.LightGray;
+                headerStyle.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                // Encabezados
+                worksheet.Cell(1, 1).Value = "ID Permiso";
+                worksheet.Cell(1, 2).Value = "Nombre Empleado";
+                worksheet.Cell(1, 3).Value = "Departamento";
+                worksheet.Cell(1, 4).Value = "Tipo";
+                worksheet.Cell(1, 5).Value = "Estado";
+                worksheet.Cell(1, 6).Value = "Fecha Creación";
+                worksheet.Cell(1, 7).Value = "Fecha Inicio";
+                worksheet.Cell(1, 8).Value = "Fecha Finalización";
+                worksheet.Cell(1, 9).Value = "Fecha Regreso Laboral";
+                worksheet.Cell(1, 10).Value = "Motivo";
+                worksheet.Cell(1, 11).Value = "Comentarios";
+                worksheet.Cell(1, 12).Value = "Archivo Adjunto";
+
+                // Aplicar estilo al encabezado
+                worksheet.Range(1, 1, 1, 12).Style = headerStyle;
+
+                // Llenar datos
+                int row = 2;
+                foreach (var permiso in permisos)
+                {
+                    worksheet.Cell(row, 1).Value = permiso.idPermiso;
+                    worksheet.Cell(row, 2).Value = permiso.nombreEmpleado;
+                    worksheet.Cell(row, 3).Value = permiso.departamento;
+                    worksheet.Cell(row, 4).Value = permiso.tipo;
+                    worksheet.Cell(row, 5).Value = permiso.estado; // Estado directo, sin mapeo
+                    worksheet.Cell(row, 6).Value = permiso.fechaCreacion.ToString("yyyy-MM-dd");
+                    worksheet.Cell(row, 7).Value = permiso.fechaInicio?.ToString("yyyy-MM-dd");
+                    worksheet.Cell(row, 8).Value = permiso.fechaFinalizacion?.ToString("yyyy-MM-dd");
+                    worksheet.Cell(row, 9).Value = permiso.fechaRegresoLaboral?.ToString("yyyy-MM-dd");
+                    worksheet.Cell(row, 10).Value = permiso.motivo;
+                    worksheet.Cell(row, 11).Value = permiso.comentarios;
+                    worksheet.Cell(row, 12).Value = string.IsNullOrEmpty(permiso.nombreArchivo) ? "No" : "Sí";
+
+                    row++;
+                }
+
+                // Ajustar ancho de columnas
+                worksheet.Columns().AdjustToContents();
+
+                // Preparar respuesta
+                var stream = new MemoryStream();
+                workbook.SaveAs(stream);
+                stream.Position = 0;
+
+                var fileName = $"Permisos_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                return File(stream,
+                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                           fileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al generar el archivo Excel: {ex.Message}");
+            }
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
@@ -164,14 +355,28 @@ namespace SistemasAnaliticos.Controllers
                     .GroupBy(p => 1)
                     .Select(g => new
                     {
+                        // Contadores por tipo
                         CitaMedica = g.Count(p => p.tipo == "Cita Médica"),
                         Vacaciones = g.Count(p => p.tipo == "Vacaciones"),
                         Incapacidad = g.Count(p => p.tipo == "Incapacidad"),
                         Teletrabajo = g.Count(p => p.tipo == "Teletrabajo"),
                         Especial = g.Count(p => p.tipo == "Especial"),
+
+                        // Contadores por estado
                         Aprobado = g.Count(p => p.estado == "Creada" || p.estado == "Aprobada"),
                         Pendiente = g.Count(p => p.estado == "Pendiente"),
-                        Rechazado = g.Count(p => p.estado == "Rechazada")
+                        Rechazado = g.Count(p => p.estado == "Rechazada"),
+
+                        // Contadores por departamento ← AGREGAR ESTOS
+                        FinancieroContable = g.Count(p => p.departamento == "Financiero Contable"),
+                        Gerencia = g.Count(p => p.departamento == "Gerencia"),
+                        Ingenieria = g.Count(p => p.departamento == "Ingenieria"),
+                        Jefatura = g.Count(p => p.departamento == "Jefatura"),
+                        Legal = g.Count(p => p.departamento == "Legal"),
+                        Operaciones = g.Count(p => p.departamento == "Operaciones"),
+                        TecnicosNCR = g.Count(p => p.departamento == "Tecnicos NCR"),
+                        TecnologiasInformacion = g.Count(p => p.departamento == "Tecnologias de Informacion"),
+                        Ventas = g.Count(p => p.departamento == "Ventas")
                     })
                     .FirstOrDefaultAsync();
 
@@ -184,7 +389,16 @@ namespace SistemasAnaliticos.Controllers
                     Especial = 0,
                     Aprobado = 0,
                     Pendiente = 0,
-                    Rechazado = 0
+                    Rechazado = 0,
+                    FinancieroContable = 0,
+                    Gerencia = 0,
+                    Ingenieria = 0,
+                    Jefatura = 0,
+                    Legal = 0,
+                    Operaciones = 0,
+                    TecnicosNCR = 0,
+                    TecnologiasInformacion = 0,
+                    Ventas = 0
                 });
             }
             catch (Exception ex)
@@ -198,7 +412,16 @@ namespace SistemasAnaliticos.Controllers
                     Especial = 0,
                     Aprobado = 0,
                     Pendiente = 0,
-                    Rechazado = 0
+                    Rechazado = 0,
+                    FinancieroContable = 0,
+                    Gerencia = 0,
+                    Ingenieria = 0,
+                    Jefatura = 0,
+                    Legal = 0,
+                    Operaciones = 0,
+                    TecnicosNCR = 0,
+                    TecnologiasInformacion = 0,
+                    Ventas = 0
                 });
             }
         }
@@ -271,8 +494,9 @@ namespace SistemasAnaliticos.Controllers
 
                 var nuevo = new Permiso
                 {
-                    fechaIngreso = ahoraCR,
+                    fechaCreacion = ahoraCR,
                     nombreEmpleado = user.nombreCompleto,
+                    departamento = user.departamento,
                     tipo = model.tipo,
 
                     fechaInicio = model.fechaInicio,

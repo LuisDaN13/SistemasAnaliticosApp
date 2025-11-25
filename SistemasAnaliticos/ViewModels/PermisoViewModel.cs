@@ -4,6 +4,7 @@
     {
         public long idPermiso { get; set; }
         public string nombreEmpleado { get; set; }
+        public string departamento { get; set; }
         public string tipo { get; set; }
         public string estado { get; set; }
         public DateTime fechaIngreso { get; set; }

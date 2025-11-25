@@ -134,21 +134,24 @@
     <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4 pb-0">
 
         <!-- Titulo de Permisos -->
-        <div class="header-card p-4 mt-4 mb-4">
+        <div class="header-card p-4 mt-4 mb-4 d-flex justify-content-between">
             <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todos los Permisos</h1>
+            <button class="btn btn-success" id="exportExcelBtn">
+                <i class="bi bi-file-earmark-excel me-2"></i>
+            </button>
         </div>
 
         <!-- Permission Types Grid -->
         <div class="container my-4">
             <div class="row">
                 <!-- FILTROS PARA CARDS -->
-                <div class="col-lg-3">
+                <div class="col-lg-3 p-0">
                     <div class="card filter-section">
                         <div class="card-body">
-                            <h2 class="h5 card-title fw-bold text-dark mb-4">Filtrar por</h2>
+                            <h2 class="h5 card-title fw-bold text-dark mb-2">Filtrar por</h2>
 
-                            <!-- Type Filter -->
-                            <div class="mb-4 pb-3 border-bottom">
+                            <!-- CHECKS DE TIPOS DE PERMISOS -->
+                            <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#typeFilter" aria-expanded="true" aria-controls="typeFilter">
                                     Tipo de Permiso
                                     <i class="bi bi-chevron-down"></i>
@@ -194,8 +197,8 @@
                                 </div>
                             </div>
 
-                            <!-- Status Filter -->
-                            <div class="pb-3">
+                            <!-- CHECKS DE ESTADOS DE PERMISOS -->
+                            <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#statusFilter" aria-expanded="true" aria-controls="statusFilter">
                                     Estado
                                     <i class="bi bi-chevron-down"></i>
@@ -226,6 +229,144 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- DROPDOWN DE DEPARTAMENTOS -->
+                            <div class="mb-3 pb-1 border-bottom">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold dropdown-toggle"
+                                        type="button" id="dropdownDepartamento" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Departamentos
+                                </button>
+
+                                <ul class="dropdown-menu w-100 px-3" aria-labelledby="dropdownDepartamento">
+
+                                    <li class="form-check my-2">
+                                        <input class="form-check-input filter-status" type="checkbox" value="Financiero Contable" id="dropdown-dp-fc">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-fc">
+                                            <span>Financiero Contable</span>
+                                            <span class="text-muted" id="dropdown-count-fc">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
+                                        <input class="form-check-input filter-status" type="checkbox" value="Gerencia" id="dropdown-dp-g">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-g">
+                                            <span>Gerencia</span>
+                                            <span class="text-muted" id="dropdown-count-g">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
+                                        <input class="form-check-input filter-status" type="checkbox" value="Ingenieria" id="dropdown-dp-i">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-i">
+                                            <span>Ingeniería</span>
+                                            <span class="text-muted" id="dropdown-count-i">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
+                                        <input class="form-check-input filter-status" type="checkbox" value="Jefatura" id="dropdown-dp-j">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-j">
+                                            <span>Jefatura</span>
+                                            <span class="text-muted" id="dropdown-count-j">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
+                                        <input class="form-check-input filter-status" type="checkbox" value="Legal" id="dropdown-dp-l">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-l">
+                                            <span>Legal</span>
+                                            <span class="text-muted" id="dropdown-count-l">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
+                                        <input class="form-check-input filter-status" type="checkbox" value="Operaciones" id="dropdown-dp-o">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-o">
+                                            <span>Operaciones</span>
+                                            <span class="text-muted" id="dropdown-count-o">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
+                                        <input class="form-check-input filter-status" type="checkbox" value="Tecnicos NCR" id="dropdown-dp-tncr">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-tncr">
+                                            <span>Técnicos NCR</span>
+                                            <span class="text-muted" id="dropdown-count-tncr">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
+                                        <input class="form-check-input filter-status" type="checkbox" value="Tecnologias de Informacion" id="dropdown-dp-ti">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-ti">
+                                            <span>Tecnologías de Información</span>
+                                            <span class="text-muted" id="dropdown-count-ti">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
+                                        <input class="form-check-input filter-status" type="checkbox" value="Ventas" id="dropdown-dp-v">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-ti">
+                                            <span>Ventas</span>
+                                            <span class="text-muted" id="dropdown-count-v">(0)</span>
+                                        </label>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- FILTRO POR FECHA -->
+                            <div class="mb-3 pb-1 border-bottom">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#dateFilter" aria-expanded="true">
+                                    Fecha
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+
+                                <div class="collapse show mt-3" id="dateFilter">
+
+                                    <!-- ACTIVAR RANGO -->
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="dateRangeSwitch">
+                                        <label class="form-check-label" for="dateRangeSwitch">Buscar por rango</label>
+                                    </div>
+
+                                    <!-- FECHA ÚNICA -->
+                                    <div id="singleDateContainer">
+                                        <label class="form-label">Fecha</label>
+                                        <input type="date" class="form-control filter-date" id="filter-date-single">
+                                    </div>
+
+                                    <!-- RANGO DE FECHAS -->
+                                    <div id="rangeDateContainer" class="d-none">
+                                        <label class="form-label">Desde</label>
+                                        <input type="date" class="form-control mb-2 filter-date" id="filter-date-from">
+
+                                        <label class="form-label">Hasta</label>
+                                        <input type="date" class="form-control filter-date" id="filter-date-to">
+                                    </div>
+
+                                </div>
+                            </div>
+                            <script>
+                                // Activar/desactivar rango de fechas - VERSIÓN CORREGIDA
+                                document.getElementById("dateRangeSwitch").addEventListener("change", function () {
+                                    const isRange = this.checked;
+
+                                    // Mostrar solo el contenedor correspondiente
+                                    document.getElementById("singleDateContainer").classList.toggle("d-none", isRange);
+                                    document.getElementById("rangeDateContainer").classList.toggle("d-none", !isRange);
+
+                                    // Limpiar los inputs cuando se cambie el modo
+                                    if (isRange) {
+                                        document.getElementById('filter-date-single').value = '';
+                                    } else {
+                                        document.getElementById('filter-date-from').value = '';
+                                        document.getElementById('filter-date-to').value = '';
+                                    }
+
+                                    // Actualizar filtros automáticamente si hay valores
+                                    actualizarFiltroFecha();
+                                });
+                            </script>
 
                             <!-- Clear Filters -->
                             <button class="btn w-100 text-primary-custom fw-medium pt-3 border-top" id="clear-filters">
@@ -268,6 +409,76 @@
             var modalImg = document.getElementById("modalFoto");
             modalImg.src = "data:image/jpeg;base64," + base64;
         }
+    </script>
+    <script>
+        //Funciones para descargar excel
+        document.getElementById('exportExcelBtn').addEventListener('click', function() {
+            const button = this;
+
+            // Mostrar indicador de carga
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-2"></i>Generando Excel...';
+            button.disabled = true;
+
+            // Construir parámetros de filtros
+            const params = new URLSearchParams();
+
+            // Agregar tipos
+            filtrosActivos.tipos.forEach(tipo => {
+                params.append('tipos', tipo);
+            });
+
+            // Agregar estados
+            filtrosActivos.estados.forEach(estado => {
+                params.append('estados', estado);
+            });
+
+            // Agregar departamentos
+            filtrosActivos.departamentos.forEach(depto => {
+                params.append('departamentos', depto);
+            });
+
+            // Agregar filtros de fecha
+            if (filtrosActivos.fecha.tipo) {
+                params.append('fechaTipo', filtrosActivos.fecha.tipo);
+
+                if (filtrosActivos.fecha.tipo === 'single' && filtrosActivos.fecha.fechaUnica) {
+                    params.append('fechaUnica', filtrosActivos.fecha.fechaUnica);
+                } else if (filtrosActivos.fecha.tipo === 'range') {
+                    if (filtrosActivos.fecha.fechaDesde) {
+                        params.append('fechaDesde', filtrosActivos.fecha.fechaDesde);
+                    }
+                    if (filtrosActivos.fecha.fechaHasta) {
+                        params.append('fechaHasta', filtrosActivos.fecha.fechaHasta);
+                    }
+                }
+            }
+
+            // Crear enlace de descarga directa
+            const downloadLink = document.createElement('a');
+            downloadLink.href = `/Permiso/ExportarPermisosExcel?${params.toString()}`;
+            downloadLink.download = `Permisos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.xlsx`;
+            downloadLink.style.display = 'none';
+
+            // Agregar event listener para restaurar el botón cuando la descarga termine
+            downloadLink.addEventListener('click', function() {
+                // Pequeño delay para asegurar que la descarga inició
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 1000);
+            });
+
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+
+            // También restaurar el botón después de un tiempo máximo por si falla
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 5000); // Máximo 5 segundos
+        });
     </script>
     <script>
         // Función para obtener icono según tipo de archivo
@@ -322,10 +533,17 @@
         let todosLosPermisos = [];
         let permisosFiltrados = [];
 
-        // Estado de los filtros
+        // Estado de los filtros - ACTUALIZADO CON NUEVOS FILTROS
         let filtrosActivos = {
             tipos: [],
-            estados: []
+            estados: [],
+            departamentos: [], // ← AGREGAR
+            fecha: {
+                tipo: 'single',
+                fechaUnica: null,
+                fechaDesde: null,
+                fechaHasta: null
+            }
         };
 
         // Mapear estado del backend al frontend
@@ -349,7 +567,6 @@
                     return todosLosPermisos;
                 } else {
                     console.error('Error al cargar permisos:', response.status);
-                    // Si falla, usar solo los de la página actual
                     todosLosPermisos = permisosPaginaActual;
                     return todosLosPermisos;
                 }
@@ -360,8 +577,62 @@
             }
         }
 
-        // Inicializar contadores con TODOS los permisos
-        async function inicializarContadores() {
+        // FUNCIÓN QUE TE FALTABA - AGREGAR ESTA
+        async function filtrarPermisos() {
+            if (todosLosPermisos.length === 0) {
+                await cargarTodosLosPermisos();
+            }
+
+            permisosFiltrados = todosLosPermisos.filter(permiso => {
+                // Filtrar por tipo
+                const coincideTipo = filtrosActivos.tipos.length === 0 ||
+                                   filtrosActivos.tipos.includes(permiso.tipo);
+
+                // Filtrar por estado
+                const estadoFrontend = mapearEstado(permiso.estado);
+                const coincideEstado = filtrosActivos.estados.length === 0 ||
+                                     filtrosActivos.estados.includes(estadoFrontend);
+
+                // Filtrar por departamento - AGREGAR
+                const coincideDepartamento = filtrosActivos.departamentos.length === 0 ||
+                                           (permiso.departamento && filtrosActivos.departamentos.includes(permiso.departamento));
+
+                // Filtrar por fecha - AGREGAR
+                let coincideFecha = true;
+                if (filtrosActivos.fecha.tipo === 'single' && filtrosActivos.fecha.fechaUnica) {
+                    const fechaUnica = new Date(filtrosActivos.fecha.fechaUnica);
+                    const fechaInicio = new Date(permiso.fechaInicio);
+                    const fechaIngreso = new Date(permiso.fechaIngreso);
+
+                    fechaUnica.setHours(0, 0, 0, 0);
+                    fechaInicio.setHours(0, 0, 0, 0);
+                    fechaIngreso.setHours(0, 0, 0, 0);
+
+                    coincideFecha = fechaInicio.getTime() === fechaUnica.getTime() ||
+                                  fechaIngreso.getTime() === fechaUnica.getTime();
+                } else if (filtrosActivos.fecha.tipo === 'range' && filtrosActivos.fecha.fechaDesde && filtrosActivos.fecha.fechaHasta) {
+                    const desde = new Date(filtrosActivos.fecha.fechaDesde);
+                    const hasta = new Date(filtrosActivos.fecha.fechaHasta);
+                    const fechaInicio = new Date(permiso.fechaInicio);
+                    const fechaIngreso = new Date(permiso.fechaIngreso);
+
+                    desde.setHours(0, 0, 0, 0);
+                    hasta.setHours(0, 0, 0, 0);
+                    fechaInicio.setHours(0, 0, 0, 0);
+                    fechaIngreso.setHours(0, 0, 0, 0);
+
+                    coincideFecha = (fechaInicio >= desde && fechaInicio <= hasta) ||
+                                  (fechaIngreso >= desde && fechaIngreso <= hasta);
+                }
+
+                return coincideTipo && coincideEstado && coincideDepartamento && coincideFecha;
+            });
+
+            return permisosFiltrados;
+        }
+
+        // Función de fallback para contadores usando permisos locales
+        async function inicializarContadoresConPermisosLocales() {
             if (todosLosPermisos.length === 0) {
                 await cargarTodosLosPermisos();
             }
@@ -380,15 +651,34 @@
                 'Rechazado': 0
             };
 
-            // Contar TODOS los permisos
+            const contadoresDepartamento = {
+                'Financiero Contable': 0,
+                'Gerencia': 0,
+                'Ingenieria': 0,
+                'Jefatura': 0,
+                'Legal': 0,
+                'Operaciones': 0,
+                'Tecnicos NCR': 0,
+                'Tecnologias de Informacion': 0,
+                'Ventas': 0
+            };
+
+            // Contar TODOS los permisos locales
             todosLosPermisos.forEach(permiso => {
+                // Contar por tipo
                 if (contadoresTipo.hasOwnProperty(permiso.tipo)) {
                     contadoresTipo[permiso.tipo]++;
                 }
 
+                // Contar por estado
                 const estadoFrontend = mapearEstado(permiso.estado);
                 if (contadoresEstado.hasOwnProperty(estadoFrontend)) {
                     contadoresEstado[estadoFrontend]++;
+                }
+
+                // Contar por departamento
+                if (permiso.departamento && contadoresDepartamento.hasOwnProperty(permiso.departamento)) {
+                    contadoresDepartamento[permiso.departamento]++;
                 }
             });
 
@@ -402,28 +692,56 @@
             document.getElementById('count-approved').textContent = `(${contadoresEstado['Aprobado']})`;
             document.getElementById('count-pending').textContent = `(${contadoresEstado['Pendiente']})`;
             document.getElementById('count-rejected').textContent = `(${contadoresEstado['Rechazado']})`;
+
+            // Actualizar contadores de departamentos
+            document.getElementById('dropdown-count-fc').textContent = `(${contadoresDepartamento['Financiero Contable']})`;
+            document.getElementById('dropdown-count-g').textContent = `(${contadoresDepartamento['Gerencia']})`;
+            document.getElementById('dropdown-count-i').textContent = `(${contadoresDepartamento['Ingenieria']})`;
+            document.getElementById('dropdown-count-j').textContent = `(${contadoresDepartamento['Jefatura']})`;
+            document.getElementById('dropdown-count-l').textContent = `(${contadoresDepartamento['Legal']})`;
+            document.getElementById('dropdown-count-o').textContent = `(${contadoresDepartamento['Operaciones']})`;
+            document.getElementById('dropdown-count-tncr').textContent = `(${contadoresDepartamento['Tecnicos NCR']})`;
+            document.getElementById('dropdown-count-ti').textContent = `(${contadoresDepartamento['Tecnologias de Informacion']})`;
+            document.getElementById('dropdown-count-v').textContent = `(${contadoresDepartamento['Ventas']})`;
         }
 
-        // Función para filtrar permisos (usa TODOS los permisos)
-        async function filtrarPermisos() {
-            if (todosLosPermisos.length === 0) {
-                await cargarTodosLosPermisos();
+        // Función para inicializar contadores con TODOS los permisos
+        async function inicializarContadores() {
+            try {
+                const response = await fetch('/Permiso/ObtenerContadoresFiltros');
+                if (response.ok) {
+                    const contadores = await response.json();
+
+                    // Actualizar contadores de tipos
+                    document.getElementById('count-medical').textContent = `(${contadores.citaMedica})`;
+                    document.getElementById('count-vacation').textContent = `(${contadores.vacaciones})`;
+                    document.getElementById('count-incapacidad').textContent = `(${contadores.incapacidad})`;
+                    document.getElementById('count-teletrabajo').textContent = `(${contadores.teletrabajo})`;
+                    document.getElementById('count-especial').textContent = `(${contadores.especial})`;
+
+                    // Actualizar contadores de estados
+                    document.getElementById('count-approved').textContent = `(${contadores.aprobado})`;
+                    document.getElementById('count-pending').textContent = `(${contadores.pendiente})`;
+                    document.getElementById('count-rejected').textContent = `(${contadores.rechazado})`;
+
+                    // Actualizar contadores de departamentos
+                    document.getElementById('dropdown-count-fc').textContent = `(${contadores.financieroContable})`;
+                    document.getElementById('dropdown-count-g').textContent = `(${contadores.gerencia})`;
+                    document.getElementById('dropdown-count-i').textContent = `(${contadores.ingenieria})`;
+                    document.getElementById('dropdown-count-j').textContent = `(${contadores.jefatura})`;
+                    document.getElementById('dropdown-count-l').textContent = `(${contadores.legal})`;
+                    document.getElementById('dropdown-count-o').textContent = `(${contadores.operaciones})`;
+                    document.getElementById('dropdown-count-tncr').textContent = `(${contadores.tecnicosNCR})`;
+                    document.getElementById('dropdown-count-ti').textContent = `(${contadores.tecnologiasInformacion})`;
+                    document.getElementById('dropdown-count-v').textContent = `(${contadores.ventas})`;
+                } else {
+                    console.error('Error al cargar contadores del servidor');
+                    await inicializarContadoresConPermisosLocales();
+                }
+            } catch (error) {
+                console.error('Error cargando contadores:', error);
+                await inicializarContadoresConPermisosLocales();
             }
-
-            permisosFiltrados = todosLosPermisos.filter(permiso => {
-                // Filtrar por tipo
-                const coincideTipo = filtrosActivos.tipos.length === 0 ||
-                                   filtrosActivos.tipos.includes(permiso.tipo);
-
-                // Filtrar por estado
-                const estadoFrontend = mapearEstado(permiso.estado);
-                const coincideEstado = filtrosActivos.estados.length === 0 ||
-                                     filtrosActivos.estados.includes(estadoFrontend);
-
-                return coincideTipo && coincideEstado;
-            });
-
-            return permisosFiltrados;
         }
 
         // Función para aplicar fade out
@@ -433,7 +751,6 @@
 
             setTimeout(() => {
                 callback();
-                // Restaurar opacidad después de cambiar el contenido
                 setTimeout(() => {
                     element.style.opacity = '1';
                 }, 50);
@@ -445,7 +762,6 @@
             element.style.transition = 'opacity 0.3s ease';
             element.style.opacity = '0';
 
-            // Pequeño delay para que el fade out termine
             setTimeout(() => {
                 element.style.opacity = '1';
             }, 50);
@@ -468,7 +784,6 @@
                         <p class="text-muted">Intenta ajustar los filtros para ver más resultados.</p>
                     </div>
                 `;
-                // Aplicar fade in al contenido vacío
                 fadeIn(permissionsContainer);
                 return;
             }
@@ -514,6 +829,13 @@
                                     ${permission.tipo}
                                 </span>
 
+                                <!-- AGREGAR BADGE DE DEPARTAMENTO -->
+                                ${permission.departamento ? `
+                                <span class="badge custom-badge bg-info text-white">
+                                    ${permission.departamento}
+                                </span>
+                                ` : ''}
+
                                 <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
                                     <div class="col-2">
                                         <span class="text-muted fw-semibold">Creación:</span>
@@ -546,7 +868,6 @@
                                     <span class="text-dark fw-medium ms-1" d-block>${permission.comentarios ?? 'Sin comentario'}</span>
                                 </div>
                                 <div class="col-2">
-                                    <span class="text-muted fw-semibold d-block">Foto:</span>
                                     ${
                                     permission.foto && permission.foto.trim() !== ''
                                         ? `<img src="data:image/jpeg;base64,${permission.foto}"
@@ -556,7 +877,7 @@
                                                 data-bs-target="#fotoModal"
                                                 onclick="mostrarImagenModal('${permission.foto}')">`
                                         : `<span class="text-muted d-inline-block text-center"
-                                                style="width:25px; height:25px; line-height:25px; background:#f0f0f0; border-radius:5px;">
+                                                style="width:100%; height:25px; line-height:25px; background:#f0f0f0; border-radius:5px;">
                                             Sin foto
                                             </span>`
                                     }
@@ -587,7 +908,7 @@
                                                     Sin archivo
                                                 </span>
                                             `
-                                        }
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -595,7 +916,6 @@
                 </div>
             `).join('');
 
-            // Aplicar fade in al nuevo contenido
             fadeIn(permissionsContainer);
         }
 
@@ -610,7 +930,58 @@
             }
         }
 
-        // Event listeners para filtros con efectos de fade
+        // Función para actualizar filtros de fecha
+        function actualizarFiltroFecha() {
+            const isRange = document.getElementById('dateRangeSwitch').checked;
+
+            if (isRange) {
+                filtrosActivos.fecha.tipo = 'range';
+                filtrosActivos.fecha.fechaUnica = null;
+                filtrosActivos.fecha.fechaDesde = document.getElementById('filter-date-from').value;
+                filtrosActivos.fecha.fechaHasta = document.getElementById('filter-date-to').value;
+            } else {
+                filtrosActivos.fecha.tipo = 'single';
+                filtrosActivos.fecha.fechaDesde = null;
+                filtrosActivos.fecha.fechaHasta = null;
+                filtrosActivos.fecha.fechaUnica = document.getElementById('filter-date-single').value;
+            }
+        }
+
+        // EVENT LISTENERS PARA NUEVOS FILTROS - AGREGAR ESTOS
+
+        // Departamentos
+        document.querySelectorAll('.filter-departamento').forEach(checkbox => {
+            checkbox.addEventListener('change', async function() {
+                if (this.checked) {
+                    filtrosActivos.departamentos.push(this.value);
+                } else {
+                    filtrosActivos.departamentos = filtrosActivos.departamentos.filter(depto => depto !== this.value);
+                }
+                const permisosFiltrados = await filtrarPermisos();
+                await renderPermissionsWithFade(permisosFiltrados);
+                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
+            });
+        });
+
+        // Fechas
+        document.querySelectorAll('.filter-date').forEach(input => {
+            input.addEventListener('change', async function() {
+                actualizarFiltroFecha();
+                const permisosFiltrados = await filtrarPermisos();
+                await renderPermissionsWithFade(permisosFiltrados);
+                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
+            });
+        });
+
+        // Switch de rango de fechas
+        document.getElementById("dateRangeSwitch").addEventListener("change", function () {
+            const isRange = this.checked;
+            document.getElementById("singleDateContainer").classList.toggle("d-none", isRange);
+            document.getElementById("rangeDateContainer").classList.toggle("d-none", !isRange);
+            actualizarFiltroFecha();
+        });
+
+        // Event listeners existentes para tipos y estados (ya los tienes)
         document.querySelectorAll('.filter-type').forEach(checkbox => {
             checkbox.addEventListener('change', async function() {
                 if (this.checked) {
@@ -620,8 +991,7 @@
                 }
                 const permisosFiltrados = await filtrarPermisos();
                 await renderPermissionsWithFade(permisosFiltrados);
-                // Ocultar paginación cuando hay filtros activos
-                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0) ? 'none' : 'flex';
+                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
 
@@ -634,21 +1004,35 @@
                 }
                 const permisosFiltrados = await filtrarPermisos();
                 await renderPermissionsWithFade(permisosFiltrados);
-                // Ocultar paginación cuando hay filtros activos
-                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0) ? 'none' : 'flex';
+                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
 
-        // Limpiar filtros con efecto de fade
+        // Limpiar filtros con efecto de fade - ACTUALIZAR ESTA FUNCIÓN
         document.getElementById('clear-filters').addEventListener('click', function() {
             // Desmarcar todos los checkboxes
-            document.querySelectorAll('.filter-type, .filter-status').forEach(checkbox => {
+            document.querySelectorAll('.filter-type, .filter-status, .filter-departamento').forEach(checkbox => {
                 checkbox.checked = false;
             });
+
+            // Limpiar campos de fecha
+            document.getElementById('filter-date-single').value = '';
+            document.getElementById('filter-date-from').value = '';
+            document.getElementById('filter-date-to').value = '';
+            document.getElementById('dateRangeSwitch').checked = false;
+            document.getElementById("singleDateContainer").classList.remove("d-none");
+            document.getElementById("rangeDateContainer").classList.add("d-none");
 
             // Limpiar filtros activos
             filtrosActivos.tipos = [];
             filtrosActivos.estados = [];
+            filtrosActivos.departamentos = [];
+            filtrosActivos.fecha = {
+                tipo: 'single',
+                fechaUnica: null,
+                fechaDesde: null,
+                fechaHasta: null
+            };
 
             // Renderizar todos los permisos de la página actual con fade
             renderPermissionsWithFade(permisosPaginaActual);
@@ -657,11 +1041,8 @@
 
         // Inicializar con efecto de fade
         document.addEventListener('DOMContentLoaded', async function() {
-            // Cargar todos los permisos primero
             await cargarTodosLosPermisos();
             await inicializarContadores();
-
-            // Aplicar fade in al contenido inicial
             permissionsContainer.style.opacity = '0';
             renderPermissions(permisosPaginaActual);
             renderPagination();
