@@ -136,9 +136,14 @@
         <!-- Titulo de Permisos -->
         <div class="header-card p-4 mt-4 mb-4 d-flex justify-content-between">
             <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todos los Permisos</h1>
-            <button class="btn btn-success" id="exportExcelBtn">
-                <i class="bi bi-file-earmark-excel me-2"></i>
-            </button>
+            <div>
+                <button class="btn btn-success" id="exportExcelBtn">
+                    <i class="bi bi-file-earmark-excel"></i>
+                </button>
+                <button class="btn btn-danger" id="exportPdfBtn">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                </button>
+            </div>
         </div>
 
         <!-- Permission Types Grid -->
@@ -410,6 +415,8 @@
             modalImg.src = "data:image/jpeg;base64," + base64;
         }
     </script>
+
+    <!-- FUNCION DE DESCARGA DE EXCEL -->
     <script>
         //Funciones para descargar excel
         document.getElementById('exportExcelBtn').addEventListener('click', function() {
@@ -480,6 +487,87 @@
             }, 5000); // Máximo 5 segundos
         });
     </script>
+
+    <!-- FUNCION DE DESCARGA DE PDF -->
+    <script>
+        document.getElementById('exportPdfBtn').addEventListener('click', async function() {
+            const button = this;
+            try {
+                // Mostrar indicador de carga
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-2"></i>Generando PDF...';
+                button.disabled = true;
+
+                // Construir parámetros de filtros (misma lógica que Excel)
+                const params = new URLSearchParams();
+
+                // Agregar tipos
+                filtrosActivos.tipos.forEach(tipo => {
+                    params.append('tipos', tipo);
+                });
+
+                // Agregar estados
+                filtrosActivos.estados.forEach(estado => {
+                    params.append('estados', estado);
+                });
+
+                // Agregar departamentos
+                filtrosActivos.departamentos.forEach(depto => {
+                    params.append('departamentos', depto);
+                });
+
+                // Agregar filtros de fecha
+                if (filtrosActivos.fecha.tipo) {
+                    params.append('fechaTipo', filtrosActivos.fecha.tipo);
+
+                    if (filtrosActivos.fecha.tipo === 'single' && filtrosActivos.fecha.fechaUnica) {
+                        params.append('fechaUnica', filtrosActivos.fecha.fechaUnica);
+                    } else if (filtrosActivos.fecha.tipo === 'range') {
+                        if (filtrosActivos.fecha.fechaDesde) {
+                            params.append('fechaDesde', filtrosActivos.fecha.fechaDesde);
+                        }
+                        if (filtrosActivos.fecha.fechaHasta) {
+                            params.append('fechaHasta', filtrosActivos.fecha.fechaHasta);
+                        }
+                    }
+                }
+
+                // Realizar la solicitud
+                const response = await fetch(`/Permiso/ExportarPermisosPDF?${params.toString()}`);
+
+                if (response.ok) {
+                    // Obtener el blob
+                    const blob = await response.blob();
+
+                    // Restaurar el botón inmediatamente
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+
+                    // Descargar el archivo
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `Permisos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                } else {
+                    throw new Error('Error al generar el PDF');
+                }
+            } catch (error) {
+                console.error('Error al exportar a PDF:', error);
+                alert('Error al generar el archivo PDF');
+
+                // Restaurar el botón en caso de error
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        });
+    </script>
+
     <script>
         // Función para obtener icono según tipo de archivo
         function obtenerIconoArchivo(nombreArchivo, tipoMIME) {
@@ -601,28 +689,25 @@
                 let coincideFecha = true;
                 if (filtrosActivos.fecha.tipo === 'single' && filtrosActivos.fecha.fechaUnica) {
                     const fechaUnica = new Date(filtrosActivos.fecha.fechaUnica);
-                    const fechaInicio = new Date(permiso.fechaInicio);
-                    const fechaIngreso = new Date(permiso.fechaIngreso);
-
+                    const fechaCreacion = new Date(permiso.fechaCreacion);
                     fechaUnica.setHours(0, 0, 0, 0);
-                    fechaInicio.setHours(0, 0, 0, 0);
-                    fechaIngreso.setHours(0, 0, 0, 0);
+                    fechaCreacion.setHours(0, 0, 0, 0);
 
-                    coincideFecha = fechaInicio.getTime() === fechaUnica.getTime() ||
-                                  fechaIngreso.getTime() === fechaUnica.getTime();
-                } else if (filtrosActivos.fecha.tipo === 'range' && filtrosActivos.fecha.fechaDesde && filtrosActivos.fecha.fechaHasta) {
+                    coincideFecha = fechaCreacion.getTime() === fechaUnica.getTime();
+
+                } else if (
+                    filtrosActivos.fecha.tipo === 'range' &&
+                    filtrosActivos.fecha.fechaDesde &&
+                    filtrosActivos.fecha.fechaHasta
+                ) {
                     const desde = new Date(filtrosActivos.fecha.fechaDesde);
                     const hasta = new Date(filtrosActivos.fecha.fechaHasta);
-                    const fechaInicio = new Date(permiso.fechaInicio);
-                    const fechaIngreso = new Date(permiso.fechaIngreso);
-
+                    const fechaCreacion = new Date(permiso.fechaCreacion);
                     desde.setHours(0, 0, 0, 0);
                     hasta.setHours(0, 0, 0, 0);
-                    fechaInicio.setHours(0, 0, 0, 0);
-                    fechaIngreso.setHours(0, 0, 0, 0);
+                    fechaCreacion.setHours(0, 0, 0, 0);
 
-                    coincideFecha = (fechaInicio >= desde && fechaInicio <= hasta) ||
-                                  (fechaIngreso >= desde && fechaIngreso <= hasta);
+                    coincideFecha = fechaCreacion >= desde && fechaCreacion <= hasta;
                 }
 
                 return coincideTipo && coincideEstado && coincideDepartamento && coincideFecha;
@@ -839,7 +924,7 @@
                                 <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
                                     <div class="col-2">
                                         <span class="text-muted fw-semibold">Creación:</span>
-                                        <span class="text-dark fw-medium ms-1">${new Date(permission.fechaIngreso).toLocaleDateString('es-CR')}</span>
+                                        <span class="text-dark fw-medium ms-1">${new Date(permission.fechaCreacion).toLocaleDateString('es-CR')}</span>
                                     </div>
                                     <div class="col-2">
                                         <span class="text-muted fw-semibold">Inicio:</span>
@@ -852,6 +937,10 @@
                                     <div class="col-2">
                                         <span class="text-muted fw-semibold">Regreso:</span>
                                         <span class="text-dark fw-medium ms-1">${new Date(permission.fechaRegresoLaboral).toLocaleDateString('es-CR')}</span>
+                                    </div>
+                                    <div class="col-2">
+                                        <span class="text-muted fw-semibold">Hora:</span>
+                                        <span class="text-dark fw-medium ms-1">${new Date(permission.horaCita).toLocaleDateString('es-CR')}</span>
                                     </div>
                                 </div>
                             </div>
