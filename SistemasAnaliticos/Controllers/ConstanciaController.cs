@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using ClosedXML.Excel;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SistemasAnaliticos.ViewModels;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
+using SistemasAnaliticos.ViewModels;
 using System.Runtime.InteropServices;
 using static SistemasAnaliticos.Models.codigoFotos;
 
@@ -37,18 +40,19 @@ namespace SistemasAnaliticos.Controllers
             var constancias = await _context.Constancia
                 .AsNoTracking()
                 .Where(p => p.estado == "Creada")
-                .OrderByDescending(x => x.fechaPedido)
+                .OrderByDescending(x => x.fechaCreacion)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(p => new ConstanciaViewModel
                 {
                     idConstancia = p.idConstancia,
-                    fechaPedido = p.fechaPedido,
-                    nombreEmpleado = p.nombrePersona,
+                    fechaCreacion = p.fechaCreacion,
+                    nombreEmpleado = p.nombreEmpleado,
+                    departamento = p.departamento,
                     tipo = p.tipo,
                     dirijido = p.dirijido,
                     fechaRequerida = p.fechaRequerida,
-                    comentarios = p.Comentarios,
+                    comentarios = p.comentarios,
                     nombreArchivo = p.nombreArchivo,
                     tipoMIME = p.tipoMIME,
                     tamanoArchivo = p.tamanoArchivo,
@@ -74,15 +78,16 @@ namespace SistemasAnaliticos.Controllers
             {
                 var todosLasConstancias = await _context.Constancia
                     .AsNoTracking()
-                    .OrderByDescending(x => x.fechaPedido)
+                    .OrderByDescending(x => x.fechaCreacion)
                     .Select(p => new {
                         p.idConstancia,
-                        p.fechaPedido,
-                        p.nombrePersona,
+                        p.fechaCreacion,
+                        p.nombreEmpleado,
+                        p.departamento,
                         p.tipo,
                         p.dirijido,
                         p.fechaRequerida,
-                        p.Comentarios,
+                        p.comentarios,
                         p.nombreArchivo,
                         p.tipoMIME,
                         p.tamanoArchivo,
@@ -100,44 +105,396 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // METODO SEGUIDO DE LA PAGINACION PARA FILTROS JUNTOS
-        public async Task<IActionResult> ObtenerConstanciasFiltrados([FromQuery] string[] tipos, [FromQuery] string[] estados)
+        public async Task<IActionResult> ObtenerConstanciasFiltradasCompletas(
+            [FromQuery] string[] tipos,
+            [FromQuery] string[] estados,
+            [FromQuery] string[] departamentos,
+            [FromQuery] string fechaTipo = null,
+            [FromQuery] string fechaUnica = null,
+            [FromQuery] string fechaDesde = null,
+            [FromQuery] string fechaHasta = null)
         {
-            var query = _context.Constancia.AsNoTracking().AsQueryable();
-
-            // Aplicar filtros
-            if (tipos != null && tipos.Length > 0)
+            try
             {
-                query = query.Where(p => tipos.Contains(p.tipo));
-            }
+                var query = _context.Constancia.AsNoTracking().AsQueryable();
 
-            if (estados != null && estados.Length > 0)
+                // Aplicar filtros de tipo
+                if (tipos != null && tipos.Length > 0)
+                {
+                    query = query.Where(p => tipos.Contains(p.tipo));
+                }
+
+                // Aplicar filtros de estado
+                if (estados != null && estados.Length > 0)
+                {
+                    var estadosMapeados = estados.Select(e =>
+                        e == "Aprobado" ? "Creada" :
+                        e == "Pendiente" ? "Pendiente" :
+                        "Rechazada").ToArray();
+
+                    query = query.Where(p => estadosMapeados.Contains(p.estado));
+                }
+
+                // Aplicar filtros de departamento
+                if (departamentos != null && departamentos.Length > 0)
+                {
+                    query = query.Where(p => departamentos.Contains(p.departamento));
+                }
+
+                // Aplicar filtros de fecha
+                if (!string.IsNullOrEmpty(fechaTipo))
+                {
+                    if (fechaTipo == "single" && !string.IsNullOrEmpty(fechaUnica))
+                    {
+                        if (DateOnly.TryParse(fechaUnica, out DateOnly fechaUnicaDate))
+                        {
+                            query = query.Where(p => p.fechaCreacion == fechaUnicaDate);
+                        }
+                    }
+
+                    else if (fechaTipo == "range" && !string.IsNullOrEmpty(fechaDesde) && !string.IsNullOrEmpty(fechaHasta))
+                    {
+                        if (DateOnly.TryParse(fechaDesde, out DateOnly desdeDate) &&
+                            DateOnly.TryParse(fechaHasta, out DateOnly hastaDate))
+                        {
+                            query = query.Where(p =>
+                                p.fechaCreacion >= desdeDate &&
+                                p.fechaCreacion <= hastaDate
+                            );
+                        }
+                    }
+                }
+
+                var contancias = await query
+                    .OrderByDescending(x => x.fechaCreacion)
+                    .Select(p => new {
+                        p.idConstancia,
+                        p.nombreEmpleado,
+                        p.departamento,
+                        p.tipo,
+                        p.dirijido,
+                        p.estado,
+                        p.fechaCreacion,
+                        p.fechaRequerida,
+                        p.comentarios,
+                        p.nombreArchivo,
+                        p.tipoMIME,
+                        p.tamanoArchivo
+                    })
+                    .ToListAsync();
+
+                return Ok(contancias);
+            }
+            catch (Exception ex)
             {
-                var estadosMapeados = estados.Select(e =>
-                    e == "Aprobado" ? "Creada" :
-                    e == "Pendiente" ? "Pendiente" :
-                    "Rechazada").ToArray();
-
-                query = query.Where(p => estadosMapeados.Contains(p.estado));
+                return StatusCode(500, "Error interno del servidor al aplicar filtros");
             }
+        }
 
-            var permisos = await query
-                .OrderByDescending(x => x.fechaPedido )
-                .Select(p => new {
-                    p.idConstancia,
-                    p.fechaPedido,
-                    p.nombrePersona,
-                    p.tipo,
-                    p.dirijido,
-                    p.fechaRequerida,
-                    p.Comentarios,
-                    p.nombreArchivo,
-                    p.tipoMIME,
-                    p.tamanoArchivo,
-                    p.estado,
-                })
-                .ToListAsync();
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // DESCARGAR PERMISOS FILTRADOS EN EXCEL Y PDF
+        public async Task<IActionResult> ExportarConstanciasExcel(
+        [FromQuery] string[] tipos,
+        [FromQuery] string[] estados,
+        [FromQuery] string[] departamentos,
+        [FromQuery] string fechaTipo = null,
+        [FromQuery] string fechaUnica = null,
+        [FromQuery] string fechaDesde = null,
+        [FromQuery] string fechaHasta = null)
+        {
+            try
+            {
+                var query = _context.Constancia.AsNoTracking().AsQueryable();
 
-            return Ok(permisos);
+                // Aplicar filtros de tipo
+                if (tipos != null && tipos.Length > 0)
+                {
+                    query = query.Where(p => tipos.Contains(p.tipo));
+                }
+
+                // Aplicar filtros de estado - SIN mapeo, directo
+                if (estados != null && estados.Length > 0)
+                {
+                    query = query.Where(p => estados.Contains(p.estado));
+                }
+
+                // Aplicar filtros de departamento
+                if (departamentos != null && departamentos.Length > 0)
+                {
+                    query = query.Where(p => departamentos.Contains(p.departamento));
+                }
+
+                // Aplicar filtros de fecha
+                if (!string.IsNullOrEmpty(fechaTipo))
+                {
+                    if (DateTime.TryParse(fechaUnica, out DateTime fechaUnicaDT))
+                    {
+                        DateOnly fechaUnicaDate = DateOnly.FromDateTime(fechaUnicaDT);
+                        query = query.Where(p => p.fechaCreacion == fechaUnicaDate);
+                    }
+                    else if (fechaTipo == "range" && !string.IsNullOrEmpty(fechaDesde) && !string.IsNullOrEmpty(fechaHasta))
+                    {
+                        if (DateOnly.TryParse(fechaDesde, out DateOnly desdeDate) &&
+                            DateOnly.TryParse(fechaHasta, out DateOnly hastaDate))
+                        {
+                            query = query.Where(p =>
+                                p.fechaCreacion >= desdeDate &&
+                                p.fechaCreacion <= hastaDate
+                            );
+                        }
+                    }
+                }
+
+                var contancias = await query
+                    .OrderByDescending(x => x.fechaCreacion)
+                    .Select(p => new {
+                        p.idConstancia,
+                        p.nombreEmpleado,
+                        p.departamento,
+                        p.tipo,
+                        p.dirijido,
+                        p.estado,
+                        p.fechaCreacion,
+                        p.fechaRequerida,
+                        p.comentarios,
+                        p.nombreArchivo,
+                        p.tipoMIME,
+                        p.tamanoArchivo
+                    })
+                    .ToListAsync();
+
+                // Crear el libro de Excel
+                using var workbook = new ClosedXML.Excel.XLWorkbook();
+                var worksheet = workbook.Worksheets.Add("Contancias");
+
+                // Estilos para el encabezado
+                var headerStyle = workbook.Style;
+                headerStyle.Font.Bold = true;
+                headerStyle.Fill.BackgroundColor = XLColor.LightGray;
+                headerStyle.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                // Encabezados
+                worksheet.Cell(1, 1).Value = "ID Constancia";
+                worksheet.Cell(1, 2).Value = "Nombre Empleado";
+                worksheet.Cell(1, 3).Value = "Departamento";
+                worksheet.Cell(1, 4).Value = "Tipo";
+                worksheet.Cell(1, 5).Value = "Estado";
+                worksheet.Cell(1, 6).Value = "Fecha Creación";
+                worksheet.Cell(1, 7).Value = "Fecha Requerida";
+                worksheet.Cell(1, 8).Value = "Dirijido a";
+                worksheet.Cell(1, 9).Value = "Comentarios";
+                worksheet.Cell(1, 10).Value = "Archivo Adjunto";
+
+                // Aplicar estilo al encabezado
+                worksheet.Range(1, 1, 1, 13).Style = headerStyle;
+
+                // Llenar datos
+                int row = 2;
+                foreach (var permiso in contancias)
+                {
+                    worksheet.Cell(row, 1).Value = permiso.idConstancia;
+                    worksheet.Cell(row, 2).Value = permiso.nombreEmpleado;
+                    worksheet.Cell(row, 3).Value = permiso.departamento;
+                    worksheet.Cell(row, 4).Value = permiso.tipo;
+                    worksheet.Cell(row, 5).Value = permiso.estado; // Estado directo, sin mapeo
+                    worksheet.Cell(row, 6).Value = permiso.fechaCreacion.ToString("dd-MM-yyyy");
+                    worksheet.Cell(row, 7).Value = permiso.fechaRequerida?.ToString("dd-MM-yyyy");
+                    worksheet.Cell(row, 8).Value = permiso.dirijido;
+                    worksheet.Cell(row, 9).Value = permiso.comentarios;
+                    worksheet.Cell(row, 9).Value = permiso.comentarios;
+                    worksheet.Cell(row, 10).Value = string.IsNullOrEmpty(permiso.nombreArchivo) ? "No" : "Sí";
+
+                    row++;
+                }
+
+                // Ajustar ancho de columnas
+                worksheet.Columns().AdjustToContents();
+
+                // Preparar respuesta
+                var stream = new MemoryStream();
+                workbook.SaveAs(stream);
+                stream.Position = 0;
+
+                var fileName = $"Constancias_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
+                return File(stream,
+                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                           fileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al generar el archivo Excel: {ex.Message}");
+            }
+        }
+
+        public async Task<IActionResult> ExportarConstanciasPDF(
+        [FromQuery] string[] tipos,
+        [FromQuery] string[] estados,
+        [FromQuery] string[] departamentos,
+        [FromQuery] string fechaTipo = null,
+        [FromQuery] string fechaUnica = null,
+        [FromQuery] string fechaDesde = null,
+        [FromQuery] string fechaHasta = null)
+        {
+            try
+            {
+                var query = _context.Constancia.AsNoTracking().AsQueryable();
+
+                // Aplicar filtros (misma lógica que Excel)
+                if (tipos != null && tipos.Length > 0)
+                {
+                    query = query.Where(p => tipos.Contains(p.tipo));
+                }
+
+                if (estados != null && estados.Length > 0)
+                {
+                    query = query.Where(p => estados.Contains(p.estado));
+                }
+
+                if (departamentos != null && departamentos.Length > 0)
+                {
+                    query = query.Where(p => departamentos.Contains(p.departamento));
+                }
+
+                if (!string.IsNullOrEmpty(fechaTipo))
+                {
+                    if (DateTime.TryParse(fechaUnica, out DateTime fechaUnicaDT))
+                    {
+                        DateOnly fechaUnicaDate = DateOnly.FromDateTime(fechaUnicaDT);
+                        query = query.Where(p => p.fechaCreacion == fechaUnicaDate);
+                    }
+                    else if (fechaTipo == "range" && !string.IsNullOrEmpty(fechaDesde) && !string.IsNullOrEmpty(fechaHasta))
+                    {
+                        if (DateOnly.TryParse(fechaDesde, out DateOnly desdeDate) &&
+                            DateOnly.TryParse(fechaHasta, out DateOnly hastaDate))
+                        {
+                            query = query.Where(p =>
+                                p.fechaCreacion >= desdeDate &&
+                                p.fechaCreacion <= hastaDate
+                            );
+                        }
+                    }
+                }
+
+                var contancias = await query
+                    .OrderByDescending(x => x.fechaCreacion)
+                    .Select(p => new {
+                        p.idConstancia,
+                        p.nombreEmpleado,
+                        p.departamento,
+                        p.tipo,
+                        p.dirijido,
+                        p.estado,
+                        p.fechaCreacion,
+                        p.fechaRequerida,
+                        p.comentarios,
+                        p.nombreArchivo,
+                        p.tipoMIME,
+                        p.tamanoArchivo
+                    })
+                    .ToListAsync();
+
+                // Crear PDF
+                using var memoryStream = new MemoryStream();
+                var document = new Document(PageSize.A4.Rotate(), 10f, 10f, 10f, 10f);
+                var writer = PdfWriter.GetInstance(document, memoryStream);
+
+                document.Open();
+
+                // Título - CORREGIDO
+                var tituloFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
+                var titulo = new Paragraph("REPORTE DE CONSTANCIAS", tituloFont);
+                titulo.Alignment = Element.ALIGN_CENTER;
+                titulo.SpacingAfter = 20f;
+                document.Add(titulo);
+
+                // Fecha de generación - CORREGIDO
+                var fechaFont = FontFactory.GetFont(FontFactory.HELVETICA, 8, Font.ITALIC);
+                var fechaGeneracion = new Paragraph($"Generado: {DateTime.Now:dd/MM/yyyy HH:mm:ss}", fechaFont);
+                fechaGeneracion.Alignment = Element.ALIGN_RIGHT;
+                fechaGeneracion.SpacingAfter = 10f;
+                document.Add(fechaGeneracion);
+
+                // Crear tabla
+                var table = new PdfPTable(8);
+                table.WidthPercentage = 100;
+                table.SetWidths(new float[] { 0.8f, 1.5f, 1.5f, 1.2f, 1.2f, 1.5f, 2f, 2f });
+
+                // Encabezados de tabla - CORREGIDO
+                var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9);
+                AddTableCell(table, "ID", headerFont);
+                AddTableCell(table, "Empleado", headerFont);
+                AddTableCell(table, "Departamento", headerFont);
+                AddTableCell(table, "Tipo", headerFont);
+                AddTableCell(table, "Estado", headerFont);
+                AddTableCell(table, "Fechas", headerFont);
+                AddTableCell(table, "Dirijido a", headerFont);
+                AddTableCell(table, "Comentarios", headerFont);
+
+                // Datos - CORREGIDO
+                var cellFont = FontFactory.GetFont(FontFactory.HELVETICA, 8);
+                var cellFontBold = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8);
+
+                foreach (var contancia in contancias)
+                {
+                    AddTableCell(table, contancia.idConstancia.ToString(), cellFontBold);
+                    AddTableCell(table, contancia.nombreEmpleado ?? "", cellFont);
+                    AddTableCell(table, contancia.departamento ?? "", cellFont);
+                    AddTableCell(table, contancia.tipo ?? "", cellFont);
+
+                    // Color según estado
+                    var estadoFont = GetEstadoFont(contancia.estado);
+                    AddTableCell(table, contancia.estado ?? "", estadoFont);
+
+                    var fechas = $"Creación: {contancia.fechaCreacion:dd/MM/yyyy}\nRequerida: {contancia.fechaRequerida:dd/MM/yyyy}";
+                    AddTableCell(table, fechas, cellFont);
+
+                    AddTableCell(table, contancia.dirijido ?? "Sin dirijir", cellFont);
+                    AddTableCell(table, contancia.comentarios ?? "Sin comentarios", cellFont);
+                }
+
+                document.Add(table);
+
+                // Pie de página - CORREGIDO
+                var pieFont = FontFactory.GetFont(FontFactory.HELVETICA, 9, Font.ITALIC);
+                var pie = new Paragraph($"Total de registros: {contancias.Count}", pieFont);
+                pie.Alignment = Element.ALIGN_RIGHT;
+                pie.SpacingBefore = 10f;
+                document.Add(pie);
+
+                document.Close();
+
+                // Devolver PDF
+                var fileName = $"Constancias_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+                return File(memoryStream.ToArray(), "application/pdf", fileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al generar el PDF: {ex.Message}");
+            }
+        }
+
+        // Métodos auxiliares - CORREGIDOS
+        private void AddTableCell(PdfPTable table, string text, Font font)
+        {
+            var cell = new PdfPCell(new Phrase(text, font));
+            cell.Padding = 5;
+            cell.BorderWidth = 0.5f;
+            table.AddCell(cell);
+        }
+
+        private Font GetEstadoFont(string estado)
+        {
+            var baseFont = FontFactory.GetFont(FontFactory.HELVETICA, 8);
+
+            if (string.IsNullOrEmpty(estado)) return baseFont;
+
+            return estado.ToUpper() switch
+            {
+                "APROBADO" or "CREADA" or "APROBADA" => FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.Green),
+                "PENDIENTE" => FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.Orange),
+                "RECHAZADO" or "RECHAZADA" => FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.Red),
+                _ => baseFont
+            };
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
@@ -151,11 +508,25 @@ namespace SistemasAnaliticos.Controllers
                     .GroupBy(p => 1)
                     .Select(g => new
                     {
+                        // Contadores por tipo
                         Laboral = g.Count(p => p.tipo == "Laboral"),
                         Salarial = g.Count(p => p.tipo == "Salarial"),
-                        Aprobado = g.Count(p => p.estado == "Aprobada"),
+
+                        // Contadores por estado
+                        Aprobado = g.Count(p => p.estado == "Creada" || p.estado == "Aprobada"),
                         Pendiente = g.Count(p => p.estado == "Pendiente"),
-                        Rechazado = g.Count(p => p.estado == "Rechazada")
+                        Rechazado = g.Count(p => p.estado == "Rechazada"),
+
+                        // Contadores por departamento ← AGREGAR ESTOS
+                        FinancieroContable = g.Count(p => p.departamento == "Financiero Contable"),
+                        Gerencia = g.Count(p => p.departamento == "Gerencia"),
+                        Ingenieria = g.Count(p => p.departamento == "Ingeniería"),
+                        Jefatura = g.Count(p => p.departamento == "Jefatura"),
+                        Legal = g.Count(p => p.departamento == "Legal"),
+                        Operaciones = g.Count(p => p.departamento == "Operaciones"),
+                        TecnicosNCR = g.Count(p => p.departamento == "Tecnicos NCR"),
+                        TecnologiasInformacion = g.Count(p => p.departamento == "Tecnologías de Información"),
+                        Ventas = g.Count(p => p.departamento == "Ventas")
                     })
                     .FirstOrDefaultAsync();
 
@@ -165,7 +536,16 @@ namespace SistemasAnaliticos.Controllers
                     Salarial = 0,
                     Aprobado = 0,
                     Pendiente = 0,
-                    Rechazado = 0
+                    Rechazado = 0,
+                    FinancieroContable = 0,
+                    Gerencia = 0,
+                    Ingenieria = 0,
+                    Jefatura = 0,
+                    Legal = 0,
+                    Operaciones = 0,
+                    TecnicosNCR = 0,
+                    TecnologiasInformacion = 0,
+                    Ventas = 0
                 });
             }
             catch (Exception ex)
@@ -176,7 +556,16 @@ namespace SistemasAnaliticos.Controllers
                     Salarial = 0,
                     Aprobado = 0,
                     Pendiente = 0,
-                    Rechazado = 0
+                    Rechazado = 0,
+                    FinancieroContable = 0,
+                    Gerencia = 0,
+                    Ingenieria = 0,
+                    Jefatura = 0,
+                    Legal = 0,
+                    Operaciones = 0,
+                    TecnicosNCR = 0,
+                    TecnologiasInformacion = 0,
+                    Ventas = 0
                 });
             }
         }
@@ -221,7 +610,6 @@ namespace SistemasAnaliticos.Controllers
             {
                 var fotoService = new CodigoFotos();
                 var adjuntoService = new ProcesarAdjuntos();
-
                 var user = await _userManager.GetUserAsync(User);
 
                 if (model.tipo == "Laboral")
@@ -230,13 +618,14 @@ namespace SistemasAnaliticos.Controllers
 
                     var nuevo = new Constancia
                     {
-                        fechaPedido = ahoraCR,
-                        nombrePersona = user.nombreCompleto,
+                        fechaCreacion = hoy,
+                        nombreEmpleado = user.nombreCompleto,
+                        departamento = user.departamento,
                         tipo = model.tipo,
 
                         dirijido = model.dirijido,
                         fechaRequerida = model.fechaRequerida,
-                        Comentarios = model.Comentarios,
+                        comentarios = model.comentarios,
 
                         datosAdjuntos = pdfBytes,
                         nombreArchivo = $"Constancia_Laboral_{user.primerNombre}{user.primerApellido}.pdf",
@@ -252,13 +641,14 @@ namespace SistemasAnaliticos.Controllers
                 {
                     var nuevo = new Constancia
                     {
-                        fechaPedido = ahoraCR,
-                        nombrePersona = user.nombreCompleto,
+                        fechaCreacion = hoy,
+                        nombreEmpleado = user.nombreCompleto,
+                        departamento = user.departamento,
                         tipo = model.tipo,
 
                         dirijido = "sin dirijido",
                         fechaRequerida = model.fechaRequerida,
-                        Comentarios = model.Comentarios,
+                        comentarios = model.comentarios,
 
                         estado = "Creada"
                     };

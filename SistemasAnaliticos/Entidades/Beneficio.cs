@@ -8,17 +8,23 @@ namespace SistemasAnaliticos.Entidades
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long idBeneficio { get; set; }
-        public DateTime fechaPedido { get; set; }
-        public string nombrePersona { get; set; }
 
+        [Required]
+        public DateOnly fechaCreacion { get; set; }
+
+        [Required]
+        public string nombreEmpleado { get; set; }
+
+        [Required]
+        public string departamento { get; set; }
+
+        [Required]
         [StringLength(30)]
         public string tipo { get; set; }
 
+        [Required]
         [Column(TypeName = "decimal(12,2)")]
         public decimal monto { get; set; }
-
-        [Column(TypeName = "decimal(12,2)")]
-        public decimal restante { get; set; }
         public string Comentarios { get; set; }
 
         [Required]

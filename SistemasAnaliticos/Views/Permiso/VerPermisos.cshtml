@@ -568,6 +568,7 @@
         });
     </script>
 
+    <!-- PARA ICONOS -->
     <script>
         // Función para obtener icono según tipo de archivo
         function obtenerIconoArchivo(nombreArchivo, tipoMIME) {
@@ -609,6 +610,7 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
     </script>
+
     <script>
         const permisosPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Permisos));
         const totalPaginas = @Model.TotalPaginas;
@@ -665,7 +667,7 @@
             }
         }
 
-        // FUNCIÓN QUE TE FALTABA - AGREGAR ESTA
+        // Inicializar contadores con TODAS los permisos
         async function filtrarPermisos() {
             if (todosLosPermisos.length === 0) {
                 await cargarTodosLosPermisos();
@@ -924,7 +926,7 @@
                                 <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
                                     <div class="col-2">
                                         <span class="text-muted fw-semibold">Creación:</span>
-                                        <span class="text-dark fw-medium ms-1">${new Date(permission.fechaCreacion).toLocaleDateString('es-CR')}</span>
+                                                <span class="text-dark fw-medium ms-1">${new Date(permission.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}</span>
                                     </div>
                                     <div class="col-2">
                                         <span class="text-muted fw-semibold">Inicio:</span>

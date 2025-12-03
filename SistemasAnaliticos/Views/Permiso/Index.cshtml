@@ -74,6 +74,15 @@
         .chevron-rotated {
             transform: rotate(180deg);
         }
+
+        .note-highlight {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
     </style>
 </head>
 <body class="bg-gradient-custom min-vh-100">
@@ -138,7 +147,6 @@
                                 type="button" data-bs-toggle="modal" data-bs-target="#createConstanciaLModal" data-tipo="Laboral">
                             <i class="fa-solid fa-file fs-1 mb-3 text-white"></i>
                             <h5 class="fw-bold mb-2 text-white">Constancia Laboral</h5>
-                            <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
                         </button>
                     </div>
                     <div class="col-md-4">
@@ -146,27 +154,28 @@
                                 type="button" data-bs-toggle="modal" data-bs-target="#createConstanciaSModal" data-tipo="Salarial">
                             <i class="fa-solid fa-file fs-1 mb-3 text-white"></i>
                             <h5 class="fw-bold mb-2 text-white">Constancia Salarial</h5>
-                            <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
                         </button>
                     </div>
 
                     <!-- BENEFICIO -->
                     <div class="col-md-4">
-                        <button class="btn w-100 h-100 p-4 text-start permission-card" 
-                                type="button" data-bs-toggle="modal" data-bs-target="#createBeneficioModal"
-                                style="background-color: #4EBBD6;">
+                        <button class="btn w-100 h-100 p-4 text-start permission-card" style="background-color: #4EBBD6;"
+                                type="button" data-bs-toggle="modal" data-bs-target="#createBeneficioModal" data-tipo="Préstamo Laboral">
                             <i class="fa-solid fa-scale-unbalanced fs-1 mb-3 text-white"></i>
                             <h5 class="fw-bold mb-2 text-white">Solicitud de Préstamo Laboral</h5>
-                            <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
+                            <p class="note-highlight text-white mb-0">
+                                Recordar que solo una vez al año se puede solicitar
+                            </p>
                         </button>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn w-100 h-100 p-4 text-start permission-card"
-                                type="button" data-bs-toggle="modal" data-bs-target="#createBeneficioModal"                                
-                                style="background-color: #4EBBD6;">
+                        <button class="btn w-100 h-100 p-4 text-start permission-card" style="background-color: #4EBBD6;"
+                                type="button" data-bs-toggle="modal" data-bs-target="#createBeneficioModal" data-tipo="Adelanto Salarial">
                             <i class="fa-solid fa-sack-dollar fs-1 mb-3 text-white"></i>
-                            <h5 class="fw-bold mb-2 text-white">Solicitud de Adelanto</h5>
-                            <p class="mb-0 opacity-90 text-white">Permiso por tiempos</p>
+                            <h5 class="fw-bold mb-2 text-white">Solicitud de Adelanto de Salario</h5>
+                            <p class="note-highlight text-white mb-0">
+                                Recordar que solo se puede pedir un 25% del salario
+                            </p>
                         </button>
                     </div>
                 </div>

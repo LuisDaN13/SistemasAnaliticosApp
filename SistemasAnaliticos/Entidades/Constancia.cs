@@ -8,9 +8,17 @@ namespace SistemasAnaliticos.Entidades
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long idConstancia { get; set; }
-        public DateTime fechaPedido { get; set; }        
-        public string nombrePersona { get; set; }
 
+        [Required]
+        public DateOnly fechaCreacion { get; set; }        
+
+        [Required]
+        public string nombreEmpleado { get; set; }
+
+        [Required]
+        public string departamento { get; set; }
+
+        [Required]
         [StringLength(30)]
         public string tipo { get; set; }
 
@@ -19,11 +27,13 @@ namespace SistemasAnaliticos.Entidades
 
         [DataType(DataType.Date)]
         public DateTime? fechaRequerida { get; set; }
-        public string? Comentarios { get; set; }
+
+        public string? comentarios { get; set; }
 
         [NotMapped]
         public IFormFile fotoFile { get; set; } = null!;
 
+        // Datos adjuntos para SQL Server
         [Column(TypeName = "varbinary(max)")]
         public byte[]? datosAdjuntos { get; set; }
         public string? nombreArchivo { get; set; }

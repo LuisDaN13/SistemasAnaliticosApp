@@ -157,21 +157,21 @@ namespace SistemasAnaliticos.Controllers
                 {
                     if (fechaTipo == "single" && !string.IsNullOrEmpty(fechaUnica))
                     {
-                        if (DateTime.TryParse(fechaUnica, out DateTime fechaUnicaDate))
+                        if (DateOnly.TryParse(fechaUnica, out DateOnly fechaUnicaDate))
                         {
-                            query = query.Where(p =>
-                                p.fechaCreacion.Date == fechaUnicaDate.Date ||
-                                p.fechaCreacion.Date == fechaUnicaDate.Date);
+                            query = query.Where(p => p.fechaCreacion == fechaUnicaDate);
                         }
                     }
+
                     else if (fechaTipo == "range" && !string.IsNullOrEmpty(fechaDesde) && !string.IsNullOrEmpty(fechaHasta))
                     {
-                        if (DateTime.TryParse(fechaDesde, out DateTime desdeDate) &&
-                            DateTime.TryParse(fechaHasta, out DateTime hastaDate))
+                        if (DateOnly.TryParse(fechaDesde, out DateOnly desdeDate) &&
+                            DateOnly.TryParse(fechaHasta, out DateOnly hastaDate))
                         {
                             query = query.Where(p =>
-                                (p.fechaCreacion.Date >= desdeDate.Date && p.fechaCreacion.Date <= hastaDate.Date) ||
-                                (p.fechaCreacion.Date >= desdeDate.Date && p.fechaCreacion.Date <= hastaDate.Date));
+                                p.fechaCreacion >= desdeDate &&
+                                p.fechaCreacion <= hastaDate
+                            );
                         }
                     }
                 }
@@ -242,23 +242,20 @@ namespace SistemasAnaliticos.Controllers
                 // Aplicar filtros de fecha
                 if (!string.IsNullOrEmpty(fechaTipo))
                 {
-                    if (fechaTipo == "single" && !string.IsNullOrEmpty(fechaUnica))
+                    if (DateTime.TryParse(fechaUnica, out DateTime fechaUnicaDT))
                     {
-                        if (DateTime.TryParse(fechaUnica, out DateTime fechaUnicaDate))
-                        {
-                            query = query.Where(p =>
-                                p.fechaCreacion.Date == fechaUnicaDate.Date ||
-                                p.fechaCreacion.Date == fechaUnicaDate.Date);
-                        }
+                        DateOnly fechaUnicaDate = DateOnly.FromDateTime(fechaUnicaDT);
+                        query = query.Where(p => p.fechaCreacion == fechaUnicaDate);
                     }
                     else if (fechaTipo == "range" && !string.IsNullOrEmpty(fechaDesde) && !string.IsNullOrEmpty(fechaHasta))
                     {
-                        if (DateTime.TryParse(fechaDesde, out DateTime desdeDate) &&
-                            DateTime.TryParse(fechaHasta, out DateTime hastaDate))
+                        if (DateOnly.TryParse(fechaDesde, out DateOnly desdeDate) &&
+                            DateOnly.TryParse(fechaHasta, out DateOnly hastaDate))
                         {
                             query = query.Where(p =>
-                                (p.fechaCreacion.Date >= desdeDate.Date && p.fechaCreacion.Date <= hastaDate.Date) ||
-                                (p.fechaCreacion.Date >= desdeDate.Date && p.fechaCreacion.Date <= hastaDate.Date));
+                                p.fechaCreacion >= desdeDate &&
+                                p.fechaCreacion <= hastaDate
+                            );
                         }
                     }
                 }
@@ -382,23 +379,20 @@ namespace SistemasAnaliticos.Controllers
 
                 if (!string.IsNullOrEmpty(fechaTipo))
                 {
-                    if (fechaTipo == "single" && !string.IsNullOrEmpty(fechaUnica))
+                    if (DateTime.TryParse(fechaUnica, out DateTime fechaUnicaDT))
                     {
-                        if (DateTime.TryParse(fechaUnica, out DateTime fechaUnicaDate))
-                        {
-                            query = query.Where(p =>
-                                p.fechaCreacion.Date == fechaUnicaDate.Date ||
-                                p.fechaCreacion.Date == fechaUnicaDate.Date);
-                        }
+                        DateOnly fechaUnicaDate = DateOnly.FromDateTime(fechaUnicaDT);
+                        query = query.Where(p => p.fechaCreacion == fechaUnicaDate);
                     }
                     else if (fechaTipo == "range" && !string.IsNullOrEmpty(fechaDesde) && !string.IsNullOrEmpty(fechaHasta))
                     {
-                        if (DateTime.TryParse(fechaDesde, out DateTime desdeDate) &&
-                            DateTime.TryParse(fechaHasta, out DateTime hastaDate))
+                        if (DateOnly.TryParse(fechaDesde, out DateOnly desdeDate) &&
+                            DateOnly.TryParse(fechaHasta, out DateOnly hastaDate))
                         {
                             query = query.Where(p =>
-                                (p.fechaCreacion.Date >= desdeDate.Date && p.fechaCreacion.Date <= hastaDate.Date) ||
-                                (p.fechaCreacion.Date >= desdeDate.Date && p.fechaCreacion.Date <= hastaDate.Date));
+                                p.fechaCreacion >= desdeDate &&
+                                p.fechaCreacion <= hastaDate
+                            );
                         }
                     }
                 }
@@ -477,7 +471,7 @@ namespace SistemasAnaliticos.Controllers
 
                     var horaCitaStr = permiso.horaCita?.ToString(@"hh\:mm") ?? "";
 
-                    var fechas = $"Inicio: {permiso.fechaInicio:dd/MM/yyyy}\nFin: {permiso.fechaFinalizacion:dd/MM/yyyy}\nRegreso: {permiso.fechaRegresoLaboral:dd/MM/yyyy}\nHora: {horaCitaStr}";
+                    var fechas = $"Creación: {permiso.fechaCreacion:dd/MM/yyyy}\nInicio: {permiso.fechaInicio:dd/MM/yyyy}\nFin: {permiso.fechaFinalizacion:dd/MM/yyyy}\nRegreso: {permiso.fechaRegresoLaboral:dd/MM/yyyy}\nHora: {horaCitaStr}";
                         AddTableCell(table, fechas, cellFont);
 
                     AddTableCell(table, permiso.motivo ?? "Sin motivo", cellFont);
@@ -532,84 +526,84 @@ namespace SistemasAnaliticos.Controllers
         // -------------------------------------------------------------------------------------------------------------------------------
         // ENDPOINT PARA OBTENER CONTADORES DE FILTROS
         public async Task<IActionResult> ObtenerContadoresFiltros()
+        {
+            try
             {
-                try
-                {
-                    var contadores = await _context.Permiso
-                        .AsNoTracking()
-                        .GroupBy(p => 1)
-                        .Select(g => new
-                        {
-                            // Contadores por tipo
-                            CitaMedica = g.Count(p => p.tipo == "Cita Médica"),
-                            Vacaciones = g.Count(p => p.tipo == "Vacaciones"),
-                            Incapacidad = g.Count(p => p.tipo == "Incapacidad"),
-                            Teletrabajo = g.Count(p => p.tipo == "Teletrabajo"),
-                            Especial = g.Count(p => p.tipo == "Especial"),
-
-                            // Contadores por estado
-                            Aprobado = g.Count(p => p.estado == "Creada" || p.estado == "Aprobada"),
-                            Pendiente = g.Count(p => p.estado == "Pendiente"),
-                            Rechazado = g.Count(p => p.estado == "Rechazada"),
-
-                            // Contadores por departamento ← AGREGAR ESTOS
-                            FinancieroContable = g.Count(p => p.departamento == "Financiero Contable"),
-                            Gerencia = g.Count(p => p.departamento == "Gerencia"),
-                            Ingenieria = g.Count(p => p.departamento == "Ingenieria"),
-                            Jefatura = g.Count(p => p.departamento == "Jefatura"),
-                            Legal = g.Count(p => p.departamento == "Legal"),
-                            Operaciones = g.Count(p => p.departamento == "Operaciones"),
-                            TecnicosNCR = g.Count(p => p.departamento == "Tecnicos NCR"),
-                            TecnologiasInformacion = g.Count(p => p.departamento == "Tecnologias de Informacion"),
-                            Ventas = g.Count(p => p.departamento == "Ventas")
-                        })
-                        .FirstOrDefaultAsync();
-
-                    return Ok(contadores ?? new
+                var contadores = await _context.Permiso
+                    .AsNoTracking()
+                    .GroupBy(p => 1)
+                    .Select(g => new
                     {
-                        CitaMedica = 0,
-                        Vacaciones = 0,
-                        Incapacidad = 0,
-                        Teletrabajo = 0,
-                        Especial = 0,
-                        Aprobado = 0,
-                        Pendiente = 0,
-                        Rechazado = 0,
-                        FinancieroContable = 0,
-                        Gerencia = 0,
-                        Ingenieria = 0,
-                        Jefatura = 0,
-                        Legal = 0,
-                        Operaciones = 0,
-                        TecnicosNCR = 0,
-                        TecnologiasInformacion = 0,
-                        Ventas = 0
-                    });
-                }
-                catch (Exception ex)
+                        // Contadores por tipo
+                        CitaMedica = g.Count(p => p.tipo == "Cita Médica"),
+                        Vacaciones = g.Count(p => p.tipo == "Vacaciones"),
+                        Incapacidad = g.Count(p => p.tipo == "Incapacidad"),
+                        Teletrabajo = g.Count(p => p.tipo == "Teletrabajo"),
+                        Especial = g.Count(p => p.tipo == "Especial"),
+
+                        // Contadores por estado
+                        Aprobado = g.Count(p => p.estado == "Creada" || p.estado == "Aprobada"),
+                        Pendiente = g.Count(p => p.estado == "Pendiente"),
+                        Rechazado = g.Count(p => p.estado == "Rechazada"),
+
+                        // Contadores por departamento ← AGREGAR ESTOS
+                        FinancieroContable = g.Count(p => p.departamento == "Financiero Contable"),
+                        Gerencia = g.Count(p => p.departamento == "Gerencia"),
+                        Ingenieria = g.Count(p => p.departamento == "Ingeniería"),
+                        Jefatura = g.Count(p => p.departamento == "Jefatura"),
+                        Legal = g.Count(p => p.departamento == "Legal"),
+                        Operaciones = g.Count(p => p.departamento == "Operaciones"),
+                        TecnicosNCR = g.Count(p => p.departamento == "Tecnicos NCR"),
+                        TecnologiasInformacion = g.Count(p => p.departamento == "Tecnologías de Información"),
+                        Ventas = g.Count(p => p.departamento == "Ventas")
+                    })
+                    .FirstOrDefaultAsync();
+
+                return Ok(contadores ?? new
                 {
-                    return Ok(new
-                    {
-                        CitaMedica = 0,
-                        Vacaciones = 0,
-                        Incapacidad = 0,
-                        Teletrabajo = 0,
-                        Especial = 0,
-                        Aprobado = 0,
-                        Pendiente = 0,
-                        Rechazado = 0,
-                        FinancieroContable = 0,
-                        Gerencia = 0,
-                        Ingenieria = 0,
-                        Jefatura = 0,
-                        Legal = 0,
-                        Operaciones = 0,
-                        TecnicosNCR = 0,
-                        TecnologiasInformacion = 0,
-                        Ventas = 0
-                    });
-                }
+                    CitaMedica = 0,
+                    Vacaciones = 0,
+                    Incapacidad = 0,
+                    Teletrabajo = 0,
+                    Especial = 0,
+                    Aprobado = 0,
+                    Pendiente = 0,
+                    Rechazado = 0,
+                    FinancieroContable = 0,
+                    Gerencia = 0,
+                    Ingenieria = 0,
+                    Jefatura = 0,
+                    Legal = 0,
+                    Operaciones = 0,
+                    TecnicosNCR = 0,
+                    TecnologiasInformacion = 0,
+                    Ventas = 0
+                });
             }
+            catch (Exception ex)
+            {
+                return Ok(new
+                {
+                    CitaMedica = 0,
+                    Vacaciones = 0,
+                    Incapacidad = 0,
+                    Teletrabajo = 0,
+                    Especial = 0,
+                    Aprobado = 0,
+                    Pendiente = 0,
+                    Rechazado = 0,
+                    FinancieroContable = 0,
+                    Gerencia = 0,
+                    Ingenieria = 0,
+                    Jefatura = 0,
+                    Legal = 0,
+                    Operaciones = 0,
+                    TecnicosNCR = 0,
+                    TecnologiasInformacion = 0,
+                    Ventas = 0
+                });
+            }
+        }
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // VER DETALLES DE PERMISOS
@@ -679,7 +673,7 @@ namespace SistemasAnaliticos.Controllers
 
                 var nuevo = new Permiso
                 {
-                    fechaCreacion = ahoraCR,
+                    fechaCreacion = hoy,
                     nombreEmpleado = user.nombreCompleto,
                     departamento = user.departamento,
                     tipo = model.tipo,

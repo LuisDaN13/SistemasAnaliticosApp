@@ -5,10 +5,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.6);
@@ -64,15 +60,17 @@
             <div class="modal-content">
                 <!-- Header -->
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="permissionModalLabel">Nueva Solicitud de Beneficio</h5>
+                    <h5 class="modal-title fw-bold" id="permissionModalLabel">Nueva Solicitud de Beneficio <span id="tipoTexto"></span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <!-- Form -->
                 <form id="benForm" asp-controller="Beneficio" asp-action="Create" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="tipo" id="tipoPermiso" value="" />
+
                     <div class="modal-body">
                         <!-- Contenedor para mensajes de validación -->
-                        <div id="validationAlertsBen"></div>
+                        <div id="validationAlertsBene"></div>
 
                         <div>
                             <!-- Motivo -->
@@ -109,8 +107,18 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Pasar palabra de los Botones -->
+    <script>
+        const modalBene = document.getElementById('createBeneficioModal');
+
+        modalBene.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const tipo = button.getAttribute('data-tipo');
+
+            document.getElementById('tipoTexto').textContent = tipo;
+            document.getElementById('tipoPermiso').value = tipo;
+        });
+    </script>
 
     <!-- JavaScript para la funcionalidad -->
     <script>
@@ -122,8 +130,8 @@
 
         function inicializarResetBene() {
             const modal = document.getElementById('createBeneficioModal');
-            const form = document.getElementById('beneForm');
-            const cancelBtn = document.querySelector('.btn-outline-secondary');
+            const form = document.getElementById('benForm');
+            const cancelBtn = modal.querySelector('.btn-outline-secondary');
 
             // Resetear cuando el modal se cierra
             modal.addEventListener('hidden.bs.modal', resetearFormularioBene);
@@ -135,13 +143,16 @@
         }
 
         function resetearFormularioBene() {
-            const form = document.getElementById('beneForm');
+            const form = document.getElementById('benForm');
+            const modal = document.getElementById('createBeneficioModal');
 
             // 1. Resetear valores del formulario
-            form.reset();
+            if (form) {
+                form.reset();
+            }
 
             // 2. Limpiar todas las clases de validación
-            const campos = form.querySelectorAll('.form-control, .form-select');
+            const campos = modal.querySelectorAll('.form-control, .form-select');
             campos.forEach(campo => {
                 campo.classList.remove('is-invalid');
                 campo.classList.remove('is-valid');
@@ -154,75 +165,138 @@
             const tipoTexto = document.getElementById('tipoTexto');
             if (tipoTexto) tipoTexto.textContent = '';
 
-            console.log('Formulario de permisos reseteado');
+            console.log('Formulario de beneficios reseteado');
         }
 
         function inicializarValidacionBene() {
+            const form = document.getElementById('benForm');
             const submitBtn = document.getElementById('submitBtnBene');
 
+            if (!form || !submitBtn) {
+                console.error('No se encontró el formulario o el botón de submit');
+                return;
+            }
+
+            // Prevenir el envío por defecto del formulario
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (validarFormularioBene()) {
+                    // Si todo es válido, enviar el formulario
+                    this.submit();
+                }
+            });
+
+            // También manejar el clic del botón por si acaso
             submitBtn.addEventListener('click', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
 
-                let formularioValido = true;
-                const invalidFields = [];
+                if (validarFormularioBene()) {
+                    form.submit();
+                }
+            });
 
-                const requiredFields = document.querySelectorAll('#createBeneficioModal [required]');
-
-                requiredFields.forEach(field => {
-                    const value = field.value ? field.value.trim() : '';
-                    const fieldType = field.type;
-                    const tagName = field.tagName.toLowerCase();
-
-                    field.classList.remove('is-invalid');
-
-                    let fieldValid = true;
-
-                    if (tagName === 'select') {
-                        fieldValid = field.value !== '' && field.value !== null;
-                    } else if (fieldType === 'number') {
-                        fieldValid = value !== '' && !isNaN(value);
-                    } else if (fieldType === 'date') {
-                        fieldValid = value !== '';
-                    } else if (fieldType === 'time') {
-                        fieldValid = value !== '';
-                    } else if (fieldType === 'checkbox') {
-                        fieldValid = field.checked;
-                    } else {
-                        fieldValid = value !== '';
-                    }
-
-                    if (!fieldValid) {
-                        formularioValido = false;
-                        field.classList.add('is-invalid');
-                        invalidFields.push(field);
-                    }
+            // Validación en tiempo real para campos requeridos
+            const requiredFields = form.querySelectorAll('[required]');
+            requiredFields.forEach(field => {
+                // Validar al perder el foco
+                field.addEventListener('blur', function() {
+                    validarCampoIndividualBene(this);
                 });
 
-                if (!formularioValido) {
-                    showValidationErrorBene('Por favor complete todos los campos requeridos antes de enviar el formulario.');
+                // Validar al cambiar el valor (para campos numéricos y selects)
+                field.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            });
+        }
 
-                    if (invalidFields.length > 0) {
+        function validarFormularioBene() {
+            let formularioValido = true;
+            const invalidFields = [];
+
+            // Obtener el formulario específico dentro del modal
+            const form = document.getElementById('benForm');
+            if (!form) {
+                console.error('No se encontró el formulario');
+                return false;
+            }
+
+            // Obtener solo los campos requeridos dentro de este formulario específico
+            const requiredFields = form.querySelectorAll('[required]');
+
+            if (requiredFields.length === 0) {
+                console.warn('No se encontraron campos con atributo required');
+            }
+
+            requiredFields.forEach(field => {
+                const value = field.value ? field.value.trim() : '';
+                const fieldType = field.type;
+                const tagName = field.tagName.toLowerCase();
+
+                field.classList.remove('is-invalid', 'is-valid');
+
+                let fieldValid = true;
+
+                if (tagName === 'select') {
+                    fieldValid = field.value !== '' && field.value !== null && field.value !== '0';
+                } else if (fieldType === 'number') {
+                    // Para campos numéricos, verificar que no esté vacío y sea un número válido
+                    fieldValid = value !== '' && !isNaN(value) && parseFloat(value) > 0;
+                    // También verificar el atributo min si existe
+                    if (field.hasAttribute('min')) {
+                        const min = parseFloat(field.getAttribute('min'));
+                        fieldValid = fieldValid && parseFloat(value) >= min;
+                    }
+                } else if (fieldType === 'date') {
+                    fieldValid = value !== '';
+                } else if (fieldType === 'time') {
+                    fieldValid = value !== '';
+                } else if (fieldType === 'checkbox' || fieldType === 'radio') {
+                    fieldValid = field.checked;
+                } else {
+                    // Para inputs de texto, textarea, etc.
+                    fieldValid = value !== '';
+                }
+
+                if (!fieldValid) {
+                    formularioValido = false;
+                    field.classList.add('is-invalid');
+                    invalidFields.push(field);
+                } else {
+                    field.classList.add('is-valid');
+                }
+            });
+
+            if (!formularioValido) {
+                showValidationErrorBene('Por favor complete todos los campos requeridos (*) antes de enviar el formulario.');
+
+                if (invalidFields.length > 0) {
+                    // Enfocar el primer campo inválido
+                    setTimeout(() => {
+                        invalidFields[0].focus();
                         invalidFields[0].scrollIntoView({
                             behavior: 'smooth',
                             block: 'center'
                         });
-                        invalidFields[0].focus();
-                    }
-                } else {
-                    hideValidationErrorBene();
-                    document.getElementById('beneForm').submit();
+                    }, 100);
                 }
-            });
+            } else {
+                hideValidationErrorBene();
+            }
 
-            const requiredFields = document.querySelectorAll('#createBeneficioModal [required]');
-            requiredFields.forEach(field => {
-                field.addEventListener('blur', function() {
-                    validarCampoIndividualBene(this);
-                });
-            });
+            return formularioValido;
         }
 
         function validarCampoIndividualBene(campo) {
+            if (!campo.hasAttribute('required')) {
+                return true; // Solo validar campos requeridos
+            }
+
             const valor = campo.value ? campo.value.trim() : '';
             const tipo = campo.type;
             const tagName = campo.tagName.toLowerCase();
@@ -230,19 +304,25 @@
             let esValido = true;
 
             if (tagName === 'select') {
-                esValido = campo.value !== '' && campo.value !== null;
+                esValido = campo.value !== '' && campo.value !== null && campo.value !== '0';
             } else if (tipo === 'number') {
-                esValido = valor !== '' && !isNaN(valor);
+                esValido = valor !== '' && !isNaN(valor) && parseFloat(valor) > 0;
+                if (campo.hasAttribute('min')) {
+                    const min = parseFloat(campo.getAttribute('min'));
+                    esValido = esValido && parseFloat(valor) >= min;
+                }
             } else if (tipo === 'date' || tipo === 'time') {
                 esValido = valor !== '';
-            } else if (tipo === 'checkbox') {
+            } else if (tipo === 'checkbox' || tipo === 'radio') {
                 esValido = campo.checked;
             } else {
                 esValido = valor !== '';
             }
 
+            campo.classList.remove('is-invalid', 'is-valid');
+
             if (esValido) {
-                campo.classList.remove('is-invalid');
+                campo.classList.add('is-valid');
             } else {
                 campo.classList.add('is-invalid');
             }
@@ -273,7 +353,6 @@
                 validationContainer.innerHTML = '';
             }
         }
-
     </script>
 </body>
 </html>

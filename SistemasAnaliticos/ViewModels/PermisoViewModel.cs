@@ -7,7 +7,7 @@
         public string departamento { get; set; }
         public string tipo { get; set; }
         public string estado { get; set; }
-        public DateTime fechaCreacion { get; set; }
+        public DateOnly fechaCreacion { get; set; }
         public DateTime? fechaInicio { get; set; }
         public DateTime? fechaFinalizacion { get; set; }
         public DateTime? fechaRegresoLaboral { get; set; }

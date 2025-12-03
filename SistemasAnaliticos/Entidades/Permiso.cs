@@ -27,7 +27,7 @@ namespace SistemasAnaliticos.Entidades
         public long idPermiso { get; set; }
 
         [Required]
-        public DateTime fechaCreacion { get; set; }
+        public DateOnly fechaCreacion { get; set; }
 
         [Required]
         public string nombreEmpleado { get; set; }

@@ -82,12 +82,15 @@
                                        asp-for="fechaRequerida"
                                        id="fechaRequeridaCons"
                                        required>
+                                <span style="font-size: 0.8rem; color: #dc3545;">
+                                    * Tomar en cuenta que la persona responsable tiene 3 días hábiles para responder
+                                </span>
                             </div>
 
                             <!-- Notas -->
                             <div class="mb-4">
                                 <label class="form-label">Comentarios</label>
-                                <textarea asp-for="Comentarios"
+                                <textarea asp-for="comentarios"
                                           class="form-control"
                                           rows="2"
                                           placeholder="Información adicional..."></textarea>

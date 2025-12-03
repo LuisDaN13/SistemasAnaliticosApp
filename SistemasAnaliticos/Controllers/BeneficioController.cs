@@ -1,20 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
-using static SistemasAnaliticos.Models.codigoFotos;
 using System.Runtime.InteropServices;
+using static SistemasAnaliticos.Models.codigoFotos;
 
 namespace SistemasAnaliticos.Controllers
 {
     public class BeneficioController : Controller
     {
         private readonly DBContext _context;
+        private readonly UserManager<Usuario> _userManager;
 
 
-        public BeneficioController(DBContext context)
+        public BeneficioController(DBContext context, UserManager<Usuario> userManager)
         {
             _context = context;
-
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -37,15 +39,16 @@ namespace SistemasAnaliticos.Controllers
             {
                 var fotoService = new CodigoFotos();
                 var adjuntoService = new ProcesarAdjuntos();
+                var user = await _userManager.GetUserAsync(User);
 
                 var nuevo = new Beneficio
                 {
-                    fechaPedido = ahoraCR,
-                    nombrePersona = "Luis",
+                    fechaCreacion = hoy,
+                    nombreEmpleado = user.nombreCompleto,
+                    departamento = user.departamento,
                     tipo = model.tipo,
 
                     monto = model.monto,
-                    restante = 0,
                     Comentarios = model.Comentarios,
 
                     estado = "Creada"
@@ -53,11 +56,13 @@ namespace SistemasAnaliticos.Controllers
 
                 _context.Beneficio.Add(nuevo);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Se creó el beneficio correctamente.";
+                return RedirectToAction("Index", "Permiso");
             }
             catch
             {
-                return RedirectToAction("Usuario", "Index");
+                TempData["ErrorMessage"] = "Error en la creación del beneficio.";
+                return RedirectToAction("Index", "Permiso");
             }
         }
 
