@@ -60,13 +60,14 @@
             <div class="modal-content">
                 <!-- Header -->
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="permissionModalLabel">Nueva Solicitud de Beneficio <span id="tipoTexto"></span></h5>
+                    <h5 class="modal-title fw-bold" id="permissionModalLabel">Nueva Solicitud de Beneficio <span id="tipoDisplay"></span></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 <!-- Form -->
                 <form id="benForm" asp-controller="Beneficio" asp-action="Create" method="post" enctype="multipart/form-data">
-                    <input type="hidden" asp-for="tipo" id="tipoPermiso" value="" />
+                    <input type="hidden" asp-for="tipo" id="tipoBeneficio" value="" />
+
 
                     <div class="modal-body">
                         <!-- Contenedor para mensajes de validación -->
@@ -107,16 +108,29 @@
         </div>
     </div>
 
-    <!-- Pasar palabra de los Botones -->
+    <!-- Pasar palabra de tipo -->
     <script>
-        const modalBene = document.getElementById('createBeneficioModal');
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalBeneficio = document.getElementById('createBeneficioModal');
 
-        modalBene.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const tipo = button.getAttribute('data-tipo');
+            if (modalBeneficio) {
+                modalBeneficio.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    const tipo = button.getAttribute('data-tipo');
 
-            document.getElementById('tipoTexto').textContent = tipo;
-            document.getElementById('tipoPermiso').value = tipo;
+                    // PARA MOSTRAR EN EL TÍTULO DEL MODAL
+                    const tipoDisplay = document.getElementById('tipoDisplay');
+                    if (tipoDisplay) {
+                        tipoDisplay.textContent = tipo;
+                    }
+
+                    // PARA GUARDAR EN LA VARIABLE DEL MODEL
+                    const tipoBeneficio = document.getElementById('tipoBeneficio');
+                    if (tipoBeneficio) {
+                        tipoBeneficio.value = tipo;
+                    }
+                });
+            }
         });
     </script>
 
