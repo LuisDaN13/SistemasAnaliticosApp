@@ -1,4 +1,4 @@
-﻿@model SistemasAnaliticos.Entidades.Permiso
+﻿@model SistemasAnaliticos.Entidades.Constancia
 
 <!DOCTYPE html>
 <html lang="es">
@@ -86,13 +86,13 @@
                         </div>
                         <div style="display: flex; flex-wrap: wrap; align-content: center; justify-content: center">
                             <h2 class="h3 fw-bold text-dark mb-3 mt-3">Permiso no encontrado</h2>
-                            <p class="text-muted mb-4">El permiso que buscas no existe en nuestro sistema.</p>
+                            <p class="text-muted mb-4">La constancia que buscas no existe en nuestro sistema.</p>
                         </div>
                     </div>
                     <div style="gap: 9%; padding-bottom: 4%; display: flex; justify-content: center; align-items: center;">
-                        <a asp-controller="Permiso" asp-action="VerPermisos" class="btn btn-outline-secondary">
+                        <a asp-controller="Constancia" asp-action="VerConstancias" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-2"></i>
-                            Volver a Permisos
+                            Volver a Constancias
                         </a>
                     </div>
                 </div>
@@ -115,9 +115,9 @@
         {
             <!-- Back Button -->
             <div class="mb-4">
-                <a asp-controller="Permiso" asp-action="VerPermisos" class="btn btn-outline-secondary">
+                <a asp-controller="Constancia" asp-action="VerConstancias" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left me-2"></i>
-                    Volver a los Permisos
+                    Volver a las Constancias
                 </a>
             </div>
 
@@ -133,11 +133,8 @@
                                         <span class="badge badge-department">Departamento de @Model.departamento</span>
                                         @{
                                             string tipoColor =
-                                            Model.tipo == "Cita Médica" ? "#F58E53" :
-                                            Model.tipo == "Vacaciones" ? "#dc3545" :
-                                            Model.tipo == "Incapacidad" ? "#ffc107" :
-                                            Model.tipo == "Teletrabajo" ? "#17a2b8" :
-                                            Model.tipo == "Especial" ? "#AA80D9" :
+                                            Model.tipo == "Laboral" ? "#F58E53" :
+                                            Model.tipo == "Salarial" ? "#dc3545" :
                                             "#6c757d";
                                         }
                                         <span class="badge"
@@ -148,7 +145,7 @@
                                 </div>
                                 <div class="text-md-end">
                                     <p class="text-muted mb-1">Número de Constancia</p>
-                                    <p class="fs-3 fw-bold employee-id">#@Model.idPermiso</p>
+                                    <p class="fs-3 fw-bold employee-id">#@Model.idConstancia</p>
                                 </div>
                             </div>
 
@@ -157,7 +154,7 @@
                                 <div class="col-md">
                                     <div class="d-flex align-items-center">
                                         <div class="flex-grow-1 min-width-0 text-center">
-                                            <p class="text-muted mb-0 small">Fecha de Creación de Permiso</p>
+                                            <p class="text-muted mb-0 small">Fecha de Creación de la Petición de Constancia</p>
                                             <p class="fw-medium mb-0 text-break">@Model.fechaCreacion.ToString("dd MMM yyyy")</p>
                                         </div>
                                     </div>
@@ -165,24 +162,8 @@
                                 <div class="col-md">
                                     <div class="d-flex align-items-center">
                                         <div class="flex-grow-1 min-width-0 text-center">
-                                            <p class="text-muted mb-0 small">Fecha de Inicio</p>
-                                            <p class="fw-medium mb-0 text-break">@Model.fechaInicio?.ToString("dd MMM yyyy")</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-grow-1 min-width-0 text-center">
-                                            <p class="text-muted mb-0 small">Fecha de Finalización</p>
-                                            <p class="fw-medium mb-0 text-break">@Model.fechaFinalizacion?.ToString("dd MMM yyyy")</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-grow-1 min-width-0 text-center">
-                                            <p class="text-muted mb-0 small">Fecha de Regreso Laboral</p>
-                                            <p class="fw-medium mb-0 text-break">@Model.fechaRegresoLaboral?.ToString("dd MMM yyyy")</p>
+                                            <p class="text-muted mb-0 small">Fecha Requerida por parte del Empleado</p>
+                                            <p class="fw-medium mb-0 text-break">@Model.fechaRequerida?.ToString("dd MMM yyyy")</p>
                                         </div>
                                     </div>
                                 </div>
@@ -207,18 +188,24 @@
                             <div class="row">
                                 <!-- Columna izquierda -->
                                 <div class="col-md-12">
-                                    <div class="mb-3 justify-content-center">
-                                        <p class="text-muted mb-1 small">Motivo</p>
-                                        <p class="fw-medium mb-0 text-break @(Model.motivo == null ? "text-decoration-line-through text-danger" : "")">
-                                            @(Model.motivo ?? "N/A")
-                                        </p>
-                                    </div>
+                                    @if (Model.tipo == "Laboral")
+                                    {
+                                        <div class="mb-3 justify-content-center">
+                                            <p class="text-muted mb-1 small">Dirigido a</p>
+
+                                            <pre class="fw-medium mb-0 text-break @(Model.dirijido == null ? "text-decoration-line-through text-danger" : "")"
+                                                 style="white-space: pre-wrap; background: transparent; border: none; padding: 0; font-family: inherit;">
+                                                 @(Model.dirijido ?? "N/A")
+                                            </pre>
+                                        </div>
+                                    }
                                     <div class="mb-3 justify-content-center">
                                         <p class="text-muted mb-1 small">Comentarios</p>
-                                        <p class="fw-medium mb-0 text-break @(Model.comentarios == null ? "text-decoration-line-through text-danger" : "")">
-                                            @(Model.comentarios ?? "N/A")
-                                        </p>
 
+                                        <pre class="fw-medium mb-0 text-break @(Model.comentarios == null ? "text-decoration-line-through text-danger" : "")"
+                                             style="white-space: pre-wrap; background: transparent; border: none; padding: 0; font-family: inherit;">
+                                                @(Model.comentarios ?? "N/A")
+                                        </pre>
                                     </div>
                                 </div>
                             </div>
@@ -236,32 +223,12 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3 d-flex justify-content-center" style="gap: 40%; align-items: center;">
-                                <p class="text-muted mb-1 small">Foto</p>
-                                @if (Model.foto != null && Model.foto.Length > 0)
-                                {
-                                    var base64foto = Convert.ToBase64String(Model.foto);
-                                    <img src="data:image/jpeg;base64,@base64foto"
-                                         alt="foto"
-                                         style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; cursor: pointer;"
-                                         data-bs-toggle="modal"
-                                         data-bs-target="#fotoModal"
-                                         onclick="mostrarImagenModal('@base64foto')" />
-                                }
-                                else
-                                {
-                                    <span class="text-muted d-inline-block text-center"
-                                          style="width: 70px; height: 70px; line-height: 70px; background: #f0f0f0; border-radius: 5px;">
-                                        Sin Foto
-                                    </span>
-                                }
-                            </div>
-                            <div class="mb-3 d-flex justify-content-center" style="gap: 40%; align-items: center;">
+                            <div class="mb-3 d-flex justify-content-center" style="height: 100%; gap: 40%; align-items: center;">
                                 <p class="text-muted mb-1 small">Archivo adjunto</p>
                                 @if (!string.IsNullOrWhiteSpace(Model.nombreArchivo))
                                 {
                                     <div class="mt-1">
-                                        <a href="/Permiso/descargar-adjunto/@Model.idPermiso"
+                                        <a href="/Constancia/descargar-adjunto/@Model.idConstancia"
                                            class="btn btn-sm btn-outline-primary d-flex align-items-center archivo-adjunto"
                                            style="font-size: 0.75rem; padding: 0.25rem 0.5rem;"
                                            title="Descargar @Model.nombreArchivo"
@@ -276,6 +243,15 @@
                                         <small class="text-muted text-center d-block mt-1 tamano-archivo">
                                             <!-- El tamaño se mostrará con JavaScript -->
                                         </small>
+                                        <!-- BOTÓN VISTA PREVIA -->
+                                        <div class="d-flex justify-content-center mt-2">
+                                            <a href="/Constancia/Preview/@Model.idConstancia"
+                                               target="_blank"
+                                               class="btn btn-sm btn-secondary d-flex justify-content-center align-items-center"
+                                               style="width: 34px; height: 34px; border-radius: 6px;">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 }
                                 else

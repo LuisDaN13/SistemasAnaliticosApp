@@ -1,4 +1,4 @@
-﻿@model SistemasAnaliticos.ViewModels.PaginacionPermisosViewModel
+﻿@model SistemasAnaliticos.ViewModels.PaginacionBeneficiosViewModel
 
 <!DOCTYPE html>
 <html lang="es">
@@ -22,12 +22,6 @@
             border: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             background-color: white;
-        }
-
-        .colorcito {
-            background-color: #e3f2fd !important;
-            color: #0d6efd !important;
-            border: 1px solid #bbdefb !important;
         }
     </style>
     <style>
@@ -86,17 +80,17 @@
             padding: 0.25rem 0.5rem;
         }
 
-        #permissionsContainer {
+        #beneficiosContainer {
             transition: opacity 0.3s ease;
             opacity: 1;
         }
 
-        .permission-card {
+        .beneficio-card {
             transition: all 0.3s ease;
             border: 1px solid #dee2e6;
         }
 
-            .permission-card:hover {
+            .beneficio-card:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
                 border-color: var(--primary-color);
@@ -139,9 +133,9 @@
     <!-- Main Content -->
     <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4 pb-0">
 
-        <!-- Titulo de Permisos -->
+        <!-- Titulo de Beneficios -->
         <div class="header-card p-4 mt-4 mb-4 d-flex justify-content-between">
-            <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todos los Permisos</h1>
+            <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todos los Beneficios</h1>
             <div>
                 <button class="btn btn-success" id="exportExcelBtn">
                     <i class="bi bi-file-earmark-excel"></i>
@@ -161,54 +155,33 @@
                         <div class="card-body">
                             <h2 class="h5 card-title fw-bold text-dark mb-2">Filtrar por</h2>
 
-                            <!-- CHECKS DE TIPOS DE PERMISOS -->
+                            <!-- CHECKS DE TIPOS DE BENEFICIOS -->
                             <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#typeFilter" aria-expanded="true" aria-controls="typeFilter">
-                                    Tipo de Permiso
+                                    Tipo de Beneficio
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
                                 <div class="collapse show mt-3" id="typeFilter">
                                     <div class="d-flex flex-column gap-2">
                                         <div class="form-check">
-                                            <input class="form-check-input filter-type" type="checkbox" value="Cita Médica" id="type-medical">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-medical">
-                                                <span>Cita Médica</span>
-                                                <span class="text-muted" id="count-medical">(0)</span>
+                                            <input class="form-check-input filter-type" type="checkbox" value="Préstamo Laboral" id="type-prestamo">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-prestamo">
+                                                <span>Préstamo Laboral</span>
+                                                <span class="text-muted" id="count-prestamo">(0)</span>
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input filter-type" type="checkbox" value="Vacaciones" id="type-vacation">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-vacation">
-                                                <span>Vacaciones</span>
-                                                <span class="text-muted" id="count-vacation">(0)</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input filter-type" type="checkbox" value="Incapacidad" id="type-incapacidad">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-incapacidad">
-                                                <span>Incapacidad</span>
-                                                <span class="text-muted" id="count-incapacidad">(0)</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input filter-type" type="checkbox" value="Teletrabajo" id="type-teletrabajo">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-teletrabajo">
-                                                <span>Teletrabajo</span>
-                                                <span class="text-muted" id="count-teletrabajo">(0)</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input filter-type" type="checkbox" value="Especial" id="type-especial">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-especial">
-                                                <span>Especial</span>
-                                                <span class="text-muted" id="count-especial">(0)</span>
+                                            <input class="form-check-input filter-type" type="checkbox" value="Adelanto Salarial" id="type-adelanto">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-adelanto">
+                                                <span>Adelanto Salarial</span>
+                                                <span class="text-muted" id="count-adelanto">(0)</span>
                                             </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- CHECKS DE ESTADOS DE PERMISOS -->
+                            <!-- CHECKS DE ESTADOS DE BENEFICIOS -->
                             <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#statusFilter" aria-expanded="true" aria-controls="statusFilter">
                                     Estado
@@ -389,7 +362,7 @@
 
                 <!-- CONTENIDO DE CARDS -->
                 <div class="col-lg-9">
-                    <div id="permissionsContainer">
+                    <div id="beneficiosContainer">
                         <!-- Permissions will be dynamically loaded here -->
                     </div>
 
@@ -404,23 +377,6 @@
             </div>
         </div>
     </main>
-
-    <!-- Modal de la Foto -->
-    <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center">
-                    <img id="modalFoto" src="" alt="Foto ampliada" class="img-fluid rounded" />
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        function mostrarImagenModal(base64) {
-            var modalImg = document.getElementById("modalFoto");
-            modalImg.src = "data:image/jpeg;base64," + base64;
-        }
-    </script>
 
     <!-- FUNCION DE DESCARGA DE EXCEL -->
     <script>
@@ -469,8 +425,8 @@
 
             // Crear enlace de descarga directa
             const downloadLink = document.createElement('a');
-            downloadLink.href = `/Permiso/ExportarPermisosExcel?${params.toString()}`;
-            downloadLink.download = `Permisos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.xlsx`;
+            downloadLink.href = `/Beneficio/ExportarBeneficiosExcel?${params.toString()}`;
+            downloadLink.download = `Beneficios_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.xlsx`;
             downloadLink.style.display = 'none';
 
             // Agregar event listener para restaurar el botón cuando la descarga termine
@@ -539,7 +495,7 @@
                 }
 
                 // Realizar la solicitud
-                const response = await fetch(`/Permiso/ExportarPermisosPDF?${params.toString()}`);
+                const response = await fetch(`/Beneficio/ExportarBeneficiosPDF?${params.toString()}`);
 
                 if (response.ok) {
                     // Obtener el blob
@@ -554,7 +510,7 @@
                     const a = document.createElement('a');
                     a.style.display = 'none';
                     a.href = url;
-                    a.download = `Permisos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.pdf`;
+                    a.download = `Beneficios_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.pdf`;
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
@@ -574,60 +530,18 @@
         });
     </script>
 
-    <!-- PARA ICONOS -->
+    <!-- FUNCIONES PRINCIPALES DE LA VISTA -->
     <script>
-        // Función para obtener icono según tipo de archivo
-        function obtenerIconoArchivo(nombreArchivo, tipoMIME) {
-            const extension = obtenerExtension(nombreArchivo).toLowerCase();
-
-            const iconos = {
-                'pdf': 'bi-file-pdf',
-                'doc': 'bi-file-word',
-                'docx': 'bi-file-word',
-                'xls': 'bi-file-excel',
-                'xlsx': 'bi-file-excel',
-                'ppt': 'bi-file-ppt',
-                'pptx': 'bi-file-ppt',
-                'jpg': 'bi-file-image',
-                'jpeg': 'bi-file-image',
-                'png': 'bi-file-image',
-                'gif': 'bi-file-image',
-                'zip': 'bi-file-zip',
-                'rar': 'bi-file-zip'
-            };
-
-            const icono = iconos[extension] || 'bi-file-earmark';
-            return `<i class="bi ${icono} me-1"></i>`;
-        }
-
-        // Función para obtener extensión del archivo
-        function obtenerExtension(nombreArchivo) {
-            return nombreArchivo.split('.').pop() || 'file';
-        }
-
-        // Función para formatear tamaño de archivo
-        function formatearTamanoArchivo(bytes) {
-            if (bytes === 0 || !bytes) return '0 B';
-
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-    </script>
-
-    <script>
-        const permisosPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Permisos));
+        const beneficiosPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Beneficios));
         const totalPaginas = @Model.TotalPaginas;
         let paginaActual = @Model.PaginaActual;
 
-        const permissionsContainer = document.getElementById("permissionsContainer");
+        const beneficiosContainer = document.getElementById("beneficiosContainer");
         const pagination = document.getElementById("pagination");
 
-        // Estado global - cargar TODOS los permisos una sola vez
-        let todosLosPermisos = [];
-        let permisosFiltrados = [];
+        // Estado global - cargar TODOS los beneficios una sola vez
+        let todosLosBeneficios = [];
+        let beneficiosFiltrados = [];
 
         // Estado de los filtros - ACTUALIZADO CON NUEVOS FILTROS
         let filtrosActivos = {
@@ -654,50 +568,50 @@
             return estadoBackend;
         }
 
-        // Cargar TODOS los permisos del servidor (solo una vez)
-        async function cargarTodosLosPermisos() {
+        // Cargar TODOS los beneficios del servidor (solo una vez)
+        async function cargartodosLosBeneficios() {
             try {
-                const response = await fetch('/Permiso/ObtenerTodosLosPermisos');
+                const response = await fetch('/Beneficio/ObtenerTodosLosBeneficios');
                 if (response.ok) {
-                    todosLosPermisos = await response.json();
-                    return todosLosPermisos;
+                    todosLosBeneficios = await response.json();
+                    return todosLosBeneficios;
                 } else {
-                    console.error('Error al cargar permisos:', response.status);
-                    todosLosPermisos = permisosPaginaActual;
-                    return todosLosPermisos;
+                    console.error('Error al cargar beneficios:', response.status);
+                    todosLosBeneficios = beneficiosPaginaActual;
+                    return todosLosBeneficios;
                 }
             } catch (error) {
-                console.error('Error cargando permisos:', error);
-                todosLosPermisos = permisosPaginaActual;
-                return todosLosPermisos;
+                console.error('Error cargando beneficios:', error);
+                todosLosBeneficios = beneficiosPaginaActual;
+                return todosLosBeneficios;
             }
         }
 
-        // Inicializar contadores con TODAS los permisos
-        async function filtrarPermisos() {
-            if (todosLosPermisos.length === 0) {
-                await cargarTodosLosPermisos();
+        // Inicializar contadores con TODAS los beneficios
+        async function filtrarBeneficios() {
+            if (todosLosBeneficios.length === 0) {
+                await cargartodosLosBeneficios();
             }
 
-            permisosFiltrados = todosLosPermisos.filter(permiso => {
+            beneficiosFiltrados = todosLosBeneficios.filter(beneficio => {
                 // Filtrar por tipo
                 const coincideTipo = filtrosActivos.tipos.length === 0 ||
-                                   filtrosActivos.tipos.includes(permiso.tipo);
+                                   filtrosActivos.tipos.includes(beneficio.tipo);
 
                 // Filtrar por estado
-                const estadoFrontend = mapearEstado(permiso.estado);
+                const estadoFrontend = mapearEstado(beneficio.estado);
                 const coincideEstado = filtrosActivos.estados.length === 0 ||
                                      filtrosActivos.estados.includes(estadoFrontend);
 
                 // Filtrar por departamento - AGREGAR
                 const coincideDepartamento = filtrosActivos.departamentos.length === 0 ||
-                                           (permiso.departamento && filtrosActivos.departamentos.includes(permiso.departamento));
+                                           (beneficio.departamento && filtrosActivos.departamentos.includes(beneficio.departamento));
 
                 // Filtrar por fecha - AGREGAR
                 let coincideFecha = true;
                 if (filtrosActivos.fecha.tipo === 'single' && filtrosActivos.fecha.fechaUnica) {
                     const fechaUnica = new Date(filtrosActivos.fecha.fechaUnica);
-                    const fechaCreacion = new Date(permiso.fechaCreacion);
+                    const fechaCreacion = new Date(beneficio.fechaCreacion);
                     fechaUnica.setHours(0, 0, 0, 0);
                     fechaCreacion.setHours(0, 0, 0, 0);
 
@@ -710,7 +624,7 @@
                 ) {
                     const desde = new Date(filtrosActivos.fecha.fechaDesde);
                     const hasta = new Date(filtrosActivos.fecha.fechaHasta);
-                    const fechaCreacion = new Date(permiso.fechaCreacion);
+                    const fechaCreacion = new Date(beneficio.fechaCreacion);
                     desde.setHours(0, 0, 0, 0);
                     hasta.setHours(0, 0, 0, 0);
                     fechaCreacion.setHours(0, 0, 0, 0);
@@ -721,21 +635,18 @@
                 return coincideTipo && coincideEstado && coincideDepartamento && coincideFecha;
             });
 
-            return permisosFiltrados;
+            return beneficiosFiltrados;
         }
 
-        // Función de fallback para contadores usando permisos locales
-        async function inicializarContadoresConPermisosLocales() {
-            if (todosLosPermisos.length === 0) {
-                await cargarTodosLosPermisos();
+        // Función de fallback para contadores usando beneficios locales
+        async function inicializarContadoresConBeneficiosLocales() {
+            if (todosLosBeneficios.length === 0) {
+                await cargartodosLosBeneficios();
             }
 
             const contadoresTipo = {
-                'Cita Médica': 0,
-                'Vacaciones': 0,
-                'Incapacidad': 0,
-                'Teletrabajo': 0,
-                'Especial': 0
+                'Préstamo Laboral': 0,
+                'Adelanto Salarial': 0
             };
 
             const contadoresEstado = {
@@ -756,31 +667,28 @@
                 'Ventas': 0
             };
 
-            // Contar TODOS los permisos locales
-            todosLosPermisos.forEach(permiso => {
+            // Contar TODOS los beneficios locales
+            todosLosBeneficios.forEach(beneficio => {
                 // Contar por tipo
-                if (contadoresTipo.hasOwnProperty(permiso.tipo)) {
-                    contadoresTipo[permiso.tipo]++;
+                if (contadoresTipo.hasOwnProperty(beneficio.tipo)) {
+                    contadoresTipo[beneficio.tipo]++;
                 }
 
                 // Contar por estado
-                const estadoFrontend = mapearEstado(permiso.estado);
+                const estadoFrontend = mapearEstado(beneficio.estado);
                 if (contadoresEstado.hasOwnProperty(estadoFrontend)) {
                     contadoresEstado[estadoFrontend]++;
                 }
 
                 // Contar por departamento
-                if (permiso.departamento && contadoresDepartamento.hasOwnProperty(permiso.departamento)) {
-                    contadoresDepartamento[permiso.departamento]++;
+                if (beneficio.departamento && contadoresDepartamento.hasOwnProperty(beneficio.departamento)) {
+                    contadoresDepartamento[beneficio.departamento]++;
                 }
             });
 
             // Actualizar contadores en la UI
-            document.getElementById('count-medical').textContent = `(${contadoresTipo['Cita Médica']})`;
-            document.getElementById('count-vacation').textContent = `(${contadoresTipo['Vacaciones']})`;
-            document.getElementById('count-incapacidad').textContent = `(${contadoresTipo['Incapacidad']})`;
-            document.getElementById('count-teletrabajo').textContent = `(${contadoresTipo['Teletrabajo']})`;
-            document.getElementById('count-especial').textContent = `(${contadoresTipo['Especial']})`;
+            document.getElementById('count-prestamo').textContent = `(${contadoresTipo['Préstamo Laboral']})`;
+            document.getElementById('count-adelanto').textContent = `(${contadoresTipo['Adelanto Salarial']})`;
 
             document.getElementById('count-approved').textContent = `(${contadoresEstado['Aprobado']})`;
             document.getElementById('count-pending').textContent = `(${contadoresEstado['Pendiente']})`;
@@ -789,28 +697,25 @@
             // Actualizar contadores de departamentos
             document.getElementById('dropdown-count-fc').textContent = `(${contadoresDepartamento['Financiero Contable']})`;
             document.getElementById('dropdown-count-g').textContent = `(${contadoresDepartamento['Gerencia']})`;
-            document.getElementById('dropdown-count-i').textContent = `(${contadoresDepartamento['Ingenieria']})`;
+            document.getElementById('dropdown-count-i').textContent = `(${contadoresDepartamento['Ingeniería']})`;
             document.getElementById('dropdown-count-j').textContent = `(${contadoresDepartamento['Jefatura']})`;
             document.getElementById('dropdown-count-l').textContent = `(${contadoresDepartamento['Legal']})`;
             document.getElementById('dropdown-count-o').textContent = `(${contadoresDepartamento['Operaciones']})`;
             document.getElementById('dropdown-count-tncr').textContent = `(${contadoresDepartamento['Tecnicos NCR']})`;
-            document.getElementById('dropdown-count-ti').textContent = `(${contadoresDepartamento['Tecnologias de Informacion']})`;
+            document.getElementById('dropdown-count-ti').textContent = `(${contadoresDepartamento['Tecnologías de Información']})`;
             document.getElementById('dropdown-count-v').textContent = `(${contadoresDepartamento['Ventas']})`;
         }
 
-        // Función para inicializar contadores con TODOS los permisos
+        // Función para inicializar contadores con TODOS los beneficios
         async function inicializarContadores() {
             try {
-                const response = await fetch('/Permiso/ObtenerContadoresFiltros');
+                const response = await fetch('/Beneficio/ObtenerContadoresFiltros');
                 if (response.ok) {
                     const contadores = await response.json();
 
                     // Actualizar contadores de tipos
-                    document.getElementById('count-medical').textContent = `(${contadores.citaMedica})`;
-                    document.getElementById('count-vacation').textContent = `(${contadores.vacaciones})`;
-                    document.getElementById('count-incapacidad').textContent = `(${contadores.incapacidad})`;
-                    document.getElementById('count-teletrabajo').textContent = `(${contadores.teletrabajo})`;
-                    document.getElementById('count-especial').textContent = `(${contadores.especial})`;
+                    document.getElementById('count-prestamo').textContent = `(${contadores.prestamoLaboral})`;
+                    document.getElementById('count-adelanto').textContent = `(${contadores.adelantoSalarial})`;
 
                     // Actualizar contadores de estados
                     document.getElementById('count-approved').textContent = `(${contadores.aprobado})`;
@@ -829,11 +734,11 @@
                     document.getElementById('dropdown-count-v').textContent = `(${contadores.ventas})`;
                 } else {
                     console.error('Error al cargar contadores del servidor');
-                    await inicializarContadoresConPermisosLocales();
+                    await inicializarContadoresConBeneficiosLocales();
                 }
             } catch (error) {
                 console.error('Error cargando contadores:', error);
-                await inicializarContadoresConPermisosLocales();
+                await inicializarContadoresConBeneficiosLocales();
             }
         }
 
@@ -860,152 +765,84 @@
             }, 50);
         }
 
-        // Función para renderizar permisos con efectos de fade
-        async function renderPermissionsWithFade(data) {
-            fadeOut(permissionsContainer, () => {
-                renderPermissions(data);
+        // Función para renderizar beneficios con efectos de fade
+        async function renderBeneficiosWithFade(data) {
+            fadeOut(beneficiosContainer, () => {
+                renderBeneficios(data);
             });
         }
 
-        // Función para renderizar permisos
-        function renderPermissions(data) {
+        // Función para renderizar beneficios
+        function renderBeneficios(data) {
             if (data.length === 0) {
-                permissionsContainer.innerHTML = `
+                beneficiosContainer.innerHTML = `
                     <div class="no-results">
                         <i class="bi bi-inbox display-1 d-block mb-3"></i>
-                        <h3 class="h4 text-muted">No se encontraron permisos</h3>
+                        <h3 class="h4 text-muted">No se encontraron beneficios</h3>
                         <p class="text-muted">Intenta ajustar los filtros para ver más resultados.</p>
                     </div>
                 `;
-                fadeIn(permissionsContainer);
+                fadeIn(beneficiosContainer);
                 return;
             }
 
-            permissionsContainer.innerHTML = data.map(permission => `
-            <div class="card permission-card mb-3">
+            beneficiosContainer.innerHTML = data.map(beneficion => `
+            <div class="card beneficio-card mb-3">
                     <div class="card-body">
                         <div class="mb-2"
                          style="cursor: pointer;"
-                         onclick="window.location.href='/Permiso/Details/${permission.idPermiso}'">
+                         onclick="window.location.href='/Beneficio/Details/${beneficion.idBeneficio}'">
                             <div class="d-flex align-items-start justify-content-between gap-1 mb-2 flex-wrap">
                                 <h3 class="h6 fw-bold text-dark mb-0" style="padding: 5px">
-                                    <i class="fa-solid fa-user me-3"></i>${permission.nombreEmpleado}
+                                    <i class="fa-solid fa-user me-3"></i>${beneficion.nombreEmpleado}
                                 </h3>
                                 <h5 class="h6 text-white small mb-0" style="padding: 5px; background-color: #012473; border-radius: 5px">
-                                    #${permission.idPermiso}
+                                    #${beneficion.idBeneficio}
                                 </h5>
                             </div>
                             <div class="d-flex align-items-center flex-wrap mb-2" style="gap: 1.5rem; padding-left: 5%; padding-right: 5%;">
                                 <span class="badge custom-badge ${
-                                    permission.estado === "Creada" || permission.estado === "Aprobada"
+                                    beneficion.estado === "Creada" || beneficion.estado === "Aprobada"
                                         ? "bg-success"
-                                        : permission.estado === "Pendiente"
+                                        : beneficion.estado === "Pendiente"
                                             ? "bg-warning"
-                                            : permission.estado === "Rechazada"
+                                            : beneficion.estado === "Rechazada"
                                                 ? "bg-danger"
                                                 : "bg-secondary"
                                 }">
-                                    ${permission.estado}
+                                    ${beneficion.estado}
                                 </span>
                                 <span class="badge custom-badge"
                                       style="
                                         background-color: ${
-                                            permission.tipo === 'Cita Médica' ? '#F58E53' :
-                                            permission.tipo === 'Vacaciones' ? '#dc3545' :
-                                            permission.tipo === 'Incapacidad' ? '#ffc107' :
-                                            permission.tipo === 'Teletrabajo' ? '#17a2b8' :
-                                            permission.tipo === 'Especial' ? '#AA80D9' :
+                                            beneficion.tipo === 'Préstamo Laboral' ? '#F58E53' :
+                                            beneficion.tipo === 'Adelanto Salarial' ? '#dc3545' :
                                             '#6c757d'
                                         };
                                         color: #fff;
                                       ">
-                                    ${permission.tipo}
+                                    ${beneficion.tipo}
                                 </span>
 
-                                <!-- AGREGAR BADGE DE DEPARTAMENTO -->
-                                ${permission.departamento ? `
-                                <span class="badge colorcito text-white">
-                                    ${permission.departamento}
+                                ${beneficion.departamento ? `
+                                <span class="badge custom-badge bg-info text-white">
+                                    ${beneficion.departamento}
                                 </span>
                                 ` : ''}
 
                                 <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
-                                    <div class="col-2">
+                                    <div class="col-3">
                                         <span class="text-muted fw-semibold">Creación:</span>
-                                                <span class="text-dark fw-medium ms-1">${new Date(permission.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}</span>
+                                                <span class="text-dark fw-medium ms-1">${new Date(beneficion.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}</span>
                                     </div>
-                                    <div class="col-2">
-                                        <span class="text-muted fw-semibold">Inicio:</span>
-                                        <span class="text-dark fw-medium ms-1">${new Date(permission.fechaInicio).toLocaleDateString('es-CR')}</span>
+                                    <div class="col-3">
+                                        <span class="text-muted fw-semibold">Monto:</span>
+                                        <span class="text-dark fw-medium ms-1">₡${beneficion.monto != null ? new Intl.NumberFormat('es-CR').format(beneficion.monto) : 'Sin monto'}</span>
                                     </div>
-                                    <div class="col-2">
-                                        <span class="text-muted fw-semibold">Fin:</span>
-                                        <span class="text-dark fw-medium ms-1">${new Date(permission.fechaFinalizacion).toLocaleDateString('es-CR')}</span>
+                                    <div class="col-5">
+                                        <span class="text-muted fw-semibold d-block">Comentarios:</span>
+                                        <span class="text-dark fw-medium ms-1" d-block>${beneficion.comentarios ?? 'Sin comentario'}</span>
                                     </div>
-                                    <div class="col-2">
-                                        <span class="text-muted fw-semibold">Regreso:</span>
-                                        <span class="text-dark fw-medium ms-1">${new Date(permission.fechaRegresoLaboral).toLocaleDateString('es-CR')}</span>
-                                    </div>
-                                    <div class="col-2">
-                                        <span class="text-muted fw-semibold">Hora:</span>
-                                        <span class="text-dark fw-medium ms-1">${new Date(permission.horaCita).toLocaleDateString('es-CR')}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="pt-2 border-top">
-                            <div class="row small d-flex align-items-center flex-wrap justify-content-around" style="gap: 0.5rem; padding-left: 5%; padding-right: 5%;">
-                                <div class="col-2">
-                                    <span class="text-muted fw-semibold d-block">Motivo:</span>
-                                    <span class="text-dark fw-medium ms-1" d-block>${permission.motivo ?? 'Sin motivo'}</span>
-                                </div>
-                                <div class="col-2">
-                                    <span class="text-muted fw-semibold d-block">Comentarios:</span>
-                                    <span class="text-dark fw-medium ms-1" d-block>${permission.comentarios ?? 'Sin comentario'}</span>
-                                </div>
-                                <div class="col-2">
-                                    ${
-                                    permission.foto && permission.foto.trim() !== ''
-                                        ? `<img src="data:image/jpeg;base64,${permission.foto}"
-                                                alt="foto"
-                                                style="width:25px; height:25px; object-fit:cover; border-radius:5px; cursor:pointer;"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#fotoModal"
-                                                onclick="mostrarImagenModal('${permission.foto}')">`
-                                        : `<span class="text-muted d-inline-block text-center"
-                                                style="width:100%; height:25px; line-height:25px; background:#f0f0f0; border-radius:5px;">
-                                            Sin foto
-                                            </span>`
-                                    }
-                                </div>
-                                <div class="col-2">
-                                    ${
-                                        permission.nombreArchivo && permission.nombreArchivo.trim() !== ''
-                                            ? `
-                                                <div class="mt-1">
-                                                    <a href="/Permiso/descargar-adjunto/${permission.idPermiso}"
-                                                        class="btn btn-sm btn-outline-primary d-flex align-items-center"
-                                                        style="font-size: 0.75rem; padding: 0.25rem 0.5rem;"
-                                                        title="Descargar ${permission.nombreArchivo}">
-                                                        ${obtenerIconoArchivo(permission.nombreArchivo, permission.tipoMIME)}
-                                                        <span class="text-truncate d-block" style="max-width: 80px;">
-                                                            ${permission.nombreArchivo}
-                                                        </span>
-                                                    </a>
-                                                    <small class="text-muted text-center d-block mt-1">
-                                                        ${formatearTamanoArchivo(permission.tamanoArchivo)} •
-                                                        ${obtenerExtension(permission.nombreArchivo)}
-                                                    </small>
-                                                </div>
-                                            `
-                                            : `
-                                                <span class="text-muted d-inline-block text-center small"
-                                                        style="width:100%; padding: 0.25rem; background:#f0f0f0; border-radius:5px;">
-                                                    Sin archivo
-                                                </span>
-                                            `
-                                    }
                                 </div>
                             </div>
                         </div>
@@ -1013,7 +850,7 @@
                 </div>
             `).join('');
 
-            fadeIn(permissionsContainer);
+            fadeIn(beneficiosContainer);
         }
 
         function renderPagination() {
@@ -1054,8 +891,8 @@
                 } else {
                     filtrosActivos.departamentos = filtrosActivos.departamentos.filter(depto => depto !== this.value);
                 }
-                const permisosFiltrados = await filtrarPermisos();
-                await renderPermissionsWithFade(permisosFiltrados);
+                const beneficiosFiltrados = await filtrarBeneficios();
+                await renderBeneficiosWithFade(beneficiosFiltrados);
                 pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
@@ -1064,8 +901,8 @@
         document.querySelectorAll('.filter-date').forEach(input => {
             input.addEventListener('change', async function() {
                 actualizarFiltroFecha();
-                const permisosFiltrados = await filtrarPermisos();
-                await renderPermissionsWithFade(permisosFiltrados);
+                const beneficiosFiltrados = await filtrarBeneficios();
+                await renderBeneficiosWithFade(beneficiosFiltrados);
                 pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
@@ -1086,8 +923,8 @@
                 } else {
                     filtrosActivos.tipos = filtrosActivos.tipos.filter(tipo => tipo !== this.value);
                 }
-                const permisosFiltrados = await filtrarPermisos();
-                await renderPermissionsWithFade(permisosFiltrados);
+                const beneficiosFiltrados = await filtrarBeneficios();
+                await renderBeneficiosWithFade(beneficiosFiltrados);
                 pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
@@ -1099,8 +936,8 @@
                 } else {
                     filtrosActivos.estados = filtrosActivos.estados.filter(estado => estado !== this.value);
                 }
-                const permisosFiltrados = await filtrarPermisos();
-                await renderPermissionsWithFade(permisosFiltrados);
+                const beneficiosFiltrados = await filtrarBeneficios();
+                await renderBeneficiosWithFade(beneficiosFiltrados);
                 pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
@@ -1131,17 +968,17 @@
                 fechaHasta: null
             };
 
-            // Renderizar todos los permisos de la página actual con fade
-            renderPermissionsWithFade(permisosPaginaActual);
+            // Renderizar todos los beneficios de la página actual con fade
+            renderBeneficiosWithFade(beneficiosPaginaActual);
             pagination.style.display = 'flex';
         });
 
         // Inicializar con efecto de fade
         document.addEventListener('DOMContentLoaded', async function() {
-            await cargarTodosLosPermisos();
+            await cargartodosLosBeneficios();
             await inicializarContadores();
-            permissionsContainer.style.opacity = '0';
-            renderPermissions(permisosPaginaActual);
+            beneficiosContainer.style.opacity = '0';
+            renderBeneficios(beneficiosPaginaActual);
             renderPagination();
         });
     </script>

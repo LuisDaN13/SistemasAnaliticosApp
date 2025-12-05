@@ -571,6 +571,29 @@ namespace SistemasAnaliticos.Controllers
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
+        // VER DETALLES DE PERMISOS
+        [HttpGet]
+        [Route("Constancia/Details/{id}")]
+        public async Task<ActionResult> Details(long id)
+        {
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "No se proporcionó un identificador de constancia válido.";
+                return RedirectToAction("VerConstancias", "Constancia");
+            }
+
+            var constancia = await _context.Constancia.FindAsync(id);
+
+            if (constancia == null)
+            {
+                TempData["ErrorMessage"] = "La constancia que intentas editar no existe o fue eliminado.";
+                return RedirectToAction("VerConstancias", "Constancia");
+            }
+
+            return View(constancia);
+        }
+
+        // -------------------------------------------------------------------------------------------------------------------------------
         // DESCARGAR ADJUNTO
         [HttpGet]
         [Route("Constancia/descargar-adjunto/{id}")]
@@ -590,6 +613,24 @@ namespace SistemasAnaliticos.Controllers
                 constancia.datosAdjuntos,
                 constancia.tipoMIME ?? "application/octet-stream",
                 constancia.nombreArchivo ?? "archivo_adjunto"
+            );
+        }
+
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // PREVIUEW ADJUNTO
+        [HttpGet]
+        [Route("Constancia/Preview/{id}")]
+        public async Task<IActionResult> Preview(long id)
+        {
+            var constancia = await _context.Constancia.FindAsync(id);
+
+            if (constancia == null || constancia.datosAdjuntos == null)
+                return NotFound();
+
+            return File(
+                constancia.datosAdjuntos,
+                constancia.tipoMIME,
+                enableRangeProcessing: true
             );
         }
 
