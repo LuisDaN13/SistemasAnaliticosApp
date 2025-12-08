@@ -1,0 +1,46 @@
+﻿<div class="modal fade" id="modalAgregarDetalle" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <form asp-controller="LiquidacionViatico" asp-action="AgregarDetalle" method="post">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Agregar Detalle</h5>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" name="idViatico" value="@Model.idViatico" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Fecha</label>
+                        <input type="date" name="fecha" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <input type="text" name="tipo" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Monto</label>
+                        <input type="number" name="monto" step="0.01" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Detalle</label>
+                        <textarea name="detalle" class="form-control"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>

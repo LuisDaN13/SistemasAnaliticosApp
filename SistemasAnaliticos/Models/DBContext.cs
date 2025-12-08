@@ -18,6 +18,9 @@ namespace SistemasAnaliticos.Models
         public DbSet<Fotos> Fotos { get; set; }
         public DbSet<Noticias> Noticias { get; set; }
 
+        public DbSet<LiquidacionViatico> LiquidacionViatico { get; set; }
+        public DbSet<LiquidacionViaticoDetalle> LiquidacionViaticoDetalle { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             // LLAMAR PRIMERO AL MÉTODO BASE
@@ -57,6 +60,13 @@ namespace SistemasAnaliticos.Models
                       .IsRequired()
                       .OnDelete(DeleteBehavior.Cascade);
             });
+
+            builder.Entity<LiquidacionViatico>()
+            .HasMany(l => l.Detalles)
+            .WithOne(d => d.Liquidacion)
+            .HasForeignKey(d => d.idViatico)
+            .OnDelete(DeleteBehavior.Cascade); // si se borra la liquidación, se borran los detalles
+
         }
     }
 }

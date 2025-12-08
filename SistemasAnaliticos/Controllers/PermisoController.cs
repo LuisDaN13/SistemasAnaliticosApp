@@ -37,12 +37,10 @@ namespace SistemasAnaliticos.Controllers
             int pageSize = 3;
 
             var totalPermisos = await _context.Permiso
-                .Where(p => p.estado == "Creada")
                 .CountAsync();
 
             var permisos = await _context.Permiso
                 .AsNoTracking()
-                .Where(p => p.estado == "Creada")
                 .OrderByDescending(x => x.fechaCreacion)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -649,6 +647,25 @@ namespace SistemasAnaliticos.Controllers
                 permiso.tipoMIME ?? "application/octet-stream",
                 permiso.nombreArchivo ?? "archivo_adjunto"
             );
+        }
+
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // CAMBIOS DE ESTADOS MASIVOS
+        [HttpPost]
+        public async Task<IActionResult> CambiarEstadoMasivo([FromBody] EstadoMasivoViewModel model)
+        {
+            foreach (var id in model.Ids)
+            {
+                var permiso = await _context.Permiso.FindAsync(id);
+                if (permiso != null)
+                {
+                    permiso.estado = model.estado;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessagePermi"] = "Se cambiaron los permisos de estados correctamente.";
+            return Ok(new { redirect = Url.Action("VerPermisos") });
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------

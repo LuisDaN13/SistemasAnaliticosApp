@@ -34,12 +34,10 @@ namespace SistemasAnaliticos.Controllers
             int pageSize = 3;
 
             var totalConstancias = await _context.Constancia
-                .Where(p => p.estado == "Creada")
                 .CountAsync();
 
             var constancias = await _context.Constancia
                 .AsNoTracking()
-                .Where(p => p.estado == "Creada")
                 .OrderByDescending(x => x.fechaCreacion)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -632,6 +630,25 @@ namespace SistemasAnaliticos.Controllers
                 constancia.tipoMIME,
                 enableRangeProcessing: true
             );
+        }
+
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // CAMBIOS DE ESTADOS MASIVOS
+        [HttpPost]
+        public async Task<IActionResult> CambiarEstadoMasivo([FromBody] EstadoMasivoViewModel model)
+        {
+            foreach (var id in model.Ids)
+            {
+                var constancia = await _context.Constancia.FindAsync(id);
+                if (constancia != null)
+                {
+                    constancia.estado = model.estado;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessageCons"] = "Se cambiaron las constancias de estados correctamente.";
+            return Ok(new { redirect = Url.Action("VerConstancias") });
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------

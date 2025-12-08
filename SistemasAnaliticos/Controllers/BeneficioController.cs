@@ -17,7 +17,6 @@ namespace SistemasAnaliticos.Controllers
         private readonly DBContext _context;
         private readonly UserManager<Usuario> _userManager;
 
-
         public BeneficioController(DBContext context, UserManager<Usuario> userManager)
         {
             _context = context;
@@ -558,6 +557,25 @@ namespace SistemasAnaliticos.Controllers
             }
 
             return View(beneficio);
+        }
+
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // CAMBIOS DE ESTADOS MASIVOS
+        [HttpPost]
+        public async Task<IActionResult> CambiarEstadoMasivo([FromBody] EstadoMasivoViewModel model)
+        {
+            foreach (var id in model.Ids)
+            {
+                var beneficio = await _context.Beneficio.FindAsync(id);
+                if (beneficio != null)
+                {
+                    beneficio.estado = model.estado;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessageBene"] = "Se cambiaron los beneficios de estados correctamente.";
+            return Ok(new { redirect = Url.Action("VerBeneficios") });
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------

@@ -137,6 +137,7 @@
         <div class="header-card p-4 mt-4 mb-4 d-flex justify-content-between">
             <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todos los Beneficios</h1>
             <div>
+                <button type="button" class="btn btn-primary" onclick="abrirModalMasivo()">Cambiar estado</button>
                 <button class="btn btn-success" id="exportExcelBtn">
                     <i class="bi bi-file-earmark-excel"></i>
                 </button>
@@ -377,6 +378,38 @@
             </div>
         </div>
     </main>
+
+    <!-- Respuestas de los Formularios -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Para mensajes de error
+            @if (TempData["ErrorMessageBene"] != null)
+            {
+                    <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: '@Html.Raw(TempData["ErrorMessageBene"])',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    </text>
+            }
+
+            // Para mensajes de éxito
+            @if (TempData["SuccessMessageBene"] != null)
+            {
+                    <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: '@Html.Raw(TempData["SuccessMessageBene"])',
+                            confirmButtonText: 'Aceptar',
+                            timer: 3000
+                        });
+                    </text>
+            }
+        });
+    </script>
 
     <!-- FUNCION DE DESCARGA DE EXCEL -->
     <script>
@@ -789,6 +822,12 @@
             beneficiosContainer.innerHTML = data.map(beneficion => `
             <div class="card beneficio-card mb-3">
                     <div class="card-body">
+                        <div class="d-flex justify-content-end">
+                            <input type="checkbox"
+                                   class="form-check-input permiso-check"
+                                   value="${beneficion.idBeneficio}"
+                                   style="width:18px; height:18px; cursor:pointer; padding:10px">
+                        </div>
                         <div class="mb-2"
                          style="cursor: pointer;"
                          onclick="window.location.href='/Beneficio/Details/${beneficion.idBeneficio}'">
@@ -981,6 +1020,94 @@
             renderBeneficios(beneficiosPaginaActual);
             renderPagination();
         });
+    </script>
+
+    <!-- MODAL CAMBIAR ESTADO -->
+    <div class="modal fade" id="estadoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Cambiar estado</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body text-center">
+
+                    <input type="hidden" id="beneficioIdSeleccionado">
+
+                    <p class="mb-3">Seleccione el nuevo estado:</p>
+
+                    <button class="btn btn-success w-100 mb-2"
+                            onclick="cambiarEstado('Creada')">
+                        Creada
+                    </button>
+
+                    <button class="btn btn-warning w-100 mb-2"
+                            onclick="cambiarEstado('Pendiente')">
+                        Pendiente
+                    </button>
+
+                    <button class="btn btn-danger w-100 mb-2"
+                            onclick="cambiarEstado('Rechazada')">
+                        Rechazada
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function abrirModalMasivo() {
+            const seleccionados = [...document.querySelectorAll(".permiso-check:checked")]
+                .map(c => parseInt(c.value));
+
+            if (seleccionados.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Debes seleccionar mínimo un beneficio',
+                    confirmButtonText: 'Aceptar'
+                });
+                return;
+            }
+
+            window.idsSeleccionados = seleccionados;
+            document.getElementById("beneficioIdSeleccionado").value = "";
+
+            const modal = new bootstrap.Modal(document.getElementById('estadoModal'));
+            modal.show();
+        }
+    </script>
+    <script>
+        function cambiarEstado(nuevoEstado) {
+
+            const idIndividual = document.getElementById("beneficioIdSeleccionado").value;
+
+            const ids = window.idsSeleccionados?.length
+                ? window.idsSeleccionados
+                : [parseInt(idIndividual)];
+
+            fetch("/Beneficio/CambiarEstadoMasivo", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ids, estado: nuevoEstado })
+            })
+            .then(res => res.json())
+            .then(data => {
+
+                // Cerrar modal
+                bootstrap.Modal.getInstance(
+                    document.getElementById("estadoModal")
+                ).hide();
+
+                // Redirigir para que muestre TempData
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            })
+            .catch(err => console.error(err));
+        }
     </script>
 </body>
 </html>
