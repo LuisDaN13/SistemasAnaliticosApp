@@ -1,41 +1,301 @@
 ﻿@model SistemasAnaliticos.Entidades.LiquidacionViatico
 
-<h2 class="mb-4">Liquidación de Viáticos #@Model.idViatico</h2>
-
-<div class="card p-4 mb-4">
-    <p><strong>Empleado:</strong> @Model.nombreEmpleado</p>
-    <p><strong>Departamento:</strong> @Model.departamento</p>
-    <p><strong>Jefe:</strong> @Model.jefe</p>
-    <p><strong>Fecha:</strong> @Model.fechaCreacion</p>
-</div>
-
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>Detalles</h4>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregarDetalle">
-        + Agregar Detalle
-    </button>
-</div>
-
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Monto</th>
-            <th>Detalle</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var d in Model.Detalles)
-        {
-            <tr>
-                <td>@d.fecha</td>
-                <td>@d.tipo</td>
-                <td>₡@d.monto.ToString("#,##0.00")</td>
-                <td>@d.detalle</td>
-            </tr>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        /* Estilos consistentes con tu diseño */
+        .card-header-custom {
+            background: linear-gradient(135deg, #012473 0%, #013599 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 1rem 1.25rem;
         }
-    </tbody>
-</table>
 
-<h3 class="mt-3">Total: <strong>₡@Model.total.ToString("#,##0.00")</strong></h3>
+        .card-body-custom {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 6px 18px rgba(3, 27, 84, 0.06);
+        }
+
+        .table-soft {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.04);
+        }
+
+            .table-soft thead {
+                background: #f8f9fb;
+            }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .btn-primary-custom {
+            background-color: #2FBD3D;
+            border-color: #2FBD3D;
+        }
+
+            .btn-primary-custom:hover {
+                background-color: #099917;
+                border-color: #099917;
+            }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.12) !important;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-xxl py-4">
+        <!-- Mensajes TempData -->
+        @if (TempData["ErrorMessageLiq"] != null)
+        {
+            <div class="alert alert-danger">@TempData["ErrorMessageLiq"]</div>
+        }
+        @if (TempData["SuccessMessageLiq"] != null)
+        {
+            <div class="alert alert-success">@TempData["SuccessMessageLiq"]</div>
+        }
+
+        <!-- Cabecera tarjeta -->
+        <div class="card mb-4 mt-4">
+            <div class="card-header card-header-custom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">Liquidación de Viáticos #@Model.idViatico</h4>
+                        <div class="small opacity-75">Creada: @Model.fechaCreacion.ToString("dd/MM/yyyy")</div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-warning text-dark">@Model.estado</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body card-body-custom">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Empleado</label>
+                        <div class="form-control-plaintext">@Model.nombreEmpleado</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Departamento</label>
+                        <div class="form-control-plaintext">@Model.departamento</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Jefe</label>
+                        <div class="form-control-plaintext">@Model.jefe</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Detalles + botón agregar -->
+        <div class="d-flex justify-content-between align-items-center card-header card-header-custom">
+            <h5 class="mb-0">Detalles</h5>
+            <div>
+                <button class="btn btn-primary-custom text-white" data-bs-toggle="modal" data-bs-target="#modalAgregarDetalle">
+                    <i class="bi bi-plus-lg me-1"></i> Agregar Detalle
+                </button>
+                <a asp-action="Index" asp-controller="Liquidacion" class="btn btn-outline-secondary ms-2">Finalizar</a>
+            </div>
+        </div>
+        <div class="table-responsive table-soft" style="border-radius: 0px">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width:140px;">Fecha</th>
+                        <th class="text-center">Tipo</th>
+                        <th class="text-center" style="width:160px;">Monto (₡)</th>
+                        <th class="text-center">Detalle</th>
+                        <th class="text-center" style="width:120px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="detallesBody">
+                    @if (Model.Detalles != null && Model.Detalles.Any())
+                    {
+                        foreach (var d in Model.Detalles.OrderByDescending(x => x.fecha))
+                        {
+                            <tr data-monto="@d.monto" id="fila-@d.idViaticoDetalle">
+                                <td class="text-center">@d.fecha.ToString("dd/MM/yyyy")</td>
+                                <td class="text-center">@d.tipo</td>
+                                <td class="text-center">@String.Format(System.Globalization.CultureInfo.GetCultureInfo("es-CR"), "{0:N2}", d.monto)</td>
+                                <td class="text-center">@d.detalle</td>
+                                <td class="text-center">
+                                    <form asp-action="EliminarDetalle" method="post" class="d-inline">
+                                        <input type="hidden" name="idDetalle" value="@d.idViaticoDetalle" />
+                                        <input type="hidden" name="idViatico" value="@Model.idViatico" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar este detalle?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr id="noDetallesRow">
+                            <td colspan="5" class="text-center py-4 text-muted">No hay detalles registrados.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Total -->
+        <div class="d-flex justify-content-end mt-3">
+            <h4>Total: <span id="totalAmount">₡@String.Format(System.Globalization.CultureInfo.GetCultureInfo("es-CR"), "{0:N2}", Model.total)</span></h4>
+        </div>
+    </div>
+
+    <!-- Modal para agregar detalle -->
+    <div class="modal fade" id="modalAgregarDetalle" tabindex="-1" aria-labelledby="modalAgregarDetalleLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <!-- Header -->
+                <div class="modal-header" style="background: linear-gradient(to right, #012473, #013599); color: white;">
+                    <h5 class="modal-title fw-bold" id="modalAgregarDetalleLabel">Agregar Detalle de Viático</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <form id="detalleForm" asp-action="AgregarViaticoDetalle" asp-controller="Liquidacion" method="post">
+                    <div class="modal-body">
+                        <div id="validationAlertsDetalle"></div>
+
+                        <input type="hidden" name="IdViatico" value="@Model.idViatico" />
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Fecha</label>
+                                <input type="date" name="Fecha" class="form-control" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Tipo</label>
+                                <select name="Tipo" class="form-select" required>
+                                    <option value="">-- Seleccione --</option>
+                                    <option value="Combustible">Combustible</option>
+                                    <option value="Kilometraje">Kilometraje</option>
+                                    <option value="Transporte">Transporte</option>
+                                    <option value="Hospedaje">Hospedaje</option>
+                                    <option value="Alimentación">Alimentación</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Monto (₡)</label>
+                                <input type="number" name="Monto" class="form-control" step="0.01" min="0" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Detalle</label>
+                                <input type="text" name="Detalle" class="form-control" required />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary-custom text-white" id="submitDetalleBtn">
+                            <i class="bi bi-save me-2"></i> Guardar Detalle
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Inicial: recalcula total en cliente (suma filas)
+        document.addEventListener('DOMContentLoaded', function () {
+            actualizarTotalCliente();
+            inicializarValidacionDetalle();
+        });
+
+        function actualizarTotalCliente() {
+            const filas = document.querySelectorAll('#detallesBody tr[data-monto]');
+            let total = 0;
+            filas.forEach(f => {
+                const monto = parseFloat(f.getAttribute('data-monto')) || 0;
+                total += monto;
+            });
+
+            // formatear con separador de miles (es-CR)
+            const formatter = new Intl.NumberFormat('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('totalAmount').textContent = '₡' + formatter.format(total);
+        }
+
+        // Validacion del modal agregar detalle
+        function inicializarValidacionDetalle() {
+            const btn = document.getElementById('submitDetalleBtn');
+            if (!btn) return;
+
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const form = document.getElementById('detalleForm');
+
+                const requiredFields = form.querySelectorAll('[required]');
+                let valido = true;
+                const invalids = [];
+
+                requiredFields.forEach(field => {
+                    field.classList.remove('is-invalid');
+
+                    let value = field.value;
+                    if (typeof value === 'string') value = value.trim();
+
+                    if (value === '' || value === null) {
+                        valido = false;
+                        field.classList.add('is-invalid');
+                        invalids.push(field);
+                    } else if (field.type === 'number' && isNaN(field.value)) {
+                        valido = false;
+                        field.classList.add('is-invalid');
+                        invalids.push(field);
+                    }
+                });
+
+                if (!valido) {
+                    mostrarErrorDetalle('Por favor complete todos los campos requeridos.');
+                    if (invalids.length > 0) {
+                        invalids[0].focus();
+                        invalids[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    return;
+                }
+
+                // ocultar errores y enviar
+                ocultarErrorDetalle();
+                form.submit();
+            });
+        }
+
+        function mostrarErrorDetalle(message) {
+            ocultarErrorDetalle();
+            const container = document.getElementById('validationAlertsDetalle');
+            const div = document.createElement('div');
+            div.className = 'alert alert-danger alert-dismissible fade show';
+            div.innerHTML = `
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.appendChild(div);
+        }
+
+        function ocultarErrorDetalle() {
+            const container = document.getElementById('validationAlertsDetalle');
+            container.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
