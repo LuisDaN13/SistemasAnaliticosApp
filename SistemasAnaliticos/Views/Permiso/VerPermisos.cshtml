@@ -411,7 +411,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Para mensajes de error
-            @if (TempData["ErrorMessage"] != null)
+            @if (TempData["ErrorMessagePermi"] != null)
             {
                             <text>
                                 Swal.fire({
@@ -424,13 +424,13 @@
             }
 
             // Para mensajes de éxito
-            @if (TempData["SuccessMessage"] != null)
+            @if (TempData["SuccessMessagePermi"] != null)
             {
                             <text>
                                 Swal.fire({
                                     icon: 'success',
                                     title: 'Éxito',
-                                    text: '@Html.Raw(TempData["SuccessMessagePermi"])',
+                                        text: '@Html.Raw(TempData["SuccessMessagePermi"])',
                                     confirmButtonText: 'Aceptar',
                                     timer: 3000
                                 });

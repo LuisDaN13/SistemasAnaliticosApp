@@ -7,7 +7,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-
         .bg-gradient-custom {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         }
@@ -49,6 +48,7 @@
         .card-employee-header {
             color: white;
             position: relative;
+            z-index: 1;
         }
 
         .employee-avatar {
@@ -127,6 +127,7 @@
 
         .search-container {
             position: relative;
+            z-index: 1;
             max-width: 400px;
         }
 
@@ -328,6 +329,7 @@
 
         .currency-input {
             position: relative;
+            z-index: 1;
         }
 
             .currency-input .input-group-text {
@@ -421,7 +423,7 @@
             <div class="card-body">
                 <div class="row g-3 align-items-center">
                     <div class="col-md-6 col-lg-8">
-                        <div class="position-relative">
+                        <div class="position-relative" style="z-index: 1;">
                             <i class="bi bi-search text-muted search-icon"></i>
                             <input type="text"
                                    class="form-control ps-5"
@@ -479,7 +481,7 @@
                 {
                     <div class="card card-employee">
                         <div class="card-employee-header text-center">
-                            <div class="position-relative d-inline-block w-100" style="background-color: rgba(1, 36, 115, 0.1);">
+                            <div class="position-relative d-inline-block w-100" style="background-color: rgba(1, 36, 115, 0.1); z-index: 1;">
 
                                 <!-- Indicador de estado (esquina superior derecha) -->
                                 <span class="corner-triangle @(empleado.Estado ? "corner-green" : "corner-red")"></span>
@@ -567,7 +569,8 @@
     </main>
 
     <!-- Modal de Registro -->
-    <partial name="modalRegistro" model="new SistemasAnaliticos.Entidades.Usuario()" />
+    <partial name="~/Views/Usuario/modalRegistro.cshtml" model="new SistemasAnaliticos.Entidades.Usuario()" />
+
 
     <!-- Modal de Inactivar -->
     <div class="modal fade" id="modalInactivar" tabindex="-1" aria-labelledby="modalInactivarLabel" aria-hidden="true">
@@ -766,5 +769,7 @@
             filterEmployees('');
         });
     </script>
+
+
 </body>
 </html>

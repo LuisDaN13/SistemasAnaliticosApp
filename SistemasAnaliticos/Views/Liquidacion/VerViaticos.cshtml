@@ -1,4 +1,4 @@
-﻿@model SistemasAnaliticos.ViewModels.PaginacionBeneficiosViewModel
+﻿@model SistemasAnaliticos.ViewModels.PaginacionLiquidacionViaticoViewModel
 
 <!DOCTYPE html>
 <html lang="es">
@@ -22,6 +22,12 @@
             border: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             background-color: white;
+        }
+
+        .colorcito {
+            background-color: #e3f2fd !important;
+            color: #0d6efd !important;
+            border: 1px solid #bbdefb !important;
         }
     </style>
     <style>
@@ -80,17 +86,17 @@
             padding: 0.25rem 0.5rem;
         }
 
-        #beneficiosContainer {
+        #viaticossContainer {
             transition: opacity 0.3s ease;
             opacity: 1;
         }
 
-        .beneficio-card {
+        .viaticos-card {
             transition: all 0.3s ease;
             border: 1px solid #dee2e6;
         }
 
-            .beneficio-card:hover {
+            .viaticos-card:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
                 border-color: var(--primary-color);
@@ -133,11 +139,12 @@
     <!-- Main Content -->
     <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4 pb-0">
 
-        <!-- Titulo de Beneficios -->
+        <!-- Titulo de Permisos -->
         <div class="header-card p-4 mt-4 mb-4 d-flex justify-content-between">
-            <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todos los Beneficios</h1>
+            <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todos los Viáticos</h1>
             <div>
                 <button type="button" class="btn btn-primary" onclick="abrirModalMasivo()">Cambiar estado</button>
+
                 <button class="btn btn-success" id="exportExcelBtn">
                     <i class="bi bi-file-earmark-excel"></i>
                 </button>
@@ -156,33 +163,56 @@
                         <div class="card-body">
                             <h2 class="h5 card-title fw-bold text-dark mb-2">Filtrar por</h2>
 
-                            <!-- CHECKS DE TIPOS DE BENEFICIOS -->
+                            <!-- CHECKS DE TIPOS DE PERMISOS -->
                             <div class="mb-3 pb-1 border-bottom">
-                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#typeFilter" aria-expanded="true" aria-controls="typeFilter">
-                                    Tipo de Beneficio
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#typeFilter"
+                                        aria-expanded="true" aria-controls="typeFilter">
+                                    Tipo de Detalles
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
                                 <div class="collapse show mt-3" id="typeFilter">
                                     <div class="d-flex flex-column gap-2">
                                         <div class="form-check">
-                                            <input class="form-check-input filter-type" type="checkbox" value="Préstamo Laboral" id="type-prestamo">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-prestamo">
-                                                <span>Préstamo Laboral</span>
-                                                <span class="text-muted" id="count-prestamo">(0)</span>
+                                            <input class="form-check-input filter-type" type="checkbox" value="Combustible" id="type-combustible">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-combustible">
+                                                <span>Combustible</span>
+                                                <span class="text-muted" id="count-combustible">(0)</span>
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input filter-type" type="checkbox" value="Adelanto Salarial" id="type-adelanto">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-adelanto">
-                                                <span>Adelanto Salarial</span>
-                                                <span class="text-muted" id="count-adelanto">(0)</span>
+                                            <input class="form-check-input filter-type" type="checkbox" value="Kilometraje" id="type-kilometraje">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-kilometraje">
+                                                <span>Kilometraje</span>
+                                                <span class="text-muted" id="count-kilometraje">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-type" type="checkbox" value="Transporte" id="type-transporte">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-transporte">
+                                                <span>Transporte</span>
+                                                <span class="text-muted" id="count-transporte">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-type" type="checkbox" value="Hospedaje" id="type-hospedaje">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-hospedaje">
+                                                <span>Hospedaje</span>
+                                                <span class="text-muted" id="count-hospedaje">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-type" type="checkbox" value="Alimentación" id="type-alimentacion">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-alimentacion">
+                                                <span>Alimentación</span>
+                                                <span class="text-muted" id="count-alimentacion">(0)</span>
                                             </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- CHECKS DE ESTADOS DE BENEFICIOS -->
+                            <!-- CHECKS DE ESTADOS DE PERMISOS -->
                             <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#statusFilter" aria-expanded="true" aria-controls="statusFilter">
                                     Estado
@@ -191,10 +221,10 @@
                                 <div class="collapse show mt-3" id="statusFilter">
                                     <div class="d-flex flex-column gap-2">
                                         <div class="form-check">
-                                            <input class="form-check-input filter-status" type="checkbox" value="Aprobado" id="status-approved">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-approved">
-                                                <span>Aprobado</span>
-                                                <span class="text-muted" id="count-approved">(0)</span>
+                                            <input class="form-check-input filter-status" type="checkbox" value="Creada" id="status-creada">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-creada">
+                                                <span>Creada</span>
+                                                <span class="text-muted" id="count-creada">(0)</span>
                                             </label>
                                         </div>
                                         <div class="form-check">
@@ -211,6 +241,13 @@
                                                 <span class="text-muted" id="count-rejected">(0)</span>
                                             </label>
                                         </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Aprobado" id="status-approved">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-approved">
+                                                <span>Aprobado</span>
+                                                <span class="text-muted" id="count-approved">(0)</span>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -225,7 +262,7 @@
                                 <ul class="dropdown-menu w-100 px-3" aria-labelledby="dropdownDepartamento">
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Financiero Contable" id="dropdown-dp-fc">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Financiero Contable" id="dropdown-dp-fc">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-fc">
                                             <span>Financiero Contable</span>
                                             <span class="text-muted" id="dropdown-count-fc">(0)</span>
@@ -233,7 +270,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Gerencia" id="dropdown-dp-g">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Gerencia" id="dropdown-dp-g">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-g">
                                             <span>Gerencia</span>
                                             <span class="text-muted" id="dropdown-count-g">(0)</span>
@@ -241,7 +278,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Ingenieria" id="dropdown-dp-i">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Ingenieria" id="dropdown-dp-i">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-i">
                                             <span>Ingeniería</span>
                                             <span class="text-muted" id="dropdown-count-i">(0)</span>
@@ -249,7 +286,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Jefatura" id="dropdown-dp-j">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Jefatura" id="dropdown-dp-j">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-j">
                                             <span>Jefatura</span>
                                             <span class="text-muted" id="dropdown-count-j">(0)</span>
@@ -257,7 +294,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Legal" id="dropdown-dp-l">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Legal" id="dropdown-dp-l">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-l">
                                             <span>Legal</span>
                                             <span class="text-muted" id="dropdown-count-l">(0)</span>
@@ -265,7 +302,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Operaciones" id="dropdown-dp-o">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Operaciones" id="dropdown-dp-o">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-o">
                                             <span>Operaciones</span>
                                             <span class="text-muted" id="dropdown-count-o">(0)</span>
@@ -273,7 +310,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Tecnicos NCR" id="dropdown-dp-tncr">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Tecnicos NCR" id="dropdown-dp-tncr">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-tncr">
                                             <span>Técnicos NCR</span>
                                             <span class="text-muted" id="dropdown-count-tncr">(0)</span>
@@ -281,7 +318,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Tecnologias de Informacion" id="dropdown-dp-ti">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Tecnologias de Informacion" id="dropdown-dp-ti">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-ti">
                                             <span>Tecnologías de Información</span>
                                             <span class="text-muted" id="dropdown-count-ti">(0)</span>
@@ -289,7 +326,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Ventas" id="dropdown-dp-v">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Ventas" id="dropdown-dp-v">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-ti">
                                             <span>Ventas</span>
                                             <span class="text-muted" id="dropdown-count-v">(0)</span>
@@ -363,7 +400,7 @@
 
                 <!-- CONTENIDO DE CARDS -->
                 <div class="col-lg-9">
-                    <div id="beneficiosContainer">
+                    <div id="viaticossContainer">
                         <!-- Permissions will be dynamically loaded here -->
                     </div>
 
@@ -383,36 +420,36 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Para mensajes de error
-            @if (TempData["ErrorMessageBene"] != null)
+            @if (TempData["ErrorMessageVia"] != null)
             {
-                    <text>
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: '@Html.Raw(TempData["ErrorMessageBene"])',
-                            confirmButtonText: 'Aceptar'
-                        });
-                    </text>
+                <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                            text: '@Html.Raw(TempData["ErrorMessageVia"])',
+                        confirmButtonText: 'Aceptar'
+                    });
+                </text>
             }
 
             // Para mensajes de éxito
-            @if (TempData["SuccessMessageBene"] != null)
+            @if (TempData["SuccessMessageVia"] != null)
             {
-                    <text>
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Éxito',
-                            text: '@Html.Raw(TempData["SuccessMessageBene"])',
-                            confirmButtonText: 'Aceptar',
-                            timer: 3000
-                        });
-                    </text>
+                <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: '@Html.Raw(TempData["SuccessMessageVia"])',
+                        confirmButtonText: 'Aceptar',
+                        timer: 3000
+                    });
+                </text>
             }
         });
     </script>
 
     <!-- FUNCION DE DESCARGA DE EXCEL -->
-    <script>
+@*     <script>
         //Funciones para descargar excel
         document.getElementById('exportExcelBtn').addEventListener('click', function() {
             const button = this;
@@ -458,8 +495,8 @@
 
             // Crear enlace de descarga directa
             const downloadLink = document.createElement('a');
-            downloadLink.href = `/Beneficio/ExportarBeneficiosExcel?${params.toString()}`;
-            downloadLink.download = `Beneficios_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.xlsx`;
+            downloadLink.href = `/Permiso/ExportarPermisosExcel?${params.toString()}`;
+            downloadLink.download = `Permisos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.xlsx`;
             downloadLink.style.display = 'none';
 
             // Agregar event listener para restaurar el botón cuando la descarga termine
@@ -482,9 +519,9 @@
             }, 5000); // Máximo 5 segundos
         });
     </script>
-
+ *@
     <!-- FUNCION DE DESCARGA DE PDF -->
-    <script>
+@*     <script>
         document.getElementById('exportPdfBtn').addEventListener('click', async function() {
             const button = this;
             try {
@@ -528,7 +565,7 @@
                 }
 
                 // Realizar la solicitud
-                const response = await fetch(`/Beneficio/ExportarBeneficiosPDF?${params.toString()}`);
+                const response = await fetch(`/Permiso/ExportarPermisosPDF?${params.toString()}`);
 
                 if (response.ok) {
                     // Obtener el blob
@@ -543,7 +580,7 @@
                     const a = document.createElement('a');
                     a.style.display = 'none';
                     a.href = url;
-                    a.download = `Beneficios_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.pdf`;
+                    a.download = `Permisos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.pdf`;
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
@@ -562,19 +599,20 @@
             }
         });
     </script>
+ *@
 
-    <!-- FUNCIONES PRINCIPALES DE LA VISTA -->
+    <!-- FILTRADO Y CONTADORES MEJORADOS -->
     <script>
-        const beneficiosPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Beneficios));
+        const viaticosPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LiquidacionesViaticos));
         const totalPaginas = @Model.TotalPaginas;
         let paginaActual = @Model.PaginaActual;
 
-        const beneficiosContainer = document.getElementById("beneficiosContainer");
+        const viaticossContainer = document.getElementById("viaticossContainer");
         const pagination = document.getElementById("pagination");
 
-        // Estado global - cargar TODOS los beneficios una sola vez
-        let todosLosBeneficios = [];
-        let beneficiosFiltrados = [];
+        // Estado global - cargar TODOS los viaticos una sola vez
+        let todosLosViaticos = [];
+        let viaticosFiltrados = [];
 
         // Estado de los filtros - ACTUALIZADO CON NUEVOS FILTROS
         let filtrosActivos = {
@@ -591,73 +629,75 @@
 
         // Mapear estado del backend al frontend
         function mapearEstado(estadoBackend) {
-            if (estadoBackend === "Creada" || estadoBackend === "Aprobada") {
-                return "Aprobado";
+            if (estadoBackend === "Creada") {
+                return "Creada";
             } else if (estadoBackend === "Pendiente") {
                 return "Pendiente";
             } else if (estadoBackend === "Rechazada") {
                 return "Rechazado";
+            } else if (estadoBackend === "Aprobada") {
+                return "Aprobada";
             }
             return estadoBackend;
         }
 
-        // Cargar TODOS los beneficios del servidor (solo una vez)
-        async function cargartodosLosBeneficios() {
+        // Cargar TODOS los viaticos del servidor (solo una vez)
+        async function cargarTodosLosViaticos() {
             try {
-                const response = await fetch('/Beneficio/ObtenerTodosLosBeneficios');
+                const response = await fetch('/Liquidacion/ObtenerTodosLosViaticos');
                 if (response.ok) {
-                    todosLosBeneficios = await response.json();
-                    return todosLosBeneficios;
+                    todosLosViaticos = await response.json();
+                    return todosLosViaticos;
                 } else {
-                    console.error('Error al cargar beneficios:', response.status);
-                    todosLosBeneficios = beneficiosPaginaActual;
-                    return todosLosBeneficios;
+                    console.error('Error al cargar viaticos:', response.status);
+                    todosLosViaticos = viaticosPaginaActual;
+                    return todosLosViaticos;
                 }
             } catch (error) {
-                console.error('Error cargando beneficios:', error);
-                todosLosBeneficios = beneficiosPaginaActual;
-                return todosLosBeneficios;
+                console.error('Error cargando viaticos:', error);
+                todosLosViaticos = viaticosPaginaActual;
+                return todosLosViaticos;
             }
         }
 
-        // Inicializar contadores con TODAS los beneficios
-        async function filtrarBeneficios() {
-            if (todosLosBeneficios.length === 0) {
-                await cargartodosLosBeneficios();
+        // Inicializar contadores con TODAS los viaticos
+        async function filtrarViaticos() {
+            if (todosLosViaticos.length === 0) {
+                await cargarTodosLosViaticos();
             }
 
-            beneficiosFiltrados = todosLosBeneficios.filter(beneficio => {
-                // Filtrar por tipo
+            viaticosFiltrados = todosLosViaticos.filter(viatico => {
+                // Filtrar por tipo de detalle (usar tipoDetalles)
                 const coincideTipo = filtrosActivos.tipos.length === 0 ||
-                                   filtrosActivos.tipos.includes(beneficio.tipo);
+                                   (viatico.tipoDetalles &&
+                                    filtrosActivos.tipos.some(tipo =>
+                                        viatico.tipoDetalles.includes(tipo)));
 
                 // Filtrar por estado
-                const estadoFrontend = mapearEstado(beneficio.estado);
                 const coincideEstado = filtrosActivos.estados.length === 0 ||
-                                     filtrosActivos.estados.includes(estadoFrontend);
+                                     filtrosActivos.estados.includes(viatico.estado);
 
-                // Filtrar por departamento - AGREGAR
+                // Filtrar por departamento
                 const coincideDepartamento = filtrosActivos.departamentos.length === 0 ||
-                                           (beneficio.departamento && filtrosActivos.departamentos.includes(beneficio.departamento));
+                                           (viatico.departamento &&
+                                            filtrosActivos.departamentos.includes(viatico.departamento));
 
-                // Filtrar por fecha - AGREGAR
+                // Filtrar por fecha
                 let coincideFecha = true;
                 if (filtrosActivos.fecha.tipo === 'single' && filtrosActivos.fecha.fechaUnica) {
                     const fechaUnica = new Date(filtrosActivos.fecha.fechaUnica);
-                    const fechaCreacion = new Date(beneficio.fechaCreacion);
+                    const fechaCreacion = new Date(viatico.fechaCreacion);
                     fechaUnica.setHours(0, 0, 0, 0);
                     fechaCreacion.setHours(0, 0, 0, 0);
 
                     coincideFecha = fechaCreacion.getTime() === fechaUnica.getTime();
 
-                } else if (
-                    filtrosActivos.fecha.tipo === 'range' &&
-                    filtrosActivos.fecha.fechaDesde &&
-                    filtrosActivos.fecha.fechaHasta
-                ) {
+                } else if (filtrosActivos.fecha.tipo === 'range' &&
+                           filtrosActivos.fecha.fechaDesde &&
+                           filtrosActivos.fecha.fechaHasta) {
                     const desde = new Date(filtrosActivos.fecha.fechaDesde);
                     const hasta = new Date(filtrosActivos.fecha.fechaHasta);
-                    const fechaCreacion = new Date(beneficio.fechaCreacion);
+                    const fechaCreacion = new Date(viatico.fechaCreacion);
                     desde.setHours(0, 0, 0, 0);
                     hasta.setHours(0, 0, 0, 0);
                     fechaCreacion.setHours(0, 0, 0, 0);
@@ -668,90 +708,113 @@
                 return coincideTipo && coincideEstado && coincideDepartamento && coincideFecha;
             });
 
-            return beneficiosFiltrados;
+            console.log("Viáticos filtrados:", viaticosFiltrados.length);
+            return viaticosFiltrados;
         }
 
-        // Función de fallback para contadores usando beneficios locales
-        async function inicializarContadoresConBeneficiosLocales() {
-            if (todosLosBeneficios.length === 0) {
-                await cargartodosLosBeneficios();
+        // Función de fallback para contadores usando viaticos locales
+        async function inicializarContadoresConViaticosLocales() {
+            if (todosLosViaticos.length === 0) {
+                await cargarTodosLosViaticos();
             }
 
             const contadoresTipo = {
-                'Préstamo Laboral': 0,
-                'Adelanto Salarial': 0
+                'Combustible': 0,
+                'Kilometraje': 0,
+                'Transporte': 0,
+                'Hospedaje': 0,
+                'Alimentación': 0
             };
 
             const contadoresEstado = {
-                'Aprobado': 0,
+                'Aprobada': 0,
                 'Pendiente': 0,
-                'Rechazado': 0
+                'Rechazado': 0,
+                'Creada': 0
             };
 
             const contadoresDepartamento = {
                 'Financiero Contable': 0,
                 'Gerencia': 0,
-                'Ingenieria': 0,
+                'Ingeniería': 0,
                 'Jefatura': 0,
                 'Legal': 0,
                 'Operaciones': 0,
                 'Tecnicos NCR': 0,
-                'Tecnologias de Informacion': 0,
+                'Tecnologías de Información': 0,
                 'Ventas': 0
             };
 
-            // Contar TODOS los beneficios locales
-            todosLosBeneficios.forEach(beneficio => {
-                // Contar por tipo
-                if (contadoresTipo.hasOwnProperty(beneficio.tipo)) {
-                    contadoresTipo[beneficio.tipo]++;
+            // Contar TODOS los viaticos locales
+            todosLosViaticos.forEach(viatico => {
+                // Contar por tipo de detalle (usar tipoDetalles, no tipo)
+                if (viatico.tipoDetalles && viatico.tipoDetalles !== "Sin detalles") {
+                    // Buscar cada tipo en el string concatenado
+                    Object.keys(contadoresTipo).forEach(tipo => {
+                        if (viatico.tipoDetalles.includes(tipo)) {
+                            contadoresTipo[tipo]++;
+                        }
+                    });
                 }
 
                 // Contar por estado
-                const estadoFrontend = mapearEstado(beneficio.estado);
-                if (contadoresEstado.hasOwnProperty(estadoFrontend)) {
-                    contadoresEstado[estadoFrontend]++;
+                if (viatico.estado && contadoresEstado.hasOwnProperty(viatico.estado)) {
+                    contadoresEstado[viatico.estado]++;
                 }
 
                 // Contar por departamento
-                if (beneficio.departamento && contadoresDepartamento.hasOwnProperty(beneficio.departamento)) {
-                    contadoresDepartamento[beneficio.departamento]++;
+                if (viatico.departamento && contadoresDepartamento.hasOwnProperty(viatico.departamento)) {
+                    contadoresDepartamento[viatico.departamento]++;
                 }
             });
 
-            // Actualizar contadores en la UI
-            document.getElementById('count-prestamo').textContent = `(${contadoresTipo['Préstamo Laboral']})`;
-            document.getElementById('count-adelanto').textContent = `(${contadoresTipo['Adelanto Salarial']})`;
+            // Función helper para actualizar elementos de forma segura
+            function actualizarSeguro(id, valor) {
+                const elemento = document.getElementById(id);
+                if (elemento) {
+                    elemento.textContent = `(${valor})`;
+                }
+            }
 
-            document.getElementById('count-approved').textContent = `(${contadoresEstado['Aprobado']})`;
-            document.getElementById('count-pending').textContent = `(${contadoresEstado['Pendiente']})`;
-            document.getElementById('count-rejected').textContent = `(${contadoresEstado['Rechazado']})`;
+            // Actualizar contadores en la UI de forma segura
+            actualizarSeguro('count-combustible', contadoresTipo['Combustible']);
+            actualizarSeguro('count-kilometraje', contadoresTipo['Kilometraje']);
+            actualizarSeguro('count-transporte', contadoresTipo['Transporte']);
+            actualizarSeguro('count-hospedaje', contadoresTipo['Hospedaje']);
+            actualizarSeguro('count-alimentacion', contadoresTipo['Alimentación']);
 
-            // Actualizar contadores de departamentos
-            document.getElementById('dropdown-count-fc').textContent = `(${contadoresDepartamento['Financiero Contable']})`;
-            document.getElementById('dropdown-count-g').textContent = `(${contadoresDepartamento['Gerencia']})`;
-            document.getElementById('dropdown-count-i').textContent = `(${contadoresDepartamento['Ingeniería']})`;
-            document.getElementById('dropdown-count-j').textContent = `(${contadoresDepartamento['Jefatura']})`;
-            document.getElementById('dropdown-count-l').textContent = `(${contadoresDepartamento['Legal']})`;
-            document.getElementById('dropdown-count-o').textContent = `(${contadoresDepartamento['Operaciones']})`;
-            document.getElementById('dropdown-count-tncr').textContent = `(${contadoresDepartamento['Tecnicos NCR']})`;
-            document.getElementById('dropdown-count-ti').textContent = `(${contadoresDepartamento['Tecnologías de Información']})`;
-            document.getElementById('dropdown-count-v').textContent = `(${contadoresDepartamento['Ventas']})`;
+            actualizarSeguro('count-creada', contadoresEstado['Creada']);
+            actualizarSeguro('count-approved', contadoresEstado['Aprobada']);
+            actualizarSeguro('count-pending', contadoresEstado['Pendiente']);
+            actualizarSeguro('count-rejected', contadoresEstado['Rechazado']);
+
+            actualizarSeguro('dropdown-count-fc', contadoresDepartamento['Financiero Contable']);
+            actualizarSeguro('dropdown-count-g', contadoresDepartamento['Gerencia']);
+            actualizarSeguro('dropdown-count-i', contadoresDepartamento['Ingeniería']);
+            actualizarSeguro('dropdown-count-j', contadoresDepartamento['Jefatura']);
+            actualizarSeguro('dropdown-count-l', contadoresDepartamento['Legal']);
+            actualizarSeguro('dropdown-count-o', contadoresDepartamento['Operaciones']);
+            actualizarSeguro('dropdown-count-tncr', contadoresDepartamento['Tecnicos NCR']);
+            actualizarSeguro('dropdown-count-ti', contadoresDepartamento['Tecnologías de Información']);
+            actualizarSeguro('dropdown-count-v', contadoresDepartamento['Ventas']);
         }
-
-        // Función para inicializar contadores con TODOS los beneficios
+        // Función para inicializar contadores con TODOS los viaticos
         async function inicializarContadores() {
             try {
-                const response = await fetch('/Beneficio/ObtenerContadoresFiltros');
+                const response = await fetch('/Liquidacion/ObtenerContadoresFiltros');
                 if (response.ok) {
                     const contadores = await response.json();
 
                     // Actualizar contadores de tipos
-                    document.getElementById('count-prestamo').textContent = `(${contadores.prestamoLaboral})`;
-                    document.getElementById('count-adelanto').textContent = `(${contadores.adelantoSalarial})`;
+                    document.getElementById('count-combustible').textContent = `(${contadores.combustible})`;
+                    document.getElementById('count-kilometraje').textContent = `(${contadores.kilometraje})`;
+                    document.getElementById('count-transporte').textContent = `(${contadores.transporte})`;
+                    document.getElementById('count-hospedaje').textContent = `(${contadores.hospedaje})`;
+                    document.getElementById('count-alimentacion').textContent = `(${contadores.alimentacion})`;
 
                     // Actualizar contadores de estados
-                    document.getElementById('count-approved').textContent = `(${contadores.aprobado})`;
+                    document.getElementById('count-creada').textContent = `(${contadores.creada})`;
+                    document.getElementById('count-approved').textContent = `(${contadores.aprobada})`;
                     document.getElementById('count-pending').textContent = `(${contadores.pendiente})`;
                     document.getElementById('count-rejected').textContent = `(${contadores.rechazado})`;
 
@@ -767,11 +830,11 @@
                     document.getElementById('dropdown-count-v').textContent = `(${contadores.ventas})`;
                 } else {
                     console.error('Error al cargar contadores del servidor');
-                    await inicializarContadoresConBeneficiosLocales();
+                    await inicializarContadoresConViaticosLocales();
                 }
             } catch (error) {
                 console.error('Error cargando contadores:', error);
-                await inicializarContadoresConBeneficiosLocales();
+                await inicializarContadoresConViaticosLocales();
             }
         }
 
@@ -798,98 +861,106 @@
             }, 50);
         }
 
-        // Función para renderizar beneficios con efectos de fade
-        async function renderBeneficiosWithFade(data) {
-            fadeOut(beneficiosContainer, () => {
-                renderBeneficios(data);
+        // Función para renderizar viaticos con efectos de fade
+        async function renderViaticosWithFade(data) {
+            fadeOut(viaticossContainer, () => {
+                renderViaticos(data);
             });
         }
 
-        // Función para renderizar beneficios
-        function renderBeneficios(data) {
-            if (data.length === 0) {
-                beneficiosContainer.innerHTML = `
+        // Función para renderizar viaticos
+        function renderViaticos(data) {
+            if (!data || data.length === 0) {
+                viaticossContainer.innerHTML = `
                     <div class="no-results">
                         <i class="bi bi-inbox display-1 d-block mb-3"></i>
-                        <h3 class="h4 text-muted">No se encontraron beneficios</h3>
+                        <h3 class="h4 text-muted">No se encontraron viáticos</h3>
                         <p class="text-muted">Intenta ajustar los filtros para ver más resultados.</p>
                     </div>
                 `;
-                fadeIn(beneficiosContainer);
+                fadeIn(viaticossContainer);
                 return;
             }
 
-            beneficiosContainer.innerHTML = data.map(beneficion => `
-            <div class="card beneficio-card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-end">
-                            <input type="checkbox"
-                                   class="form-check-input permiso-check"
-                                   value="${beneficion.idBeneficio}"
-                                   style="width:18px; height:18px; cursor:pointer; padding:10px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);">
-                        </div>
-                        <div class="mb-2"
+            viaticossContainer.innerHTML = data.map(viatico => `
+            <div class="card viaticos-card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-end">
+                        <input type="checkbox"
+                               class="form-check-input viatico-check"
+                               value="${viatico.idViatico}"
+                               style="width:18px; height:18px; cursor:pointer; padding:10px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);">
+                    </div>
+                    <div class="mb-2"
                          style="cursor: pointer;"
-                         onclick="window.location.href='/Beneficio/Details/${beneficion.idBeneficio}'">
-                            <div class="d-flex align-items-start justify-content-between gap-1 mb-2 flex-wrap">
-                                <h3 class="h6 fw-bold text-dark mb-0" style="padding: 5px">
-                                    <i class="fa-solid fa-user me-3"></i>${beneficion.nombreEmpleado}
-                                </h3>
-                                <h5 class="h6 text-white small mb-0" style="padding: 5px; background-color: #012473; border-radius: 5px">
-                                    #${beneficion.idBeneficio}
-                                </h5>
-                            </div>
-                            <div class="d-flex align-items-center flex-wrap mb-2" style="gap: 1.5rem; padding-left: 5%; padding-right: 5%;">
-                                <span class="badge custom-badge ${
-                                    beneficion.estado === "Creada" || beneficion.estado === "Aprobada"
-                                        ? "bg-success"
-                                        : beneficion.estado === "Pendiente"
-                                            ? "bg-warning"
-                                            : beneficion.estado === "Rechazada"
-                                                ? "bg-danger"
-                                                : "bg-secondary"
-                                }">
-                                    ${beneficion.estado}
-                                </span>
-                                <span class="badge custom-badge"
-                                      style="
-                                        background-color: ${
-                                            beneficion.tipo === 'Préstamo Laboral' ? '#F58E53' :
-                                            beneficion.tipo === 'Adelanto Salarial' ? '#dc3545' :
-                                            '#6c757d'
-                                        };
-                                        color: #fff;
-                                      ">
-                                    ${beneficion.tipo}
-                                </span>
+                         onclick="window.location.href='/Liquidacion/Details/${viatico.idViatico}'">
+                        <div class="d-flex align-items-start justify-content-between gap-1 mb-2 flex-wrap">
+                            <h3 class="h6 fw-bold text-dark mb-0" style="padding: 5px">
+                                <i class="fa-solid fa-user me-3"></i>${viatico.nombreEmpleado || 'Sin nombre'}
+                            </h3>
+                            <h5 class="h6 text-white small mb-0" style="padding: 5px; background-color: #012473; border-radius: 5px">
+                                #${viatico.idViatico}
+                            </h5>
+                        </div>
+                        <div class="d-flex align-items-center flex-wrap mb-2" style="gap: 1.5rem; padding-left: 5%; padding-right: 5%;">
+                            <span class="badge custom-badge ${
+                                viatico.estado === "Creada" || viatico.estado === "Aprobada"
+                                    ? "bg-success"
+                                    : viatico.estado === "Pendiente"
+                                        ? "bg-warning"
+                                        : viatico.estado === "Rechazada"
+                                            ? "bg-danger"
+                                            : "bg-secondary"
+                            }">
+                                ${viatico.estado || 'Sin estado'}
+                            </span>
 
-                                ${beneficion.departamento ? `
-                                <span class="badge custom-badge bg-info text-white">
-                                    ${beneficion.departamento}
-                                </span>
-                                ` : ''}
+                            ${viatico.departamento ? `
+                            <span class="badge colorcito">
+                                ${viatico.departamento}
+                            </span>
+                            ` : ''}
 
-                                <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
-                                    <div class="col-3">
-                                        <span class="text-muted fw-semibold">Creación:</span>
-                                                <span class="text-dark fw-medium ms-1">${new Date(beneficion.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}</span>
-                                    </div>
-                                    <div class="col-3">
-                                        <span class="text-muted fw-semibold">Monto:</span>
-                                        <span class="text-dark fw-medium ms-1">₡${beneficion.monto != null ? new Intl.NumberFormat('es-CR').format(beneficion.monto) : 'Sin monto'}</span>
-                                    </div>
-                                    <div class="col-5">
-                                        <span class="text-muted fw-semibold d-block">Comentarios:</span>
-                                        <span class="text-dark fw-medium ms-1" d-block>${beneficion.comentarios ?? 'Sin comentario'}</span>
-                                    </div>
+                            <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
+                                <div class="col">
+                                    <span class="text-muted fw-bold">Creación:</span>
+                                    <span class="text-dark fw-medium ms-1">
+                                        ${new Date(viatico.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="pt-2 border-top">
+                        <div class="row small d-flex align-items-center flex-wrap justify-content-around" style="gap: 0.5rem; padding-left: 5%; padding-right: 5%;">
+                            <div class="col">
+                                <span class="text-muted fw-semibold d-block">Jefe:</span>
+                                <span class="text-dark fw-medium ms-1 d-block">${viatico.jefe || 'Sin jefe'}</span>
+                            </div>
+                            <div class="col">
+                                <span class="text-muted fw-semibold d-block">Total:</span>
+                                <span class="text-dark fw-medium ms-1 d-block">
+                                    ₡${viatico.total?.toLocaleString('es-CR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) || '0.00'}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row small d-flex align-items-center flex-wrap justify-content-around mt-2" style="gap: 0.5rem; padding-left: 5%; padding-right: 5%;">
+                            <div class="col">
+                                <span class="text-muted fw-semibold d-block">Tipos de Detalles:</span>
+                                <span class="text-dark fw-medium ms-1 d-block">${viatico.tipoDetalles || 'Sin detalles'}</span>
+                            </div>
+                            <div class="col">
+                                <span class="text-muted fw-semibold d-block">Cantidad de Detalles:</span>
+                                <span class="badge bg-info">${viatico.cantidadDetalle || 0}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
             `).join('');
 
-            fadeIn(beneficiosContainer);
+            fadeIn(viaticossContainer);
         }
 
         function renderPagination() {
@@ -920,8 +991,6 @@
             }
         }
 
-        // EVENT LISTENERS PARA NUEVOS FILTROS - AGREGAR ESTOS
-
         // Departamentos
         document.querySelectorAll('.filter-departamento').forEach(checkbox => {
             checkbox.addEventListener('change', async function() {
@@ -930,8 +999,8 @@
                 } else {
                     filtrosActivos.departamentos = filtrosActivos.departamentos.filter(depto => depto !== this.value);
                 }
-                const beneficiosFiltrados = await filtrarBeneficios();
-                await renderBeneficiosWithFade(beneficiosFiltrados);
+                const viaticosFiltrados = await filtrarViaticos();
+                await renderViaticosWithFade(viaticosFiltrados);
                 pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
@@ -940,8 +1009,8 @@
         document.querySelectorAll('.filter-date').forEach(input => {
             input.addEventListener('change', async function() {
                 actualizarFiltroFecha();
-                const beneficiosFiltrados = await filtrarBeneficios();
-                await renderBeneficiosWithFade(beneficiosFiltrados);
+                const viaticosFiltrados = await filtrarViaticos();
+                await renderViaticosWithFade(viaticosFiltrados);
                 pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
@@ -962,8 +1031,8 @@
                 } else {
                     filtrosActivos.tipos = filtrosActivos.tipos.filter(tipo => tipo !== this.value);
                 }
-                const beneficiosFiltrados = await filtrarBeneficios();
-                await renderBeneficiosWithFade(beneficiosFiltrados);
+                const viaticosFiltrados = await filtrarViaticos();
+                await renderViaticosWithFade(viaticosFiltrados);
                 pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
@@ -975,8 +1044,8 @@
                 } else {
                     filtrosActivos.estados = filtrosActivos.estados.filter(estado => estado !== this.value);
                 }
-                const beneficiosFiltrados = await filtrarBeneficios();
-                await renderBeneficiosWithFade(beneficiosFiltrados);
+                const viaticosFiltrados = await filtrarViaticos();
+                await renderViaticosWithFade(viaticosFiltrados);
                 pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
@@ -1007,17 +1076,17 @@
                 fechaHasta: null
             };
 
-            // Renderizar todos los beneficios de la página actual con fade
-            renderBeneficiosWithFade(beneficiosPaginaActual);
+            // Renderizar todos los viaticos de la página actual con fade
+            renderViaticosWithFade(viaticosPaginaActual);
             pagination.style.display = 'flex';
         });
 
         // Inicializar con efecto de fade
         document.addEventListener('DOMContentLoaded', async function() {
-            await cargartodosLosBeneficios();
+            await cargarTodosLosViaticos();
             await inicializarContadores();
-            beneficiosContainer.style.opacity = '0';
-            renderBeneficios(beneficiosPaginaActual);
+            viaticossContainer.style.opacity = '0';
+            renderViaticos(viaticosPaginaActual);
             renderPagination();
         });
     </script>
@@ -1034,7 +1103,7 @@
 
                 <div class="modal-body text-center">
 
-                    <input type="hidden" id="beneficioIdSeleccionado">
+                    <input type="hidden" id="viaticoIdSeleccionado">
 
                     <p class="mb-3">Seleccione el nuevo estado:</p>
 
@@ -1059,21 +1128,21 @@
     </div>
     <script>
         function abrirModalMasivo() {
-            const seleccionados = [...document.querySelectorAll(".permiso-check:checked")]
+            const seleccionados = [...document.querySelectorAll(".viatico-check:checked")]
                 .map(c => parseInt(c.value));
 
             if (seleccionados.length === 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Debes seleccionar mínimo un beneficio',
+                    text: 'Debes seleccionar mínimo un viático',
                     confirmButtonText: 'Aceptar'
                 });
                 return;
             }
 
             window.idsSeleccionados = seleccionados;
-            document.getElementById("beneficioIdSeleccionado").value = "";
+            document.getElementById("viaticoIdSeleccionado").value = "";
 
             const modal = new bootstrap.Modal(document.getElementById('estadoModal'));
             modal.show();
@@ -1082,13 +1151,13 @@
     <script>
         function cambiarEstado(nuevoEstado) {
 
-            const idIndividual = document.getElementById("beneficioIdSeleccionado").value;
+            const idIndividual = document.getElementById("viaticoIdSeleccionado").value;
 
             const ids = window.idsSeleccionados?.length
                 ? window.idsSeleccionados
                 : [parseInt(idIndividual)];
 
-            fetch("/Beneficio/CambiarEstadoMasivo", {
+            fetch("/Liquidacion/CambiarEstadoMasivo", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ids, estado: nuevoEstado })

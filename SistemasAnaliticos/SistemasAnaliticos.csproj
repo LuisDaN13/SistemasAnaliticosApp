@@ -16,14 +16,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ClosedXML" Version="0.105.0" />
+	<PackageReference Include="Bootstrap" Version="5.3.0">
+		<PrivateAssets>all</PrivateAssets>
+	</PackageReference>
+	<PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
     <PackageReference Include="FreeSpire.Doc" Version="12.2.0" />
     <PackageReference Include="FreeSpire.Pdf" Version="10.2.0" />
     <PackageReference Include="itext7" Version="8.0.0" />
     <PackageReference Include="itext7.bouncy-castle-adapter" Version="8.0.0" />
     <PackageReference Include="iTextSharp.LGPLv2.Core" Version="3.7.12" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
+	<PackageReference Include="jQuery" Version="3.6.0">
+		<PrivateAssets>all</PrivateAssets>
+	</PackageReference>
+	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
@@ -33,4 +39,16 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.4" />
   </ItemGroup>
 
+  <Target Name="CopyBootstrapToWwwroot" AfterTargets="Build">
+	  <ItemGroup>
+		  <BootstrapFiles Include="$(NuGetPackageRoot)bootstrap\5.3.0\content\Content\**\*.*" />
+		  <JQueryFiles Include="$(NuGetPackageRoot)jquery\3.6.0\content\Scripts\*.*" />
+	  </ItemGroup>
+
+	  <Copy SourceFiles="@(BootstrapFiles)"
+			    DestinationFiles="@(BootstrapFiles->'wwwroot\lib\bootstrap\%(RecursiveDir)%(Filename)%(Extension)')" />
+
+	  <Copy SourceFiles="@(JQueryFiles)"
+			    DestinationFiles="@(JQueryFiles->'wwwroot\lib\jquery\dist\%(Filename)%(Extension)')" />
+  </Target>
 </Project>
