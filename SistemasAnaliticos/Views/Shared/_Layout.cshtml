@@ -45,67 +45,66 @@
                 border-radius: 50%;
             }
 
-            @@media (min-width: 992px) {
-                .navbar-rh .nav-item.dropdown:hover .dropdown-menu {
-                    display: block;
-                    margin-top: 0;
-                }
+        @@media (min-width: 992px) {
+            .navbar-rh .nav-item.dropdown:hover .dropdown-menu {
+                display: block;
+                margin-top: 0;
+            }
+        }
+
+        .navbar-rh .dropdown-menu {
+            background-color: #012473;
+            border: 1px solid #013599;
+            border-radius: 0.375rem;
+        }
+
+        .navbar-rh .dropdown-item {
+            color: white !important;
+            padding: 0.5rem 1rem;
+        }
+
+            .navbar-rh .dropdown-item:hover {
+                background-color: #013599;
+                color: white;
             }
 
-            .navbar-rh .dropdown-menu {
-                background-color: #012473;
-                border: 1px solid #013599;
-                border-radius: 0.375rem;
+        .navbar-rh .dropdown-divider {
+            border-color: #013599;
+        }
+
+        .navbar-rh .nav-link {
+            position: relative;
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+        }
+
+            .navbar-rh .nav-link:hover {
+                background-color: #013599;
             }
 
-            .navbar-rh .dropdown-item {
-                color: white !important;
-                padding: 0.5rem 1rem;
+        /* Logo */
+        .navbar-rh .logo-rh {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .navbar-rh .logo-container-rh {
+            transition: transform 0.3s ease;
+        }
+
+            .navbar-rh .logo-container-rh:hover {
+                transform: scale(1.05);
             }
 
-                .navbar-rh .dropdown-item:hover {
-                    background-color: #013599;
-                    color: white;
-                }
-
-            .navbar-rh .dropdown-divider {
-                border-color: #013599;
-            }
-
-            .navbar-rh .nav-link {
-                position: relative;
-                padding: 0.5rem 1rem !important;
-                border-radius: 0.375rem;
-                transition: all 0.3s ease;
-            }
-
-                .navbar-rh .nav-link:hover {
-                    background-color: #013599;
-                }
-
-            /* Logo */
-            .navbar-rh .logo-rh {
-                height: 40px;
-                width: auto;
-                object-fit: contain;
-            }
-
-            .navbar-rh .logo-container-rh {
-                transition: transform 0.3s ease;
-            }
-
-                .navbar-rh .logo-container-rh:hover {
-                    transform: scale(1.05);
-                }
-
-            .navbar-rh .border-primary {
-                border-color: rgba(255,255,255,0.3) !important;
-            }
+        .navbar-rh .border-primary {
+            border-color: rgba(255,255,255,0.3) !important;
+        }
 
         /* Responsive ajustes */
         @@media (max-width: 991.98px) {
-            .navbar-rh .navbar-collapse
-            {
+            .navbar-rh .navbar-collapse {
                 background-color: #012473;
                 border-top: 1px solid #013599;
                 padding: 1rem;
@@ -118,7 +117,7 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-rh text-white shadow-lg">
             <div class="container-xxl px-4 px-sm-6 px-lg-8">
-
+                <!-- Logo y marca -->
                 <a class="d-flex align-items-center gap-2 logo-container-rh text-white text-decoration-none"
                         asp-controller="Home" asp-action="Index">
                     <img src='/Img/circulo - logo blanco.png' alt="logo-circulo" class="logo-rh">
@@ -126,27 +125,31 @@
                 </a>
 
                 <!-- Botón responsive -->
-                <button class="navbar-toggler" type="button" id="customNavbarToggler"
-                        aria-controls="navbarRH" aria-expanded="false" aria-label="Toggle navigation">
-                    <i class="bi bi-list"></i>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarRHCollapse"
+                        aria-controls="navbarRHCollapse"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <i class="bi bi-list text-white"></i>
                 </button>
 
                 <!-- Opciones de navegación -->
-                <div class="collapse navbar-collapse" id="navbarRH">
+                <div class="collapse navbar-collapse" id="navbarRHCollapse">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0 mt-3 mt-lg-0">
                         <!-- Empleados -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Empleados
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Index"><i class="bi bi-people me-2"></i>Directorio</a></li>
+                                <li><a class="dropdown-item" asp-controller="Usuario" asp-action="Index"
+                                ><i class="bi bi-people me-2"></i>Directorio</a></li>
                             </ul>
                         </li>
 
                         <!-- Acciones -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Acciones
                             </a>
                             <ul class="dropdown-menu">
@@ -162,7 +165,7 @@
 
                         <!-- Otros -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Otros
                             </a>
                             <ul class="dropdown-menu">
@@ -219,98 +222,6 @@
     <!-- Scripts de tu proyecto -->
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    <script>
-        // Solución específica para Blazor - Dropdowns con toggle mejorado
-        function initializeBlazorNavbar() {
-            const customToggler = document.getElementById('customNavbarToggler');
-            const navbarCollapse = document.getElementById('navbarRH');
-
-            // Botón hamburguesa
-            if (customToggler && !customToggler._navInitialized) {
-                customToggler._navInitialized = true;
-
-                customToggler.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-
-                    const isExpanded = this.getAttribute('aria-expanded') === 'true';
-                    const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse) ||
-                                     new bootstrap.Collapse(navbarCollapse);
-
-                    if (isExpanded) {
-                        bsCollapse.hide();
-                    } else {
-                        bsCollapse.show();
-                    }
-                });
-            }
-
-            // Variable para trackear el dropdown abierto actual
-            let currentOpenDropdown = null;
-
-            // Dropdowns - comportamiento mejorado
-            document.addEventListener('click', function(e) {
-                const target = e.target;
-                const dropdownToggle = target.closest('.dropdown-toggle');
-
-                // Si es un dropdown toggle
-                if (dropdownToggle && dropdownToggle.closest('.navbar-rh')) {
-                    if (window.innerWidth < 992) {
-                        e.preventDefault();
-                        e.stopPropagation();
-
-                        const menu = dropdownToggle.nextElementSibling;
-                        const isSameDropdown = currentOpenDropdown === menu;
-
-                        // Cerrar otros dropdowns
-                        document.querySelectorAll('.navbar-rh .dropdown-menu.show').forEach(otherMenu => {
-                            if (otherMenu !== menu) {
-                                otherMenu.classList.remove('show');
-                            }
-                        });
-
-                        // Si es el MISMO dropdown que ya estaba abierto, cerrarlo
-                        if (isSameDropdown) {
-                            menu.classList.remove('show');
-                            currentOpenDropdown = null;
-                        } else {
-                            // Si es un dropdown diferente, abrirlo
-                            menu.classList.add('show');
-                            currentOpenDropdown = menu;
-                        }
-                    }
-                }
-                // Si es un link normal, cerrar navbar en móvil
-                else if ((target.classList.contains('dropdown-item') ||
-                         (target.classList.contains('nav-link') && !target.classList.contains('dropdown-toggle'))) &&
-                        target.closest('.navbar-rh')) {
-                    if (window.innerWidth < 992 && navbarCollapse.classList.contains('show')) {
-                        const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
-                        if (bsCollapse) bsCollapse.hide();
-                        if (customToggler) customToggler.setAttribute('aria-expanded', 'false');
-
-                        // Cerrar también los dropdowns
-                        document.querySelectorAll('.navbar-rh .dropdown-menu.show').forEach(menu => {
-                            menu.classList.remove('show');
-                        });
-                        currentOpenDropdown = null;
-                    }
-                }
-                // Si se hace click fuera del navbar, cerrar dropdowns
-                else if (!target.closest('.navbar-rh')) {
-                    document.querySelectorAll('.navbar-rh .dropdown-menu.show').forEach(menu => {
-                        menu.classList.remove('show');
-                    });
-                    currentOpenDropdown = null;
-                }
-            });
-        }
-
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', initializeBlazorNavbar);
-        window.addEventListener('load', initializeBlazorNavbar);
-        setInterval(initializeBlazorNavbar, 500);
-    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
