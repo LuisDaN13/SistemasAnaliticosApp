@@ -1,0 +1,320 @@
+﻿@* @model SistemasAnaliticos.ViewModels.ViaticoDetailsViewModel
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+        .badge-department {
+            background-color: #e3f2fd;
+            color: #0d6efd;
+            border: 1px solid #bbdefb;
+        }
+
+        .badge-success {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #664d03;
+        }
+
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+        .badge-info {
+            background-color: #cff4fc;
+            color: #055160;
+        }
+
+        .badge-primary {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+
+        .employee-id {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .info-icon {
+            color: var(--primary-color);
+        }
+
+        .card-title-custom {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-custom {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+            .table-custom th {
+                background-color: #f8f9fa;
+                font-weight: 600;
+                border-bottom: 2px solid #e9ecef;
+            }
+
+            .table-custom td {
+                vertical-align: middle;
+            }
+
+        .total-row {
+            background-color: #f8f9fc;
+            font-weight: 600;
+            border-top: 2px solid #dee2e6;
+        }
+
+        .type-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <!-- Main Content -->
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+        @if (Model == null)
+        {
+            <!-- Viático Not Found -->
+            <div class="d-flex align-items-center justify-content-center" style="min-height: 68vh !important;">
+                <div class="card shadow-sm border-0" style="max-width: 700px">
+                    <div class="card-body p-5 pt-2 pb-0 text-center" style="display: flex; justify-content: center;">
+                        <div class="flex-shrink-0">
+                            <div id="lottie-animation" style="width: 240px; height: 240px;"></div>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; align-content: center; justify-content: center">
+                            <h2 class="h3 fw-bold text-dark mb-3 mt-3">Viático no encontrado</h2>
+                            <p class="text-muted mb-4">El viático que buscas no existe en nuestro sistema.</p>
+                        </div>
+                    </div>
+                    <div style="gap: 9%; padding-bottom: 4%; display: flex; justify-content: center; align-items: center;">
+                        <a asp-controller="Liquidacion" asp-action="VerViaticos" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Volver a Viáticos
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Inicializar la animación
+                const animation = document.createElement('lottie-player');
+                animation.setAttribute('src', '/lottie/Empty Box.json'); // Ruta a tu JSON
+                animation.setAttribute('background', 'transparent');
+                animation.setAttribute('speed', '1');
+                animation.setAttribute('style', 'width: 240px; height: 240px;');
+                animation.setAttribute('loop', '');
+                animation.setAttribute('autoplay', '');
+
+                document.getElementById('lottie-animation').appendChild(animation);
+            </script>
+        }
+        else
+        {
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a asp-controller="Liquidacion" asp-action="VerViaticos" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Volver a los Viáticos
+                </a>
+            </div>
+
+            <!-- Viático Header Card -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row g-4 align-items-start">
+                        <div class="col-md">
+                            <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                                <div class="mb-3 mb-md-0">
+                                    <h1 class="display-6 fw-bold text-dark mb-2">@Model.nombreEmpleado</h1>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge badge-department">@Model.departamento</span>
+                                        <span class="badge">@Model.estado</span>
+                                        <span class="badge bg-secondary">@Model.cantidadDetalles Detalles</span>
+                                    </div>
+                                </div>
+                                <div class="text-md-end">
+                                    <p class="text-muted mb-1">Número de Viático</p>
+                                    <p class="fs-3 fw-bold employee-id">#@Model.idViatico</p>
+                                </div>
+                            </div>
+
+                            <!-- Quick Info -->
+                            <div class="row g-3 mt-3">
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1 min-width-0 text-center">
+                                            <p class="text-muted mb-0 small">Fecha de Creación</p>
+                                            <p class="fw-medium mb-0 text-break">@Model.fechaCreacionFormateada</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1 min-width-0 text-center">
+                                            <p class="text-muted mb-0 small">Jefe Inmediato</p>
+                                            <p class="fw-medium mb-0 text-break">@Model.jefe</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-grow-1 min-width-0 text-center">
+                                            <p class="text-muted mb-0 small">Total del Viático</p>
+                                            <p class="fw-medium mb-0 text-break fs-5 text-primary">@Model.total</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Detalles -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0 card-title-custom">
+                        <i class="bi bi-table info-icon"></i>
+                        Detalles del Viático
+                        <span class="badge bg-secondary ms-2">@Model.cantidadDetalles</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Detalles.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 table-custom">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="120">Fecha</th>
+                                        <th>Tipo</th>
+                                        <th width="150" class="text-end">Monto</th>
+                                        <th>Descripción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var detalle in Model.Detalles)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <span class="fw-medium">@detalle.fecha</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@detalle.TipoColor type-badge">@detalle.tipo</span>
+                                            </td>
+                                            <td class="text-end fw-bold">@detalle.monto</td>
+                                            <td>
+                                                <span class="text-muted">@detalle.detalle</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr class="total-row">
+                                        <td colspan="2" class="text-end fw-bold">
+                                            <i class="bi bi-calculator me-2"></i>Total del Viático:
+                                        </td>
+                                        <td class="text-end fw-bold fs-5 text-primary">@Model.total</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <!-- Estadísticas de la tabla -->
+                        <div class="p-3 border-top bg-light">
+                            <div class="row">
+                                <div class="col-md-4 text-center">
+                                    <small class="text-muted d-block">Total Items</small>
+                                    <span class="fw-bold">@Model.cantidadDetalles</span>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <small class="text-muted d-block">Tipos Diferentes</small>
+                                    <span class="fw-bold">@Model.Detalles.Select(d => d.tipo).Distinct().Count()</span>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <small class="text-muted d-block">Monto Total</small>
+                                    <span class="fw-bold text-primary">@Model.totalFormateado</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No hay detalles registrados para este viático</h5>
+                            <p class="text-muted small">Este viático fue creado sin detalles adjuntos.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">
+                                <i class="bi bi-lightning-charge-fill text-warning me-2"></i>
+                                Acciones Disponibles
+                            </h6>
+                            <small class="text-muted">Gestiona este viático según su estado actual</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a asp-action="VerViaticos" asp-controller="Liquidacion" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Volver
+                            </a>
+
+                            @if (Model.estado == "Creada" || Model.estado == "Pendiente")
+                            {
+                                <button type="button" class="btn btn-success" onclick="cambiarEstado('Aprobada')">
+                                    <i class="bi bi-check-circle me-2"></i>Aprobar
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="cambiarEstado('Rechazada')">
+                                    <i class="bi bi-x-circle me-2"></i>Rechazar
+                                </button>
+                            }
+
+                            @if (Model.estado == "Aprobada")
+                            {
+                                <button type="button" class="btn btn-info" onclick="cambiarEstado('Liquidado')">
+                                    <i class="bi bi-cash-coin me-2"></i>Marcar como Liquidado
+                                </button>
+                            }
+
+                            <a href="javascript:window.print()" class="btn btn-outline-primary">
+                                <i class="bi bi-printer me-2"></i>Imprimir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </main>
+ *@

@@ -449,8 +449,8 @@
     </script>
 
     <!-- FUNCION DE DESCARGA DE EXCEL -->
-@*     <script>
-        //Funciones para descargar excel
+    <!-- FUNCION DE DESCARGA DE EXCEL PARA VIÁTICOS -->
+    <script>
         document.getElementById('exportExcelBtn').addEventListener('click', function() {
             const button = this;
 
@@ -462,9 +462,9 @@
             // Construir parámetros de filtros
             const params = new URLSearchParams();
 
-            // Agregar tipos
+            // Agregar tipos de detalle (usa el nombre correcto del parámetro)
             filtrosActivos.tipos.forEach(tipo => {
-                params.append('tipos', tipo);
+                params.append('tiposDetalle', tipo);
             });
 
             // Agregar estados
@@ -495,8 +495,8 @@
 
             // Crear enlace de descarga directa
             const downloadLink = document.createElement('a');
-            downloadLink.href = `/Permiso/ExportarPermisosExcel?${params.toString()}`;
-            downloadLink.download = `Permisos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.xlsx`;
+            downloadLink.href = `/Liquidacion/ExportarViaticosExcel?${params.toString()}`;
+            downloadLink.download = `Viaticos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.xlsx`;
             downloadLink.style.display = 'none';
 
             // Agregar event listener para restaurar el botón cuando la descarga termine
@@ -519,9 +519,10 @@
             }, 5000); // Máximo 5 segundos
         });
     </script>
- *@
+
     <!-- FUNCION DE DESCARGA DE PDF -->
-@*     <script>
+    <!-- FUNCION DE DESCARGA DE PDF PARA VIÁTICOS -->
+    <script>
         document.getElementById('exportPdfBtn').addEventListener('click', async function() {
             const button = this;
             try {
@@ -530,12 +531,12 @@
                 button.innerHTML = '<i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-2"></i>Generando PDF...';
                 button.disabled = true;
 
-                // Construir parámetros de filtros (misma lógica que Excel)
+                // Construir parámetros de filtros
                 const params = new URLSearchParams();
 
-                // Agregar tipos
+                // Agregar tipos de detalle
                 filtrosActivos.tipos.forEach(tipo => {
-                    params.append('tipos', tipo);
+                    params.append('tiposDetalle', tipo);
                 });
 
                 // Agregar estados
@@ -565,7 +566,7 @@
                 }
 
                 // Realizar la solicitud
-                const response = await fetch(`/Permiso/ExportarPermisosPDF?${params.toString()}`);
+                const response = await fetch(`/Liquidacion/ExportarViaticosPDF?${params.toString()}`);
 
                 if (response.ok) {
                     // Obtener el blob
@@ -580,18 +581,32 @@
                     const a = document.createElement('a');
                     a.style.display = 'none';
                     a.href = url;
-                    a.download = `Permisos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.pdf`;
+                    a.download = `Viaticos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.pdf`;
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
                     document.body.removeChild(a);
 
                 } else {
-                    throw new Error('Error al generar el PDF');
+                    // Intentar obtener el mensaje de error
+                    let errorMessage = 'Error al generar el PDF';
+                    try {
+                        const errorData = await response.text();
+                        if (errorData) errorMessage = errorData;
+                    } catch {}
+
+                    throw new Error(errorMessage);
                 }
             } catch (error) {
                 console.error('Error al exportar a PDF:', error);
-                alert('Error al generar el archivo PDF');
+
+                // Mostrar alerta más informativa
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al generar PDF',
+                    text: error.message || 'Ocurrió un error al generar el archivo PDF',
+                    confirmButtonText: 'Aceptar'
+                });
 
                 // Restaurar el botón en caso de error
                 button.innerHTML = originalText;
@@ -599,8 +614,6 @@
             }
         });
     </script>
- *@
-
     <!-- FILTRADO Y CONTADORES MEJORADOS -->
     <script>
         const viaticosPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LiquidacionesViaticos));
