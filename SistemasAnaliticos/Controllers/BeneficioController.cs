@@ -114,7 +114,8 @@ namespace SistemasAnaliticos.Controllers
                 if (estados != null && estados.Length > 0)
                 {
                     var estadosMapeados = estados.Select(e =>
-                        e == "Aprobado" ? "Creada" :
+                        e == "Creada" ? "Creada" :
+                        e == "Aprobada" ? "Aprobada" :
                         e == "Pendiente" ? "Pendiente" :
                         "Rechazada").ToArray();
 
@@ -479,9 +480,10 @@ namespace SistemasAnaliticos.Controllers
                         AdelantoSalarial = g.Count(b => b.tipo == "Adelanto Salarial"),
 
                         // Contadores por estado
-                        Aprobado = g.Count(b => b.estado == "Creada" || b.estado == "Aprobada"),
+                        Creada = g.Count(b => b.estado == "Creada"),
+                        Aprobada = g.Count(b => b.estado == "Aprobada"),
                         Pendiente = g.Count(b => b.estado == "Pendiente"),
-                        Rechazado = g.Count(b => b.estado == "Rechazada"),
+                        Rechazada = g.Count(b => b.estado == "Rechazada"),
 
                         // Contadores por departamento ← AGREGAR ESTOS
                         FinancieroContable = g.Count(b => b.departamento == "Financiero Contable"),
@@ -500,9 +502,10 @@ namespace SistemasAnaliticos.Controllers
                 {
                     PrestamoLaboral = 0,
                     AdelantoSalarial = 0,
-                    Aprobado = 0,
+                    Creada = 0,
+                    Aprobada = 0,
                     Pendiente = 0,
-                    Rechazado = 0,
+                    Rechazada = 0,
                     FinancieroContable = 0,
                     Gerencia = 0,
                     Ingenieria = 0,
@@ -520,9 +523,10 @@ namespace SistemasAnaliticos.Controllers
                 {
                     PrestamoLaboral = 0,
                     AdelantoSalarial = 0,
-                    Aprobado = 0,
+                    Creada = 0,
+                    Aprobada = 0,
                     Pendiente = 0,
-                    Rechazado = 0,
+                    Rechazada = 0,
                     FinancieroContable = 0,
                     Gerencia = 0,
                     Ingenieria = 0,

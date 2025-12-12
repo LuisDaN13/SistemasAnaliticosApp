@@ -153,7 +153,16 @@
                                     <h1 class="display-6 fw-bold text-dark mb-2">@Model.nombreEmpleado</h1>
                                     <div class="d-flex flex-wrap gap-2">
                                         <span class="badge badge-department">@Model.departamento</span>
-                                        <span class="badge">@Model.estado</span>
+                                        @{
+                                            string tipoColor = Model.estado == "Creada" || Model.estado == "Aprobada" ? "bg-success" :
+                                            Model.estado == "Pendiente" ? "bg-warning" :
+                                            Model.estado == "Rechazada" ? "bg-danger" : "bg-secondary"; // Using bg-secondary for default
+
+                                            string textColor = Model.estado == "Pendiente" ? "text-dark" : "text-white"; // Often warning badges need dark text
+                                        }
+                                        <span class="badge @tipoColor @textColor">
+                                            @Model.estado
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="text-md-end">
@@ -196,14 +205,7 @@
 
             <!-- Tabla de Detalles -->
             <div class="card shadow-sm mt-4">
-                <div class="card-header bg-white">
-                    <h5 class="card-title mb-0 card-title-custom">
-                        <i class="bi bi-table info-icon"></i>
-                        Detalles
-                        <span class="badge bg-secondary ms-2">@Model.cantidadDetalles</span>
-                    </h5>
-                </div>
-                <div class="card-body p-0 mt-2 mb-2">
+                <div class="card-body p-0">
                     @if (Model.Detalles.Any())
                     {
                         <div class="table-responsive">
@@ -212,7 +214,7 @@
                                     <tr>
                                         <th class="text-center" width="120">Fecha</th>
                                         <th class="text-center">Tipo</th>
-                                        <th class="text-center" width="150" class="text-end">Monto</th>
+                                        <th class="text-center" width="150">Monto</th>
                                         <th class="text-center">Descripción</th>
                                     </tr>
                                 </thead>
@@ -239,11 +241,7 @@
                         <!-- Estadísticas de la tabla -->
                         <div class="p-3 border-top bg-light">
                             <div class="row">
-                                <div class="col-md-6 text-center">
-                                    <small class="text-muted d-block">Total Items</small>
-                                    <span class="fw-bold">@Model.cantidadDetalles</span>
-                                </div>
-                                <div class="col-md-6 text-center">
+                                <div class="col-md-12 text-center">
                                     <small class="text-muted d-block">Tipos Diferentes</small>
                                     <span class="fw-bold">@Model.Detalles.Select(d => d.tipo).Distinct().Count()</span>
                                 </div>

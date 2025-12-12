@@ -198,7 +198,14 @@
                                 <div class="collapse show mt-3" id="statusFilter">
                                     <div class="d-flex flex-column gap-2">
                                         <div class="form-check">
-                                            <input class="form-check-input filter-status" type="checkbox" value="Aprobado" id="status-approved">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Creada" id="status-creada">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-creada">
+                                                <span>Creada</span>
+                                                <span class="text-muted" id="count-creada">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Aprobada" id="status-approved">
                                             <label class="form-check-label d-flex justify-content-between w-100" for="status-approved">
                                                 <span>Aprobado</span>
                                                 <span class="text-muted" id="count-approved">(0)</span>
@@ -715,12 +722,14 @@
 
         // Mapear estado del backend al frontend
         function mapearEstado(estadoBackend) {
-            if (estadoBackend === "Creada" || estadoBackend === "Aprobada") {
-                return "Aprobado";
+            if (estadoBackend === "Creada") {
+                return "Creada";
+            } else if (estadoBackend === "Aprobada") {
+                return "Aprobada";
             } else if (estadoBackend === "Pendiente") {
                 return "Pendiente";
             } else if (estadoBackend === "Rechazada") {
-                return "Rechazado";
+                return "Rechazada";
             }
             return estadoBackend;
         }
@@ -808,9 +817,10 @@
             };
 
             const contadoresEstado = {
-                'Aprobado': 0,
+                'Aprobada': 0,
+                'Creada': 0,
                 'Pendiente': 0,
-                'Rechazado': 0
+                'Rechazada': 0
             };
 
             const contadoresDepartamento = {
@@ -848,9 +858,10 @@
             document.getElementById('count-laboral').textContent = `(${contadoresTipo['Laboral']})`;
             document.getElementById('count-salarial').textContent = `(${contadoresTipo['Salarial']})`;
 
-            document.getElementById('count-approved').textContent = `(${contadoresEstado['Aprobado']})`;
+            document.getElementById('count-cread').textContent = `(${contadoresEstado['Creada']})`;
+            document.getElementById('count-approved').textContent = `(${contadoresEstado['Aprobada']})`;
             document.getElementById('count-pending').textContent = `(${contadoresEstado['Pendiente']})`;
-            document.getElementById('count-rejected').textContent = `(${contadoresEstado['Rechazado']})`;
+            document.getElementById('count-rejected').textContent = `(${contadoresEstado['Rechazada']})`;
 
             // Actualizar contadores de departamentos
             document.getElementById('dropdown-count-fc').textContent = `(${contadoresDepartamento['Financiero Contable']})`;
@@ -874,8 +885,9 @@
                     // Actualizar contadores de tipos
                     document.getElementById('count-laboral').textContent = `(${contadores.laboral})`;
                     document.getElementById('count-salarial').textContent = `(${contadores.salarial})`;
-
+                    A
                     // Actualizar contadores de estados
+                    document.getElementById('count-creada').textContent = `(${contadores.creada})`;
                     document.getElementById('count-approved').textContent = `(${contadores.aprobado})`;
                     document.getElementById('count-pending').textContent = `(${contadores.pendiente})`;
                     document.getElementById('count-rejected').textContent = `(${contadores.rechazado})`;
