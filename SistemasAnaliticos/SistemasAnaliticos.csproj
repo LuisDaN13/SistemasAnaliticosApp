@@ -45,10 +45,8 @@
 		  <JQueryFiles Include="$(NuGetPackageRoot)jquery\3.6.0\content\Scripts\*.*" />
 	  </ItemGroup>
 
-	  <Copy SourceFiles="@(BootstrapFiles)"
-			    DestinationFiles="@(BootstrapFiles->'wwwroot\lib\bootstrap\%(RecursiveDir)%(Filename)%(Extension)')" />
+	  <Copy SourceFiles="@(BootstrapFiles)" DestinationFiles="@(BootstrapFiles->'wwwroot\lib\bootstrap\%(RecursiveDir)%(Filename)%(Extension)')" />
 
-	  <Copy SourceFiles="@(JQueryFiles)"
-			    DestinationFiles="@(JQueryFiles->'wwwroot\lib\jquery\dist\%(Filename)%(Extension)')" />
+	  <Copy SourceFiles="@(JQueryFiles)" DestinationFiles="@(JQueryFiles->'wwwroot\lib\jquery\dist\%(Filename)%(Extension)')" />
   </Target>
 </Project>

@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using SistemasAnaliticos.Auxiliares;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
@@ -11,6 +13,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IConstanciaService, ConstanciaService>();
 builder.Services.AddScoped<IFechaLargaService, FechaLargaService>();
+builder.Services.AddScoped<IRolPermisoService, RolPermisoService>();
+
+builder.Services.AddScoped<IAuthorizationHandler, PermisoHandler>();
+builder.Services.AddAuthorization(options =>
+{
+    foreach (var permiso in PermisosSistema.Todos)
+    {
+        options.AddPolicy(permiso, policy =>
+            policy.Requirements.Add(new PermisoRequirement(permiso)));
+    }
+});
+
 
 // Base de Datos a Usar
 builder.Services.AddDbContext<DBContext>(o =>

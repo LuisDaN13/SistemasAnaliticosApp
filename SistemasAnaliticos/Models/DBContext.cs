@@ -10,7 +10,10 @@ namespace SistemasAnaliticos.Models
     {
         public DBContext(DbContextOptions<DBContext> options) : base(options) { }
 
+        public DbSet<RolPermiso> RolPermisos { get; set; }
+
         public DbSet<UsuarioSesion> UsuarioSesion { get; set; }
+
         public DbSet<Permiso> Permiso { get; set; }
         public DbSet<Constancia> Constancia { get; set; }
         public DbSet<Beneficio> Beneficio { get; set; }
@@ -67,6 +70,20 @@ namespace SistemasAnaliticos.Models
             .HasForeignKey(d => d.idViatico)
             .OnDelete(DeleteBehavior.Cascade); // si se borra la liquidación, se borran los detalles
 
+            builder.Entity<RolPermiso>(entity =>
+            {
+                entity.HasKey(rp => rp.Id);
+
+                entity.Property(rp => rp.Clave)
+                      .IsRequired()
+                      .HasMaxLength(100);
+
+                entity.Property(rp => rp.RolId)
+                      .IsRequired();
+
+                entity.HasIndex(rp => new { rp.RolId, rp.Clave })
+                      .IsUnique();
+            });
         }
     }
 }

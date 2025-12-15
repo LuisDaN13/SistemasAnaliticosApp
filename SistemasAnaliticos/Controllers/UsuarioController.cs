@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SistemasAnaliticos.ViewModels;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
+using SistemasAnaliticos.ViewModels;
 using System.Runtime.InteropServices;
 using static SistemasAnaliticos.Models.codigoFotos;
 
@@ -22,32 +23,17 @@ namespace SistemasAnaliticos.Controllers
             _context = context;
         }
 
-        // -------------------------------------------------------------------------------------------------------------------------------
-        // INDEX = PRESENTAR A LOS EMPLEADOS CON CARDS PARA SCINICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
-        public async Task<ActionResult> Index()
-        {
-            var cards = await _context.Users
-                .AsNoTracking()
-                .OrderByDescending(x => x.primerNombre)
-                .Select(x => new CardsViewModel
-                {
-                    Id = x.Id,
-                    Nombre = x.primerNombre + " " + x.primerApellido + " " + x.segundoApellido,
-                    Puesto = x.puesto,
-                    Departamento = x.departamento,
-                    CorreoEmp = x.correoEmpresa,
-                    TelefonoEmp = x.celularOficina,
-                    CorreoPerso = x.correoPersonal,
-                    TelefonoPerso = x.celularPersonal,
-                    Estado = x.estado,
-                    Foto = x.foto
-                })
-                .ToListAsync();
-            return View(cards);
-        }
 
         // -------------------------------------------------------------------------------------------------------------------------------
-        // LOGIN = INICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
+        // LOG OUT
+        public async Task<IActionResult> LogOut()
+        {
+            await signInManager.SignOutAsync();
+            HttpContext.Session.Clear(); // Limpiar la sesión
+            return RedirectToAction("Login", "Usuario");
+        }
+
+        // LOG IN
         [HttpGet]
         public ActionResult Login()
         {
@@ -126,8 +112,35 @@ namespace SistemasAnaliticos.Controllers
             return View(model);
         }
 
+
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // INDEX = PRESENTAR A LOS EMPLEADOS CON CARDS PARA SCINICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
+        [Authorize(Policy = "Usuarios.Ver")]
+        public async Task<ActionResult> Index()
+        {
+            var cards = await _context.Users
+                .AsNoTracking()
+                .OrderByDescending(x => x.primerNombre)
+                .Select(x => new CardsViewModel
+                {
+                    Id = x.Id,
+                    Nombre = x.primerNombre + " " + x.primerApellido + " " + x.segundoApellido,
+                    Puesto = x.puesto,
+                    Departamento = x.departamento,
+                    CorreoEmp = x.correoEmpresa,
+                    TelefonoEmp = x.celularOficina,
+                    CorreoPerso = x.correoPersonal,
+                    TelefonoPerso = x.celularPersonal,
+                    Estado = x.estado,
+                    Foto = x.foto
+                })
+                .ToListAsync();
+            return View(cards);
+        }
+
         // -------------------------------------------------------------------------------------------------------------------------------
         // DETAILS = VER MÁS INFORMACIÓN DEL EMPLEADO
+        [Authorize(Policy = "Usuarios.Detalles")]
         public async Task<ActionResult> Details(string id)
         {
             var details = await _context.Users
@@ -141,6 +154,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // CREATE = REGISTRAR EMPLEADO CON FORMULARIO Y TODO
+        [Authorize(Policy = "Usuarios.Crear")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Usuario model)
@@ -225,6 +239,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // EDIT = MODIFICAR INFORMACIÓN DEL EMPLEADO
+        [Authorize(Policy = "Usuarios.Editar")]
         public async Task<ActionResult> Edit(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -244,6 +259,7 @@ namespace SistemasAnaliticos.Controllers
             return View(usuario);
         }
 
+        [Authorize(Policy = "Usuarios.Editar")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(string id, Usuario model)
@@ -336,6 +352,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INACTIVAR = CAMBIO DE ESTADO DEL EMPLEADO (ACTIVO / INACTIVO)
+        [Authorize(Policy = "Usuarios.Inactivar")]
         [HttpPost("Usuario/Inactivar/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Inactivar(string id)
@@ -357,15 +374,6 @@ namespace SistemasAnaliticos.Controllers
             {
                 return Json(new { success = false, message = ex.Message });
             }
-        }
-
-        // -------------------------------------------------------------------------------------------------------------------------------
-        // LOG OUT
-        public async Task<IActionResult> LogOut()
-        {
-            await signInManager.SignOutAsync();
-            HttpContext.Session.Clear(); // Limpiar la sesión
-            return RedirectToAction("Login", "Usuario");
         }
     }
 }

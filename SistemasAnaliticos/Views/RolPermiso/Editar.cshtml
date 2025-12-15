@@ -1,0 +1,510 @@
+﻿@model SistemasAnaliticos.ViewModels.RolViewModel
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .btn-custom-primary {
+            background-color: #012473;
+            border-color: #012473;
+            color: white;
+        }
+
+            .btn-custom-primary:hover {
+                background-color: #013599;
+                border-color: #013599;
+                color: white;
+            }
+
+        .header-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background-color: white;
+        }
+
+        /* Estilos para checkboxes modernos */
+        .form-check-input:checked {
+            background-color: #012473;
+            border-color: #012473;
+        }
+
+        .form-check-input:focus {
+            border-color: #012473;
+            box-shadow: 0 0 0 0.25rem rgba(1, 36, 115, 0.25);
+        }
+
+        /* Estilos para la tabla de permisos por módulos */
+        .table-modulos {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+
+            .table-modulos th {
+                background-color: var(--primary-color);
+                color: white;
+                padding: 16px 12px;
+                text-align: center;
+                font-weight: 600;
+                border: 1px solid #dee2e6;
+                vertical-align: middle;
+            }
+
+            .table-modulos td {
+                padding: 12px;
+                border: 1px solid #e9ecef;
+                vertical-align: middle;
+                min-width: 120px;
+            }
+
+            .table-modulos .modulo-header {
+                background-color: #f8f9fa;
+                color: #495057;
+                font-weight: 600;
+                text-align: left;
+                width: 200px;
+            }
+
+            .table-modulos tr:hover {
+                background-color: #f8f9fa;
+            }
+
+        /* Estilo para el contenedor de permisos */
+        .permisos-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        /* Switch moderno */
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+            cursor: pointer;
+        }
+
+        /* Checkbox en celda */
+        .permiso-cell {
+            text-align: center;
+        }
+
+        .permiso-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        /* Scroll horizontal para tabla */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Estilos para los checkboxes individuales */
+        .form-check {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        /* Estilo para encabezados fijos */
+        .table-modulos thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Estilo para celdas vacías */
+        .empty-cell {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+        <!-- Header -->
+        <div class="header-card p-4 mb-4 mt-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 fw-bold text-gray-900 mb-1">
+                        <i class="fas fa-key me-2 text-primary"></i>
+                        Gestión de Permisos
+                    </h1>
+                    <p class="text-muted mb-0">
+                        <span class="badge bg-primary bg-opacity-10 text-primary">
+                            Rol: <strong>@Model.nombre</strong>
+                        </span>
+                        <span class="ms-2">
+                            <i class="fas fa-info-circle text-muted"></i>
+                            Selecciona los permisos para este rol por módulo
+                        </span>
+                    </p>
+                </div>
+                <a href="@Url.Action("Index", "Rol")" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Volver
+                </a>
+            </div>
+        </div>
+
+        <!-- Formulario de permisos -->
+        <div class="permisos-container">
+            <form asp-action="Guardar" method="post" class="p-0">
+                <input type="hidden" asp-for="Id" />
+
+                <!-- Header de la tabla -->
+                <div class="border-bottom">
+                    <div class="d-flex justify-content-between align-items-center p-4">
+                        <div>
+                            <h4 class="mb-0">Permisos por Módulo</h4>
+                            <small class="text-muted">Selecciona los permisos para cada módulo</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="selectAll">
+                                <label class="form-check-label" for="selectAll">
+                                    Seleccionar todos
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-custom-primary text-white">
+                                <i class="fas fa-save me-2"></i>
+                                Guardar permisos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de permisos por módulos -->
+                <div class="table-responsive">
+                    <table class="table table-modulos">
+                        <thead>
+                            <tr>
+                                <th class="modulo-header">Acciones</th>
+                                <th>Usuarios</th>
+                                <th>Rol</th>
+                                <th>Permiso</th>
+                                <th>Constancia</th>
+                                <th>Beneficios</th>
+                                <th>Liquidación Viático</th>
+                                <th>Fotos</th>
+                                <th>Noticias</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                // Definir todas las acciones posibles
+                                var todasLasAcciones = new List<string>
+                                                        {
+                                                        "Ver",
+                                                        "Crear",
+                                                        "Detalles",
+                                                        "Editar",
+                                                        "Eliminar",
+                                                        "Inactivar",
+                                                        "CambiarEstado"
+                                                        };
+
+                                // Definir los módulos en el orden correcto
+                                var modulos = new List<string>
+                                                        {
+                                                        "Usuarios",
+                                                        "Rol",
+                                                        "Permiso",
+                                                        "Constancia",
+                                                        "Beneficio",
+                                                        "LiquidacionViatico",
+                                                        "Fotos",
+                                                        "Noticias"
+                                                        };
+
+                                // Crear diccionario de permisos por módulo y acción
+                                var permisosPorModulo = new Dictionary<string, Dictionary<string, PermisoChecksViewModel>>();
+
+                                foreach (var modulo in modulos)
+                                {
+                                    permisosPorModulo[modulo] = new Dictionary<string, SistemasAnaliticos.ViewModels.PermisoChecksViewModel>();
+                                }
+
+                                // Organizar permisos existentes
+                                foreach (var permiso in Model.Permisos)
+                                {
+                                    var partes = permiso.Clave.Split('.');
+                                    if (partes.Length == 2)
+                                    {
+                                        var modulo = partes[0];
+                                        var accion = partes[1];
+
+                                        if (permisosPorModulo.ContainsKey(modulo))
+                                        {
+                                            permisosPorModulo[modulo][accion] = permiso;
+                                        }
+                                    }
+                                }
+                            }
+
+                            @foreach (var accion in todasLasAcciones)
+                            {
+                                <tr>
+                                    <td class="modulo-header">@accion</td>
+
+                                    @foreach (var modulo in modulos)
+                                    {
+                                        <td class="permiso-cell @(!permisosPorModulo[modulo].ContainsKey(accion) ? "empty-cell" : "")">
+                                            @if (permisosPorModulo[modulo].ContainsKey(accion))
+                                            {
+                                                var permiso = permisosPorModulo[modulo][accion];
+                                                var index = Model.Permisos.IndexOf(permiso);
+                                                <div class="form-check d-flex justify-content-center">
+                                                    <input asp-for="Permisos[index].Seleccionado" class="form-check-input permiso-checkbox" />
+                                                    <input type="hidden" asp-for="Permisos[index].Clave" />
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer del formulario -->
+                <div class="border-top p-4 bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted">
+                            <i class="fas fa-exclamation-circle me-1"></i>
+                            Los cambios se aplicarán inmediatamente al guardar
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="@Url.Action("Index", "Rol")" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-custom-primary text-white">
+                                <i class="fas fa-save me-2"></i>
+                                Guardar cambios
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Resumen de selección -->
+        <div class="header-card p-4 mt-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-shield-alt text-primary fa-lg"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0" id="permisosSeleccionados">0</h5>
+                            <small class="text-muted">Permisos seleccionados</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-check-circle text-success fa-lg"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0" id="permisosTotales">@Model.Permisos.Count</h5>
+                            <small class="text-muted">Permisos disponibles</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-percentage text-info fa-lg"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0" id="porcentajeSeleccion">0%</h5>
+                            <small class="text-muted">Del total asignado</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Función para seleccionar/deseleccionar todos
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.permiso-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            actualizarResumen();
+        });
+
+        // Función para seleccionar/deseleccionar toda una columna (módulo)
+        function seleccionarModulo(moduloIndex) {
+            const table = document.querySelector('.table-modulos');
+            const rows = table.querySelectorAll('tbody tr');
+
+            // Determinar si todos los checkboxes de esta columna están seleccionados
+            let todosSeleccionados = true;
+            let alMenosUnoSeleccionado = false;
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > moduloIndex) {
+                    const checkbox = cells[moduloIndex].querySelector('.permiso-checkbox');
+                    if (checkbox) {
+                        if (!checkbox.checked) todosSeleccionados = false;
+                        if (checkbox.checked) alMenosUnoSeleccionado = true;
+                    }
+                }
+            });
+
+            // Si todos están seleccionados, deseleccionar todos
+            // Si no, seleccionar todos
+            const nuevoEstado = !(todosSeleccionados && alMenosUnoSeleccionado);
+
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > moduloIndex) {
+                    const checkbox = cells[moduloIndex].querySelector('.permiso-checkbox');
+                    if (checkbox) {
+                        checkbox.checked = nuevoEstado;
+                    }
+                }
+            });
+
+            actualizarResumen();
+        }
+
+        // Función para seleccionar/deseleccionar toda una fila (acción)
+        function seleccionarAccion(filaIndex) {
+            const table = document.querySelector('.table-modulos');
+            const fila = table.querySelectorAll('tbody tr')[filaIndex];
+            const checkboxes = fila.querySelectorAll('.permiso-checkbox');
+
+            if (checkboxes.length > 0) {
+                // Determinar si todos están seleccionados
+                const todosSeleccionados = Array.from(checkboxes).every(cb => cb.checked);
+                const nuevoEstado = !todosSeleccionados;
+
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = nuevoEstado;
+                });
+
+                actualizarResumen();
+            }
+        }
+
+        // Actualizar resumen de selección
+        function actualizarResumen() {
+            const checkboxes = document.querySelectorAll('.permiso-checkbox');
+            const seleccionados = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const total = checkboxes.length;
+            const porcentaje = total > 0 ? Math.round((seleccionados / total) * 100) : 0;
+
+            document.getElementById('permisosSeleccionados').textContent = seleccionados;
+            document.getElementById('permisosTotales').textContent = total;
+            document.getElementById('porcentajeSeleccion').textContent = porcentaje + '%';
+
+            // Actualizar el checkbox "Seleccionar todos"
+            document.getElementById('selectAll').checked = seleccionados === total && total > 0;
+            document.getElementById('selectAll').indeterminate = seleccionados > 0 && seleccionados < total;
+        }
+
+        // Inicializar eventos en los checkboxes
+        document.querySelectorAll('.permiso-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', actualizarResumen);
+        });
+
+        // Inicializar resumen al cargar la página
+        document.addEventListener('DOMContentLoaded', actualizarResumen);
+
+        // SweetAlert para confirmación de guardado
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const seleccionados = Array.from(document.querySelectorAll('.permiso-checkbox:checked')).length;
+            if (seleccionados === 0) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: '¿Continuar sin permisos?',
+                    text: 'No has seleccionado ningún permiso. ¿Deseas continuar?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, continuar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.submit();
+                    }
+                });
+            }
+        });
+
+        // Mensajes de respuesta del servidor
+        @if (TempData["SuccessMessage"] != null)
+        {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: '@Html.Raw(TempData["SuccessMessage"])',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    </text>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+                    <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: '@Html.Raw(TempData["ErrorMessage"])'
+                    });
+                    </text>
+        }
+
+        // Agregar eventos de clic a los encabezados de módulo para seleccionar/deseleccionar toda la columna
+        document.querySelectorAll('.table-modulos thead th:not(.modulo-header)').forEach((th, index) => {
+            th.style.cursor = 'pointer';
+            th.title = 'Haz clic para seleccionar/deseleccionar todo el módulo';
+            th.addEventListener('click', (e) => {
+                if (e.target === th) {
+                    seleccionarModulo(index);
+                }
+            });
+        });
+
+        // Agregar eventos de clic a los encabezados de fila (acciones) para seleccionar/deseleccionar toda la fila
+        document.querySelectorAll('.table-modulos tbody .modulo-header').forEach((td, index) => {
+            td.style.cursor = 'pointer';
+            td.title = 'Haz clic para seleccionar/deseleccionar esta acción en todos los módulos';
+            td.addEventListener('click', (e) => {
+                if (e.target === td) {
+                    seleccionarAccion(index);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
