@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX
+        [Authorize(Policy = "Beneficio.Ver")]
         public async Task<IActionResult> VerBeneficios(int page = 1)
         {
             int pageSize = 3;
@@ -542,6 +544,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // VER DETALLES DE PERMISOS
+        [Authorize(Policy = "Beneficio.Detalles")]
         [HttpGet]
         [Route("Beneficio/Details/{id}")]
         public async Task<ActionResult> Details(long id)
@@ -565,6 +568,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // CAMBIOS DE ESTADOS MASIVOS
+        [Authorize(Policy = "Beneficio.CambiarEstado")]
         [HttpPost]
         public async Task<IActionResult> CambiarEstadoMasivo([FromBody] EstadoMasivoViewModel model)
         {
@@ -584,6 +588,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // HACER REGISTROS DE BENEFICIOS
+        [Authorize(Policy = "Beneficio.Crear")]
         public async Task<IActionResult> Create(Beneficio model)
         {
             // Detectar sistema operativo y usar el ID de zona horaria adecuado

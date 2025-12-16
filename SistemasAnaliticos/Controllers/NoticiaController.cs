@@ -1,11 +1,9 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
-using SistemasAnaliticos.Services;
 using SistemasAnaliticos.ViewModels;
 using System.Runtime.InteropServices;
 using static SistemasAnaliticos.Models.codigoFotos;
@@ -25,6 +23,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX
+        [Authorize(Policy = "Noticia.Ver")]
         public async Task<ActionResult> Index()
         {
             var fotos = await _context.Noticias
@@ -46,6 +45,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // VER DETALLES DE NOTICIAS
+        [Authorize(Policy = "Noticia.Detalles")]
         public async Task<ActionResult> Details(long id)
         {
             if (id == null)
@@ -67,6 +67,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // CREAR REGISTRO DE NOTICIAS
+        [Authorize(Policy = "Noticia.Crear")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Noticias model)
@@ -111,6 +112,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INACTIVAR NOTICIAS
+        [Authorize(Policy = "Noticia.Inactivar")]
         [HttpPost("Noticia/Inactivar/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Inactivar(long id)
@@ -138,7 +140,8 @@ namespace SistemasAnaliticos.Controllers
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
-        // EIMI NOTICIAS
+        // ELIMINAR NOTICIAS
+        [Authorize(Policy = "Noticia.Eliminar")]
         [HttpPost("Noticia/Delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(long id)

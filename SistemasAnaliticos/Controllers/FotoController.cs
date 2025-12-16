@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SistemasAnaliticos.ViewModels;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
+using SistemasAnaliticos.ViewModels;
 
 namespace SistemasAnaliticos.Controllers
 {
@@ -17,6 +18,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX
+        [Authorize(Policy = "Foto.Ver")]
         public async Task<ActionResult> Index()
         {
             var fotos = await _context.Fotos
@@ -34,6 +36,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // HACER REGISTRO DE FOTOS
+        [Authorize(Policy = "Foto.Crear")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(IFormFile foto)
@@ -92,6 +95,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // ELIMINAR FOTOS
+        [Authorize(Policy = "Foto.Eliminar")]
         [HttpPost("Foto/Delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(long id)
@@ -120,6 +124,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INACTIVAR FOTOS
+        [Authorize(Policy = "Foto.Inactivar")]
         [HttpPost("Foto/Inactivar/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Inactivar(long id)

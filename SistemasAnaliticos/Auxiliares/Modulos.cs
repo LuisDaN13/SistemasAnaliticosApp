@@ -8,7 +8,7 @@
         public const string Constancia = "Constancia";
         public const string Beneficio = "Beneficio";
         public const string LiquidacionViatico = "LiquidacionViatico";
-        public const string Fotos = "Fotos";
-        public const string Noticias = "Noticias";
+        public const string Foto = "Foto";
+        public const string Noticia = "Noticia";
     }
 }

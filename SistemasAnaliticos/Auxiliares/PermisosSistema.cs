@@ -23,6 +23,7 @@
             ClavesPermiso.Crear(Modulos.Permiso, Acciones.Crear),
             ClavesPermiso.Crear(Modulos.Permiso, Acciones.Editar),
             ClavesPermiso.Crear(Modulos.Permiso, Acciones.CambiarEstado),
+            ClavesPermiso.Crear(Modulos.Permiso, Acciones.Descargar),
 
             // Constancia
             ClavesPermiso.Crear(Modulos.Constancia, Acciones.Ver),
@@ -30,6 +31,7 @@
             ClavesPermiso.Crear(Modulos.Constancia, Acciones.Crear),
             ClavesPermiso.Crear(Modulos.Constancia, Acciones.Editar),
             ClavesPermiso.Crear(Modulos.Constancia, Acciones.CambiarEstado),
+            ClavesPermiso.Crear(Modulos.Constancia, Acciones.Descargar),
 
             // Beneficio
             ClavesPermiso.Crear(Modulos.Beneficio, Acciones.Ver),
@@ -42,21 +44,20 @@
             ClavesPermiso.Crear(Modulos.LiquidacionViatico, Acciones.Ver),
             ClavesPermiso.Crear(Modulos.LiquidacionViatico, Acciones.Detalles),
             ClavesPermiso.Crear(Modulos.LiquidacionViatico, Acciones.Crear),
-            ClavesPermiso.Crear(Modulos.LiquidacionViatico, Acciones.Editar),
             ClavesPermiso.Crear(Modulos.LiquidacionViatico, Acciones.CambiarEstado),
 
-            // Fotos
-            ClavesPermiso.Crear(Modulos.Fotos, Acciones.Ver),
-            ClavesPermiso.Crear(Modulos.Fotos, Acciones.Crear),
-            ClavesPermiso.Crear(Modulos.Fotos, Acciones.Eliminar),
-            ClavesPermiso.Crear(Modulos.Fotos, Acciones.Inactivar),
+            // Foto
+            ClavesPermiso.Crear(Modulos.Foto, Acciones.Ver),
+            ClavesPermiso.Crear(Modulos.Foto, Acciones.Crear),
+            ClavesPermiso.Crear(Modulos.Foto, Acciones.Eliminar),
+            ClavesPermiso.Crear(Modulos.Foto, Acciones.Inactivar),
 
             // Noticias
-            ClavesPermiso.Crear(Modulos.Noticias, Acciones.Ver),
-            ClavesPermiso.Crear(Modulos.Noticias, Acciones.Crear),
-            ClavesPermiso.Crear(Modulos.Noticias, Acciones.Detalles),
-            ClavesPermiso.Crear(Modulos.Noticias, Acciones.Eliminar),
-            ClavesPermiso.Crear(Modulos.Noticias, Acciones.Inactivar),
+            ClavesPermiso.Crear(Modulos.Noticia, Acciones.Ver),
+            ClavesPermiso.Crear(Modulos.Noticia, Acciones.Crear),
+            ClavesPermiso.Crear(Modulos.Noticia, Acciones.Detalles),
+            ClavesPermiso.Crear(Modulos.Noticia, Acciones.Eliminar),
+            ClavesPermiso.Crear(Modulos.Noticia, Acciones.Inactivar),
         };
     }
 }

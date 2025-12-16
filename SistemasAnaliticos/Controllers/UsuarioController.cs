@@ -14,18 +14,20 @@ namespace SistemasAnaliticos.Controllers
     {
         private readonly SignInManager<Usuario> signInManager;
         private readonly UserManager<Usuario> userManager;
+        private readonly RoleManager<Rol> roleManager;
         private readonly DBContext _context;
 
-        public UsuarioController(SignInManager<Usuario> signInManager, UserManager<Usuario> userManager, DBContext context)
+        public UsuarioController(SignInManager<Usuario> signInManager, UserManager<Usuario> userManager, RoleManager<Rol> roleManager, DBContext context)
         {
             this.signInManager = signInManager;
             this.userManager = userManager;
+            this.roleManager = roleManager;
             _context = context;
         }
 
 
         // -------------------------------------------------------------------------------------------------------------------------------
-        // LOG OUT
+        // SESSION MANAGEMENT
         public async Task<IActionResult> LogOut()
         {
             await signInManager.SignOutAsync();
@@ -110,6 +112,13 @@ namespace SistemasAnaliticos.Controllers
                 }
             }
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult AccesoDenegado()
+        {
+            Response.StatusCode = StatusCodes.Status403Forbidden;
+            return View();
         }
 
 
@@ -220,6 +229,8 @@ namespace SistemasAnaliticos.Controllers
                 var resultado = await userManager.CreateAsync(nuevo, pass);
                 if (resultado.Succeeded)
                 {
+                    await userManager.AddToRoleAsync(nuevo, "Empleado Normal");
+
                     TempData["SuccessMessage"] = "El empleado se creó correctamente.";
                     return RedirectToAction(nameof(Index));
                 }

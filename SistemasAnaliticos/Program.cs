@@ -25,7 +25,6 @@ builder.Services.AddAuthorization(options =>
     }
 });
 
-
 // Base de Datos a Usar
 builder.Services.AddDbContext<DBContext>(o =>
     o.UseSqlServer(builder.Configuration.GetConnectionString("pruebas")));
@@ -42,6 +41,12 @@ builder.Services.AddIdentity<Usuario, Rol>(o =>
 })
     .AddEntityFrameworkStores<DBContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Usuario/Login";
+    options.AccessDeniedPath = "/Usuario/AccesoDenegado";
+});
 
 // Servicio de Sesiones
 builder.Services.AddDistributedMemoryCache();

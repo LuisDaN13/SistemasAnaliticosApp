@@ -165,11 +165,11 @@
 
                             <!-- CHECKS DE TIPOS DE PERMISOS -->
                             <div class="mb-3 pb-1 border-bottom">
-                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#typeFilter" aria-expanded="true" aria-controls="typeFilter">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#typeFilter" aria-expanded="false" aria-controls="typeFilter">
                                     Tipo de Permiso
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
-                                <div class="collapse show mt-3" id="typeFilter">
+                                <div class="collapse mt-3" id="typeFilter">
                                     <div class="d-flex flex-column gap-2">
                                         <div class="form-check">
                                             <input class="form-check-input filter-type" type="checkbox" value="Cita Médica" id="type-medical">
@@ -212,11 +212,11 @@
 
                             <!-- CHECKS DE ESTADOS DE PERMISOS -->
                             <div class="mb-3 pb-1 border-bottom">
-                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#statusFilter" aria-expanded="true" aria-controls="statusFilter">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#statusFilter" aria-expanded="false" aria-controls="statusFilter">
                                     Estado
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
-                                <div class="collapse show mt-3" id="statusFilter">
+                                <div class="collapse mt-3" id="statusFilter">
                                     <div class="d-flex flex-column gap-2">
                                         <div class="form-check">
                                             <input class="form-check-input filter-status" type="checkbox" value="Creada" id="status-creada">
@@ -333,15 +333,38 @@
                                 </ul>
                             </div>
 
+                            <!-- FILTRO POR NOMBRE -->
+                            <div class="mb-3 pb-1 border-bottom">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#nameFilter" aria-expanded="true">
+                                    Nombre del Empleado
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+
+                                <div class="collapse show mt-3" id="nameFilter">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                        <input type="text"
+                                               class="form-control border-start-0 filter-name"
+                                               id="filter-name-input"
+                                               placeholder="Escribir nombre..."
+                                               aria-label="Buscar por nombre">
+                                    </div>
+                                    <div class="form-text mt-1">Escribe parte del nombre para buscar</div>
+                                </div>
+                            </div>
+
                             <!-- FILTRO POR FECHA -->
                             <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#dateFilter" aria-expanded="true">
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#dateFilter" aria-expanded="false">
                                     Fecha
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
 
-                                <div class="collapse show mt-3" id="dateFilter">
+                                <div class="collapse mt-3" id="dateFilter">
 
                                     <!-- ACTIVAR RANGO -->
                                     <div class="form-check form-switch mb-3">

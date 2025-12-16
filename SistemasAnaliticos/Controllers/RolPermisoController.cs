@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Auxiliares;
 using SistemasAnaliticos.Models;
@@ -18,6 +19,7 @@ namespace SistemasAnaliticos.Controllers
             _rolPermisoService = rolPermisoService;
         }
 
+        [Authorize(Policy = "Rol.Crear")]
         [HttpGet]
         public async Task<IActionResult> Editar(string id)
         {
@@ -54,6 +56,7 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
+        [Authorize(Policy = "Rol.Crear")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Guardar(RolViewModel model)

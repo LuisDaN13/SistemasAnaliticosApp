@@ -1,0 +1,358 @@
+﻿
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        .fullscreen-center {
+            min-height: calc(100vh - 125px); /* ajusta según tu layout */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 90px 0 90px;
+        }
+
+        .access-denied-container {
+            margin: auto;
+            width: 100%;
+            max-width: 1800px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        .header {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px 25px 0px 30px;
+            color: white;
+            text-align: center;
+        }
+
+            .header h1 {
+                font-size: 2.2rem;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+                margin-bottom: 5px;
+            }
+
+            .header p {
+                font-size: 0.9rem;
+                opacity: 0.9;
+                font-weight: 300;
+            }
+
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10PX 40px 0 40px;
+        }
+
+        .animation-section {
+            flex: 0;
+            min-width: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .message-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+            .message-section h2 {
+                color: #333;
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+                font-weight: 600;
+            }
+
+            .message-section p {
+                color: #555;
+                line-height: 1.4;
+                margin-bottom: 5px;
+                font-size: 1.05rem;
+            }
+
+        .reasons-list {
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            padding: 20px 20px 0 20px;
+            margin: 20px 0;
+            border-left: 4px solid rgba(0, 0, 0, 0.5);
+        }
+
+            .reasons-list h3 {
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 1.1rem;
+            }
+
+            .reasons-list ul {
+                list-style-type: none;
+                padding-left: 5px;
+            }
+
+            .reasons-list li {
+                margin-bottom: 8px;
+                color: #666;
+                position: relative;
+                padding-left: 25px;
+            }
+
+                .reasons-list li:before {
+                    content: "✗";
+                    color: #ff416c;
+                    font-weight: bold;
+                    position: absolute;
+                    left: 0;
+                }
+
+        .actions {
+            text-align: center;
+            padding: 0 60px 0 60px;
+            font-size: 0.95rem;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #012473;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 100%;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            }
+
+        .btn i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 0.95rem;
+        }
+
+            .footer a {
+                color: #4a6cf7;
+                text-decoration: none;
+            }
+
+                .footer a:hover {
+                    text-decoration: underline;
+                }
+
+        @@media (max-width: 768px) {
+            .content
+
+        {
+            flex-direction: column;
+            padding: 25px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+        }
+
+        .animation-section {
+            order: -1;
+        }
+
+        .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        }
+
+        /* Efecto de pulso para el ícono de advertencia */
+        @@keyframes pulse {
+            0%
+
+        {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+
+        }
+
+        .warning-icon {
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 1));
+        }
+    </style>
+</head>
+<main>
+    <div class="fullscreen-center">
+        <div class="access-denied-container">
+            <div class="header">
+                <h1><i class="fas fa-exclamation-triangle"></i> Acceso Denegado</h1>
+                <p>
+                    No tienes permiso para acceder a este recurso <strong>403 Forbidden</strong>
+                </p>
+            </div>
+
+            <div class="content">
+                <div class="animation-section">
+                    <!-- Animación Lottie de acceso denegado -->
+                    <div class="warning-icon">
+                        <lottie-player src='/lottie/Bouncy Fail.json'
+                                        background="transparent"
+                                        speed="0.5"
+                                        style="width: 200px; height: 200px;"
+                                        loop
+                                        autoplay>
+                        </lottie-player>
+                    </div>
+                </div>
+
+                <div class="message-section">
+                    <h2>Lo sentimos, no puedes acceder a esta página</h2>
+
+                    <p>Tu cuenta no tiene los permisos necesarios para ver este contenido. Esto puede deberse a varias razones:</p>
+
+                    <div class="reasons-list">
+                        <h3>Posibles causas:</h3>
+                        <ul>
+                            <li>Tu cuenta no tiene el rol necesario para acceder</li>
+                            <li>El recurso ha sido restringido temporalmente</li>
+                            <li>Necesitas iniciar sesión con una cuenta diferente</li>
+                            <li>El contenido ha sido movido o eliminado</li>
+                            <li>Restricciones de seguridad de la organización</li>
+                        </ul>
+                    </div>
+
+                    <p>Si crees que esto es un error, por favor contacta al administrador del sistema</p>
+                </div>
+            </div>
+            <div class="actions">
+                <a href="javascript:history.back()" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Volver al Inicio
+                </a>
+            </div>
+            <div class="footer">
+                <p>
+                    Sistemas Analíticos S.A. |
+                    <a href="https://www.sistemasanaliticos.cr/privacy">Política de Privacidad</a>
+                </p>
+            </div>
+        </div>
+        <audio autoplay loop>
+            <source src='/mp3/acceso denegado.mp3' type="audio/mpeg" />
+            Tu navegador no soporta audio HTML5.
+        </audio>
+        <script>
+            // Añadir interacción a la animación
+            document.addEventListener('DOMContentLoaded', function() {
+                const lottiePlayer = document.querySelector('lottie-player');
+
+                // Cambiar velocidad de animación al pasar el ratón
+                lottiePlayer.addEventListener('mouseover', () => {
+                    lottiePlayer.setSpeed(0.2);
+                });
+
+                lottiePlayer.addEventListener('mouseout', () => {
+                    lottiePlayer.setSpeed(0.5);
+                });
+
+                // Efecto de clic en los botones
+                const buttons = document.querySelectorAll('.btn');
+                buttons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        // Pequeña animación de clic
+                        this.style.transform = 'scale(0.98)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 150);
+
+                        // Si es el botón de "Volver al inicio", añadir efecto especial
+                        if (this.textContent.includes('Volver al Inicio')) {
+                            const pulseEffect = document.createElement('div');
+                            pulseEffect.style.position = 'fixed';
+                            pulseEffect.style.width = '20px';
+                            pulseEffect.style.height = '20px';
+                            pulseEffect.style.borderRadius = '50%';
+                            pulseEffect.style.background = 'rgba(74, 108, 247, 0.7)';
+                            pulseEffect.style.left = e.clientX + 'px';
+                            pulseEffect.style.top = e.clientY + 'px';
+                            pulseEffect.style.pointerEvents = 'none';
+                            pulseEffect.style.zIndex = '1000';
+                            pulseEffect.style.animation = 'ripple 0.6s linear';
+
+                            document.body.appendChild(pulseEffect);
+
+                            setTimeout(() => {
+                                pulseEffect.remove();
+                            }, 600);
+                        }
+                    });
+                });
+
+                // Añadir estilo para el efecto de onda
+                const style = document.createElement('style');
+                style.textContent = `
+                    @@keyframes ripple {
+                        0% { transform: scale(1); opacity: 1; }
+                        100% { transform: scale(20); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            });
+        </script>
+    </div>
+</main>
+</html>

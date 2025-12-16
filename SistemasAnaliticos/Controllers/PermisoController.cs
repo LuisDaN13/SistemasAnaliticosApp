@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX DONDE SE VEN LOS PERMISOS
+        [Authorize(Policy = "Permiso.Ver")]
         public async Task<IActionResult> VerPermisos(int page = 1)
         {
             int pageSize = 3;
@@ -609,6 +611,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // VER DETALLES DE PERMISOS
+        [Authorize(Policy = "Permiso.Detalles")]
         [HttpGet]
         [Route("Permiso/Details/{id}")]
         public async Task<ActionResult> Details(long id)
@@ -632,6 +635,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // DESCARGAR ADJUNTO DE PERMISO
+        [Authorize(Policy = "Permiso.Descargar")]
         [HttpGet]
         [Route("Permiso/descargar-adjunto/{id}")]
         public async Task<IActionResult> DescargarAdjunto(long id)
@@ -655,6 +659,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // CAMBIOS DE ESTADOS MASIVOS
+        [Authorize(Policy = "Permiso.CambiarEstado")]
         [HttpPost]
         public async Task<IActionResult> CambiarEstadoMasivo([FromBody] EstadoMasivoViewModel model)
         {
@@ -674,6 +679,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // HACER REGISTRO DE UN NUEVO PERMISO
+        [Authorize(Policy = "Permiso.Crear")]
         [HttpPost]
         public async Task<IActionResult> Create(Permiso model)
         {

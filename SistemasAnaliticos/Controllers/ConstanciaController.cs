@@ -1,6 +1,7 @@
 ﻿using ClosedXML.Excel;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX
+        [Authorize(Policy = "Constancia.Ver")]
         public async Task<IActionResult> VerConstancias(int page = 1)
         {
             int pageSize = 3;
@@ -480,7 +482,6 @@ namespace SistemasAnaliticos.Controllers
             cell.BorderWidth = 0.5f;
             table.AddCell(cell);
         }
-
         private Font GetEstadoFont(string estado)
         {
             var baseFont = FontFactory.GetFont(FontFactory.HELVETICA, 8);
@@ -574,6 +575,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // VER DETALLES DE PERMISOS
+        [Authorize(Policy = "Constancia.Detalles")]
         [HttpGet]
         [Route("Constancia/Details/{id}")]
         public async Task<ActionResult> Details(long id)
@@ -597,6 +599,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // DESCARGAR ADJUNTO
+        [Authorize(Policy = "Constancia.Descargar")]
         [HttpGet]
         [Route("Constancia/descargar-adjunto/{id}")]
         public async Task<IActionResult> DescargarAdjunto(long id)
@@ -620,6 +623,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // PREVIUEW ADJUNTO
+        [Authorize(Policy = "Constancia.Detalles")]
         [HttpGet]
         [Route("Constancia/Preview/{id}")]
         public async Task<IActionResult> Preview(long id)
@@ -638,6 +642,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // CAMBIOS DE ESTADOS MASIVOS
+        [Authorize(Policy = "Constancia.CambiarEstado")]
         [HttpPost]
         public async Task<IActionResult> CambiarEstadoMasivo([FromBody] EstadoMasivoViewModel model)
         {
@@ -657,6 +662,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // HACER REGISTROS DE CONSTANCIAS
+        [Authorize(Policy = "Constancia.Crear")]
         public async Task<IActionResult> Create(Constancia model)
         {
             // Detectar sistema operativo y usar el ID de zona horaria adecuado
@@ -731,6 +737,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // CREAR DOCUMENTO DE CONSTANCIA SALARIAL
+        [Authorize(Policy = "Constancia.Crear")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> HacerConstanciaSalarial(long idConstancia, int salarioBruto, int deducciones, int salarioNeto)

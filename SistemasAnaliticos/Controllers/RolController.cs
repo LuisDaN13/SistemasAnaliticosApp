@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
@@ -15,7 +16,9 @@ namespace SistemasAnaliticos.Controllers
             _context = context;
         }
 
-        // GET: RolController
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // INDEX
+        [Authorize(Policy = "Rol.Ver")]
         public async Task<ActionResult> Index()
         {
             var roles = await _context.Roles
@@ -31,7 +34,9 @@ namespace SistemasAnaliticos.Controllers
             return View(roles);
         }
 
-        // POST: RolController/Create
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // Crear
+        [Authorize(Policy = "Rol.Crear")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(RolViewModel model)
@@ -49,6 +54,7 @@ namespace SistemasAnaliticos.Controllers
                 var nuevoRol = new Rol
                 {
                     Name = model.nombre.Trim(),
+                    NormalizedName = model.nombre.ToUpper(),
                     estado = true
                 };
 
@@ -83,6 +89,9 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // Eliminar Rol
+        [Authorize(Policy = "Rol.Eliminar")]
         [HttpPost("Rol/Delete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Delete(string id)
@@ -109,6 +118,9 @@ namespace SistemasAnaliticos.Controllers
             }
         }
 
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // Inactivar Rol
+        [Authorize(Policy = "Rol.Inactivar")]
         [HttpPost("Rol/Inactivar")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Inactivar(string id)

@@ -1,13 +1,13 @@
 ﻿using ClosedXML.Excel;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.ViewModels;
-using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace SistemasAnaliticos.Controllers
@@ -31,6 +31,7 @@ namespace SistemasAnaliticos.Controllers
 
         // --------------------------------------------------------------------------------------
         // CREATE DE LA CABECERA DE LA LIQUIDACION
+        [Authorize(Policy = "LiquidacionViatico.Ver")]
         [HttpGet]
         public async Task<IActionResult> VerViaticos(int page = 1)
         {
@@ -652,7 +653,6 @@ namespace SistemasAnaliticos.Controllers
             cell.BorderWidth = 0.5f;
             table.AddCell(cell);
         }
-
         private Font GetEstadoFontViaticos(string estado)
         {
             var baseFont = FontFactory.GetFont(FontFactory.HELVETICA, 8);
@@ -794,6 +794,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // CAMBIOS DE ESTADOS MASIVOS
+        [Authorize(Policy = "LiquidacionViatico.CambiarEstado")]
         [HttpPost]
         public async Task<IActionResult> CambiarEstadoMasivo([FromBody] EstadoMasivoViewModel model)
         {
@@ -814,6 +815,7 @@ namespace SistemasAnaliticos.Controllers
 
         // --------------------------------------------------------------------------------------
         // CREATE DE LA CABECERA DE LA LIQUIDACION
+        [Authorize(Policy = "LiquidacionViatico.Crear")]
         [HttpGet]
         public async Task<IActionResult> CreateViatico()
         {
@@ -847,6 +849,7 @@ namespace SistemasAnaliticos.Controllers
 
         // --------------------------------------------------------------------------------------
         // MUESTRA LA VISTA DE EDIT CON CABECERA Y DETALLES
+        [Authorize(Policy = "LiquidacionViatico.Crear")]
         [HttpGet]
         public async Task<IActionResult> EditViatico(long id)
         {
@@ -861,6 +864,7 @@ namespace SistemasAnaliticos.Controllers
 
         // --------------------------------------------------------------------------------------
         // AGREGAR DETALLE A LA LIQUIDACION
+        [Authorize(Policy = "LiquidacionViatico.Crear")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AgregarViaticoDetalle([FromForm] AgregarDetalleViaticoViewModel model)
@@ -894,6 +898,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // VER DETALLES DE VIÁTICOS
+        [Authorize(Policy = "LiquidacionViatico.Detalles")]
         [HttpGet]
         [Route("Liquidacion/DetailsViatico/{id}")]
         public async Task<ActionResult> DetailsViatico(long id)
@@ -947,6 +952,7 @@ namespace SistemasAnaliticos.Controllers
 
         // --------------------------------------------------------------------------------------
         // ELIMINAR DETALLE DENTRO DEL EDIT DE LA LIQUIDACION
+        [Authorize(Policy = "LiquidacionViatico.Crear")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EliminarDetalle(long idDetalle, long idViatico)
@@ -969,6 +975,7 @@ namespace SistemasAnaliticos.Controllers
 
         // --------------------------------------------------------------------------------------
         // Recalcula total sumando montos de los detalles
+        [Authorize(Policy = "LiquidacionViatico.Crear")]
         private async Task RecalcularTotalViatico(long idViatico)
         {
             var liqui = await _context.LiquidacionViatico
