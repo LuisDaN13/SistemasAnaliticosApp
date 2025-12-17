@@ -120,6 +120,7 @@ namespace SistemasAnaliticos.Controllers
             [FromQuery] string[] tipos,
             [FromQuery] string[] estados,
             [FromQuery] string[] departamentos,
+            [FromQuery] string nombre = null,
             [FromQuery] string fechaTipo = null,
             [FromQuery] string fechaUnica = null,
             [FromQuery] string fechaDesde = null,
@@ -151,6 +152,13 @@ namespace SistemasAnaliticos.Controllers
                 if (departamentos != null && departamentos.Length > 0)
                 {
                     query = query.Where(p => departamentos.Contains(p.departamento));
+                }
+
+                // Aplicar filtro por nombre
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    query = query.Where(p => p.nombreEmpleado != null &&
+                                           p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
                 }
 
                 // Aplicar filtros de fecha
@@ -213,6 +221,7 @@ namespace SistemasAnaliticos.Controllers
         [FromQuery] string[] tipos,
         [FromQuery] string[] estados,
         [FromQuery] string[] departamentos,
+        [FromQuery] string nombre = null,
         [FromQuery] string fechaTipo = null,
         [FromQuery] string fechaUnica = null,
         [FromQuery] string fechaDesde = null,
@@ -238,6 +247,13 @@ namespace SistemasAnaliticos.Controllers
                 if (departamentos != null && departamentos.Length > 0)
                 {
                     query = query.Where(p => departamentos.Contains(p.departamento));
+                }
+
+                // Aplicar filtro por nombre
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    query = query.Where(p => p.nombreEmpleado != null &&
+                                           p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
                 }
 
                 // Aplicar filtros de fecha
@@ -353,6 +369,7 @@ namespace SistemasAnaliticos.Controllers
         [FromQuery] string[] tipos,
         [FromQuery] string[] estados,
         [FromQuery] string[] departamentos,
+        [FromQuery] string nombre = null,
         [FromQuery] string fechaTipo = null,
         [FromQuery] string fechaUnica = null,
         [FromQuery] string fechaDesde = null,
@@ -376,6 +393,12 @@ namespace SistemasAnaliticos.Controllers
                 if (departamentos != null && departamentos.Length > 0)
                 {
                     query = query.Where(p => departamentos.Contains(p.departamento));
+                }
+
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    query = query.Where(p => p.nombreEmpleado != null &&
+                                           p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
                 }
 
                 if (!string.IsNullOrEmpty(fechaTipo))
@@ -425,14 +448,14 @@ namespace SistemasAnaliticos.Controllers
 
                 document.Open();
 
-                // Título - CORREGIDO
+                // Título
                 var tituloFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
                 var titulo = new Paragraph("REPORTE DE PERMISOS", tituloFont);
                 titulo.Alignment = Element.ALIGN_CENTER;
                 titulo.SpacingAfter = 20f;
                 document.Add(titulo);
 
-                // Fecha de generación - CORREGIDO
+                // Fecha de generación
                 var fechaFont = FontFactory.GetFont(FontFactory.HELVETICA, 8, Font.ITALIC);
                 var fechaGeneracion = new Paragraph($"Generado: {DateTime.Now:dd/MM/yyyy HH:mm:ss}", fechaFont);
                 fechaGeneracion.Alignment = Element.ALIGN_RIGHT;
@@ -444,7 +467,7 @@ namespace SistemasAnaliticos.Controllers
                 table.WidthPercentage = 100;
                 table.SetWidths(new float[] { 0.8f, 1.5f, 1.5f, 1.2f, 1.2f, 1.5f, 2f, 2f });
 
-                // Encabezados de tabla - CORREGIDO
+                // Encabezados de tabla
                 var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9);
                 AddTableCell(table, "ID", headerFont);
                 AddTableCell(table, "Empleado", headerFont);
@@ -455,7 +478,7 @@ namespace SistemasAnaliticos.Controllers
                 AddTableCell(table, "Motivo", headerFont);
                 AddTableCell(table, "Comentarios", headerFont);
 
-                // Datos - CORREGIDO
+                // Datos
                 var cellFont = FontFactory.GetFont(FontFactory.HELVETICA, 8);
                 var cellFontBold = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8);
 
@@ -481,7 +504,7 @@ namespace SistemasAnaliticos.Controllers
 
                 document.Add(table);
 
-                // Pie de página - CORREGIDO
+                // Pie de página
                 var pieFont = FontFactory.GetFont(FontFactory.HELVETICA, 9, Font.ITALIC);
                 var pie = new Paragraph($"Total de registros: {permisos.Count}", pieFont);
                 pie.Alignment = Element.ALIGN_RIGHT;

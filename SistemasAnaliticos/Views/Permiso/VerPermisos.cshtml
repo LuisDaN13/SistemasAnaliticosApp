@@ -1,6 +1,4 @@
-﻿@model SistemasAnaliticos.ViewModels.PaginacionPermisosViewModel
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
@@ -164,6 +162,7 @@
                             <h2 class="h5 card-title fw-bold text-dark mb-2">Filtrar por</h2>
 
                             <!-- CHECKS DE TIPOS DE PERMISOS -->
+
                             <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#typeFilter" aria-expanded="false" aria-controls="typeFilter">
                                     Tipo de Permiso
@@ -226,9 +225,9 @@
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input filter-status" type="checkbox" value="Aprobado" id="status-approved">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Aprobada" id="status-approved">
                                             <label class="form-check-label d-flex justify-content-between w-100" for="status-approved">
-                                                <span>Aprobado</span>
+                                                <span>Aprobada</span>
                                                 <span class="text-muted" id="count-approved">(0)</span>
                                             </label>
                                         </div>
@@ -240,9 +239,9 @@
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input filter-status" type="checkbox" value="Rechazado" id="status-rejected">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Rechazada" id="status-rejected">
                                             <label class="form-check-label d-flex justify-content-between w-100" for="status-rejected">
-                                                <span>Rechazado</span>
+                                                <span>Rechazada</span>
                                                 <span class="text-muted" id="count-rejected">(0)</span>
                                             </label>
                                         </div>
@@ -260,7 +259,7 @@
                                 <ul class="dropdown-menu w-100 px-3" aria-labelledby="dropdownDepartamento">
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Financiero Contable" id="dropdown-dp-fc">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Financiero Contable" id="dropdown-dp-fc">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-fc">
                                             <span>Financiero Contable</span>
                                             <span class="text-muted" id="dropdown-count-fc">(0)</span>
@@ -268,7 +267,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Gerencia" id="dropdown-dp-g">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Gerencia" id="dropdown-dp-g">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-g">
                                             <span>Gerencia</span>
                                             <span class="text-muted" id="dropdown-count-g">(0)</span>
@@ -276,7 +275,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Ingenieria" id="dropdown-dp-i">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Ingenieria" id="dropdown-dp-i">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-i">
                                             <span>Ingeniería</span>
                                             <span class="text-muted" id="dropdown-count-i">(0)</span>
@@ -284,7 +283,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Jefatura" id="dropdown-dp-j">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Jefatura" id="dropdown-dp-j">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-j">
                                             <span>Jefatura</span>
                                             <span class="text-muted" id="dropdown-count-j">(0)</span>
@@ -292,7 +291,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Legal" id="dropdown-dp-l">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Legal" id="dropdown-dp-l">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-l">
                                             <span>Legal</span>
                                             <span class="text-muted" id="dropdown-count-l">(0)</span>
@@ -300,7 +299,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Operaciones" id="dropdown-dp-o">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Operaciones" id="dropdown-dp-o">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-o">
                                             <span>Operaciones</span>
                                             <span class="text-muted" id="dropdown-count-o">(0)</span>
@@ -308,7 +307,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Tecnicos NCR" id="dropdown-dp-tncr">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Tecnicos NCR" id="dropdown-dp-tncr">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-tncr">
                                             <span>Técnicos NCR</span>
                                             <span class="text-muted" id="dropdown-count-tncr">(0)</span>
@@ -316,7 +315,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Tecnologias de Informacion" id="dropdown-dp-ti">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Tecnologias de Informacion" id="dropdown-dp-ti">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-ti">
                                             <span>Tecnologías de Información</span>
                                             <span class="text-muted" id="dropdown-count-ti">(0)</span>
@@ -324,8 +323,8 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Ventas" id="dropdown-dp-v">
-                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-ti">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Ventas" id="dropdown-dp-v">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-v">
                                             <span>Ventas</span>
                                             <span class="text-muted" id="dropdown-count-v">(0)</span>
                                         </label>
@@ -443,28 +442,28 @@
             // Para mensajes de error
             @if (TempData["ErrorMessagePermi"] != null)
             {
-                            <text>
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                        text: '@Html.Raw(TempData["ErrorMessagePermi"])',
-                                    confirmButtonText: 'Aceptar'
-                                });
-                            </text>
+                    <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                                text: '@Html.Raw(TempData["ErrorMessagePermi"])',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    </text>
             }
 
             // Para mensajes de éxito
             @if (TempData["SuccessMessagePermi"] != null)
             {
-                            <text>
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Éxito',
-                                        text: '@Html.Raw(TempData["SuccessMessagePermi"])',
-                                    confirmButtonText: 'Aceptar',
-                                    timer: 3000
-                                });
-                            </text>
+                    <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                                text: '@Html.Raw(TempData["SuccessMessagePermi"])',
+                            confirmButtonText: 'Aceptar',
+                            timer: 3000
+                        });
+                    </text>
             }
         });
     </script>
@@ -514,6 +513,11 @@
             filtrosActivos.departamentos.forEach(depto => {
                 params.append('departamentos', depto);
             });
+
+            // Agregar nombres
+            if (filtrosActivos.nombre) {
+                params.append('nombre', filtrosActivos.nombre);
+            }
 
             // Agregar filtros de fecha
             if (filtrosActivos.fecha.tipo) {
@@ -585,6 +589,11 @@
                 filtrosActivos.departamentos.forEach(depto => {
                     params.append('departamentos', depto);
                 });
+
+                // Agregar nombres
+                if (filtrosActivos.nombre) {
+                    params.append('nombre', filtrosActivos.nombre);
+                }
 
                 // Agregar filtros de fecha
                 if (filtrosActivos.fecha.tipo) {
@@ -698,7 +707,8 @@
         let filtrosActivos = {
             tipos: [],
             estados: [],
-            departamentos: [], // ← AGREGAR
+            departamentos: [],
+            nombre: '',
             fecha: {
                 tipo: 'single',
                 fechaUnica: null,
@@ -756,11 +766,16 @@
                 const coincideEstado = filtrosActivos.estados.length === 0 ||
                                      filtrosActivos.estados.includes(estadoFrontend);
 
-                // Filtrar por departamento - AGREGAR
+                // Filtrar por departamento
                 const coincideDepartamento = filtrosActivos.departamentos.length === 0 ||
                                            (permiso.departamento && filtrosActivos.departamentos.includes(permiso.departamento));
 
-                // Filtrar por fecha - AGREGAR
+                // Filtrar por nombre - NUEVO FILTRO
+                const coincideNombre = !filtrosActivos.nombre ||
+                                     (permiso.nombreEmpleado &&
+                                      permiso.nombreEmpleado.toLowerCase().includes(filtrosActivos.nombre.toLowerCase()));
+
+                // Filtrar por fecha
                 let coincideFecha = true;
                 if (filtrosActivos.fecha.tipo === 'single' && filtrosActivos.fecha.fechaUnica) {
                     const fechaUnica = new Date(filtrosActivos.fecha.fechaUnica);
@@ -785,7 +800,7 @@
                     coincideFecha = fechaCreacion >= desde && fechaCreacion <= hasta;
                 }
 
-                return coincideTipo && coincideEstado && coincideDepartamento && coincideFecha;
+                return coincideTipo && coincideEstado && coincideDepartamento && coincideNombre && coincideFecha;
             });
 
             return permisosFiltrados;
@@ -1108,15 +1123,27 @@
             const isRange = document.getElementById('dateRangeSwitch').checked;
 
             if (isRange) {
+                // Modo rango activado
                 filtrosActivos.fecha.tipo = 'range';
                 filtrosActivos.fecha.fechaUnica = null;
                 filtrosActivos.fecha.fechaDesde = document.getElementById('filter-date-from').value;
                 filtrosActivos.fecha.fechaHasta = document.getElementById('filter-date-to').value;
             } else {
+                // Modo fecha única
                 filtrosActivos.fecha.tipo = 'single';
                 filtrosActivos.fecha.fechaDesde = null;
                 filtrosActivos.fecha.fechaHasta = null;
                 filtrosActivos.fecha.fechaUnica = document.getElementById('filter-date-single').value;
+            }
+
+            // Validación adicional para limpiar campos no usados
+            if (!isRange) {
+                // Limpiar campos de rango si están visibles
+                document.getElementById('filter-date-from').value = '';
+                document.getElementById('filter-date-to').value = '';
+            } else {
+                // Limpiar campo de fecha única
+                document.getElementById('filter-date-single').value = '';
             }
         }
 
@@ -1132,9 +1159,47 @@
                 }
                 const permisosFiltrados = await filtrarPermisos();
                 await renderPermissionsWithFade(permisosFiltrados);
-                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
+                pagination.style.display = (filtrosActivos.tipos.length > 0 ||
+                                            filtrosActivos.estados.length > 0 ||
+                                            filtrosActivos.departamentos.length > 0 ||
+                                            filtrosActivos.nombre ||
+                                            filtrosActivos.fecha.fechaUnica ||
+                                            filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
+
+        // Empleados
+        document.getElementById('filter-name-input').addEventListener('input', debounce(async function() {
+            // Validar que this.value existe antes de usar .trim()
+            const valor = this.value || '';
+            filtrosActivos.nombre = valor.trim();
+
+            console.log('Filtrando por nombre:', filtrosActivos.nombre); // Para depurar
+
+            const permisosFiltrados = await filtrarPermisos();
+            console.log('Permisos encontrados:', permisosFiltrados.length); // Para depurar
+
+            await renderPermissionsWithFade(permisosFiltrados);
+            pagination.style.display = (filtrosActivos.tipos.length > 0 ||
+                                        filtrosActivos.estados.length > 0 ||
+                                        filtrosActivos.departamentos.length > 0 ||
+                                        filtrosActivos.nombre ||
+                                        filtrosActivos.fecha.fechaUnica ||
+                                        filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
+        }, 300));
+
+        // Función debounce para optimizar
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
 
         // Fechas
         document.querySelectorAll('.filter-date').forEach(input => {
@@ -1142,7 +1207,12 @@
                 actualizarFiltroFecha();
                 const permisosFiltrados = await filtrarPermisos();
                 await renderPermissionsWithFade(permisosFiltrados);
-                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
+                pagination.style.display = (filtrosActivos.tipos.length > 0 ||
+                                            filtrosActivos.estados.length > 0 ||
+                                            filtrosActivos.departamentos.length > 0 ||
+                                            filtrosActivos.nombre ||
+                                            filtrosActivos.fecha.fechaUnica ||
+                                            filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
 
@@ -1164,7 +1234,12 @@
                 }
                 const permisosFiltrados = await filtrarPermisos();
                 await renderPermissionsWithFade(permisosFiltrados);
-                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
+                pagination.style.display = (filtrosActivos.tipos.length > 0 ||
+                                            filtrosActivos.estados.length > 0 ||
+                                            filtrosActivos.departamentos.length > 0 ||
+                                            filtrosActivos.nombre ||
+                                            filtrosActivos.fecha.fechaUnica ||
+                                            filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
 
@@ -1177,7 +1252,12 @@
                 }
                 const permisosFiltrados = await filtrarPermisos();
                 await renderPermissionsWithFade(permisosFiltrados);
-                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
+                pagination.style.display = (filtrosActivos.tipos.length > 0 ||
+                                            filtrosActivos.estados.length > 0 ||
+                                            filtrosActivos.departamentos.length > 0 ||
+                                            filtrosActivos.nombre ||
+                                            filtrosActivos.fecha.fechaUnica ||
+                                            filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
             });
         });
 
@@ -1189,6 +1269,7 @@
             });
 
             // Limpiar campos de fecha
+            document.getElementById('filter-name-input').value = '';
             document.getElementById('filter-date-single').value = '';
             document.getElementById('filter-date-from').value = '';
             document.getElementById('filter-date-to').value = '';
@@ -1200,6 +1281,7 @@
             filtrosActivos.tipos = [];
             filtrosActivos.estados = [];
             filtrosActivos.departamentos = [];
+            filtrosActivos.nombre = '';
             filtrosActivos.fecha = {
                 tipo: 'single',
                 fechaUnica: null,
