@@ -11,20 +11,19 @@ namespace SistemasAnaliticos.Models
     {
         public DBContext(DbContextOptions<DBContext> options) : base(options) { }
 
+        // TABLAS DE BASE DE DATOS
         public DbSet<RolPermiso> RolPermisos { get; set; }
-
         public DbSet<UsuarioSesion> UsuarioSesion { get; set; }
-
         public DbSet<Permiso> Permiso { get; set; }
         public DbSet<Constancia> Constancia { get; set; }
         public DbSet<Beneficio> Beneficio { get; set; }
-
         public DbSet<Fotos> Fotos { get; set; }
         public DbSet<Noticias> Noticias { get; set; }
-
         public DbSet<LiquidacionViatico> LiquidacionViatico { get; set; }
         public DbSet<LiquidacionViaticoDetalle> LiquidacionViaticoDetalle { get; set; }
+        public DbSet<AlcanceUsuario> AlcanceUsuario { get; set; }
 
+        // REGLAS DE MODELO
         protected override void OnModelCreating(ModelBuilder builder)
         {
             // LLAMAR PRIMERO AL MÉTODO BASE
@@ -44,8 +43,8 @@ namespace SistemasAnaliticos.Models
 
             builder.Entity<UsuarioSesion>(entity =>
             {
-                entity.ToTable("UsuarioSesion"); // Nombre de tabla
-                entity.HasKey(us => us.Id); // Clave primaria
+                entity.ToTable("UsuarioSesion"); 
+                entity.HasKey(us => us.Id);
 
                 entity.Property(us => us.SessionId)
                       .IsRequired()
@@ -65,11 +64,7 @@ namespace SistemasAnaliticos.Models
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            builder.Entity<LiquidacionViatico>()
-            .HasMany(l => l.Detalles)
-            .WithOne(d => d.Liquidacion)
-            .HasForeignKey(d => d.idViatico)
-            .OnDelete(DeleteBehavior.Cascade); // si se borra la liquidación, se borran los detalles
+            builder.Entity<LiquidacionViatico>().HasMany(l => l.Detalles).WithOne(d => d.Liquidacion).HasForeignKey(d => d.idViatico).OnDelete(DeleteBehavior.Cascade); // si se borra la liquidación, se borran los detalles
 
             builder.Entity<RolPermiso>(entity =>
             {
@@ -84,6 +79,13 @@ namespace SistemasAnaliticos.Models
 
                 entity.HasIndex(rp => new { rp.RolId, rp.Clave })
                       .IsUnique();
+            });
+
+            builder.Entity<AlcanceUsuario>(entity =>
+            {
+                entity.HasKey(x => x.idAlcance);
+                entity.Property(x => x.alcance).IsRequired().HasMaxLength(50);
+                entity.HasIndex(x => x.rolId).IsUnique();
             });
         }
     }

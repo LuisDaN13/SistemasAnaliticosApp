@@ -97,6 +97,7 @@ namespace SistemasAnaliticos.Controllers
         [FromQuery] string[] tipos,
         [FromQuery] string[] estados,
         [FromQuery] string[] departamentos,
+        [FromQuery] string nombre = null,
         [FromQuery] string fechaTipo = null,
         [FromQuery] string fechaUnica = null,
         [FromQuery] string fechaDesde = null,
@@ -128,6 +129,12 @@ namespace SistemasAnaliticos.Controllers
                 if (departamentos != null && departamentos.Length > 0)
                 {
                     query = query.Where(b => departamentos.Contains(b.departamento));
+                }
+
+                // Aplicar filtro por nombre
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    query = query.Where(p => !string.IsNullOrEmpty(p.nombreEmpleado) && p.nombreEmpleado.Contains(nombre));
                 }
 
                 // Aplicar filtros de fecha
@@ -182,6 +189,7 @@ namespace SistemasAnaliticos.Controllers
         [FromQuery] string[] tipos,
         [FromQuery] string[] estados,
         [FromQuery] string[] departamentos,
+        [FromQuery] string nombre = null,
         [FromQuery] string fechaTipo = null,
         [FromQuery] string fechaUnica = null,
         [FromQuery] string fechaDesde = null,
@@ -207,6 +215,12 @@ namespace SistemasAnaliticos.Controllers
                 if (departamentos != null && departamentos.Length > 0)
                 {
                     query = query.Where(b => departamentos.Contains(b.departamento));
+                }
+
+                // Aplicar filtro por nombre
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    query = query.Where(p => p.nombreEmpleado != null && p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
                 }
 
                 // Aplicar filtros de fecha
@@ -306,6 +320,7 @@ namespace SistemasAnaliticos.Controllers
         [FromQuery] string[] tipos,
         [FromQuery] string[] estados,
         [FromQuery] string[] departamentos,
+        [FromQuery] string nombre = null,
         [FromQuery] string fechaTipo = null,
         [FromQuery] string fechaUnica = null,
         [FromQuery] string fechaDesde = null,
@@ -329,6 +344,11 @@ namespace SistemasAnaliticos.Controllers
                 if (departamentos != null && departamentos.Length > 0)
                 {
                     query = query.Where(b => departamentos.Contains(b.departamento));
+                }
+
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    query = query.Where(p => p.nombreEmpleado != null && p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
                 }
 
                 if (!string.IsNullOrEmpty(fechaTipo))

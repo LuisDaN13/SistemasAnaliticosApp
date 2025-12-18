@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IConstanciaService, ConstanciaService>();
 builder.Services.AddScoped<IFechaLargaService, FechaLargaService>();
+builder.Services.AddScoped<IAlcanceUsuarioService, AlcanceUsuarioService>();
 builder.Services.AddScoped<IRolPermisoService, RolPermisoService>();
 
 builder.Services.AddScoped<IAuthorizationHandler, PermisoHandler>();

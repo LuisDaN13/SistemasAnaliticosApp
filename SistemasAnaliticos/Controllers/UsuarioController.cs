@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
@@ -28,6 +29,31 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // SESSION MANAGEMENT
+        private async Task CargarViewBagJefes()
+        {
+            var jefes = await userManager.GetUsersInRoleAsync("Jefatura");
+
+            var lista = new List<SelectListItem>
+            {
+                new SelectListItem
+                {
+                    Text = "Seleccione un Jefe",
+                    Value = ""
+                }
+            };
+
+            foreach (var jefe in jefes)
+            {
+                lista.Add(new SelectListItem
+                {
+                    Text = jefe.nombreCompleto,
+                    Value = jefe.Id
+                });
+            }
+
+            ViewBag.Jefes = lista;
+        }
+
         public async Task<IActionResult> LogOut()
         {
             await signInManager.SignOutAsync();
@@ -35,7 +61,6 @@ namespace SistemasAnaliticos.Controllers
             return RedirectToAction("Login", "Usuario");
         }
 
-        // LOG IN
         [HttpGet]
         public ActionResult Login()
         {
@@ -124,7 +149,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX = PRESENTAR A LOS EMPLEADOS CON CARDS PARA SCINICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
-        [Authorize(Policy = "Usuarios.Ver")]
+        //[Authorize(Policy = "Usuarios.Ver")]
         public async Task<ActionResult> Index()
         {
             var cards = await _context.Users
@@ -163,7 +188,16 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // CREATE = REGISTRAR EMPLEADO CON FORMULARIO Y TODO
-        [Authorize(Policy = "Usuarios.Crear")]
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            await CargarViewBagJefes();
+
+            return PartialView("modalRegistro");
+        }
+
+
+        //[Authorize(Policy = "Usuarios.Crear")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Usuario model)
@@ -229,7 +263,7 @@ namespace SistemasAnaliticos.Controllers
                 var resultado = await userManager.CreateAsync(nuevo, pass);
                 if (resultado.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(nuevo, "Empleado Normal");
+                    await userManager.AddToRoleAsync(nuevo, "Administrador");
 
                     TempData["SuccessMessage"] = "El empleado se creó correctamente.";
                     return RedirectToAction(nameof(Index));

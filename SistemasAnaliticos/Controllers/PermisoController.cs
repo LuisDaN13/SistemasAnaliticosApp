@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
+using SistemasAnaliticos.Services;
 using SistemasAnaliticos.ViewModels;
 using System.Runtime.InteropServices;
 using static SistemasAnaliticos.Models.codigoFotos;
@@ -17,12 +18,50 @@ namespace SistemasAnaliticos.Controllers
     {
         private readonly DBContext _context;
         private readonly UserManager<Usuario> _userManager;
+        private readonly IAlcanceUsuarioService _alcanceUsuarioService;
 
-        public PermisoController(DBContext context, UserManager<Usuario> userManager)
+        public PermisoController(DBContext context, UserManager<Usuario> userManager, IAlcanceUsuarioService alcanceUsuarioService)
         {
             _context = context;
             _userManager = userManager;
+            _alcanceUsuarioService = alcanceUsuarioService;
         }
+
+
+        private async Task<IQueryable<Permiso>> AplicarAlcanceAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(user);
+
+            IQueryable<Permiso> query = _context.Permiso.AsNoTracking();
+
+            switch (alcance)
+            {
+                case "Global":
+                    // No se filtra nada
+                    break;
+
+                case "Subordinados":
+                    var subordinados = await _context.Users
+                        .Where(u => u.jefe == user.UserName)
+                        .Select(u => u.UserName)
+                        .ToListAsync();
+
+                    query = query.Where(p => subordinados.Contains(p.nombreEmpleado));
+                    break;
+
+                default: // Propio
+                    query = query.Where(p => p.nombreEmpleado == user.UserName);
+                    break;
+            }
+
+            return query;
+        }
+
+
+
+
+
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX DONDE SE OCUPAN CREAR PERMISOS
@@ -38,11 +77,11 @@ namespace SistemasAnaliticos.Controllers
         {
             int pageSize = 3;
 
-            var totalPermisos = await _context.Permiso
-                .CountAsync();
+            var query = await AplicarAlcanceAsync();
 
-            var permisos = await _context.Permiso
-                .AsNoTracking()
+            var totalPermisos = await query.CountAsync();
+
+            var permisos = await query
                 .OrderByDescending(x => x.fechaCreacion)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -157,8 +196,7 @@ namespace SistemasAnaliticos.Controllers
                 // Aplicar filtro por nombre
                 if (!string.IsNullOrWhiteSpace(nombre))
                 {
-                    query = query.Where(p => p.nombreEmpleado != null &&
-                                           p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
+                    query = query.Where(p => !string.IsNullOrEmpty(p.nombreEmpleado) && p.nombreEmpleado.Contains(nombre));
                 }
 
                 // Aplicar filtros de fecha
@@ -252,8 +290,7 @@ namespace SistemasAnaliticos.Controllers
                 // Aplicar filtro por nombre
                 if (!string.IsNullOrWhiteSpace(nombre))
                 {
-                    query = query.Where(p => p.nombreEmpleado != null &&
-                                           p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
+                    query = query.Where(p => p.nombreEmpleado != null && p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
                 }
 
                 // Aplicar filtros de fecha
@@ -395,10 +432,10 @@ namespace SistemasAnaliticos.Controllers
                     query = query.Where(p => departamentos.Contains(p.departamento));
                 }
 
+                // Aplicar filtro por nombre
                 if (!string.IsNullOrWhiteSpace(nombre))
                 {
-                    query = query.Where(p => p.nombreEmpleado != null &&
-                                           p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
+                    query = query.Where(p => p.nombreEmpleado != null && p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
                 }
 
                 if (!string.IsNullOrEmpty(fechaTipo))
