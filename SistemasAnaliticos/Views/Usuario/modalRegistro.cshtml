@@ -717,12 +717,14 @@
                                                     <label class="form-label required-field">Departamento</label>
                                                     <select class="form-select" required asp-for="departamento">
                                                         <option value="" selected disabled>Seleccione el departmento</option>
+                                                        <option value="Bodega">Bodega</option>
                                                         <option value="Financiero Contable">Financiero Contable</option>
                                                         <option value="Gerencia">Gerencia</option>
                                                         <option value="Ingenieria">Ingeniería</option>
                                                         <option value="Jefatura">Jefatura</option>
                                                         <option value="Legal">Legal</option>
                                                         <option value="Operaciones">Operaciones</option>
+                                                        <option value="Recursos Humanos">Recursos Humanos</option>
                                                         <option value="Técnicos NCR">Técnicos NCR</option>
                                                         <option value="Tecnologías de Información">Tecnologías de Información</option>
                                                         <option value="Ventas">Ventas</option>
@@ -734,11 +736,21 @@
                                                     <input type="date" class="form-control" asp-for="fechaIngreso" required>
                                                 </div>
                                                 <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
-                                                    <label style="margin-top: 1.25rem"  class="form-label required-field">Jefe</label>
-                                                    <select class="form-select" asp-for="jefe">
+                                                    <label style="margin-top: 1.25rem" class="form-label">Jefe</label>
+                                                    <select asp-items="ViewBag.Roles" name="rolId" class="form-select">
                                                         <option value="Ninguno" selected disabled>Seleccione el jefe</option>
                                                     </select>
                                                 </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label">Rol</label>
+                                                    <select asp-items="ViewBag.Roles"
+                                                            name="RolId"
+                                                            class="form-select"
+                                                            required>
+                                                    </select>
+                                                </div>
+
                                              
                                                 <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
                                                     <label style="margin-top: 1.25rem"  class="form-label">Correo Empresarial</label>

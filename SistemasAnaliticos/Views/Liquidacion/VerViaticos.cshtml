@@ -262,6 +262,14 @@
                                 <ul class="dropdown-menu w-100 px-3" aria-labelledby="dropdownDepartamento">
 
                                     <li class="form-check my-2">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Bodega" id="dropdown-dp-bo">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-bo">
+                                            <span>Bodega</span>
+                                            <span class="text-muted" id="dropdown-count-bo">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
                                         <input class="form-check-input filter-departamento" type="checkbox" value="Financiero Contable" id="dropdown-dp-fc">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-fc">
                                             <span>Financiero Contable</span>
@@ -310,6 +318,14 @@
                                     </li>
 
                                     <li class="form-check my-2">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Recursos Humanos" id="dropdown-dp-rrhh">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-rrhh">
+                                            <span>Recursos Humanos</span>
+                                            <span class="text-muted" id="dropdown-count-rrhh">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
                                         <input class="form-check-input filter-departamento" type="checkbox" value="Tecnicos NCR" id="dropdown-dp-tncr">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-tncr">
                                             <span>Técnicos NCR</span>
@@ -333,6 +349,29 @@
                                         </label>
                                     </li>
                                 </ul>
+                            </div>
+
+                            <!-- FILTRO POR NOMBRE -->
+                            <div class="mb-3 pb-1 border-bottom">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#nameFilter" aria-expanded="true">
+                                    Nombre del Empleado
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+
+                                <div class="collapse show mt-3" id="nameFilter">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white border-end-0">
+                                            <i class="bi bi-search"></i>
+                                        </span>
+                                        <input type="text"
+                                               class="form-control border-start-0 filter-name"
+                                               id="filter-name-input"
+                                               placeholder="Escribir nombre..."
+                                               aria-label="Buscar por nombre">
+                                    </div>
+                                    <div class="form-text mt-1">Escribe parte del nombre para buscar</div>
+                                </div>
                             </div>
 
                             <!-- FILTRO POR FECHA -->
@@ -368,27 +407,6 @@
 
                                 </div>
                             </div>
-                            <script>
-                                // Activar/desactivar rango de fechas - VERSIÓN CORREGIDA
-                                document.getElementById("dateRangeSwitch").addEventListener("change", function () {
-                                    const isRange = this.checked;
-
-                                    // Mostrar solo el contenedor correspondiente
-                                    document.getElementById("singleDateContainer").classList.toggle("d-none", isRange);
-                                    document.getElementById("rangeDateContainer").classList.toggle("d-none", !isRange);
-
-                                    // Limpiar los inputs cuando se cambie el modo
-                                    if (isRange) {
-                                        document.getElementById('filter-date-single').value = '';
-                                    } else {
-                                        document.getElementById('filter-date-from').value = '';
-                                        document.getElementById('filter-date-to').value = '';
-                                    }
-
-                                    // Actualizar filtros automáticamente si hay valores
-                                    actualizarFiltroFecha();
-                                });
-                            </script>
 
                             <!-- Clear Filters -->
                             <button class="btn w-100 text-primary-custom fw-medium pt-3 border-top" id="clear-filters">
@@ -449,7 +467,6 @@
     </script>
 
     <!-- FUNCION DE DESCARGA DE EXCEL -->
-    <!-- FUNCION DE DESCARGA DE EXCEL PARA VIÁTICOS -->
     <script>
         document.getElementById('exportExcelBtn').addEventListener('click', function() {
             const button = this;
@@ -476,6 +493,11 @@
             filtrosActivos.departamentos.forEach(depto => {
                 params.append('departamentos', depto);
             });
+
+            // Agregar nombres
+            if (filtrosActivos.nombre) {
+                params.append('nombre', filtrosActivos.nombre);
+            }
 
             // Agregar filtros de fecha
             if (filtrosActivos.fecha.tipo) {
@@ -521,7 +543,6 @@
     </script>
 
     <!-- FUNCION DE DESCARGA DE PDF -->
-    <!-- FUNCION DE DESCARGA DE PDF PARA VIÁTICOS -->
     <script>
         document.getElementById('exportPdfBtn').addEventListener('click', async function() {
             const button = this;
@@ -548,6 +569,11 @@
                 filtrosActivos.departamentos.forEach(depto => {
                     params.append('departamentos', depto);
                 });
+
+                // Agregar nombres
+                if (filtrosActivos.nombre) {
+                    params.append('nombre', filtrosActivos.nombre);
+                }
 
                 // Agregar filtros de fecha
                 if (filtrosActivos.fecha.tipo) {
@@ -614,6 +640,7 @@
             }
         });
     </script>
+
     <!-- FILTRADO Y CONTADORES MEJORADOS -->
     <script>
         const viaticosPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LiquidacionesViaticos));
@@ -623,15 +650,12 @@
         const viaticossContainer = document.getElementById("viaticossContainer");
         const pagination = document.getElementById("pagination");
 
-        // Estado global - cargar TODOS los viaticos una sola vez
-        let todosLosViaticos = [];
-        let viaticosFiltrados = [];
-
-        // Estado de los filtros - ACTUALIZADO CON NUEVOS FILTROS
+        // Estado global de filtros
         let filtrosActivos = {
             tipos: [],
             estados: [],
-            departamentos: [], // ← AGREGAR
+            departamentos: [],
+            nombre: '',
             fecha: {
                 tipo: 'single',
                 fechaUnica: null,
@@ -640,177 +664,118 @@
             }
         };
 
-        // Mapear estado del backend al frontend
-        function mapearEstado(estadoBackend) {
-            if (estadoBackend === "Creada") {
-                return "Creada";
-            } else if (estadoBackend === "Pendiente") {
-                return "Pendiente";
-            } else if (estadoBackend === "Rechazada") {
-                return "Rechazado";
-            } else if (estadoBackend === "Aprobada") {
-                return "Aprobada";
-            }
-            return estadoBackend;
-        }
+        // Función para construir parámetros de filtro
+        function construirParametrosFiltros() {
+            const params = new URLSearchParams();
 
-        // Cargar TODOS los viaticos del servidor (solo una vez)
-        async function cargarTodosLosViaticos() {
-            try {
-                const response = await fetch('/Liquidacion/ObtenerTodosLosViaticos');
-                if (response.ok) {
-                    todosLosViaticos = await response.json();
-                    return todosLosViaticos;
-                } else {
-                    console.error('Error al cargar viaticos:', response.status);
-                    todosLosViaticos = viaticosPaginaActual;
-                    return todosLosViaticos;
-                }
-            } catch (error) {
-                console.error('Error cargando viaticos:', error);
-                todosLosViaticos = viaticosPaginaActual;
-                return todosLosViaticos;
+            // Tipos
+            filtrosActivos.tipos.forEach(tipo => {
+                params.append('tipos', tipo);
+            });
+
+            // Estados
+            filtrosActivos.estados.forEach(estado => {
+                params.append('estados', estado);
+            });
+
+            // Departamentos
+            filtrosActivos.departamentos.forEach(depto => {
+                params.append('departamentos', depto);
+            });
+
+            // Nombre
+            if (filtrosActivos.nombre && filtrosActivos.nombre.trim().length > 0) {
+                params.append('nombre', filtrosActivos.nombre.trim());
             }
+
+            // Fechas
+            if (filtrosActivos.fecha.tipo) {
+                params.append('fechaTipo', filtrosActivos.fecha.tipo);
+
+                if (filtrosActivos.fecha.tipo === 'single' && filtrosActivos.fecha.fechaUnica) {
+                    params.append('fechaUnica', filtrosActivos.fecha.fechaUnica);
+                } else if (filtrosActivos.fecha.tipo === 'range') {
+                    if (filtrosActivos.fecha.fechaDesde) {
+                        params.append('fechaDesde', filtrosActivos.fecha.fechaDesde);
+                    }
+                    if (filtrosActivos.fecha.fechaHasta) {
+                        params.append('fechaHasta', filtrosActivos.fecha.fechaHasta);
+                    }
+                }
+            }
+
+            return params;
         }
 
         // Inicializar contadores con TODAS los viaticos
         async function filtrarViaticos() {
-            if (todosLosViaticos.length === 0) {
-                await cargarTodosLosViaticos();
-            }
+            try {
+                // Mostrar loader
+                viaticossContainer.innerHTML = `
+                    <div class="text-center py-5" id="filter-loading">
+                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        <p class="mt-3 text-primary fw-semibold fs-5">Aplicando filtros...</p>
+                        <p class="text-muted">Por favor espere un momento</p>
+                    </div>
+                `;
 
-            viaticosFiltrados = todosLosViaticos.filter(viatico => {
-                // Filtrar por tipo de detalle (usar tipoDetalles)
-                const coincideTipo = filtrosActivos.tipos.length === 0 ||
-                                   (viatico.tipoDetalles &&
-                                    filtrosActivos.tipos.some(tipo =>
-                                        viatico.tipoDetalles.includes(tipo)));
+                viaticossContainer.style.opacity = '1';
 
-                // Filtrar por estado
-                const coincideEstado = filtrosActivos.estados.length === 0 ||
-                                     filtrosActivos.estados.includes(viatico.estado);
+                const params = construirParametrosFiltros();
+                const response = await fetch(`/Liquidacion/ObtenerViaticosFiltradosCompletos?${params.toString()}`);
 
-                // Filtrar por departamento
-                const coincideDepartamento = filtrosActivos.departamentos.length === 0 ||
-                                           (viatico.departamento &&
-                                            filtrosActivos.departamentos.includes(viatico.departamento));
-
-                // Filtrar por fecha
-                let coincideFecha = true;
-                if (filtrosActivos.fecha.tipo === 'single' && filtrosActivos.fecha.fechaUnica) {
-                    const fechaUnica = new Date(filtrosActivos.fecha.fechaUnica);
-                    const fechaCreacion = new Date(viatico.fechaCreacion);
-                    fechaUnica.setHours(0, 0, 0, 0);
-                    fechaCreacion.setHours(0, 0, 0, 0);
-
-                    coincideFecha = fechaCreacion.getTime() === fechaUnica.getTime();
-
-                } else if (filtrosActivos.fecha.tipo === 'range' &&
-                           filtrosActivos.fecha.fechaDesde &&
-                           filtrosActivos.fecha.fechaHasta) {
-                    const desde = new Date(filtrosActivos.fecha.fechaDesde);
-                    const hasta = new Date(filtrosActivos.fecha.fechaHasta);
-                    const fechaCreacion = new Date(viatico.fechaCreacion);
-                    desde.setHours(0, 0, 0, 0);
-                    hasta.setHours(0, 0, 0, 0);
-                    fechaCreacion.setHours(0, 0, 0, 0);
-
-                    coincideFecha = fechaCreacion >= desde && fechaCreacion <= hasta;
+                if (response.ok) {
+                    const viaticosFiltrados = await response.json();
+                    return viaticosFiltrados;
+                } else {
+                    return [];
                 }
 
-                return coincideTipo && coincideEstado && coincideDepartamento && coincideFecha;
-            });
-
-            console.log("Viáticos filtrados:", viaticosFiltrados.length);
-            return viaticosFiltrados;
+            } catch (error) {
+                return [];
+            }
         }
 
-        // Función de fallback para contadores usando viaticos locales
-        async function inicializarContadoresConViaticosLocales() {
-            if (todosLosViaticos.length === 0) {
-                await cargarTodosLosViaticos();
-            }
+        // Función para aplicar filtros y renderizar
+        async function aplicarFiltros() {
+            const viaticosFiltrados = await filtrarViaticos();
 
-            const contadoresTipo = {
-                'Combustible': 0,
-                'Kilometraje': 0,
-                'Transporte': 0,
-                'Hospedaje': 0,
-                'Alimentación': 0
-            };
+            // Asegurar que el mensaje de "Aplicando filtros..." se vea por al menos 1 segundo
+            setTimeout(async () => {
+                await renderrenderViaticosWithFade(viaticosFiltrados);
 
-            const contadoresEstado = {
-                'Aprobada': 0,
-                'Pendiente': 0,
-                'Rechazado': 0,
-                'Creada': 0
-            };
+                // Ocultar paginación cuando hay filtros activos
+                const hayFiltrosActivos =
+                    filtrosActivos.tipos.length > 0 ||
+                    filtrosActivos.estados.length > 0 ||
+                    filtrosActivos.departamentos.length > 0 ||
+                    (filtrosActivos.nombre && filtrosActivos.nombre.trim().length > 0) ||
+                    (filtrosActivos.fecha.tipo === 'single' && filtrosActivos.fecha.fechaUnica) ||
+                    (filtrosActivos.fecha.tipo === 'range' && (filtrosActivos.fecha.fechaDesde || filtrosActivos.fecha.fechaHasta));
 
-            const contadoresDepartamento = {
-                'Financiero Contable': 0,
-                'Gerencia': 0,
-                'Ingeniería': 0,
-                'Jefatura': 0,
-                'Legal': 0,
-                'Operaciones': 0,
-                'Tecnicos NCR': 0,
-                'Tecnologías de Información': 0,
-                'Ventas': 0
-            };
-
-            // Contar TODOS los viaticos locales
-            todosLosViaticos.forEach(viatico => {
-                // Contar por tipo de detalle (usar tipoDetalles, no tipo)
-                if (viatico.tipoDetalles && viatico.tipoDetalles !== "Sin detalles") {
-                    // Buscar cada tipo en el string concatenado
-                    Object.keys(contadoresTipo).forEach(tipo => {
-                        if (viatico.tipoDetalles.includes(tipo)) {
-                            contadoresTipo[tipo]++;
-                        }
-                    });
-                }
-
-                // Contar por estado
-                if (viatico.estado && contadoresEstado.hasOwnProperty(viatico.estado)) {
-                    contadoresEstado[viatico.estado]++;
-                }
-
-                // Contar por departamento
-                if (viatico.departamento && contadoresDepartamento.hasOwnProperty(viatico.departamento)) {
-                    contadoresDepartamento[viatico.departamento]++;
-                }
-            });
-
-            // Función helper para actualizar elementos de forma segura
-            function actualizarSeguro(id, valor) {
-                const elemento = document.getElementById(id);
-                if (elemento) {
-                    elemento.textContent = `(${valor})`;
-                }
-            }
-
-            // Actualizar contadores en la UI de forma segura
-            actualizarSeguro('count-combustible', contadoresTipo['Combustible']);
-            actualizarSeguro('count-kilometraje', contadoresTipo['Kilometraje']);
-            actualizarSeguro('count-transporte', contadoresTipo['Transporte']);
-            actualizarSeguro('count-hospedaje', contadoresTipo['Hospedaje']);
-            actualizarSeguro('count-alimentacion', contadoresTipo['Alimentación']);
-
-            actualizarSeguro('count-creada', contadoresEstado['Creada']);
-            actualizarSeguro('count-approved', contadoresEstado['Aprobada']);
-            actualizarSeguro('count-pending', contadoresEstado['Pendiente']);
-            actualizarSeguro('count-rejected', contadoresEstado['Rechazado']);
-
-            actualizarSeguro('dropdown-count-fc', contadoresDepartamento['Financiero Contable']);
-            actualizarSeguro('dropdown-count-g', contadoresDepartamento['Gerencia']);
-            actualizarSeguro('dropdown-count-i', contadoresDepartamento['Ingeniería']);
-            actualizarSeguro('dropdown-count-j', contadoresDepartamento['Jefatura']);
-            actualizarSeguro('dropdown-count-l', contadoresDepartamento['Legal']);
-            actualizarSeguro('dropdown-count-o', contadoresDepartamento['Operaciones']);
-            actualizarSeguro('dropdown-count-tncr', contadoresDepartamento['Tecnicos NCR']);
-            actualizarSeguro('dropdown-count-ti', contadoresDepartamento['Tecnologías de Información']);
-            actualizarSeguro('dropdown-count-v', contadoresDepartamento['Ventas']);
+                pagination.style.display = hayFiltrosActivos ? 'none' : 'flex';
+            }, 1200); // 1 segundo de delay mínimo
         }
+
+        // Función para actualizar filtro de fecha
+        function actualizarFiltroFecha() {
+            const isRange = document.getElementById('dateRangeSwitch').checked;
+
+            if (isRange) {
+                filtrosActivos.fecha.tipo = 'range';
+                filtrosActivos.fecha.fechaUnica = null;
+                filtrosActivos.fecha.fechaDesde = document.getElementById('filter-date-from').value;
+                filtrosActivos.fecha.fechaHasta = document.getElementById('filter-date-to').value;
+            } else {
+                filtrosActivos.fecha.tipo = 'single';
+                filtrosActivos.fecha.fechaDesde = null;
+                filtrosActivos.fecha.fechaHasta = null;
+                filtrosActivos.fecha.fechaUnica = document.getElementById('filter-date-single').value;
+            }
+        }
+
         // Función para inicializar contadores con TODOS los viaticos
         async function inicializarContadores() {
             try {
@@ -829,47 +794,49 @@
                     document.getElementById('count-creada').textContent = `(${contadores.creada})`;
                     document.getElementById('count-approved').textContent = `(${contadores.aprobada})`;
                     document.getElementById('count-pending').textContent = `(${contadores.pendiente})`;
-                    document.getElementById('count-rejected').textContent = `(${contadores.rechazado})`;
+                    document.getElementById('count-rejected').textContent = `(${contadores.rechazada})`;
 
                     // Actualizar contadores de departamentos
+                    document.getElementById('dropdown-count-bo').textContent = `(${contadores.bodega})`;
                     document.getElementById('dropdown-count-fc').textContent = `(${contadores.financieroContable})`;
                     document.getElementById('dropdown-count-g').textContent = `(${contadores.gerencia})`;
                     document.getElementById('dropdown-count-i').textContent = `(${contadores.ingenieria})`;
                     document.getElementById('dropdown-count-j').textContent = `(${contadores.jefatura})`;
                     document.getElementById('dropdown-count-l').textContent = `(${contadores.legal})`;
                     document.getElementById('dropdown-count-o').textContent = `(${contadores.operaciones})`;
+                    document.getElementById('dropdown-count-rrhh').textContent = `(${contadores.recursosHumanos})`;
                     document.getElementById('dropdown-count-tncr').textContent = `(${contadores.tecnicosNCR})`;
                     document.getElementById('dropdown-count-ti').textContent = `(${contadores.tecnologiasInformacion})`;
                     document.getElementById('dropdown-count-v').textContent = `(${contadores.ventas})`;
                 } else {
                     console.error('Error al cargar contadores del servidor');
-                    await inicializarContadoresConViaticosLocales();
                 }
             } catch (error) {
                 console.error('Error cargando contadores:', error);
-                await inicializarContadoresConViaticosLocales();
             }
         }
 
         // Función para aplicar fade out
         function fadeOut(element, callback) {
-            element.style.transition = 'opacity 0.3s ease';
+            element.style.transition = 'opacity 0.5s ease';
             element.style.opacity = '0';
 
             setTimeout(() => {
                 callback();
                 setTimeout(() => {
+                    element.style.transition = 'opacity 0.5s ease';
                     element.style.opacity = '1';
-                }, 50);
-            }, 300);
+                }, 100);
+            }, 500);
         }
 
         // Función para aplicar fade in
         function fadeIn(element) {
-            element.style.transition = 'opacity 0.3s ease';
+            element.style.transition = 'opacity 0.5s ease';
             element.style.opacity = '0';
 
             setTimeout(() => {
+                element.style.transition = 'opacity 0.5s ease';
                 element.style.opacity = '1';
             }, 50);
         }
@@ -987,120 +954,137 @@
             }
         }
 
-        // Función para actualizar filtros de fecha
-        function actualizarFiltroFecha() {
-            const isRange = document.getElementById('dateRangeSwitch').checked;
-
-            if (isRange) {
-                filtrosActivos.fecha.tipo = 'range';
-                filtrosActivos.fecha.fechaUnica = null;
-                filtrosActivos.fecha.fechaDesde = document.getElementById('filter-date-from').value;
-                filtrosActivos.fecha.fechaHasta = document.getElementById('filter-date-to').value;
-            } else {
-                filtrosActivos.fecha.tipo = 'single';
-                filtrosActivos.fecha.fechaDesde = null;
-                filtrosActivos.fecha.fechaHasta = null;
-                filtrosActivos.fecha.fechaUnica = document.getElementById('filter-date-single').value;
-            }
+        // Función debounce para optimizar búsquedas por nombre
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
 
-        // Departamentos
-        document.querySelectorAll('.filter-departamento').forEach(checkbox => {
-            checkbox.addEventListener('change', async function() {
-                if (this.checked) {
-                    filtrosActivos.departamentos.push(this.value);
-                } else {
-                    filtrosActivos.departamentos = filtrosActivos.departamentos.filter(depto => depto !== this.value);
-                }
-                const viaticosFiltrados = await filtrarViaticos();
-                await renderViaticosWithFade(viaticosFiltrados);
-                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
-            });
-        });
+        // ================= EVENT LISTENERS =================
+        document.addEventListener('DOMContentLoaded', function() {
 
-        // Fechas
-        document.querySelectorAll('.filter-date').forEach(input => {
-            input.addEventListener('change', async function() {
-                actualizarFiltroFecha();
-                const viaticosFiltrados = await filtrarViaticos();
-                await renderViaticosWithFade(viaticosFiltrados);
-                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
-            });
-        });
-
-        // Switch de rango de fechas
-        document.getElementById("dateRangeSwitch").addEventListener("change", function () {
-            const isRange = this.checked;
-            document.getElementById("singleDateContainer").classList.toggle("d-none", isRange);
-            document.getElementById("rangeDateContainer").classList.toggle("d-none", !isRange);
-            actualizarFiltroFecha();
-        });
-
-        // Event listeners existentes para tipos y estados (ya los tienes)
-        document.querySelectorAll('.filter-type').forEach(checkbox => {
-            checkbox.addEventListener('change', async function() {
-                if (this.checked) {
-                    filtrosActivos.tipos.push(this.value);
-                } else {
-                    filtrosActivos.tipos = filtrosActivos.tipos.filter(tipo => tipo !== this.value);
-                }
-                const viaticosFiltrados = await filtrarViaticos();
-                await renderViaticosWithFade(viaticosFiltrados);
-                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
-            });
-        });
-
-        document.querySelectorAll('.filter-status').forEach(checkbox => {
-            checkbox.addEventListener('change', async function() {
-                if (this.checked) {
-                    filtrosActivos.estados.push(this.value);
-                } else {
-                    filtrosActivos.estados = filtrosActivos.estados.filter(estado => estado !== this.value);
-                }
-                const viaticosFiltrados = await filtrarViaticos();
-                await renderViaticosWithFade(viaticosFiltrados);
-                pagination.style.display = (filtrosActivos.tipos.length > 0 || filtrosActivos.estados.length > 0 || filtrosActivos.departamentos.length > 0 || filtrosActivos.fecha.fechaUnica || filtrosActivos.fecha.fechaDesde) ? 'none' : 'flex';
-            });
-        });
-
-        // Limpiar filtros con efecto de fade - ACTUALIZAR ESTA FUNCIÓN
-        document.getElementById('clear-filters').addEventListener('click', function() {
-            // Desmarcar todos los checkboxes
-            document.querySelectorAll('.filter-type, .filter-status, .filter-departamento').forEach(checkbox => {
-                checkbox.checked = false;
+            // Event listeners para tipos
+            document.querySelectorAll('.filter-type').forEach(checkbox => {
+                checkbox.addEventListener('change', async function() {
+                    if (this.checked) {
+                        filtrosActivos.tipos.push(this.value);
+                    } else {
+                        filtrosActivos.tipos = filtrosActivos.tipos.filter(tipo => tipo !== this.value);
+                    }
+                    await aplicarFiltros();
+                });
             });
 
-            // Limpiar campos de fecha
-            document.getElementById('filter-date-single').value = '';
-            document.getElementById('filter-date-from').value = '';
-            document.getElementById('filter-date-to').value = '';
-            document.getElementById('dateRangeSwitch').checked = false;
-            document.getElementById("singleDateContainer").classList.remove("d-none");
-            document.getElementById("rangeDateContainer").classList.add("d-none");
+            // Event listeners para estados
+            document.querySelectorAll('.filter-status').forEach(checkbox => {
+                checkbox.addEventListener('change', async function() {
+                    if (this.checked) {
+                        filtrosActivos.estados.push(this.value);
+                    } else {
+                        filtrosActivos.estados = filtrosActivos.estados.filter(estado => estado !== this.value);
+                    }
+                    await aplicarFiltros();
+                });
+            });
 
-            // Limpiar filtros activos
-            filtrosActivos.tipos = [];
-            filtrosActivos.estados = [];
-            filtrosActivos.departamentos = [];
-            filtrosActivos.fecha = {
-                tipo: 'single',
-                fechaUnica: null,
-                fechaDesde: null,
-                fechaHasta: null
-            };
+            // Event listeners para departamentos
+            document.querySelectorAll('.filter-departamento').forEach(checkbox => {
+                checkbox.addEventListener('change', async function() {
+                    if (this.checked) {
+                        filtrosActivos.departamentos.push(this.value);
+                    } else {
+                        filtrosActivos.departamentos = filtrosActivos.departamentos.filter(depto => depto !== this.value);
+                    }
+                    await aplicarFiltros();
+                });
+            });
 
-            // Renderizar todos los viaticos de la página actual con fade
-            renderViaticosWithFade(viaticosPaginaActual);
-            pagination.style.display = 'flex';
-        });
+            // Event listener para nombre
+            const inputNombre = document.getElementById('filter-name-input');
 
-        // Inicializar con efecto de fade
-        document.addEventListener('DOMContentLoaded', async function() {
-            await cargarTodosLosViaticos();
-            await inicializarContadores();
-            viaticossContainer.style.opacity = '0';
-            renderViaticos(viaticosPaginaActual);
-            renderPagination();
+            if (inputNombre) {
+                inputNombre.addEventListener('input', debounce(async function (e) {
+                    const valor = e.target.value || '';
+                    filtrosActivos.nombre = valor.trim();
+                    await aplicarFiltros();
+                }, 1000));
+            }
+
+            // Event listeners para fechas
+            document.querySelectorAll('.filter-date').forEach(input => {
+                input.addEventListener('change', async function() {
+                    actualizarFiltroFecha();
+                    await aplicarFiltros();
+                });
+            });
+
+            // Switch de rango de fechas
+            const dateSwitch = document.getElementById("dateRangeSwitch");
+            if (dateSwitch) {
+                dateSwitch.addEventListener("change", function() {
+                    const isRange = this.checked;
+                    document.getElementById("singleDateContainer").classList.toggle("d-none", isRange);
+                    document.getElementById("rangeDateContainer").classList.toggle("d-none", !isRange);
+
+                    // Limpiar inputs no utilizados
+                    if (isRange) {
+                        document.getElementById('filter-date-single').value = '';
+                    } else {
+                        document.getElementById('filter-date-from').value = '';
+                        document.getElementById('filter-date-to').value = '';
+                    }
+
+                    actualizarFiltroFecha();
+                });
+            }
+
+            // Limpiar filtros
+            document.getElementById('clear-filters').addEventListener('click', function() {
+                // Desmarcar checkboxes
+                document.querySelectorAll('.filter-type, .filter-status, .filter-departamento').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+
+                // Limpiar inputs
+                document.getElementById('filter-name-input').value = '';
+                document.getElementById('filter-date-single').value = '';
+                document.getElementById('filter-date-from').value = '';
+                document.getElementById('filter-date-to').value = '';
+                document.getElementById('dateRangeSwitch').checked = false;
+                document.getElementById("singleDateContainer").classList.remove("d-none");
+                document.getElementById("rangeDateContainer").classList.add("d-none");
+
+                // Limpiar estado de filtros
+                filtrosActivos.tipos = [];
+                filtrosActivos.estados = [];
+                filtrosActivos.departamentos = [];
+                filtrosActivos.nombre = '';
+                filtrosActivos.fecha = {
+                    tipo: 'single',
+                    fechaUnica: null,
+                    fechaDesde: null,
+                    fechaHasta: null
+                };
+
+                // Mostrar permisos iniciales (de la paginación)
+                renderViaticosWithFade(viaticosPaginaActual);
+                pagination.style.display = 'flex';
+            });
+
+            // Inicializar contadores y renderizar
+            (async function() {
+                await inicializarContadores();
+                viaticossContainer.style.opacity = '0';
+                renderViaticos(viaticosPaginaActual);
+                renderPagination();
+            })();
         });
     </script>
 

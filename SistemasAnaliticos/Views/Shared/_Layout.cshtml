@@ -166,26 +166,31 @@
                             </ul>
                         </li>
 
-                        <!-- Otros -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Otros
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="Foto" asp-action="Index">Fotos Empresariales</a></li>
-                                <li><a class="dropdown-item" asp-controller="Noticia" asp-action="Index">Noticias Empresariales</a></li>
-                            </ul>
-                        </li>
-
-                        <!-- Admin Roles -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Roles
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="Rol" asp-action="Index">Roles Aplicación</a></li>
-                            </ul>
-                        </li>
+                        @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                        {
+                            <!-- Otros -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Otros
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Foto" asp-action="Index">Fotos Empresariales</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Noticia" asp-action="Index">Noticias Empresariales</a></li>
+                                </ul>
+                            </li>
+                        }
+                        @if (User.IsInRole("Administrador"))
+                        {
+                            <!-- Admin Roles -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Roles
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Rol" asp-action="Index">Roles Aplicación</a></li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
 
                     <!-- Controles de usuario -->

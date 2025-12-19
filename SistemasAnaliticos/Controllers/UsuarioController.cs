@@ -149,7 +149,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX = PRESENTAR A LOS EMPLEADOS CON CARDS PARA SCINICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
-        //[Authorize(Policy = "Usuarios.Ver")]
+        [Authorize(Policy = "Usuarios.Ver")]
         public async Task<ActionResult> Index()
         {
             var cards = await _context.Users
@@ -197,7 +197,7 @@ namespace SistemasAnaliticos.Controllers
         }
 
 
-        //[Authorize(Policy = "Usuarios.Crear")]
+        [Authorize(Policy = "Usuarios.Crear")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Usuario model)
@@ -240,7 +240,7 @@ namespace SistemasAnaliticos.Controllers
                     UserName = userName,
 
                     celularOficina = model.celularOficina,
-                    jefe = model.jefe,
+                    jefeId = model.jefeId,
                     extension = model.extension,
                     salario = model.salario,
                     cuentaIBAN = model.cuentaIBAN,
@@ -263,7 +263,7 @@ namespace SistemasAnaliticos.Controllers
                 var resultado = await userManager.CreateAsync(nuevo, pass);
                 if (resultado.Succeeded)
                 {
-                    await userManager.AddToRoleAsync(nuevo, "Administrador");
+                    await userManager.AddToRoleAsync(nuevo, "RRHH");
 
                     TempData["SuccessMessage"] = "El empleado se creó correctamente.";
                     return RedirectToAction(nameof(Index));
@@ -360,7 +360,7 @@ namespace SistemasAnaliticos.Controllers
                 usuario.UserName = model.correoEmpresa;
 
                 usuario.celularOficina = model.celularOficina;
-                usuario.jefe = model.jefe;
+                usuario.jefeId = model.jefeId;
                 usuario.extension = model.extension;
                 usuario.salario = model.salario;
                 usuario.cuentaIBAN = model.cuentaIBAN;

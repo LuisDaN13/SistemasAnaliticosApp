@@ -94,8 +94,11 @@ namespace SistemasAnaliticos.Entidades
         [StringLength(12)]
         public string? celularOficina { get; set; }
 
-        [StringLength(100)]
-        public string? jefe { get; set; }
+
+        public string? jefeId { get; set; }
+        [ForeignKey("JefeId")]
+        public Usuario? Jefe { get; set; }
+
 
         [StringLength(20)]
         public string? extension { get; set; }

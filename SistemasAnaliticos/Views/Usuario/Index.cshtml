@@ -32,6 +32,10 @@
         }
 
         .card-employee {
+            display: flex;
+            flex-direction: column;
+            height: 95%; /* CLAVE */
+
             border-radius: 12px;
             border: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -39,7 +43,6 @@
             margin-bottom: 1.5rem;
             overflow: hidden;
         }
-
             .card-employee:hover {
                 transform: translateY(-5px);
                 box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
@@ -87,6 +90,7 @@
         }
 
         .card-employee-body {
+            flex: 1; /* CLAVE */
             padding: 1.5rem 1.5rem 0 1.5rem;
         }
 
@@ -152,6 +156,7 @@
 
         .card-employee-footer {
             padding: 1rem 1.5rem;
+            margin-top: auto; /* refuerzo extra (opcional pero recomendado) */
         }
 
         /* Contenedor principal del footer */
@@ -422,29 +427,39 @@
         <div class="header-card p-4 mt-4 mb-4">
             <div class="card-body">
                 <div class="row g-3 align-items-center">
-                    <div class="col-md-6 col-lg-8">
-                        <div class="position-relative" style="z-index: 1;">
-                            <i class="bi bi-search text-muted search-icon"></i>
-                            <input type="text"
-                                   class="form-control ps-5"
-                                   id="searchInput"
-                                   placeholder="Buscar por nombre, departamento o puesto...">
+                    @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                    {
+                        <div class="col-md-6 col-lg-9">
+                            <div class="position-relative" style="z-index: 1;">
+                                <i class="bi bi-search text-muted search-icon"></i>
+                                <input type="text"
+                                class="form-control ps-5"
+                                id="searchInput"
+                                placeholder="Buscar por nombre, departamento o puesto...">
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6 col-lg-4">
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-outline-secondary d-flex align-items-center">
-                                <i class="bi bi-funnel me-2"></i>
-                                Filtrar
-                            </button>
-                            <button class="btn btn-primary-custom text-white d-flex align-items-center"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#createEmployeeModal">
-                                <i class="bi bi-plus me-2"></i>
-                                Nuevo Empleado
-                            </button>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary-custom text-white d-flex align-items-center"
+                                data-bs-toggle="modal"
+                                data-bs-target="#createEmployeeModal">
+                                    <i class="bi bi-plus me-2"></i>
+                                    Nuevo Empleado
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    } else                    
+                    {
+                        <div class="col-lg-12">
+                            <div class="position-relative" style="z-index: 1;">
+                                <i class="bi bi-search text-muted search-icon"></i>
+                                <input type="text"
+                                       class="form-control ps-5"
+                                       id="searchInput"
+                                       placeholder="Buscar por nombre, departamento o puesto...">
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>
@@ -483,8 +498,11 @@
                         <div class="card-employee-header text-center">
                             <div class="position-relative d-inline-block w-100" style="background-color: rgba(1, 36, 115, 0.1); z-index: 1;">
 
-                                <!-- Indicador de estado (esquina superior derecha) -->
-                                <span class="corner-triangle @(empleado.Estado ? "corner-green" : "corner-red")"></span>
+                                @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                                {
+                                    <!-- Indicador de estado (esquina superior derecha) -->
+                                    <span class="corner-triangle @(empleado.Estado ? "corner-green" : "corner-red")"></span>
+                                }
 
                                 @if (empleado.Foto != null && empleado.Foto.Length > 0)
                                 {
@@ -514,54 +532,57 @@
                             <div class="employee-info-item">
                                 <div class="employee-info-text">
                                     <strong>Correo Empresarial:</strong><br>
-                                    @(empleado.CorreoEmp != null && !string.IsNullOrEmpty(empleado.CorreoEmp) ? empleado.CorreoEmp : "Sin Correo Empresarial")
-                                </div>
+                                    <span class="text-break">@(empleado.CorreoEmp != null && !string.IsNullOrEmpty(empleado.CorreoEmp) ? empleado.CorreoEmp : "Sin Correo Empresarial")</span>
+                            </div>
                             </div>
                             <div class="employee-info-item">
                                 <div class="employee-info-text">
                                     <strong>Teléfono Empresarial:</strong><br>
-                                    @(empleado.TelefonoEmp != null && !string.IsNullOrEmpty(empleado.TelefonoEmp) ? empleado.TelefonoEmp : "Sin Celular Empresarial")
+                                    <span class="text-break">@(empleado.TelefonoEmp != null && !string.IsNullOrEmpty(empleado.TelefonoEmp) ? empleado.TelefonoEmp : "Sin Celular Empresarial")</span>
                                 </div>
                             </div>
                             <div class="employee-info-item">
                                 <div class="employee-info-text">
                                     <strong>Correo Personal:</strong><br>
-                                    @(empleado.CorreoPerso != null && !string.IsNullOrEmpty(empleado.CorreoPerso) ? empleado.CorreoPerso : "Sin Correo Personal")
+                                    <span class="text-break">@(empleado.CorreoPerso != null && !string.IsNullOrEmpty(empleado.CorreoPerso) ? empleado.CorreoPerso : "Sin Correo Personal")</span>
                                 </div>
                             </div>
                             <div class="employee-info-item">
                                 <div class="employee-info-text">
                                     <strong>Teléfono Personal:</strong><br>
-                                    @(empleado.TelefonoPerso != null && !string.IsNullOrEmpty(empleado.TelefonoPerso) ? empleado.TelefonoPerso : "Sin Celular Personal")
+                                    <span class="text-break">@(empleado.TelefonoPerso != null && !string.IsNullOrEmpty(empleado.TelefonoPerso) ? empleado.TelefonoPerso : "Sin Celular Personal")</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-employee-footer">
-                            <div class="footer-actions">
-                                <div class="footer-slot-details">
-                                    <a asp-action="Details" asp-controller="Usuario" asp-route-id="@empleado.Id"
-                                        class="action-btn btn-details" title="Detalles">
-                                        <i class="bi bi-file-text"></i>
-                                    </a>
-                                </div>
-                                <div class="footer-slot-edit">
-                                    <a asp-action="Edit" asp-controller="Usuario" asp-route-id="@empleado.Id"
-                                        class="action-btn btn-edit" title="Editar">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                </div>
-                                <div class="footer-slot-delete">
-                                    <button class="action-btn btn-delete"
-                                            title="Inactivar"
-                                            data-id="@empleado.Id"
-                                            data-nombre="@empleado.Nombre"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalInactivar">
-                                        <i class="bi bi-slash-circle"></i>
-                                    </button>
+                        @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                        {
+                            <div class="card-employee-footer">
+                                <div class="footer-actions">
+                                    <div class="footer-slot-details">
+                                        <a asp-action="Details" asp-controller="Usuario" asp-route-id="@empleado.Id"
+                                            class="action-btn btn-details" title="Detalles">
+                                            <i class="bi bi-file-text"></i>
+                                        </a>
+                                    </div>
+                                    <div class="footer-slot-edit">
+                                        <a asp-action="Edit" asp-controller="Usuario" asp-route-id="@empleado.Id"
+                                            class="action-btn btn-edit" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                    <div class="footer-slot-delete">
+                                        <button class="action-btn btn-delete"
+                                                title="Inactivar"
+                                                data-id="@empleado.Id"
+                                                data-nombre="@empleado.Nombre"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalInactivar">
+                                            <i class="bi bi-slash-circle"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
                 }
             </div>

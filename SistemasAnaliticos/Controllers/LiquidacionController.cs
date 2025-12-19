@@ -35,7 +35,6 @@ namespace SistemasAnaliticos.Controllers
         [HttpGet]
         public async Task<IActionResult> VerViaticos(int page = 1)
         {
-            // Buscar liquidaciones creadas sin detalles
             var cabecerasSinDetalles = await _context.LiquidacionViatico
                 .Include(l => l.Detalles)
                 .Where(l => l.estado == "Creada" && !l.Detalles.Any())
@@ -125,6 +124,7 @@ namespace SistemasAnaliticos.Controllers
             [FromQuery] string[] tiposDetalle,
             [FromQuery] string[] estados,
             [FromQuery] string[] departamentos,
+            [FromQuery] string nombre = null,
             [FromQuery] string fechaTipo = null,
             [FromQuery] string fechaUnica = null,
             [FromQuery] string fechaDesde = null,
@@ -163,7 +163,13 @@ namespace SistemasAnaliticos.Controllers
                 if (departamentos != null && departamentos.Length > 0)
                 {
                     query = query.Where(v => departamentos.Contains(v.departamento));
-                }                            
+                }
+
+                // Aplicar filtro por nombre
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    query = query.Where(p => !string.IsNullOrEmpty(p.nombreEmpleado) && p.nombreEmpleado.Contains(nombre));
+                }
 
                 // Aplicar filtros de fecha
                 if (!string.IsNullOrEmpty(fechaTipo))
@@ -228,6 +234,7 @@ namespace SistemasAnaliticos.Controllers
             [FromQuery] string[] tiposDetalle,
             [FromQuery] string[] estados,
             [FromQuery] string[] departamentos,
+            [FromQuery] string nombre = null,
             [FromQuery] string fechaTipo = null,
             [FromQuery] string fechaUnica = null,
             [FromQuery] string fechaDesde = null,
@@ -263,6 +270,12 @@ namespace SistemasAnaliticos.Controllers
                 if (departamentos != null && departamentos.Length > 0)
                 {
                     query = query.Where(v => departamentos.Contains(v.departamento));
+                }
+
+                // Aplicar filtro por nombre
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    query = query.Where(p => p.nombreEmpleado != null && p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
                 }
 
                 // Aplicar filtros de fecha
@@ -413,6 +426,7 @@ namespace SistemasAnaliticos.Controllers
             [FromQuery] string[] tiposDetalle,
             [FromQuery] string[] estados,
             [FromQuery] string[] departamentos,
+            [FromQuery] string nombre = null,
             [FromQuery] string fechaTipo = null,
             [FromQuery] string fechaUnica = null,
             [FromQuery] string fechaDesde = null,
@@ -444,6 +458,11 @@ namespace SistemasAnaliticos.Controllers
                 if (departamentos != null && departamentos.Length > 0)
                 {
                     query = query.Where(v => departamentos.Contains(v.departamento));
+                }
+
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    query = query.Where(p => p.nombreEmpleado != null && p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
                 }
 
                 if (!string.IsNullOrEmpty(fechaTipo))
@@ -726,10 +745,12 @@ namespace SistemasAnaliticos.Controllers
                         .Count(v => v.estado == "Aprobada"),
                     Pendiente = viaticosConDetalles
                         .Count(v => v.estado == "Pendiente"),
-                    Rechazado = viaticosConDetalles
+                    Rechazada = viaticosConDetalles
                         .Count(v => v.estado == "Rechazada"),
 
                     // Contadores por departamento
+                    Bodega = viaticosConDetalles
+                        .Count(v => v.departamento == "Bodega"),
                     FinancieroContable = viaticosConDetalles
                         .Count(v => v.departamento == "Financiero Contable"),
                     Gerencia = viaticosConDetalles
@@ -742,6 +763,8 @@ namespace SistemasAnaliticos.Controllers
                         .Count(v => v.departamento == "Legal"),
                     Operaciones = viaticosConDetalles
                         .Count(v => v.departamento == "Operaciones"),
+                    RecursosHumanos = viaticosConDetalles
+                        .Count(v => v.departamento == "Recursos Humanos"),
                     TecnicosNCR = viaticosConDetalles
                         .Count(v => v.departamento == "Tecnicos NCR"),
                     TecnologiasInformacion = viaticosConDetalles
@@ -772,22 +795,24 @@ namespace SistemasAnaliticos.Controllers
                     Alimentacion = 0,
                     OtrosTipos = 0,
 
+                    // Contadores por estado
+                    Creada = 0,
+                    Aprobada = 0,
+                    Pendiente = 0,
+                    Rechazada = 0,
+
                     // Contadores por departamento
+                    Bodega = 0,
                     FinancieroContable = 0,
                     Gerencia = 0,
                     Ingenieria = 0,
                     Jefatura = 0,
                     Legal = 0,
                     Operaciones = 0,
+                    RecursosHumanos = 0,
                     TecnicosNCR = 0,
                     TecnologiasInformacion = 0,
                     Ventas = 0,
-
-                    // Contadores por estado
-                    Aprobado = 0,
-                    Pendiente = 0,
-                    Rechazada = 0,
-                    Creada = 0
                 });
             }
         }

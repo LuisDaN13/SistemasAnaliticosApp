@@ -231,6 +231,14 @@
                                 <ul class="dropdown-menu w-100 px-3" aria-labelledby="dropdownDepartamento">
 
                                     <li class="form-check my-2">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Bodega" id="dropdown-dp-bo">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-bo">
+                                            <span>Bodega</span>
+                                            <span class="text-muted" id="dropdown-count-bo">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
                                         <input class="form-check-input filter-departamento" type="checkbox" value="Financiero Contable" id="dropdown-dp-fc">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-fc">
                                             <span>Financiero Contable</span>
@@ -275,6 +283,14 @@
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-o">
                                             <span>Operaciones</span>
                                             <span class="text-muted" id="dropdown-count-o">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Recursos Humanos" id="dropdown-dp-rrhh">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-rrhh">
+                                            <span>Recursos Humanos</span>
+                                            <span class="text-muted" id="dropdown-count-rrhh">(0)</span>
                                         </label>
                                     </li>
 
@@ -851,12 +867,14 @@
                     document.getElementById('count-rejected').textContent = `(${contadores.rechazado})`;
 
                     // Actualizar contadores de departamentos
+                    document.getElementById('dropdown-count-bo').textContent = `(${contadores.bodega})`;
                     document.getElementById('dropdown-count-fc').textContent = `(${contadores.financieroContable})`;
                     document.getElementById('dropdown-count-g').textContent = `(${contadores.gerencia})`;
                     document.getElementById('dropdown-count-i').textContent = `(${contadores.ingenieria})`;
                     document.getElementById('dropdown-count-j').textContent = `(${contadores.jefatura})`;
                     document.getElementById('dropdown-count-l').textContent = `(${contadores.legal})`;
                     document.getElementById('dropdown-count-o').textContent = `(${contadores.operaciones})`;
+                    document.getElementById('dropdown-count-rrhh').textContent = `(${contadores.recursosHumanos})`;
                     document.getElementById('dropdown-count-tncr').textContent = `(${contadores.tecnicosNCR})`;
                     document.getElementById('dropdown-count-ti').textContent = `(${contadores.tecnologiasInformacion})`;
                     document.getElementById('dropdown-count-v').textContent = `(${contadores.ventas})`;

@@ -28,35 +28,35 @@ namespace SistemasAnaliticos.Controllers
         }
 
 
-        private async Task<IQueryable<Permiso>> AplicarAlcanceAsync()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(user);
+        //private async Task<IQueryable<Permiso>> AplicarAlcanceAsync()
+        //{
+        //    var user = await _userManager.GetUserAsync(User);
+        //    var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(user);
 
-            IQueryable<Permiso> query = _context.Permiso.AsNoTracking();
+        //    IQueryable<Permiso> query = _context.Permiso.AsNoTracking();
 
-            switch (alcance)
-            {
-                case "Global":
-                    // No se filtra nada
-                    break;
+        //    switch (alcance)
+        //    {
+        //        case "Global":
+        //            // No se filtra nada
+        //            break;
 
-                case "Subordinados":
-                    var subordinados = await _context.Users
-                        .Where(u => u.jefe == user.UserName)
-                        .Select(u => u.UserName)
-                        .ToListAsync();
+        //        case "Subordinados":
+        //            var subordinados = await _context.Users
+        //                .Where(u => u.jefe == user.UserName)
+        //                .Select(u => u.UserName)
+        //                .ToListAsync();
 
-                    query = query.Where(p => subordinados.Contains(p.nombreEmpleado));
-                    break;
+        //            query = query.Where(p => subordinados.Contains(p.nombreEmpleado));
+        //            break;
 
-                default: // Propio
-                    query = query.Where(p => p.nombreEmpleado == user.UserName);
-                    break;
-            }
+        //        default: // Propio
+        //            query = query.Where(p => p.nombreEmpleado == user.UserName);
+        //            break;
+        //    }
 
-            return query;
-        }
+        //    return query;
+        //}
 
 
 
@@ -77,11 +77,11 @@ namespace SistemasAnaliticos.Controllers
         {
             int pageSize = 3;
 
-            var query = await AplicarAlcanceAsync();
+            var totalPermisos = await _context.Permiso
+                .CountAsync();
 
-            var totalPermisos = await query.CountAsync();
-
-            var permisos = await query
+            var permisos = await _context.Permiso
+                .AsNoTracking()
                 .OrderByDescending(x => x.fechaCreacion)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -416,7 +416,6 @@ namespace SistemasAnaliticos.Controllers
             {
                 var query = _context.Permiso.AsNoTracking().AsQueryable();
 
-                // Aplicar filtros (misma lógica que Excel)
                 if (tipos != null && tipos.Length > 0)
                 {
                     query = query.Where(p => tipos.Contains(p.tipo));
@@ -432,7 +431,6 @@ namespace SistemasAnaliticos.Controllers
                     query = query.Where(p => departamentos.Contains(p.departamento));
                 }
 
-                // Aplicar filtro por nombre
                 if (!string.IsNullOrWhiteSpace(nombre))
                 {
                     query = query.Where(p => p.nombreEmpleado != null && p.nombreEmpleado.ToLower().Contains(nombre.ToLower()));
@@ -603,19 +601,21 @@ namespace SistemasAnaliticos.Controllers
                         Especial = g.Count(p => p.tipo == "Especial"),
 
                         // Contadores por estado
-                        Aprobada = g.Count(p => p.estado == "Aprobada"),
                         Creada = g.Count(p => p.estado == "Creada"),
+                        Aprobada = g.Count(p => p.estado == "Aprobada"),
                         Pendiente = g.Count(p => p.estado == "Pendiente"),
                         Rechazada = g.Count(p => p.estado == "Rechazada"),
 
                         // Contadores por departamento ← AGREGAR ESTOS
+                        Bodega = g.Count(p => p.departamento == "Bodega"),
                         FinancieroContable = g.Count(p => p.departamento == "Financiero Contable"),
                         Gerencia = g.Count(p => p.departamento == "Gerencia"),
                         Ingenieria = g.Count(p => p.departamento == "Ingeniería"),
                         Jefatura = g.Count(p => p.departamento == "Jefatura"),
                         Legal = g.Count(p => p.departamento == "Legal"),
                         Operaciones = g.Count(p => p.departamento == "Operaciones"),
-                        TecnicosNCR = g.Count(p => p.departamento == "Tecnicos NCR"),
+                        RecursosHumanos = g.Count(p => p.departamento == "Recursos Humanos"),
+                        TecnicosNCR = g.Count(p => p.departamento == "Técnicos NCR"),
                         TecnologiasInformacion = g.Count(p => p.departamento == "Tecnologías de Información"),
                         Ventas = g.Count(p => p.departamento == "Ventas")
                     })
@@ -628,16 +628,18 @@ namespace SistemasAnaliticos.Controllers
                     Incapacidad = 0,
                     Teletrabajo = 0,
                     Especial = 0,
-                    Aprobada = 0,
                     Creada = 0,
+                    Aprobada = 0,
                     Pendiente = 0,
                     Rechazada = 0,
+                    Bodega = 0,
                     FinancieroContable = 0,
                     Gerencia = 0,
                     Ingenieria = 0,
                     Jefatura = 0,
                     Legal = 0,
                     Operaciones = 0,
+                    RecursosHumanos = 0,
                     TecnicosNCR = 0,
                     TecnologiasInformacion = 0,
                     Ventas = 0
@@ -652,16 +654,18 @@ namespace SistemasAnaliticos.Controllers
                     Incapacidad = 0,
                     Teletrabajo = 0,
                     Especial = 0,
-                    Aprobada = 0,
                     Creada = 0,
+                    Aprobada = 0,
                     Pendiente = 0,
                     Rechazada = 0,
+                    Bodega = 0,
                     FinancieroContable = 0,
                     Gerencia = 0,
                     Ingenieria = 0,
                     Jefatura = 0,
                     Legal = 0,
                     Operaciones = 0,
+                    RecursosHumanos = 0,
                     TecnicosNCR = 0,
                     TecnologiasInformacion = 0,
                     Ventas = 0
