@@ -117,13 +117,15 @@
                         </button>
                     </div>
                     <div class="col-md-4">
-                        <buttom asp-controller="Liquidacion" asp-action="CreateViatico"
-                           class="btn btn-success w-100 h-100 p-4 text-start liquidacion-card"
-                           style="background-color: #B290D6;">
+                        <a class="btn btn-success w-100 h-100 p-4 liquidacion-card d-flex flex-column justify-content-center align-items-start"
+                           style="background-color: #B290D6"
+                           asp-controller="Liquidacion" asp-action="CreateViatico">
                             <i class="fa-solid fa-suitcase fs-1 mb-3 text-white"></i>
-                            <h5 class="fw-bold mb-2 text-white">Viáticos</h5>
-                            <p class="mb-0 opacity-90">Registra los viáticos, gastos de viaje y de transporte para el personal.</p>
-                        </buttom>
+                            <h5 class="fw-bold mb-2 text-white text-start">Viáticos</h5>
+                            <p class="mb-0 opacity-90 text-white text-start">
+                                Registra los viáticos, gastos de viaje y de transporte para el personal.
+                            </p>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
+using SistemasAnaliticos.Services;
 using SistemasAnaliticos.ViewModels;
 using System.Runtime.InteropServices;
 
@@ -17,11 +18,13 @@ namespace SistemasAnaliticos.Controllers
 
         private readonly DBContext _context;
         private readonly UserManager<Usuario> _userManager;
+        private readonly IPermisoAlcanceService _permisoAlcanceService;
 
-        public LiquidacionController(DBContext context, UserManager<Usuario> userManager)
+        public LiquidacionController(DBContext context, UserManager<Usuario> userManager, IPermisoAlcanceService permisoAlcanceService)
         {
             _context = context;
             _userManager = userManager;
+            _permisoAlcanceService = permisoAlcanceService;
         }
 
         public IActionResult Index()
@@ -35,6 +38,7 @@ namespace SistemasAnaliticos.Controllers
         [HttpGet]
         public async Task<IActionResult> VerViaticos(int page = 1)
         {
+            // Eliminar cabeceras en estado "Creada" que no tengan detalles asociados
             var cabecerasSinDetalles = await _context.LiquidacionViatico
                 .Include(l => l.Detalles)
                 .Where(l => l.estado == "Creada" && !l.Detalles.Any())
@@ -48,10 +52,12 @@ namespace SistemasAnaliticos.Controllers
 
             int pageSize = 3;
 
-            var totalViaticos = await _context.LiquidacionViatico
-                .CountAsync();
+            var query = _context.LiquidacionViatico.AsNoTracking();
+            query = await _permisoAlcanceService.AplicarAlcanceViaticoAsync(query, User);
 
-            var viaticos = await _context.LiquidacionViatico
+            var totalViaticos = await query.CountAsync();
+
+            var viaticos = await query
                 .AsNoTracking()
                 .Include(lv => lv.Detalles)
                 .OrderByDescending(x => x.fechaCreacion)
@@ -89,7 +95,10 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var todosLosViaticos = await _context.LiquidacionViatico
+                var query = _context.LiquidacionViatico.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcanceViaticoAsync(query, User);
+
+                var todosLosViaticos = await query
                     .AsNoTracking()
                     .Include(lv => lv.Detalles)
                     .OrderByDescending(x => x.fechaCreacion)
@@ -132,10 +141,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.LiquidacionViatico
-                    .AsNoTracking()
-                    .Include(v => v.Detalles)  // Incluir detalles para filtrar por tipoDetalle
-                    .AsQueryable();
+                var query = _context.LiquidacionViatico.AsNoTracking().Include(v => v.Detalles).AsQueryable();
+                query = await _permisoAlcanceService.AplicarAlcanceViaticoAsync(query, User);
 
                 // Aplicar filtros de tipo de detalle
                 if (tiposDetalle != null && tiposDetalle.Length > 0)
@@ -242,10 +249,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.LiquidacionViatico
-                    .AsNoTracking()
-                    .Include(v => v.Detalles)
-                    .AsQueryable();
+                var query = _context.LiquidacionViatico.AsNoTracking().Include(v => v.Detalles).AsQueryable();
+                query = await _permisoAlcanceService.AplicarAlcanceViaticoAsync(query, User);
 
                 // Aplicar filtros de tipo de detalle
                 if (tiposDetalle != null && tiposDetalle.Length > 0)
@@ -434,10 +439,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.LiquidacionViatico
-                    .AsNoTracking()
-                    .Include(v => v.Detalles)
-                    .AsQueryable();
+                var query = _context.LiquidacionViatico.AsNoTracking().Include(v => v.Detalles).AsQueryable();
+                query = await _permisoAlcanceService.AplicarAlcanceViaticoAsync(query, User);
 
                 // Aplicar filtros (misma lógica que Excel)
                 if (tiposDetalle != null && tiposDetalle.Length > 0)
@@ -695,10 +698,14 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                // Obtener todos los viáticos con sus detalles
-                var viaticosConDetalles = await _context.LiquidacionViatico
+                var baseQuery = _context.LiquidacionViatico
                     .AsNoTracking()
                     .Include(v => v.Detalles)
+                    .AsQueryable();
+
+                baseQuery = await _permisoAlcanceService.AplicarAlcanceViaticoAsync(baseQuery, User);
+
+                var data = await baseQuery
                     .Select(v => new
                     {
                         v.idViatico,
@@ -724,56 +731,34 @@ namespace SistemasAnaliticos.Controllers
                 var contadores = new
                 {
                     // Contadores por tipo de detalle
-                    Combustible = viaticosConDetalles
-                        .Count(v => v.DetallesTipos.Any(t => t == "Combustible")),
-                    Kilometraje = viaticosConDetalles
-                        .Count(v => v.DetallesTipos.Any(t => t == "Kilometraje")),
-                    Transporte = viaticosConDetalles
-                        .Count(v => v.DetallesTipos.Any(t => t == "Transporte")),
-                    Hospedaje = viaticosConDetalles
-                        .Count(v => v.DetallesTipos.Any(t => t == "Hospedaje")),
-                    Alimentacion = viaticosConDetalles
-                        .Count(v => v.DetallesTipos.Any(t => t == "Alimentación")),
-                    OtrosTipos = viaticosConDetalles
-                        .Count(v => v.DetallesTipos.Any(t =>
-                            !tiposInteres.Contains(t) && !string.IsNullOrEmpty(t))),
+                    Combustible = data.Count(v => v.DetallesTipos.Any(t => t == "Combustible")),
+                    Kilometraje = data.Count(v => v.DetallesTipos.Any(t => t == "Kilometraje")),
+                    Transporte = data.Count(v => v.DetallesTipos.Any(t => t == "Transporte")),
+                    Hospedaje = data.Count(v => v.DetallesTipos.Any(t => t == "Hospedaje")),
+                    Alimentacion = data.Count(v => v.DetallesTipos.Any(t => t == "Alimentación")),
+                    OtrosTipos = data.Count(v => v.DetallesTipos.Any(t => !tiposInteres.Contains(t) && !string.IsNullOrEmpty(t))),
 
                     // Contadores por estado
-                    Creada = viaticosConDetalles
-                        .Count(v => v.estado == "Creada"),
-                    Aprobada = viaticosConDetalles
-                        .Count(v => v.estado == "Aprobada"),
-                    Pendiente = viaticosConDetalles
-                        .Count(v => v.estado == "Pendiente"),
-                    Rechazada = viaticosConDetalles
-                        .Count(v => v.estado == "Rechazada"),
+                    Creada = data.Count(v => v.estado == "Creada"),
+                    Aprobada = data.Count(v => v.estado == "Aprobada"),
+                    Pendiente = data.Count(v => v.estado == "Pendiente"),
+                    Rechazada = data.Count(v => v.estado == "Rechazada"),
 
                     // Contadores por departamento
-                    Bodega = viaticosConDetalles
-                        .Count(v => v.departamento == "Bodega"),
-                    FinancieroContable = viaticosConDetalles
-                        .Count(v => v.departamento == "Financiero Contable"),
-                    Gerencia = viaticosConDetalles
-                        .Count(v => v.departamento == "Gerencia"),
-                    Ingenieria = viaticosConDetalles
-                        .Count(v => v.departamento == "Ingeniería"),
-                    Jefatura = viaticosConDetalles
-                        .Count(v => v.departamento == "Jefatura"),
-                    Legal = viaticosConDetalles
-                        .Count(v => v.departamento == "Legal"),
-                    Operaciones = viaticosConDetalles
-                        .Count(v => v.departamento == "Operaciones"),
-                    RecursosHumanos = viaticosConDetalles
-                        .Count(v => v.departamento == "Recursos Humanos"),
-                    TecnicosNCR = viaticosConDetalles
-                        .Count(v => v.departamento == "Tecnicos NCR"),
-                    TecnologiasInformacion = viaticosConDetalles
-                        .Count(v => v.departamento == "Tecnologías de Información"),
-                    Ventas = viaticosConDetalles
-                        .Count(v => v.departamento == "Ventas"),
+                    Bodega = data.Count(v => v.departamento == "Bodega"),
+                    FinancieroContable = data.Count(v => v.departamento == "Financiero Contable"),
+                    Gerencia = data.Count(v => v.departamento == "Gerencia"),
+                    Ingenieria = data.Count(v => v.departamento == "Ingeniería"),
+                    Jefatura = data.Count(v => v.departamento == "Jefatura"),
+                    Legal = data.Count(v => v.departamento == "Legal"),
+                    Operaciones = data.Count(v => v.departamento == "Operaciones"),
+                    RecursosHumanos = data.Count(v => v.departamento == "Recursos Humanos"),
+                    TecnicosNCR = data.Count(v => v.departamento == "Tecnicos NCR"),
+                    TecnologiasInformacion = data.Count(v => v.departamento == "Tecnologías de Información"),
+                    Ventas = data.Count(v => v.departamento == "Ventas"),
 
                     // Tipos únicos encontrados (para filtros dinámicos)
-                    TiposUnicos = viaticosConDetalles
+                    TiposUnicos = data
                         .SelectMany(v => v.DetallesTipos)
                         .Where(t => !string.IsNullOrEmpty(t))
                         .Distinct()
@@ -857,6 +842,7 @@ namespace SistemasAnaliticos.Controllers
 
             var liquidacion = new LiquidacionViatico
             {
+                UsuarioId = user.Id,
                 fechaCreacion = hoy,
                 nombreEmpleado = user.nombreCompleto ?? "Sin nombre",
                 departamento = user.departamento ?? "Sin departamento",

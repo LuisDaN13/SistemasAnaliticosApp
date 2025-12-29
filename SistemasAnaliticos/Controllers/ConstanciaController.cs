@@ -19,13 +19,15 @@ namespace SistemasAnaliticos.Controllers
         private readonly DBContext _context;
         private readonly UserManager<Usuario> _userManager;
         private readonly IConstanciaService _constanciaService;
+        private readonly IPermisoAlcanceService _permisoAlcanceService;
 
 
-        public ConstanciaController(DBContext context, UserManager<Usuario> userManager, IConstanciaService constanciaService)
+        public ConstanciaController(DBContext context, UserManager<Usuario> userManager, IConstanciaService constanciaService, IPermisoAlcanceService permisoAlcanceService)
         {
             _context = context;
             _userManager = userManager;
             _constanciaService = constanciaService;
+            _permisoAlcanceService = permisoAlcanceService;
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
@@ -35,10 +37,12 @@ namespace SistemasAnaliticos.Controllers
         {
             int pageSize = 3;
 
-            var totalConstancias = await _context.Constancia
-                .CountAsync();
+            var query = _context.Constancia.AsNoTracking();
+            query = await _permisoAlcanceService.AplicarAlcanceConstanciaAsync(query, User);
 
-            var constancias = await _context.Constancia
+            var totalConstancias = await query.CountAsync();
+
+            var constancias = await query
                 .AsNoTracking()
                 .OrderByDescending(x => x.fechaCreacion)
                 .Skip((page - 1) * pageSize)
@@ -76,7 +80,10 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var todosLasConstancias = await _context.Constancia
+                var query = _context.Constancia.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcanceConstanciaAsync(query, User);
+
+                var todosLasConstancias = await query
                     .AsNoTracking()
                     .OrderByDescending(x => x.fechaCreacion)
                     .Select(p => new {
@@ -117,7 +124,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.Constancia.AsNoTracking().AsQueryable();
+                var query = _context.Constancia.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcanceConstanciaAsync(query, User);
 
                 // Aplicar filtros de tipo
                 if (tipos != null && tipos.Length > 0)
@@ -213,7 +221,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.Constancia.AsNoTracking().AsQueryable();
+                var query = _context.Constancia.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcanceConstanciaAsync(query, User);
 
                 // Aplicar filtros de tipo
                 if (tipos != null && tipos.Length > 0)
@@ -353,7 +362,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.Constancia.AsNoTracking().AsQueryable();
+                var query = _context.Constancia.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcanceConstanciaAsync(query, User);
 
                 // Aplicar filtros (misma lógica que Excel)
                 if (tipos != null && tipos.Length > 0)
@@ -523,7 +533,10 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var contadores = await _context.Constancia
+                var query = _context.Constancia.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcanceConstanciaAsync(query, User);
+
+                var contadores = await query
                     .AsNoTracking()
                     .GroupBy(p => 1)
                     .Select(g => new

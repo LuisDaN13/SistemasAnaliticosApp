@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
+using SistemasAnaliticos.Helpers;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
 using SistemasAnaliticos.ViewModels;
@@ -19,52 +20,19 @@ namespace SistemasAnaliticos.Controllers
         private readonly DBContext _context;
         private readonly UserManager<Usuario> _userManager;
         private readonly IAlcanceUsuarioService _alcanceUsuarioService;
+        private readonly IPermisoAlcanceService _permisoAlcanceService;
+        private readonly IEmailService _emailService;
 
-        public PermisoController(DBContext context, UserManager<Usuario> userManager, IAlcanceUsuarioService alcanceUsuarioService)
+        public PermisoController(DBContext context, UserManager<Usuario> userManager, IAlcanceUsuarioService alcanceUsuarioService, IPermisoAlcanceService permisoAlcanceService, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
             _alcanceUsuarioService = alcanceUsuarioService;
+            _permisoAlcanceService = permisoAlcanceService;
+            _emailService = emailService;
         }
 
-
-        //private async Task<IQueryable<Permiso>> AplicarAlcanceAsync()
-        //{
-        //    var user = await _userManager.GetUserAsync(User);
-        //    var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(user);
-
-        //    IQueryable<Permiso> query = _context.Permiso.AsNoTracking();
-
-        //    switch (alcance)
-        //    {
-        //        case "Global":
-        //            // No se filtra nada
-        //            break;
-
-        //        case "Subordinados":
-        //            var subordinados = await _context.Users
-        //                .Where(u => u.jefe == user.UserName)
-        //                .Select(u => u.UserName)
-        //                .ToListAsync();
-
-        //            query = query.Where(p => subordinados.Contains(p.nombreEmpleado));
-        //            break;
-
-        //        default: // Propio
-        //            query = query.Where(p => p.nombreEmpleado == user.UserName);
-        //            break;
-        //    }
-
-        //    return query;
-        //}
-
-
-
-
-
-
-        // -------------------------------------------------------------------------------------------------------------------------------
-        // INDEX DONDE SE OCUPAN CREAR PERMISOS
+        [Authorize(Policy = "Permiso.Crear")]
         public async Task<IActionResult> Index()
         {
             return View();
@@ -77,12 +45,13 @@ namespace SistemasAnaliticos.Controllers
         {
             int pageSize = 3;
 
-            var totalPermisos = await _context.Permiso
-                .CountAsync();
+            var query = _context.Permiso.AsNoTracking();
+            query = await _permisoAlcanceService.AplicarAlcancePermisoAsync(query, User);
 
-            var permisos = await _context.Permiso
-                .AsNoTracking()
-                .OrderByDescending(x => x.fechaCreacion)
+            var totalPermisos = await query.CountAsync();
+
+            var permisos = await query
+                .OrderByDescending(p => p.fechaCreacion)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(p => new PermisoViewModel
@@ -106,14 +75,12 @@ namespace SistemasAnaliticos.Controllers
                 })
                 .ToListAsync();
 
-            var viewModel = new PaginacionPermisosViewModel
+            return View(new PaginacionPermisosViewModel
             {
                 Permisos = permisos,
                 PaginaActual = page,
                 TotalPaginas = (int)Math.Ceiling(totalPermisos / (double)pageSize)
-            };
-
-            return View(viewModel);
+            });
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
@@ -122,7 +89,10 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var todosLosPermisos = await _context.Permiso
+                var query = _context.Permiso.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcancePermisoAsync(query, User);
+
+                var todosLosPermisos = await query
                     .AsNoTracking()
                     .OrderByDescending(x => x.fechaCreacion)
                     .Select(p => new {
@@ -167,7 +137,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.Permiso.AsNoTracking().AsQueryable();
+                var query = _context.Permiso.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcancePermisoAsync(query, User);
 
                 // Aplicar filtros de tipo
                 if (tipos != null && tipos.Length > 0)
@@ -267,7 +238,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.Permiso.AsNoTracking().AsQueryable();
+                var query = _context.Permiso.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcancePermisoAsync(query, User);
 
                 // Aplicar filtros de tipo
                 if (tipos != null && tipos.Length > 0)
@@ -414,7 +386,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.Permiso.AsNoTracking().AsQueryable();
+                var query = _context.Permiso.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcancePermisoAsync(query, User);
 
                 if (tipos != null && tipos.Length > 0)
                 {
@@ -588,7 +561,10 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var contadores = await _context.Permiso
+                var query = _context.Permiso.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcancePermisoAsync(query, User);
+
+                var contadores = await query
                     .AsNoTracking()
                     .GroupBy(p => 1)
                     .Select(g => new
@@ -747,7 +723,21 @@ namespace SistemasAnaliticos.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Permiso model)
         {
-            // Detectar sistema operativo y usar el ID de zona horaria adecuado
+            var usuario = await _userManager.GetUserAsync(User);
+
+            string nombreJefe = "No asignado";
+            string correoJefe = "No asignado";
+
+            if (!string.IsNullOrEmpty(usuario.jefeId))
+            {
+                var jefe = await _userManager.FindByIdAsync(usuario.jefeId);
+                if (jefe != null)
+                {
+                    nombreJefe = jefe.nombreCompleto ?? jefe.UserName;
+                    correoJefe = jefe.Email;
+                }
+            }
+
             string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? "Central America Standard Time"           // Windows
                 : "America/Costa_Rica";                     // Linux/macOS
@@ -764,6 +754,8 @@ namespace SistemasAnaliticos.Controllers
 
                 var nuevo = new Permiso
                 {
+                    UsuarioId = usuario.Id,
+
                     fechaCreacion = hoy,
                     nombreEmpleado = user.nombreCompleto,
                     departamento = user.departamento,
@@ -789,6 +781,46 @@ namespace SistemasAnaliticos.Controllers
 
                 _context.Permiso.Add(nuevo);
                 await _context.SaveChangesAsync();
+
+                try
+                {
+                    // 1. Correo al empleado
+                    var htmlEmpleado = PlantillasEmail.ConfirmacionEmpleado(
+                        nombreEmpleado: user.nombreCompleto,
+                        tipoPermiso: model.tipo
+                    );
+
+                    await _emailService.SendEmailAsync(
+                        toEmail: user.Email,
+                        toName: user.nombreCompleto,
+                        subject: $"Confirmación de Permiso - {user.nombreCompleto}",
+                        htmlBody: htmlEmpleado
+                    );
+
+                    //2.Correo de notificación al jefe(si tiene)
+                    if (!string.IsNullOrEmpty(user.jefeId))
+                    {
+                        var htmlJefe = PlantillasEmail.NotificacionJefatura(
+                            nombreEmpleado: user.nombreCompleto,
+                            tipoPermiso: model.tipo,
+                            nombreJefe: nombreJefe
+                        );
+
+                        await _emailService.SendEmailAsync(
+                            toEmail: correoJefe,
+                            toName: nombreJefe,
+                            subject: $"Solicitud de permiso pendiente - {user.nombreCompleto}",
+                            htmlBody: htmlJefe
+                        );
+                    }
+
+                }
+                catch (Exception exEmail)
+                {
+                    // Solo log si hay error en correo, no interrumpir
+                    Console.WriteLine($"Error enviando correo: {exEmail.Message}");
+                }
+
                 TempData["SuccessMessage"] = "Se creó el permiso correctamente.";
                 return RedirectToAction(nameof(Index));
             }
@@ -797,6 +829,19 @@ namespace SistemasAnaliticos.Controllers
                 TempData["ErrorMessage"] = "Error en la creación del permiso.";
                 return RedirectToAction(nameof(Index));
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendTestEmail(string toEmail, string toName, string subject, string htmlBody)
+        {
+            await _emailService.SendEmailAsync(
+                toEmail,
+                toName,
+                subject,
+                htmlBody
+            );
+
+            return Ok(new { message = "Correo enviado correctamente" });
         }
     }
 }

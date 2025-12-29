@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
@@ -10,10 +11,12 @@ namespace SistemasAnaliticos.Controllers
     public class RolController : Controller
     {
         private readonly DBContext _context;
+        private readonly UserManager<Usuario> userManager;
 
-        public RolController(DBContext context)
+        public RolController(DBContext context, UserManager<Usuario> userManager)
         {
             _context = context;
+            this.userManager = userManager;
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
@@ -32,6 +35,36 @@ namespace SistemasAnaliticos.Controllers
                 .ToListAsync();
 
             return View(roles);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> MostrarUsers()
+        {
+            var usuarios = userManager.Users.ToList();
+            var resultado = new List<object>();
+
+            foreach (var user in usuarios)
+            {
+                var rol = (await userManager.GetRolesAsync(user)).FirstOrDefault();
+                resultado.Add(new
+                {
+                    user.Id,
+                    user.nombreCompleto,
+                    user.UserName,
+                    Rol = rol ?? "Sin rol asignado"
+                });
+            }
+
+            ViewBag.Usuarios = resultado;
+
+            // Si es una solicitud AJAX, devolver la vista parcial
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_UsuariosList");
+            }
+
+            return View();
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------

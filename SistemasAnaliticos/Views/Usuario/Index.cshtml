@@ -165,23 +165,12 @@
             width: 100%;
         }
 
-        /* Cada “slot” de botón ocupa el mismo espacio */
-        .footer-slot-details {
-            flex: 2;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .footer-slot-edit {
-            flex: 2;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .footer-slot-delete {
-            flex: 2;
+        /* Cada "slot" de botón */
+        .footer-slot-details,
+        .footer-slot-edit,
+        .footer-slot-delete,
+        .footer-slot-password {
+            flex: 1; /* Ahora todos ocupan el mismo espacio */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -216,6 +205,16 @@
         .btn-delete {
             color: #dc3545;
         }
+
+        /* Estilo para el botón de contraseña */
+        .btn-password {
+            color: #6a11cb;
+        }
+
+            .btn-password:hover {
+                color: #2575fc;
+                background-color: rgba(106, 17, 203, 0.1);
+            }
     </style>
 
     <!-- ESTILOS DEL MODAL -->
@@ -580,6 +579,16 @@
                                             <i class="bi bi-slash-circle"></i>
                                         </button>
                                     </div>
+                                    <div class="footer-slot-password">
+                                        <button class="action-btn btn-password"
+                                                title="Cambiar Contraseña"
+                                                data-id="@empleado.Id"
+                                                data-nombre="@empleado.Nombre"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalCambiarContrasena">
+                                            <i class="bi bi-key"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         }
@@ -592,7 +601,6 @@
     <!-- Modal de Registro -->
     <partial name="~/Views/Usuario/modalRegistro.cshtml" model="new SistemasAnaliticos.Entidades.Usuario()" />
 
-
     <!-- Modal de Inactivar -->
     <div class="modal fade" id="modalInactivar" tabindex="-1" aria-labelledby="modalInactivarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -601,7 +609,7 @@
                     <h5 class="modal-title" id="modalInactivarLabel">Cambiar de Estado</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <p style="margin: 1rem;">
                         ¿Está seguro que desea cambiar el estado del empleado
                         <strong id="nombreInactivar"></strong>?
@@ -612,13 +620,147 @@
                     <input type="hidden" id="idEmpleadoInactivar" name="id" />
                     <div class="modal-footer d-flex justify-content-around">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-warning">Inactivar</button>
+                        <button type="submit" class="btn btn-warning">Cambiar</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
+    <!-- Modal de Cambio de Contraseña -->
+    <div class="modal fade" id="modalCambiarContrasena" tabindex="-1" aria-labelledby="modalCambiarContrasenaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #012473; color: white;">
+                    <h5 class="modal-title" id="modalCambiarContrasenaLabel">Cambiar Contraseña</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formCambiarContrasena" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="idUsuarioContrasena" name="id" />
+
+                        <div class="p-3">
+                            <label for="nuevaContrasena" class="form-label">
+                                Nueva Contraseña <span class="text-danger">*</span>
+                            </label>
+
+                            <!-- Input + botón -->
+                            <div class="input-group">
+                                <input type="password"
+                                       class="form-control"
+                                       id="nuevaContrasena"
+                                       name="nuevaContrasena"
+                                       autocomplete="new-password"
+                                       required
+                                       pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@@\$!%*?&#._-])[A-Za-z\d@@\$!%*?&#._-]{8,}$" />
+
+                                <button class="btn btn-outline-secondary"
+                                        type="button"
+                                        id="toggleNuevaContrasena">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+
+                            <!-- Especificaciones debajo -->
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    La contraseña debe tener:
+                                    <ul class="mb-0 ps-3" style="font-size: 0.85rem;">
+                                        <li>Mínimo 8 caracteres</li>
+                                        <li>Al menos una mayúscula y una minúscula</li>
+                                        <li>Al menos un número</li>
+                                        <li>Al menos un carácter especial</li>
+                                    </ul>
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary-custom" id="btnCambiarContrasena">Cambiar Contraseña</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const modalCambiarContrasena = document.getElementById('modalCambiarContrasena');
+            const formCambiarContrasena = document.getElementById('formCambiarContrasena');
+            const btnCambiarContrasena = document.getElementById('btnCambiarContrasena');
+            const nuevaContrasenaInput = document.getElementById('nuevaContrasena');
+            const toggleNuevaContrasena = document.getElementById('toggleNuevaContrasena');
+            const idUsuarioContrasena = document.getElementById('idUsuarioContrasena');
+
+            if (!modalCambiarContrasena) return;
+
+            modalCambiarContrasena.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                idUsuarioContrasena.value = button.getAttribute('data-id');
+
+                const nombre = button.getAttribute('data-nombre');
+                modalCambiarContrasena.querySelector('.modal-title')
+                    .textContent = `Cambiar Contraseña - ${nombre}`;
+
+                formCambiarContrasena.reset();
+                nuevaContrasenaInput.type = 'password';
+                toggleNuevaContrasena.querySelector('i').className = 'bi bi-eye';
+            });
+
+            toggleNuevaContrasena.addEventListener('click', function () {
+                const isPassword = nuevaContrasenaInput.type === 'password';
+                nuevaContrasenaInput.type = isPassword ? 'text' : 'password';
+                this.querySelector('i').className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+            });
+
+            function validarFortalezaContrasena(password) {
+                const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@@$!%*?&#._-])[A-Za-z\d@@$!%*?&#._-]{8,}$/;
+                return regex.test(password);
+            }
+
+            nuevaContrasenaInput.addEventListener('input', function () {
+                this.classList.remove('is-valid', 'is-invalid');
+                if (!this.value) return;
+
+                this.classList.add(
+                    validarFortalezaContrasena(this.value) ? 'is-valid' : 'is-invalid'
+                );
+            });
+
+            btnCambiarContrasena.addEventListener('click', async function () {
+                if (!formCambiarContrasena.checkValidity()) {
+                    formCambiarContrasena.reportValidity();
+                    return;
+                }
+
+                const response = await fetch('/Usuario/CambiarContrasena', {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken':
+                            document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: new FormData(formCambiarContrasena)
+                });
+
+                const result = await response.json();
+
+                Swal.fire({
+                    icon: result.success ? 'success' : 'error',
+                    title: result.success ? 'Éxito' : 'Error',
+                    text: result.message
+                });
+
+                if (result.success) {
+                    bootstrap.Modal.getInstance(modalCambiarContrasena).hide();
+                }
+            });
+        });
+    </script>
 
     <!-- SCRIPT DE LA API DE LA UBICACION -->
     <script src='~/JS/costaricaLocal.js'></script>
@@ -652,6 +794,23 @@
                         timer: 3000
                     });
                 </text>
+            }
+
+            if (result.success) {
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: result.message
+                }).then(() => {
+
+                    if (result.logout) {
+                        // 🔥 redirige al login
+                        window.location.href = '/Usuario/Login';
+                    } else {
+                        location.reload();
+                    }
+                });
             }
         });
     </script>
@@ -790,7 +949,6 @@
             filterEmployees('');
         });
     </script>
-
-
+    }
 </body>
 </html>

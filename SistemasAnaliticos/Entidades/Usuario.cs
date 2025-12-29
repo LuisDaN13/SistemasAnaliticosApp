@@ -9,44 +9,36 @@ namespace SistemasAnaliticos.Entidades
     {
         // INFORMACIÓN PERSONAL BÁSICA
 
-        [Required]
         [StringLength(50)]
-        public string primerNombre { get; set; } = string.Empty;
+        public string? primerNombre { get; set; } = string.Empty;
 
         [StringLength(50)]
         public string? segundoNombre { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(50)]
-        public string primerApellido { get; set; } = string.Empty;
+        public string? primerApellido { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(50)]
-        public string segundoApellido { get; set; } = string.Empty;
+        public string? segundoApellido { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(15)]
-        public string noEmpleado { get; set; } = string.Empty;
+        public string? noEmpleado { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(20)]
-        public string cedula { get; set; } = string.Empty;
+        public string? cedula { get; set; } = string.Empty;
 
         [DataType(DataType.Date)]
         public DateTime? fechaNacimiento { get; set; }
 
-        [Required]
         [StringLength(10)]
-        public string genero { get; set; } = string.Empty;
+        public string? genero { get; set; } = string.Empty;
 
 
         // INFORMACIÓN DEMOGRÁFICA
 
-        [Required]
         [StringLength(20)]
-        public string estadoCivil { get; set; } = string.Empty;
+        public string? estadoCivil { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(5)]
         public string? tipoSangre { get; set; }
 
@@ -56,17 +48,14 @@ namespace SistemasAnaliticos.Entidades
 
         // DIRECCIÓN 
 
-        [Required]
         [StringLength(50)]
-        public string provincia { get; set; } = string.Empty;
+        public string? provincia { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(50)]
-        public string canton { get; set; } = string.Empty;
+        public string? canton { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(50)]
-        public string distrito { get; set; } = string.Empty;
+        public string? distrito { get; set; } = string.Empty;
 
         [StringLength(255)]
         public string? direccionExacta { get; set; } = string.Empty;
@@ -77,13 +66,11 @@ namespace SistemasAnaliticos.Entidades
         [StringLength(100)]
         public string? profesion { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(100)]
-        public string puesto { get; set; } = string.Empty;
+        public string? puesto { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(100)]
-        public string departamento { get; set; } = string.Empty;
+        public string? departamento { get; set; } = string.Empty;
 
         [DataType(DataType.Date)]
         public DateTime? fechaIngreso { get; set; }
@@ -94,31 +81,36 @@ namespace SistemasAnaliticos.Entidades
         [StringLength(12)]
         public string? celularOficina { get; set; }
 
-
         public string? jefeId { get; set; }
-        [ForeignKey("JefeId")]
-        public Usuario? Jefe { get; set; }
+
+        [StringLength(100)]
+        public string? jefeNombre { get; set; }
+
+        // Relación con el jefe
+        [ForeignKey("jefeId")]
+        [InverseProperty("Subordinados")]
+        public virtual Usuario? Jefe { get; set; }
+
+        // Colección de subordinados (opcional)
+        [InverseProperty("Jefe")]
+        public virtual ICollection<Usuario>? Subordinados { get; set; }
 
 
         [StringLength(20)]
         public string? extension { get; set; }
 
-        [Required]
         [StringLength(15)]
-        public string salario { get; set; } = string.Empty;
+        public string? salario { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(50)]
         public string? cuentaIBAN { get; set; }
 
 
         // CONTACTOS
 
-        [Required]
         [StringLength(20)]
         public string? celularPersonal { get; set; }
 
-        [Required]
         [EmailAddress]
         public string? correoPersonal { get; set; }
 
@@ -131,17 +123,14 @@ namespace SistemasAnaliticos.Entidades
         [StringLength(80)]
         public string? licencias { get; set; }
 
-        [Required]
         [StringLength(100)]
-        public string tipoPariente { get; set; } = string.Empty;
+        public string? tipoPariente { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(100)]
-        public string contactoEmergencia { get; set; } = string.Empty;
+        public string? contactoEmergencia { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(20)]
-        public string telefonoEmergencia { get; set; } = string.Empty;
+        public string? telefonoEmergencia { get; set; } = string.Empty;
 
 
         // ARCHIVOS Y SALUD
@@ -158,6 +147,12 @@ namespace SistemasAnaliticos.Entidades
         public string? padecimientosAlergias { get; set; }
 
         public bool estado { get; set; }
+
+
+        [StringLength(100)]
+        public string? sessionId { get; set; }   // Identificador único de la sesión activa
+
+        public DateTime? lastActivityUtc { get; set; } // Última actividad en UTC
 
 
         // PROPIEDADES CALCULADAS

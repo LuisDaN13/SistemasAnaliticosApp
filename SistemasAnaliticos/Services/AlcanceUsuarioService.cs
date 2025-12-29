@@ -20,12 +20,13 @@ namespace SistemasAnaliticos.Services
         {
             var roles = await _userManager.GetRolesAsync(user);
 
-            var alcance = await _context.AlcanceUsuario
-                .Where(r => roles.Contains(r.rolId) || roles.Contains(r.rolId))
-                .Select(r => r.alcance)
-                .FirstOrDefaultAsync();
+            if (roles.Contains("Administrador") || roles.Contains("RRHH"))
+                return "Global";
 
-            return alcance ?? "Propio";
+            if (roles.Contains("Jefatura"))
+                return "Subordinados";
+
+            return "Propio";
         }
     }
 }

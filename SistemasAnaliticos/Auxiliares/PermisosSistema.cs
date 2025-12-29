@@ -16,12 +16,12 @@
             ClavesPermiso.Crear(Modulos.Rol, Acciones.Crear),
             ClavesPermiso.Crear(Modulos.Rol, Acciones.Inactivar),
             ClavesPermiso.Crear(Modulos.Rol, Acciones.Eliminar),
+            ClavesPermiso.Crear(Modulos.Rol, Acciones.CambiarRol),
 
             // Permiso
             ClavesPermiso.Crear(Modulos.Permiso, Acciones.Ver),
             ClavesPermiso.Crear(Modulos.Permiso, Acciones.Detalles),
             ClavesPermiso.Crear(Modulos.Permiso, Acciones.Crear),
-            ClavesPermiso.Crear(Modulos.Permiso, Acciones.Editar),
             ClavesPermiso.Crear(Modulos.Permiso, Acciones.CambiarEstado),
             ClavesPermiso.Crear(Modulos.Permiso, Acciones.Descargar),
 
@@ -29,7 +29,6 @@
             ClavesPermiso.Crear(Modulos.Constancia, Acciones.Ver),
             ClavesPermiso.Crear(Modulos.Constancia, Acciones.Detalles),
             ClavesPermiso.Crear(Modulos.Constancia, Acciones.Crear),
-            ClavesPermiso.Crear(Modulos.Constancia, Acciones.Editar),
             ClavesPermiso.Crear(Modulos.Constancia, Acciones.CambiarEstado),
             ClavesPermiso.Crear(Modulos.Constancia, Acciones.Descargar),
 
@@ -37,7 +36,6 @@
             ClavesPermiso.Crear(Modulos.Beneficio, Acciones.Ver),
             ClavesPermiso.Crear(Modulos.Beneficio, Acciones.Detalles),
             ClavesPermiso.Crear(Modulos.Beneficio, Acciones.Crear),
-            ClavesPermiso.Crear(Modulos.Beneficio, Acciones.Editar),
             ClavesPermiso.Crear(Modulos.Beneficio, Acciones.CambiarEstado),
 
             // Liquidación

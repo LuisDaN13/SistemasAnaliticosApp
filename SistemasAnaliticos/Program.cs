@@ -1,21 +1,38 @@
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using SistemasAnaliticos.Auxiliares;
 using SistemasAnaliticos.Entidades;
+using SistemasAnaliticos.Middlewares;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.Configure<ConfiguracionEmail>(
+    builder.Configuration.GetSection("Smtp"));
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+
 builder.Services.AddControllersWithViews();
+//builder.Services.AddControllersWithViews(options =>
+//{
+//    var policy = new AuthorizationPolicyBuilder()
+//        .RequireAuthenticatedUser()
+//        .Build();
+
+//    options.Filters.Add(new AuthorizeFilter(policy));
+//});
 builder.Services.AddScoped<IConstanciaService, ConstanciaService>();
 builder.Services.AddScoped<IFechaLargaService, FechaLargaService>();
 builder.Services.AddScoped<IAlcanceUsuarioService, AlcanceUsuarioService>();
 builder.Services.AddScoped<IRolPermisoService, RolPermisoService>();
-
+builder.Services.AddScoped<IPermisoAlcanceService, PermisoAlcanceService>();
 builder.Services.AddScoped<IAuthorizationHandler, PermisoHandler>();
 builder.Services.AddAuthorization(options =>
 {
@@ -59,6 +76,14 @@ builder.Services.AddSession(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Expiración por inactividad: 1 minuto, con sliding expiration
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/Usuario/Login"; // ajustar si la ruta es diferente
+});
+
 // Aplicacion
 var app = builder.Build();
 
@@ -74,6 +99,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
+app.UseSessionValidation();
 app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",

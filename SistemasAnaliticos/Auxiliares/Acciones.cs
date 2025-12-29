@@ -10,5 +10,6 @@
         public const string Inactivar = "Inactivar";
         public const string CambiarEstado = "CambiarEstado";
         public const string Descargar = "Descargar";
+        public const string CambiarRol = "CambiarRol";
     }
 }

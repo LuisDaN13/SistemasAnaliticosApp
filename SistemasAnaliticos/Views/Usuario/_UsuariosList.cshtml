@@ -1,0 +1,281 @@
+﻿@model dynamic
+
+<div class="table-responsive">
+    <table class="table table-borderless table-hover mb-0">
+        <thead class="border-bottom">
+            <tr>
+                <th class="text-start fw-normal text-muted">Nombre Completo</th>
+                <th class="text-start fw-normal text-muted">Usuario</th>
+                <th class="text-start fw-normal text-muted">Rol</th>
+                <th class="text-end fw-normal text-muted">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (ViewBag.Usuarios != null)
+            {
+                foreach (var user in ViewBag.Usuarios)
+                {
+                    <tr class="align-middle">
+                        <td class="text-start">
+                            <span class="fw-medium">@user.nombreCompleto</span>
+                        </td>
+                        <td class="text-start">
+                            <span class="text-muted">@user.UserName</span>
+                        </td>
+                        <td class="text-start">
+                            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-1">
+                                @user.Rol
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button class="btn btn-outline-primary border cambiar-rol-btn"
+                                        data-user-id="@user.Id"
+                                        data-user-nombre="@user.nombreCompleto"
+                                        data-user-username="@user.UserName"
+                                        data-user-rol="@user.Rol">
+                                    <i class="fas fa-user-tag"></i>
+                                    <span class="d-none d-md-inline ms-1">Cambiar Rol</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h5 class="text-muted mb-2">No hay usuarios registrados</h5>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para cambiar rol -->
+<div class="modal fade" id="modalCambiarRol" tabindex="-1" aria-labelledby="modalCambiarRolLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: var(--primary-color);">
+                <h5 class="modal-title text-white">Cambiar Rol de Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: invert(1);"></button>
+            </div>
+            <form id="formCambiarRol" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body p-4">
+                    <!-- Información de solo lectura -->
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">Información del Usuario</h6>
+
+                        <div class="row mb-3">
+                            <label class="form-label text-muted">Nombre Completo</label>
+                            <div class="form-control-plaintext bg-light p-3 rounded" id="modalNombreCompleto">
+                                <!-- Se llena con JavaScript -->
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="form-label text-muted">Usuario</label>
+                            <div class="form-control-plaintext bg-light p-3 rounded" id="modalUserName">
+                                <!-- Se llena con JavaScript -->
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="form-label text-muted">Rol Actual</label>
+                            <div class="form-control-plaintext bg-light p-3 rounded" id="modalRolActual">
+                                <!-- Se llena con JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campo editable: Rol -->
+                    <div class="mb-3">
+                        <label for="nuevoRol" class="form-label fw-semibold">
+                            <i class="fas fa-user-tag me-2"></i>Seleccionar Nuevo Rol
+                        </label>
+                        <select class="form-select" id="nuevoRol" name="nuevoRol" required>
+                            <option value="">-- Seleccione un rol --</option>
+                            <!-- Se llena dinámicamente con JavaScript -->
+                        </select>
+                        <div class="form-text">Seleccione el nuevo rol para este usuario</div>
+                    </div>
+
+                    <!-- Campo oculto para el ID del usuario -->
+                    <input type="hidden" id="userId" name="userId" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-custom-primary text-white">
+                        <i class="fas fa-save me-2"></i>Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Función para abrir el modal de cambiar rol
+    function abrirModalCambiarRol(userId, nombreCompleto, userName, rolActual) {
+        // Llenar información de solo lectura
+        document.getElementById('modalNombreCompleto').textContent = nombreCompleto;
+        document.getElementById('modalUserName').textContent = userName;
+        document.getElementById('modalRolActual').textContent = rolActual;
+        document.getElementById('userId').value = userId;
+
+        // Cargar lista de roles disponibles
+        cargarRolesDisponibles(rolActual);
+
+        // Mostrar el modal
+        const modal = new bootstrap.Modal(document.getElementById('modalCambiarRol'));
+        modal.show();
+    }
+
+    // Función para cargar roles disponibles
+    function cargarRolesDisponibles(rolActual) {
+        const select = document.getElementById('nuevoRol');
+
+        // Mostrar loading
+        select.innerHTML = '<option value="">Cargando roles...</option>';
+
+        // Obtener roles del servidor (necesitas crear esta acción en el controlador)
+        fetch('@Url.Action("GetRoles", "Usuario")')
+            .then(response => response.json())
+            .then(data => {
+
+                if (!data.success || !Array.isArray(data.roles)) {
+                    throw new Error('Respuesta inválida del servidor');
+                }
+
+                select.innerHTML = '<option value="">-- Seleccione un rol --</option>';
+
+                data.roles.forEach(rol => {
+                    if (rol.nombre === rolActual) return;
+
+                    const option = document.createElement('option');
+                    option.value = rol.nombre;
+                    option.textContent = rol.nombre;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar roles:', error);
+                select.innerHTML = '<option value="">Error al cargar roles</option>';
+            });
+    }
+
+    // Manejar el envío del formulario
+    const form = document.getElementById('formCambiarRol');
+
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault(); // ⬅️ IMPORTANTE
+
+            const formData = new FormData(this);
+            const userId = formData.get('userId');
+            const nuevoRol = formData.get('nuevoRol');
+
+            console.log(userId);
+            console.log(nuevoRol);
+
+
+            cambiarRolUsuario(userId, nuevoRol);
+
+            if (!nuevoRol) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Seleccione un rol',
+                    text: 'Debe seleccionar un rol para continuar',
+                    confirmButtonText: 'Aceptar'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: '¿Cambiar rol?',
+                html: `¿Está seguro que desea cambiar el rol del usuario?<br><br>
+                      <strong>Nuevo rol:</strong> ${nuevoRol}`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#012473',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, cambiar rol',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    cambiarRolUsuario(userId, nuevoRol);
+                }
+            });
+        });
+    }
+
+
+    // Función para cambiar el rol del usuario
+    function cambiarRolUsuario(userId, nuevoRol) {
+        // Mostrar loading
+        Swal.fire({
+            title: 'Cambiando rol...',
+            text: 'Por favor espere',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('@Url.Action("CambiarRol", "Usuario")', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: JSON.stringify({
+                userId: userId,
+                nuevoRol: nuevoRol
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Rol cambiado!',
+                    text: data.message,
+                    confirmButtonText: 'Aceptar'
+                }).then(() => {
+                    // Cerrar modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('modalCambiarRol'));
+                    modal.hide();
+
+                    // Recargar la lista de usuarios
+                    cargarUsuarios();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message,
+                    confirmButtonText: 'Aceptar'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Ocurrió un error al cambiar el rol',
+                confirmButtonText: 'Aceptar'
+            });
+        });
+    }
+</script>
+

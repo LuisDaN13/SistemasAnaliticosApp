@@ -10,6 +10,9 @@ namespace SistemasAnaliticos.Entidades
         public long idConstancia { get; set; }
 
         [Required]
+        public string UsuarioId { get; set; }
+
+        [Required]
         public DateOnly fechaCreacion { get; set; }        
 
         [Required]

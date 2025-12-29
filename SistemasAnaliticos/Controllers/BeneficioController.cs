@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
+using SistemasAnaliticos.Services;
 using SistemasAnaliticos.ViewModels;
 using System.Runtime.InteropServices;
 using static SistemasAnaliticos.Models.codigoFotos;
@@ -17,11 +18,13 @@ namespace SistemasAnaliticos.Controllers
     {
         private readonly DBContext _context;
         private readonly UserManager<Usuario> _userManager;
+        private readonly IPermisoAlcanceService _permisoAlcanceService;
 
-        public BeneficioController(DBContext context, UserManager<Usuario> userManager)
+        public BeneficioController(DBContext context, UserManager<Usuario> userManager, IPermisoAlcanceService permisoAlcanceService)
         {
             _context = context;
             _userManager = userManager;
+            _permisoAlcanceService = permisoAlcanceService;
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
@@ -31,10 +34,12 @@ namespace SistemasAnaliticos.Controllers
         {
             int pageSize = 3;
 
-            var totalBeneficios = await _context.Beneficio
-                .CountAsync();
+            var query = _context.Beneficio.AsNoTracking();
+            query = await _permisoAlcanceService.AplicarAlcanceBeneficioAsync(query, User);
 
-            var beneficios = await _context.Beneficio
+            var totalBeneficios = await query.CountAsync();
+
+            var beneficios = await query
                 .AsNoTracking()
                 .OrderByDescending(x => x.fechaCreacion)
                 .Skip((page - 1) * pageSize)
@@ -68,7 +73,10 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var todosLosBeneficios = await _context.Beneficio
+                var query = _context.Beneficio.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcanceBeneficioAsync(query, User);
+
+                var todosLosBeneficios = await query
                     .AsNoTracking()
                     .OrderByDescending(x => x.fechaCreacion)
                     .Select(b => new {
@@ -105,7 +113,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.Beneficio.AsNoTracking().AsQueryable();
+                var query = _context.Beneficio.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcanceBeneficioAsync(query, User);
 
                 // Aplicar filtros de tipo
                 if (tipos != null && tipos.Length > 0)
@@ -197,7 +206,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.Beneficio.AsNoTracking().AsQueryable();
+                var query = _context.Beneficio.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcanceBeneficioAsync(query, User);
 
                 // Aplicar filtros de tipo
                 if (tipos != null && tipos.Length > 0)
@@ -328,7 +338,8 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var query = _context.Beneficio.AsNoTracking().AsQueryable();
+                var query = _context.Beneficio.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcanceBeneficioAsync(query, User);
 
                 // Aplicar filtros (misma lógica que Excel)
                 if (tipos != null && tipos.Length > 0)
@@ -492,7 +503,10 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var contadores = await _context.Beneficio
+                var query = _context.Beneficio.AsNoTracking();
+                query = await _permisoAlcanceService.AplicarAlcanceBeneficioAsync(query, User);
+
+                var contadores = await query
                     .AsNoTracking()
                     .GroupBy(b => 1)
                     .Select(g => new

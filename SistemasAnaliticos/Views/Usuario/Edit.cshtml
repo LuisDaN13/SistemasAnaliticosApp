@@ -13,6 +13,10 @@
             --success-color: #198754;
         }
 
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
         .stepper-sidebar {
             background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
             color: white;
@@ -215,7 +219,7 @@
         }
     </style>
 </head>
-<body>
+<body class="bg-gradient-custom">
     <!-- Contenido principal -->
     <div class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
         <!-- Back Button -->
@@ -663,11 +667,18 @@
                                                 <input type="date" class="form-control" asp-for="fechaIngreso" required>
                                             </div>
                                             <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
-                                                <label style="margin-top: 1.25rem" class="form-label required-field">Jefe</label>
-                                                <select asp-for="jefeId" class="form-select">
-                                                    <option value="Ninguno" selected disabled>Seleccione el jefe</option>
+                                                <label style="margin-top: 1.25rem" class="form-label">Jefe</label>
+                                                <select id="jefeSelect" class="form-select">
+                                                    <option value="">Cargando jefes...</option>
                                                 </select>
+                                                <small class="form-text text-muted" id="jefeSeleccionadoInfo"></small>
                                             </div>
+
+                                            <!-- Campo oculto para el ID del jefe -->
+                                            <input type="hidden" asp-for="jefeId" id="hiddenJefeId" />
+
+                                            <!-- Campo oculto para el nombre del jefe -->
+                                            <input type="hidden" asp-for="jefeNombre" id="hiddenJefeNombre" />
 
                                             <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
                                                 <label style="margin-top: 1.25rem" class="form-label">Correo Empresarial</label>
@@ -798,13 +809,6 @@
 
     <!-- SCRIPT DE LA API DE LA UBICACION -->
     <script src='~/JS/costaricaLocalEdit.js'></script>
-
-    <!-- Incluir Lottie -->
-    <script src="https://unpkg.com/@@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
         function mostrarImagenModal(base64) {
             var modalImg = document.getElementById("modalFoto");
@@ -853,6 +857,204 @@
         });
     </script>
 
+    <!-- SCRIPT DE JEFES -->
+    <script>
+        async function cargarJefes() {
+            const selectJefe = document.getElementById('jefeSelect');
+            const jefeInfo = document.getElementById('jefeSeleccionadoInfo');
+            const hiddenJefeId = document.getElementById('hiddenJefeId');
+            const hiddenJefeNombre = document.getElementById('hiddenJefeNombre');
+
+            if (!selectJefe) return;
+
+            try {
+                // Mostrar indicador de carga
+                selectJefe.innerHTML = '<option value="">Cargando jefes...</option>';
+                selectJefe.disabled = true;
+                if (jefeInfo) jefeInfo.textContent = '';
+
+                const response = await fetch('/Usuario/GetJefes');
+                const data = await response.json();
+
+                if (data.success) {
+                    // Limpiar y agregar opciones
+                    selectJefe.innerHTML = '<option value="">Seleccione un jefe</option>' +
+                                           '<option value="">Ninguno</option>';
+
+                    if (data.jefes && data.jefes.length > 0) {
+                        data.jefes.forEach(jefe => {
+                            const option = document.createElement('option');
+                            option.value = jefe.id;
+                            option.textContent = `${jefe.nombreCompleto}${jefe.departamento ? ` (${jefe.departamento})` : ''}`;
+
+                            // Agregar atributos data para información adicional
+                            option.dataset.nombre = jefe.nombreCompleto;
+                            option.dataset.departamento = jefe.departamento || '';
+
+                            selectJefe.appendChild(option);
+                        });
+
+                        // 🔹 PRESELECCIONAR EL JEFE ACTUAL DEL EMPLEADO
+                        const currentJefeId = hiddenJefeId ? hiddenJefeId.value : null;
+                        const currentJefeNombre = hiddenJefeNombre ? hiddenJefeNombre.value : null;
+
+                        if (currentJefeId && currentJefeId.trim() !== '') {
+                            // Intentar encontrar el jefe actual en la lista
+                            const jefeActualOption = Array.from(selectJefe.options).find(
+                                option => option.value === currentJefeId
+                            );
+
+                            if (jefeActualOption) {
+                                selectJefe.value = currentJefeId;
+
+                                // Actualizar información visual
+                                if (jefeInfo && currentJefeNombre) {
+                                    jefeInfo.textContent = `Jefe actual: ${currentJefeNombre}`;
+                                    jefeInfo.className = 'form-text text-success';
+                                }
+                            } else {
+                                // Si el jefe no está en la lista (tal vez fue eliminado o desactivado)
+                                if (jefeInfo) {
+                                    jefeInfo.textContent = `⚠️ El jefe actual (${currentJefeNombre}) ya no está disponible. Seleccione uno nuevo.`;
+                                    jefeInfo.className = 'form-text text-warning';
+                                }
+                                selectJefe.value = ''; // Dejar sin selección
+                            }
+                        } else {
+                            // No hay jefe asignado
+                            selectJefe.value = '';
+                            if (jefeInfo) {
+                                jefeInfo.textContent = 'No hay jefe asignado actualmente';
+                                jefeInfo.className = 'form-text text-muted';
+                            }
+                        }
+
+                    } else {
+                        selectJefe.innerHTML = '<option value="">No hay jefes disponibles</option>';
+
+                        // Mostrar jefe actual si existe pero no hay jefes en la lista
+                        const currentJefeId = hiddenJefeId ? hiddenJefeId.value : null;
+                        const currentJefeNombre = hiddenJefeNombre ? hiddenJefeNombre.value : null;
+
+                        if (currentJefeId && currentJefeNombre) {
+                            if (jefeInfo) {
+                                jefeInfo.textContent = `⚠️ Jefe actual: ${currentJefeNombre} (no disponible en lista)`;
+                                jefeInfo.className = 'form-text text-warning';
+                            }
+                        }
+                    }
+                } else {
+                    selectJefe.innerHTML = '<option value="">Error al cargar jefes</option>';
+                    console.error('Error al cargar jefes:', data.message);
+                }
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+                selectJefe.innerHTML = '<option value="">Error de conexión</option>';
+            } finally {
+                selectJefe.disabled = false;
+            }
+        }
+
+        // Manejar cambio en la selección del jefe
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectJefe = document.getElementById('jefeSelect');
+            const hiddenJefeId = document.getElementById('hiddenJefeId');
+            const hiddenJefeNombre = document.getElementById('hiddenJefeNombre');
+            const jefeInfo = document.getElementById('jefeSeleccionadoInfo');
+
+            if (selectJefe) {
+                selectJefe.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const jefeId = this.value;
+                    const jefeNombre = selectedOption.dataset.nombre || '';
+                    const departamento = selectedOption.dataset.departamento || '';
+
+                    // Actualizar campos ocultos
+                    if (hiddenJefeId) hiddenJefeId.value = jefeId;
+                    if (hiddenJefeNombre) hiddenJefeNombre.value = jefeNombre;
+
+                    // Mostrar información adicional
+                    if (jefeInfo) {
+                        if (jefeId && jefeNombre) {
+                            jefeInfo.textContent = `Jefe seleccionado: ${jefeNombre}${departamento ? ` (${departamento})` : ''}`;
+                            jefeInfo.className = 'form-text text-success';
+                        } else if (!jefeId) {
+                            jefeInfo.textContent = 'No se asignará ningún jefe';
+                            jefeInfo.className = 'form-text text-muted';
+                        }
+                    }
+
+                    console.log(`Jefe ID: ${jefeId}, Nombre: ${jefeNombre}`);
+                });
+            }
+
+            // 🔹 Cargar jefes inmediatamente cuando la página cargue
+            setTimeout(cargarJefes, 100);
+
+            // 🔹 También cargar cuando se haga clic en el paso 4 (Información Laboral)
+            document.querySelectorAll('.step-item[data-step="4"]').forEach(item => {
+                item.addEventListener('click', function() {
+                    setTimeout(cargarJefes, 100);
+                });
+            });
+
+            // 🔹 Cargar cuando se navegue al paso 4 con los botones
+            const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
+
+            if (nextBtn) {
+                const originalNextClick = nextBtn.onclick;
+                nextBtn.onclick = function() {
+                    if (originalNextClick) originalNextClick();
+                    // Verificar si vamos al paso 4
+                    setTimeout(() => {
+                        const step4 = document.getElementById('step4');
+                        if (step4 && !step4.classList.contains('d-none')) {
+                            cargarJefes();
+                        }
+                    }, 50);
+                };
+            }
+
+            if (prevBtn) {
+                const originalPrevClick = prevBtn.onclick;
+                prevBtn.onclick = function() {
+                    if (originalPrevClick) originalPrevClick();
+                    // Verificar si vamos al paso 4
+                    setTimeout(() => {
+                        const step4 = document.getElementById('step4');
+                        if (step4 && !step4.classList.contains('d-none')) {
+                            cargarJefes();
+                        }
+                    }, 50);
+                };
+            }
+        });
+
+        // 🔹 Función para mostrar un mensaje temporal
+        function showTemporaryMessage(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show mt-2`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const container = document.querySelector('.stepper-sidebar');
+            if (container) {
+                container.parentNode.insertBefore(alertDiv, container);
+
+                // Remover después de 5 segundos
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 5000);
+            }
+        }
+    </script>
+
+    <!-- SCRIPT DE PROVINCIAS -->
     <script>
         // Provincias conocidas de CR
         const provinciasCR = [

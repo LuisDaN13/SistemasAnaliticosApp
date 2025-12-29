@@ -228,7 +228,7 @@
 <body>
     <!-- Modal de Creación de Empleado -->
     <div class="modal fade" id="createEmployeeModal" tabindex="-1" aria-labelledby="createEmployeeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl-custom">
+        <div class="modal-dialog modal-xl-custom modal-dialog-centered">
             <div class="modal-content">
                 <form id="employeeForm" asp-controller="Usuario" asp-action="Create" method="post" enctype="multipart/form-data">
                     <div class="modal-body p-0">
@@ -737,21 +737,18 @@
                                                 </div>
                                                 <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
                                                     <label style="margin-top: 1.25rem" class="form-label">Jefe</label>
-                                                    <select asp-items="ViewBag.Roles" name="rolId" class="form-select">
-                                                        <option value="Ninguno" selected disabled>Seleccione el jefe</option>
+                                                    <select id="jefeSelect" class="form-select">
+                                                        <option value="">Cargando jefes...</option>
                                                     </select>
-                                                </div>
+                                                    <small class="form-text text-muted" id="jefeSeleccionadoInfo"></small>
+                                                </div>       
+                                                
+                                                <!-- Campo oculto para el ID del jefe -->
+                                                <input type="hidden" asp-for="jefeId" id="hiddenJefeId" />
 
-                                                <div class="mb-3">
-                                                    <label class="form-label">Rol</label>
-                                                    <select asp-items="ViewBag.Roles"
-                                                            name="RolId"
-                                                            class="form-select"
-                                                            required>
-                                                    </select>
-                                                </div>
+                                                <!-- Campo oculto para el nombre del jefe -->
+                                                <input type="hidden" asp-for="jefeNombre" id="hiddenJefeNombre" />
 
-                                             
                                                 <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
                                                     <label style="margin-top: 1.25rem"  class="form-label">Correo Empresarial</label>
                                                     <input asp-for="correoEmpresa" type="text" class="form-control" placeholder="Ingrese el correo empresarial">
@@ -841,6 +838,21 @@
                                                         </div>
                                                     </div>
                                                 </div>
+
+                                                <div class="border-top">
+                                                    @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                                                    {
+                                                        <div class="col" style="margin-top: 1.5rem !important">
+                                                            <label class="form-label required-field">Rol del Usuario</label>
+                                                            <select class="form-select" id="rolDropdown" name="rolSeleccionado" required>
+                                                                <option value="" selected disabled>Seleccione un rol</option>
+                                                                <!-- Los roles se cargarán dinámicamente -->
+                                                            </select>
+                                                            <!-- Campo para mostrar el rol seleccionado -->
+                                                            <div id="rolSeleccionadoInfo" class="mt-2 small"></div>
+                                                        </div>
+                                                    }
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -868,6 +880,190 @@
         </div>
     </div>
 
+    <!-- SCRIPT DE ROLES DROPDOWN -->
+    <script>
+        // Función para cargar roles desde el servidor
+        async function cargarRoles() {
+            const rolDropdown = document.getElementById('rolDropdown');
+            if (!rolDropdown) return;
+
+            try {
+                // Mostrar indicador de carga
+                rolDropdown.innerHTML = '<option value="">Cargando roles...</option>';
+                rolDropdown.disabled = true;
+
+                const response = await fetch('/Usuario/GetRoles');
+                const data = await response.json();
+
+                if (data.success && data.roles && data.roles.length > 0) {
+                    // Limpiar y agregar opciones
+                    rolDropdown.innerHTML = '<option value="" selected disabled>Seleccione un rol</option>';
+
+                    data.roles.forEach(rol => {
+                        const option = document.createElement('option');
+                        option.value = rol.nombre;
+                        option.textContent = rol.nombre;
+                        rolDropdown.appendChild(option);
+                    });
+                } else {
+                    rolDropdown.innerHTML = '<option value="" selected disabled>No hay roles disponibles</option>';
+                    console.error('Error al cargar roles:', data.message);
+                }
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+                rolDropdown.innerHTML = '<option value="" selected disabled>Error de conexión</option>';
+            } finally {
+                rolDropdown.disabled = false;
+            }
+        }
+
+        // Función para mostrar información del rol seleccionado
+        function actualizarInfoRolSeleccionado() {
+            const rolDropdown = document.getElementById('rolDropdown');
+            const rolInfo = document.getElementById('rolSeleccionadoInfo');
+
+            if (!rolDropdown || !rolInfo) return;
+
+            const rolSeleccionado = rolDropdown.value;
+            const textoSeleccionado = rolDropdown.options[rolDropdown.selectedIndex].text;
+
+            if (rolSeleccionado) {
+                rolInfo.innerHTML = `
+                    <div class="alert alert-success p-2 mb-0">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <strong>Rol seleccionado:</strong> ${textoSeleccionado}
+                    </div>
+                `;
+
+                // Validación visual
+                rolDropdown.classList.remove('is-invalid');
+            } else {
+                rolInfo.innerHTML = `
+                    <div class="alert alert-warning p-2 mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Advertencia:</strong> No se ha seleccionado ningún rol
+                    </div>
+                `;
+            }
+        }
+
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            const rolDropdown = document.getElementById('rolDropdown');
+
+            // Cargar roles cuando se abra el modal
+            const modal = document.getElementById('createEmployeeModal');
+            if (modal) {
+                modal.addEventListener('show.bs.modal', function() {
+                    setTimeout(() => {
+                        cargarRoles();
+                    }, 100);
+                });
+            }
+
+            // Actualizar información cuando se seleccione un rol
+            if (rolDropdown) {
+                rolDropdown.addEventListener('change', function() {
+                    actualizarInfoRolSeleccionado();
+                });
+            }
+        });
+    </script>
+
+    <!-- SCRIPT JEFES -->
+    <script>
+        async function cargarJefes() {
+            const selectJefe = document.getElementById('jefeSelect');
+            const jefeInfo = document.getElementById('jefeSeleccionadoInfo');
+
+            if (!selectJefe) return;
+
+            try {
+                // Mostrar indicador de carga
+                selectJefe.innerHTML = '<option value="">Cargando jefes...</option>';
+                selectJefe.disabled = true;
+                if (jefeInfo) jefeInfo.textContent = '';
+
+                const response = await fetch('/Usuario/GetJefes');
+                const data = await response.json();
+
+                if (data.success) {
+                    // Limpiar y agregar opciones
+                    selectJefe.innerHTML = '<option value="">Seleccione un jefe</option>' +
+                                           '<option value="">Ninguno</option>';
+
+                    if (data.jefes && data.jefes.length > 0) {
+                        data.jefes.forEach(jefe => {
+                            const option = document.createElement('option');
+                            option.value = jefe.id;
+                            option.textContent = `${jefe.nombreCompleto}${jefe.departamento ? ` (${jefe.departamento})` : ''}`;
+
+                            // Agregar atributos data para información adicional
+                            option.dataset.nombre = jefe.nombreCompleto;
+                            option.dataset.departamento = jefe.departamento || '';
+
+                            selectJefe.appendChild(option);
+                        });
+                    } else {
+                        selectJefe.innerHTML = '<option value="">No hay jefes disponibles</option>';
+                    }
+                } else {
+                    selectJefe.innerHTML = '<option value="">Error al cargar jefes</option>';
+                    console.error('Error al cargar jefes:', data.message);
+                }
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+                selectJefe.innerHTML = '<option value="">Error de conexión</option>';
+            } finally {
+                selectJefe.disabled = false;
+            }
+        }
+
+        // Manejar cambio en la selección del jefe
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectJefe = document.getElementById('jefeSelect');
+            const hiddenJefeId = document.getElementById('hiddenJefeId');
+            const hiddenJefeNombre = document.getElementById('hiddenJefeNombre');
+            const jefeInfo = document.getElementById('jefeSeleccionadoInfo');
+
+            if (selectJefe) {
+                selectJefe.addEventListener('change', function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const jefeId = this.value;
+                    const jefeNombre = selectedOption.dataset.nombre || '';
+                    const puesto = selectedOption.dataset.puesto || '';
+
+                    // Actualizar campos ocultos
+                    if (hiddenJefeId) hiddenJefeId.value = jefeId;
+                    if (hiddenJefeNombre) hiddenJefeNombre.value = jefeNombre;
+
+                    // Mostrar información adicional
+                    if (jefeInfo) {
+                        if (jefeId && jefeNombre) {
+                            jefeInfo.textContent = `Jefe seleccionado: ${jefeNombre}${puesto ? ` (${puesto})` : ''}`;
+                            jefeInfo.className = 'form-text text-success';
+                        } else if (!jefeId) {
+                            jefeInfo.textContent = 'No se asignará ningún jefe';
+                            jefeInfo.className = 'form-text text-muted';
+                        }
+                    }
+
+                    console.log(`Jefe ID: ${jefeId}, Nombre: ${jefeNombre}`);
+                });
+            }
+
+            // Cargar jefes cuando se abra el modal
+            const createEmployeeModal = document.getElementById('createEmployeeModal');
+            if (createEmployeeModal) {
+                createEmployeeModal.addEventListener('show.bs.modal', function() {
+                    // Pequeño delay para asegurar que el DOM esté listo
+                    setTimeout(cargarJefes, 100);
+                });
+            }
+        });
+    </script>
+
+    <!-- SCRIPT PARA PROVINCIAS -->
     <script>
         // Provincias conocidas de CR
         const provinciasCR = [

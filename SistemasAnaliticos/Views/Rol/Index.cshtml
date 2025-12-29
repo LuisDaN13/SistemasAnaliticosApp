@@ -3,6 +3,8 @@
 
 @{
     var listaRoles = Model ?? Enumerable.Empty<RolViewModel>();
+    var esVistaRoles = ViewContext.RouteData.Values["controller"]?.ToString() == "Rol";
+    var esVistaUsuarios = ViewContext.RouteData.Values["controller"]?.ToString() == "Usuario";
 }
 
 <!DOCTYPE html>
@@ -41,6 +43,42 @@
             background-color: white;
         }
 
+        /* Estilos para tabs */
+        .nav-tabs-custom {
+            border-bottom: 2px solid #dee2e6;
+            margin-top: 1rem;
+        }
+
+            .nav-tabs-custom .nav-link {
+                border: none;
+                border-bottom: 3px solid transparent;
+                color: #6c757d;
+                font-weight: 500;
+                padding: 12px 20px;
+                transition: all 0.3s ease;
+                text-decoration: none !important;
+                display: inline-block;
+            }
+
+                .nav-tabs-custom .nav-link:hover {
+                    border-bottom-color: #dee2e6;
+                    color: #495057;
+                    text-decoration: none;
+                }
+
+                .nav-tabs-custom .nav-link.active {
+                    color: var(--primary-color);
+                    border-bottom-color: var(--primary-color);
+                    background-color: transparent;
+                    font-weight: 600;
+                }
+
+        /* Contenido de tabs */
+        .tab-content {
+            padding: 20px 0;
+            min-height: 400px;
+        }
+
         /* Estilos para la tabla */
         .table-custom {
             width: 100%;
@@ -65,6 +103,28 @@
             .table-custom tr:hover {
                 background-color: #f8f9fa;
             }
+
+        /* Estado vacío */
+        .empty-state {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background-color: white;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 1rem;
+        }
+
+        /* Estilos para tabs como enlaces */
+        .nav-tabs-custom a.nav-link {
+            text-align: center;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="bg-gradient-custom min-vh-100">
@@ -72,236 +132,258 @@
     <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
 
         <!-- Header -->
-        <div class="header-card p-4 mt-4 d-flex justify-content-between gap-2 mb-4">
-            <h1 class="h2 fw-bold text-gray-900 mb-0">
-                Lista de Roles
-                <span class="small fw-light" id="role-count">(@(Model?.Count() ?? 0))</span>
-            </h1>
-
-            <button class="btn btn-custom-primary text-white d-flex align-items-center"
+        <div class="header-card p-4 mt-4 mb-4 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 fw-bold text-gray-900 mb-0">
+                    Gestión de Sistema
+                </h1>
+                <p class="text-muted mb-0">Administre roles y usuarios del sistema</p>
+            </div>
+            <button class="btn btn-custom-primary text-white px-4 py-2 fw-medium"
                     data-bs-toggle="modal"
                     data-bs-target="#modalNuevoRol">
-                <i class="bi bi-plus me-2"></i>
-                Nuevo Rol
+                <i class="fas fa-user-plus me-2"></i>Nuevo Rol
             </button>
         </div>
 
-        <!-- Tabla de Roles -->
+        <!-- Tabs como enlaces de navegación -->
         <div class="card shadow-sm">
             <div class="card-body p-0">
-                @if (!listaRoles.Any())
-                {
-                    <div id="emptyState">
-                        <div style="border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); background-color: white;">
-                            <div style="display: flex; align-items: center; justify-content: space-around; padding: 2rem;">
-                                <p style="color: #6c757d; margin: 0; text-align: left; font-size: 1rem;">
-                                    No se encontraron roles en el sistema.
-                                </p>
+                <!-- Navegación de Tabs -->
+                <ul class="nav nav-tabs-custom px-3" id="mainTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link @(esVistaRoles ? "active" : "")"
+                           href="@Url.Action("Index", "Rol")">
+                            <i class="fas fa-user-tag me-2"></i>Roles
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link @(esVistaUsuarios ? "active" : "")"
+                           href="@Url.Action("MostrarUsers", "Usuario")">
+                            <i class="fas fa-users me-2"></i>Usuarios
+                        </a>
+                    </li>
+                </ul>
 
-                                <div id="lottie-animation" style="width: 110px; height: 110px; flex-shrink: 0;"></div>
-
-                                <script>
-                                    const animation = document.createElement('lottie-player');
-                                    animation.setAttribute('src', '/lottie/loading.json');
-                                    animation.setAttribute('background', 'transparent');
-                                    animation.setAttribute('speed', '1');
-                                    animation.setAttribute('style', 'width: 110px; height: 110px;');
-                                    animation.setAttribute('loop', '');
-                                    animation.setAttribute('autoplay', '');
-                                    document.getElementById('lottie-animation').appendChild(animation);
-                                </script>
-                            </div>
+                <!-- Contenido de la vista actual -->
+                <div class="tab-content p-4" id="mainTabContent">
+                    @if (esVistaRoles)
+                    {
+                        <!-- Contenido para Roles -->
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="h4 mb-0">Lista de Roles</h3>
                         </div>
-                    </div>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                        <table class="table table-borderless table-hover mb-0">
-                            <thead class="border-bottom">
-                                <tr>
-                                    <th class="text-start fw-normal text-muted">Nombre</th>
-                                    <th class="text-center fw-normal text-muted">Estado</th>
-                                    <th class="text-end fw-normal text-muted">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in listaRoles)
-                                {
-                                    <tr class="align-middle">
-                                        <td class="text-start">
-                                            <span class="fw-medium">@item.nombre</span>
-                                        </td>
-                                        <td class="text-center">
-                                            @if (item.estado)
-                                            {
-                                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
-                                                    <i class="fas fa-circle me-1" style="font-size: 8px;"></i> Activo
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">
-                                                    <i class="fas fa-circle me-1" style="font-size: 8px;"></i> Inactivo
-                                                </span>
-                                            }
-                                        </td>
-                                        <td class="text-end">
-                                            <div class="btn-group btn-group-sm" role="group">
-                                                <a class="btn btn-outline-primary border"
-                                                   asp-action="Editar"
-                                                   asp-controller="RolPermiso"
-                                                   asp-route-id="@item.Id">
-                                                    <i class="fas fa-key"></i>
-                                                </a>
-                                                <button class="btn btn-outline-secondary border"
-                                                        onclick="abrirModalInactivar('@Url.Action("Inactivar", "Rol", new { id = item.Id })')">
-                                                    <i class="fas fa-ban"></i>
-                                                </button>
-                                                <button class="btn btn-outline-danger border"
-                                                        onclick="abrirModalEliminar('@Url.Action("Delete", "Rol", new { id = item.Id })')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
+
+                        @if (!listaRoles.Any())
+                        {
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-user-tag"></i>
+                                </div>
+                                <h5 class="text-muted mb-2">No hay roles registrados</h5>
+                                <p class="text-muted mb-4">Cree un nuevo rol para comenzar</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-borderless table-hover mb-0">
+                                    <thead class="border-bottom">
+                                        <tr>
+                                            <th class="text-start fw-normal text-muted">Nombre</th>
+                                            <th class="text-center fw-normal text-muted">Estado</th>
+                                            <th class="text-end fw-normal text-muted">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in listaRoles)
+                                        {
+                                            <tr class="align-middle">
+                                                <td class="text-start">
+                                                    <span class="fw-medium">@item.nombre</span>
+                                                </td>
+                                                <td class="text-center">
+                                                    @if (item.estado)
+                                                    {
+                                                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                                            <i class="fas fa-circle me-1" style="font-size: 8px;"></i> Activo
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25">
+                                                            <i class="fas fa-circle me-1" style="font-size: 8px;"></i> Inactivo
+                                                        </span>
+                                                    }
+                                                </td>
+                                                <td class="text-end">
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <a class="btn btn-outline-primary border"
+                                                           asp-action="Editar"
+                                                           asp-controller="RolPermiso"
+                                                           asp-route-id="@item.Id">
+                                                            <i class="fas fa-key"></i>
+                                                        </a>
+                                                        <button class="btn btn-outline-secondary border"
+                                                                onclick="abrirModalInactivar('@Url.Action("Inactivar", "Rol", new { id = item.Id })')">
+                                                            <i class="fas fa-ban"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-danger border"
+                                                                onclick="abrirModalEliminar('@Url.Action("Delete", "Rol", new { id = item.Id })')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <!-- Esto se mostrará solo en la vista de Roles -->
+                        <!-- Cuando estés en la vista de Usuarios, mostrará el contenido de esa vista -->
+                        <p class="text-center text-muted py-5">
+                            Seleccione una pestaña para ver el contenido
+                        </p>
+                    }
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- Modal de Inactivar -->
-    <div class="modal fade" id="modalInactivar" tabindex="-1" aria-labelledby="modalInactivarLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title" id="modalInactivarLabel">Cambiar Estado del Rol</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <p style="margin: 1rem;">
-                        ¿Está seguro que desea cambiar el estado del rol?
-                    </p>
-                </div>
-                <form id="formInactivar" asp-action="Inactivar" asp-controller="Rol" method="post">
-                    @Html.AntiForgeryToken()
-                    <div class="modal-footer d-flex justify-content-around">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-warning">Inactivar</button>
+    <!-- Modales para Roles (solo se muestran en la vista de Roles) -->
+    @if (esVistaRoles)
+    {
+        <!-- Modal de Inactivar -->
+        <div class="modal fade" id="modalInactivar" tabindex="-1" aria-labelledby="modalInactivarLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title" id="modalInactivarLabel">Cambiar Estado del Rol</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Eliminación -->
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="modalEliminarLabel">Confirmar eliminación</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro que desea eliminar este rol?
-                </div>
-                <form id="formEliminar" asp-action="Delete" asp-controller="Rol" method="post">
-                    @Html.AntiForgeryToken()
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Nuevo Rol -->
-    <div class="modal fade" id="modalNuevoRol" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <form asp-action="Create" asp-controller="Rol" method="post">
-                    <div class="modal-header" style="background-color: var(--primary-color);">
-                        <h5 class="modal-title text-white">Agregar Nuevo Rol</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: invert(1);"></button>
-                    </div>
-
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="nombreRol" class="form-label">Nombre del Rol</label>
-                            <input  type="text"
-                                    class="form-control"
-                                    id="nombre"
-                                    name="nombre"
-                                    placeholder="Ingrese el nombre del rol" 
-                                    required/>
+                        <p style="margin: 1rem;">
+                            ¿Está seguro que desea cambiar el estado del rol?
+                        </p>
+                    </div>
+                    <form id="formInactivar" asp-action="Inactivar" asp-controller="Rol" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="modal-footer d-flex justify-content-around">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Inactivar</button>
                         </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                            Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-custom-primary text-white">
-                            Crear Rol
-                        </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+
+        <!-- Modal de Eliminación -->
+        <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="modalEliminarLabel">Confirmar eliminación</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Está seguro que desea eliminar este rol?
+                    </div>
+                    <form id="formEliminar" asp-action="Delete" asp-controller="Rol" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Nuevo Rol -->
+        <div class="modal fade" id="modalNuevoRol" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form asp-action="Create" asp-controller="Rol" method="post">
+                        <div class="modal-header" style="background-color: var(--primary-color);">
+                            <h5 class="modal-title text-white">Agregar Nuevo Rol</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: invert(1);"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="nombreRol" class="form-label">Nombre del Rol</label>
+                                <input type="text"
+                                       class="form-control"
+                                       id="nombre"
+                                       name="nombre"
+                                       placeholder="Ingrese el nombre del rol"
+                                       required />
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-custom-primary text-white">
+                                Crear Rol
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
 
     <script>
+        // Funciones para modales (solo en vista Roles)
         function abrirModalEliminar(url) {
             const form = document.getElementById('formEliminar');
-            form.action = url; // 🔑 AQUÍ ESTÁ LA CLAVE
-            const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
-            modal.show();
+            if (form) {
+                form.action = url;
+                const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+                modal.show();
+            }
         }
 
         function abrirModalInactivar(url) {
             const form = document.getElementById('formInactivar');
-            form.action = url; // 🔑 AQUÍ TAMBIÉN
-            const modal = new bootstrap.Modal(document.getElementById('modalInactivar'));
-            modal.show();
+            if (form) {
+                form.action = url;
+                const modal = new bootstrap.Modal(document.getElementById('modalInactivar'));
+                modal.show();
+            }
         }
-    </script>
 
+        // Respuestas de los Formularios
+        @if (TempData["ErrorMessageRoles"] != null)
+        {
+                <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: '@Html.Raw(TempData["ErrorMessageRoles"])',
+                        confirmButtonText: 'Aceptar'
+                    });
+                </text>
+        }
 
-    <!-- Respuestas de los Formularios -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Para mensajes de error
-            @if (TempData["ErrorMessageRoles"] != null)
-            {
-                    <text>
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: '@Html.Raw(TempData["ErrorMessageRoles"])',
-                            confirmButtonText: 'Aceptar'
-                        });
-                    </text>
-            }
-
-            // Para mensajes de éxito
-            @if (TempData["SuccessMessageRoles"] != null)
-            {
-                    <text>
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Éxito',
-                            text: '@Html.Raw(TempData["SuccessMessageRoles"])',
-                            confirmButtonText: 'Aceptar',
-                            timer: 3000
-                        });
-                    </text>
-            }
-        });
+        @if (TempData["SuccessMessageRoles"] != null)
+        {
+                <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: '@Html.Raw(TempData["SuccessMessageRoles"])',
+                        confirmButtonText: 'Aceptar',
+                        timer: 3000
+                    });
+                </text>
+        }
     </script>
 </body>
 </html>
