@@ -19,15 +19,13 @@ namespace SistemasAnaliticos.Controllers
     {
         private readonly DBContext _context;
         private readonly UserManager<Usuario> _userManager;
-        private readonly IAlcanceUsuarioService _alcanceUsuarioService;
         private readonly IPermisoAlcanceService _permisoAlcanceService;
         private readonly IEmailService _emailService;
 
-        public PermisoController(DBContext context, UserManager<Usuario> userManager, IAlcanceUsuarioService alcanceUsuarioService, IPermisoAlcanceService permisoAlcanceService, IEmailService emailService)
+        public PermisoController(DBContext context, UserManager<Usuario> userManager, IPermisoAlcanceService permisoAlcanceService, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
-            _alcanceUsuarioService = alcanceUsuarioService;
             _permisoAlcanceService = permisoAlcanceService;
             _emailService = emailService;
         }
@@ -750,15 +748,14 @@ namespace SistemasAnaliticos.Controllers
             {
                 var fotoService = new CodigoFotos();
                 var adjuntoService = new ProcesarAdjuntos();
-                var user = await _userManager.GetUserAsync(User);
 
                 var nuevo = new Permiso
                 {
                     UsuarioId = usuario.Id,
 
                     fechaCreacion = hoy,
-                    nombreEmpleado = user.nombreCompleto,
-                    departamento = user.departamento,
+                    nombreEmpleado = usuario.nombreCompleto,
+                    departamento = usuario.departamento,
                     tipo = model.tipo,
 
                     fechaInicio = model.fechaInicio,
@@ -786,22 +783,22 @@ namespace SistemasAnaliticos.Controllers
                 {
                     // 1. Correo al empleado
                     var htmlEmpleado = PlantillasEmail.ConfirmacionEmpleado(
-                        nombreEmpleado: user.nombreCompleto,
+                        nombreEmpleado: usuario.nombreCompleto,
                         tipoPermiso: model.tipo
                     );
 
                     await _emailService.SendEmailAsync(
-                        toEmail: user.Email,
-                        toName: user.nombreCompleto,
-                        subject: $"Confirmación de Permiso - {user.nombreCompleto}",
+                        toEmail: usuario.Email,
+                        toName: usuario.nombreCompleto,
+                        subject: $"Confirmación de Permiso - {usuario.nombreCompleto}",
                         htmlBody: htmlEmpleado
                     );
 
                     //2.Correo de notificación al jefe(si tiene)
-                    if (!string.IsNullOrEmpty(user.jefeId))
+                    if (!string.IsNullOrEmpty(usuario.jefeId))
                     {
                         var htmlJefe = PlantillasEmail.NotificacionJefatura(
-                            nombreEmpleado: user.nombreCompleto,
+                            nombreEmpleado: usuario.nombreCompleto,
                             tipoPermiso: model.tipo,
                             nombreJefe: nombreJefe
                         );
@@ -809,7 +806,7 @@ namespace SistemasAnaliticos.Controllers
                         await _emailService.SendEmailAsync(
                             toEmail: correoJefe,
                             toName: nombreJefe,
-                            subject: $"Solicitud de permiso pendiente - {user.nombreCompleto}",
+                            subject: $"Solicitud de permiso pendiente - {usuario.nombreCompleto}",
                             htmlBody: htmlJefe
                         );
                     }
@@ -829,19 +826,6 @@ namespace SistemasAnaliticos.Controllers
                 TempData["ErrorMessage"] = "Error en la creación del permiso.";
                 return RedirectToAction(nameof(Index));
             }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> SendTestEmail(string toEmail, string toName, string subject, string htmlBody)
-        {
-            await _emailService.SendEmailAsync(
-                toEmail,
-                toName,
-                subject,
-                htmlBody
-            );
-
-            return Ok(new { message = "Correo enviado correctamente" });
         }
     }
 }

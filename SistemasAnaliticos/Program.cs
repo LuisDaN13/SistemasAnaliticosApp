@@ -79,7 +79,7 @@ builder.Services.AddSession(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     // Expiración por inactividad: 1 minuto, con sliding expiration
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
     options.SlidingExpiration = true;
     options.LoginPath = "/Usuario/Login"; // ajustar si la ruta es diferente
 });

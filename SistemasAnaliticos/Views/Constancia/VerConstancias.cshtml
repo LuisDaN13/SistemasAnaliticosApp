@@ -135,7 +135,10 @@
         <div class="header-card p-4 mt-4 mb-4 d-flex justify-content-between">
             <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todas las Constancias</h1>
             <div>
-                <button type="button" class="btn btn-primary" onclick="abrirModalMasivo()">Cambiar estado</button>
+                @if (!User.IsInRole("Empleado Normal"))
+                {
+                    <button type="button" class="btn btn-primary" onclick="abrirModalMasivo()">Cambiar estado</button>
+                }
                 <button class="btn btn-success" id="exportExcelBtnC">
                     <i class="bi bi-file-earmark-excel"></i>
                 </button>
@@ -714,6 +717,11 @@
         }
     </script>
 
+    <!-- SCRIPT PARA DEJAR LISTO ROL DE EMPLEADO PARA USAR JS -->
+    <script>
+        const esEmpleadoNormal = @User.IsInRole("Empleado Normal").ToString();
+    </script>
+
     <!-- FILTRADO Y CONTADORES MEJORADOS -->
     <script>
         const constanciasPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Constancias));
@@ -1012,40 +1020,52 @@
                                 <div class="col">
                                     ${
                                         constanciaas.nombreArchivo && constanciaas.nombreArchivo.trim() !== ''
-                                            ? `
-                                                <div class="mt-1 d-flex align-items-center gap-1">
-                                                    <a href="/Constancia/descargar-adjunto/${constanciaas.idConstancia}"
-                                                        class="btn btn-sm btn-outline-primary d-flex align-items-center"
-                                                        style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: 80%"
-                                                        title="Descargar ${constanciaas.nombreArchivo}">
-                                                        ${obtenerIconoArchivo(constanciaas.nombreArchivo, constanciaas.tipoMIME)}
-                                                        <span class="text-truncate d-block" style="max-width: 220px;">
-                                                            ${constanciaas.nombreArchivo}
+                                            ? (
+                                                constanciaas.estado === 'Aprobada'
+                                                    // 1️⃣ HAY ARCHIVO Y ESTÁ APROBADA
+                                                    ? `
+                                                        <div class="mt-1 d-flex align-items-center gap-1">
+                                                            <a href="/Constancia/descargar-adjunto/${constanciaas.idConstancia}"
+                                                                class="btn btn-sm btn-outline-primary d-flex align-items-center"
+                                                                style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: 80%"
+                                                                title="Descargar ${constanciaas.nombreArchivo}">
+                                                                ${obtenerIconoArchivo(constanciaas.nombreArchivo, constanciaas.tipoMIME)}
+                                                                <span class="text-truncate d-block" style="max-width: 220px;">
+                                                                    ${constanciaas.nombreArchivo}
+                                                                </span>
+                                                            </a>
+                                                            <small class="text-muted text-center d-block mt-1">
+                                                                ${formatearTamanoArchivo(constanciaas.tamanoArchivo)} •
+                                                                ${obtenerExtension(constanciaas.nombreArchivo)}
+                                                            </small>
+                                                        </div>
+                                                    `
+                                                    // 2️⃣ HAY ARCHIVO PERO NO ESTÁ APROBADA
+                                                    : `
+                                                        <span class="text-danger d-inline-block text-center small"
+                                                            style="width:100%; padding: 0.25rem; background:#fff3cd; border-radius:5px;">
+                                                            Archivo disponible tras aprobación
                                                         </span>
-                                                    </a>
-                                                    <small class="text-muted text-center d-block mt-1">
-                                                        ${formatearTamanoArchivo(constanciaas.tamanoArchivo)} •
-                                                        ${obtenerExtension(constanciaas.nombreArchivo)}
-                                                    </small>
-                                                </div>
-                                            `
+                                                    `
+                                            )
+                                            // 3️⃣ NO HAY ARCHIVO
                                             : (
                                                 constanciaas.tipo === "Salarial"
-                                                ? `
-                                                    <button class="btn btn-sm btn-warning w-100"
-                                                            onclick="abrirModalSalarial(${constanciaas.idConstancia})">
-                                                        Crear Constancia Salarial
-                                                    </button>
-                                                `
-                                                : `
-                                                    <span class="text-muted d-inline-block text-center small"
+                                                    ? `
+                                                        <button class="btn btn-sm btn-warning w-100"
+                                                                onclick="abrirModalSalarial(${constanciaas.idConstancia})">
+                                                            Crear Constancia Salarial
+                                                        </button>
+                                                    `
+                                                    : `
+                                                        <span class="text-muted d-inline-block text-center small"
                                                             style="width:100%; padding: 0.25rem; background:#f0f0f0; border-radius:5px;">
-                                                        Sin archivo
-                                                    </span>
-                                                `
+                                                            Sin archivo
+                                                        </span>
+                                                    `
                                             )
                                     }
-                                </div>
+                                </div>                                
                             </div>
                         </div>
                     </div>

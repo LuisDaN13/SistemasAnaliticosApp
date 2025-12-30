@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
+using SistemasAnaliticos.Helpers;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
 using SistemasAnaliticos.ViewModels;
@@ -19,12 +20,14 @@ namespace SistemasAnaliticos.Controllers
         private readonly DBContext _context;
         private readonly UserManager<Usuario> _userManager;
         private readonly IPermisoAlcanceService _permisoAlcanceService;
+        private readonly IEmailService _emailService;
 
-        public BeneficioController(DBContext context, UserManager<Usuario> userManager, IPermisoAlcanceService permisoAlcanceService)
+        public BeneficioController(DBContext context, UserManager<Usuario> userManager, IPermisoAlcanceService permisoAlcanceService, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
             _permisoAlcanceService = permisoAlcanceService;
+            _emailService = emailService;
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
@@ -631,7 +634,21 @@ namespace SistemasAnaliticos.Controllers
         [Authorize(Policy = "Beneficio.Crear")]
         public async Task<IActionResult> Create(Beneficio model)
         {
-            // Detectar sistema operativo y usar el ID de zona horaria adecuado
+            var usuario = await _userManager.GetUserAsync(User);
+
+            string nombreJefe = "No asignado";
+            string correoJefe = "No asignado";
+
+            if (!string.IsNullOrEmpty(usuario.jefeId))
+            {
+                var jefe = await _userManager.FindByIdAsync(usuario.jefeId);
+                if (jefe != null)
+                {
+                    nombreJefe = jefe.nombreCompleto ?? jefe.UserName;
+                    correoJefe = jefe.Email;
+                }
+            }
+
             string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? "Central America Standard Time"           // Windows
                 : "America/Costa_Rica";                     // Linux/macOS
@@ -644,13 +661,12 @@ namespace SistemasAnaliticos.Controllers
             {
                 var fotoService = new CodigoFotos();
                 var adjuntoService = new ProcesarAdjuntos();
-                var user = await _userManager.GetUserAsync(User);
 
                 var nuevo = new Beneficio
                 {
                     fechaCreacion = hoy,
-                    nombreEmpleado = user.nombreCompleto,
-                    departamento = user.departamento,
+                    nombreEmpleado = usuario.nombreCompleto,
+                    departamento = usuario.departamento,
                     tipo = model.tipo,
 
                     monto = model.monto,
@@ -661,6 +677,46 @@ namespace SistemasAnaliticos.Controllers
 
                 _context.Beneficio.Add(nuevo);
                 await _context.SaveChangesAsync();
+
+                try
+                {
+                    // 1. Correo al empleado
+                    var htmlEmpleado = PlantillasEmail.ConfirmacionEmpleado(
+                        nombreEmpleado: usuario.nombreCompleto,
+                        tipoPermiso: model.tipo
+                    );
+
+                    await _emailService.SendEmailAsync(
+                        toEmail: usuario.Email,
+                        toName: usuario.nombreCompleto,
+                        subject: $"Confirmación de Permiso - {usuario.nombreCompleto}",
+                        htmlBody: htmlEmpleado
+                    );
+
+                    //2.Correo de notificación al jefe(si tiene)
+                    if (!string.IsNullOrEmpty(usuario.jefeId))
+                    {
+                        var htmlJefe = PlantillasEmail.NotificacionJefatura(
+                            nombreEmpleado: usuario.nombreCompleto,
+                            tipoPermiso: model.tipo,
+                            nombreJefe: nombreJefe
+                        );
+
+                        await _emailService.SendEmailAsync(
+                            toEmail: correoJefe,
+                            toName: nombreJefe,
+                            subject: $"Solicitud de permiso pendiente - {usuario.nombreCompleto}",
+                            htmlBody: htmlJefe
+                        );
+                    }
+
+                }
+                catch (Exception exEmail)
+                {
+                    // Solo log si hay error en correo, no interrumpir
+                    Console.WriteLine($"Error enviando correo: {exEmail.Message}");
+                }
+
                 TempData["SuccessMessage"] = "Se creó el beneficio correctamente.";
                 return RedirectToAction("Index", "Permiso");
             }
@@ -670,6 +726,5 @@ namespace SistemasAnaliticos.Controllers
                 return RedirectToAction("Index", "Permiso");
             }
         }
-
     }
 }

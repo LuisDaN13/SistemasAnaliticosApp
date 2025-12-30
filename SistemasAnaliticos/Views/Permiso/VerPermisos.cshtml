@@ -133,8 +133,10 @@
         <div class="header-card p-4 mt-4 mb-4 d-flex justify-content-between">
             <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todos los Permisos</h1>
             <div>
-                <button type="button" class="btn btn-primary" onclick="abrirModalMasivo()">Cambiar estado</button>
-
+                @if (!User.IsInRole("Empleado Normal"))
+                {
+                    <button type="button" class="btn btn-primary" onclick="abrirModalMasivo()">Cambiar estado</button>
+                }
                 <button class="btn btn-success" id="exportExcelBtn">
                     <i class="bi bi-file-earmark-excel"></i>
                 </button>

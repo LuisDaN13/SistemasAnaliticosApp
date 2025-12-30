@@ -113,6 +113,12 @@ namespace SistemasAnaliticos.Controllers
                 return View(model);
             }
 
+            if (!user.estado)
+            {
+                ModelState.AddModelError("", "Su cuenta está desactivada. Contacte al administrador.");
+                return View(model);
+            }
+
             var result = await signInManager.CheckPasswordSignInAsync(
                 user, model.Password, false);
 
@@ -122,9 +128,11 @@ namespace SistemasAnaliticos.Controllers
                 return View(model);
             }
 
+            // 🔍 Detectar si es el primer inicio de sesión
+            var esPrimerInicio = user.lastActivityUtc == null;
+
             // 🔄 Generar nueva sesión (invalida las anteriores)
             var newSessionId = Guid.NewGuid().ToString();
-
             user.sessionId = newSessionId;
             user.lastActivityUtc = DateTime.UtcNow;
             await userManager.UpdateAsync(user);
@@ -133,7 +141,6 @@ namespace SistemasAnaliticos.Controllers
             var principal = await signInManager.CreateUserPrincipalAsync(user);
             var identity = (ClaimsIdentity)principal.Identity!;
 
-            // Evitar duplicados si re-login
             var existing = identity.FindFirst("SessionId");
             if (existing != null)
                 identity.RemoveClaim(existing);
@@ -150,8 +157,16 @@ namespace SistemasAnaliticos.Controllers
                     AllowRefresh = true
                 });
 
+            // 📋 Si es primer inicio, almacenar info para mostrar modal
+            if (esPrimerInicio)
+            {
+                TempData["ShowPasswordChangeModal"] = "true";
+                TempData["FirstLoginUserId"] = user.Id;
+            }
+
             return RedirectToAction("Index", "Home");
         }
+
         [AllowAnonymous]
         [HttpGet]
         public IActionResult AccesoDenegado()
@@ -379,7 +394,27 @@ namespace SistemasAnaliticos.Controllers
                 usuario.UserName = model.correoEmpresa;
 
                 usuario.celularOficina = model.celularOficina;
-                usuario.jefeId = model.jefeId;
+
+                if (!string.IsNullOrEmpty(model.jefeId))
+                {
+                    usuario.jefeId = model.jefeId;
+                    var busquedaJefe = await _context.Users.FindAsync(model.jefeId);
+
+                    if (busquedaJefe != null)
+                    {
+                        usuario.jefeNombre = busquedaJefe.nombreCompleto;
+                    }
+                    else
+                    {
+                        usuario.jefeNombre = null;
+                    }
+                }
+                else
+                {
+                    usuario.jefeId = null;
+                    usuario.jefeNombre = null;
+                }
+
                 usuario.extension = model.extension;
                 usuario.salario = model.salario;
                 usuario.cuentaIBAN = model.cuentaIBAN;
@@ -492,6 +527,71 @@ namespace SistemasAnaliticos.Controllers
             {
                 success = true,
                 message = "Contraseña cambiada correctamente"
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CambiarContrasena2(CambiarContrasenaViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Datos inválidos",
+                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
+            }
+
+            var user = await userManager.FindByIdAsync(model.Id);
+
+            if (user == null)
+            {
+                return Json(new { success = false, message = "Usuario no encontrado" });
+            }
+
+            // Generar token y cambiar contraseña
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await userManager.ResetPasswordAsync(user, token, model.NuevaContrasena);
+
+            if (!result.Succeeded)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Error al cambiar la contraseña",
+                    errors = result.Errors.Select(e => e.Description)
+                });
+            }
+
+            // 🔥 INVALIDAR TODAS LAS SESIONES
+            await userManager.UpdateSecurityStampAsync(user);
+
+            // 🔐 Logout inmediato si es el mismo usuario
+            var usuarioActualId = userManager.GetUserId(User);
+
+            if (usuarioActualId == user.Id)
+            {
+                await signInManager.SignOutAsync();
+
+                // Opcional: Marcar que ya no es primer login
+                // user.lastActivityUtc = DateTime.UtcNow; // Ya se actualizó en el login
+                // await userManager.UpdateAsync(user);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Contraseña cambiada exitosamente. Por favor inicie sesión nuevamente.",
+                    logout = true
+                });
+            }
+
+            return Json(new
+            {
+                success = true,
+                message = "Contraseña cambiada correctamente",
+                logout = false
             });
         }
 

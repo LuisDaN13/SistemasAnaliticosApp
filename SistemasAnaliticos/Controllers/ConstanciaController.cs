@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
+using SistemasAnaliticos.Helpers;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
 using SistemasAnaliticos.ViewModels;
@@ -20,14 +21,16 @@ namespace SistemasAnaliticos.Controllers
         private readonly UserManager<Usuario> _userManager;
         private readonly IConstanciaService _constanciaService;
         private readonly IPermisoAlcanceService _permisoAlcanceService;
+        private readonly IEmailService _emailService;
 
 
-        public ConstanciaController(DBContext context, UserManager<Usuario> userManager, IConstanciaService constanciaService, IPermisoAlcanceService permisoAlcanceService)
+        public ConstanciaController(DBContext context, UserManager<Usuario> userManager, IConstanciaService constanciaService, IPermisoAlcanceService permisoAlcanceService, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
             _constanciaService = constanciaService;
             _permisoAlcanceService = permisoAlcanceService;
+            _emailService = emailService;
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
@@ -704,7 +707,21 @@ namespace SistemasAnaliticos.Controllers
         [Authorize(Policy = "Constancia.Crear")]
         public async Task<IActionResult> Create(Constancia model)
         {
-            // Detectar sistema operativo y usar el ID de zona horaria adecuado
+            var usuario = await _userManager.GetUserAsync(User);
+
+            string nombreJefe = "No asignado";
+            string correoJefe = "No asignado";
+
+            if (!string.IsNullOrEmpty(usuario.jefeId))
+            {
+                var jefe = await _userManager.FindByIdAsync(usuario.jefeId);
+                if (jefe != null)
+                {
+                    nombreJefe = jefe.nombreCompleto ?? jefe.UserName;
+                    correoJefe = jefe.Email;
+                }
+            }
+
             string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? "Central America Standard Time"           // Windows
                 : "America/Costa_Rica";                     // Linux/macOS
@@ -717,17 +734,18 @@ namespace SistemasAnaliticos.Controllers
             {
                 var fotoService = new CodigoFotos();
                 var adjuntoService = new ProcesarAdjuntos();
-                var user = await _userManager.GetUserAsync(User);
 
                 if (model.tipo == "Laboral")
                 {
-                    var pdfBytes = await _constanciaService.GenerarConstanciaLaboral(user.nombreCompleto, user.cedula, user.departamento, user.fechaIngreso, user.puesto, model.dirijido);
+                    var pdfBytes = await _constanciaService.GenerarConstanciaLaboral(usuario.nombreCompleto, usuario.cedula, usuario.departamento, usuario.fechaIngreso, usuario.puesto, model.dirijido);
 
                     var nuevo = new Constancia
                     {
+                        UsuarioId = usuario.Id,
+
                         fechaCreacion = hoy,
-                        nombreEmpleado = user.nombreCompleto,
-                        departamento = user.departamento,
+                        nombreEmpleado = usuario.nombreCompleto,
+                        departamento = usuario.departamento,
                         tipo = model.tipo,
 
                         dirijido = model.dirijido,
@@ -735,7 +753,7 @@ namespace SistemasAnaliticos.Controllers
                         comentarios = model.comentarios,
 
                         datosAdjuntos = pdfBytes,
-                        nombreArchivo = $"Constancia_Laboral_{user.primerNombre}{user.primerApellido}.pdf",
+                        nombreArchivo = $"Constancia_Laboral_{usuario.primerNombre}{usuario.primerApellido}.pdf",
                         tipoMIME = "application/pdf",
                         tamanoArchivo = pdfBytes.Length,
 
@@ -749,8 +767,8 @@ namespace SistemasAnaliticos.Controllers
                     var nuevo = new Constancia
                     {
                         fechaCreacion = hoy,
-                        nombreEmpleado = user.nombreCompleto,
-                        departamento = user.departamento,
+                        nombreEmpleado = usuario.nombreCompleto,
+                        departamento = usuario.departamento,
                         tipo = model.tipo,
 
                         dirijido = "sin dirijido",
@@ -762,6 +780,45 @@ namespace SistemasAnaliticos.Controllers
 
                     _context.Constancia.Add(nuevo);
                     await _context.SaveChangesAsync();
+                }
+
+                try
+                {
+                    // 1. Correo al empleado
+                    var htmlEmpleado = PlantillasEmail.ConfirmacionEmpleadoCons(
+                        nombreEmpleado: usuario.nombreCompleto,
+                        tipoConstancia: model.tipo
+                    );
+
+                    await _emailService.SendEmailAsync(
+                        toEmail: usuario.Email,
+                        toName: usuario.nombreCompleto,
+                        subject: $"Confirmación de Constancia - {usuario.nombreCompleto}",
+                        htmlBody: htmlEmpleado
+                    );
+
+                    //2.Correo de notificación al jefe(si tiene)
+                    if (!string.IsNullOrEmpty(usuario.jefeId))
+                    {
+                        var htmlJefe = PlantillasEmail.NotificacionJefaturaCons(
+                            nombreEmpleado: usuario.nombreCompleto,
+                            tipoConstancia: model.tipo,
+                            nombreJefe: nombreJefe
+                        );
+
+                        await _emailService.SendEmailAsync(
+                            toEmail: correoJefe,
+                            toName: nombreJefe,
+                            subject: $"Solicitud de constancia pendiente - {usuario.nombreCompleto}",
+                            htmlBody: htmlJefe
+                        );
+                    }
+
+                }
+                catch (Exception exEmail)
+                {
+                    // Solo log si hay error en correo, no interrumpir
+                    Console.WriteLine($"Error enviando correo: {exEmail.Message}");
                 }
 
                 TempData["SuccessMessage"] = "Se creó la constancia correctamente.";

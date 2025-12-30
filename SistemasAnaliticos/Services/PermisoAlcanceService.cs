@@ -49,6 +49,9 @@
                 .Select(u => u.Id)
                 .ToListAsync();
 
+            // AÑADIR AL USUARIO ACTUAL A LA LISTA
+            subordinadosIds.Add(usuario.Id);
+
             return query.Where(p => subordinadosIds.Contains(p.UsuarioId));
         }
 
@@ -79,6 +82,9 @@
                 .Where(u => u.jefeId == usuario.Id)
                 .Select(u => u.Id)
                 .ToListAsync();
+
+            // AÑADIR AL USUARIO ACTUAL A LA LISTA
+            subordinadosIds.Add(usuario.Id);
 
             return query.Where(p => subordinadosIds.Contains(p.UsuarioId));
         }
@@ -111,6 +117,9 @@
                 .Select(u => u.Id)
                 .ToListAsync();
 
+            // AÑADIR AL USUARIO ACTUAL A LA LISTA
+            subordinadosIds.Add(usuario.Id);
+
             return query.Where(p => subordinadosIds.Contains(p.UsuarioId));
         }
 
@@ -141,6 +150,9 @@
                 .Where(u => u.jefeId == usuario.Id)
                 .Select(u => u.Id)
                 .ToListAsync();
+
+            // AÑADIR AL USUARIO ACTUAL A LA LISTA
+            subordinadosIds.Add(usuario.Id);
 
             return query.Where(p => subordinadosIds.Contains(p.UsuarioId));
         }
