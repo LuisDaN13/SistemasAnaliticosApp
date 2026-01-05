@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
@@ -238,7 +239,7 @@ namespace SistemasAnaliticos.Controllers
                     segundoApellido = model.segundoApellido,
 
                     noEmpleado = model.noEmpleado,
-                    cedula = model.cedula,
+                    cedula = model.cedula.Replace("-", ""),
                     fechaNacimiento = model.fechaNacimiento,
                     genero = model.genero,
                     estadoCivil = model.estadoCivil,
@@ -261,22 +262,22 @@ namespace SistemasAnaliticos.Controllers
                     Email = email,
                     UserName = userName,
 
-                    celularOficina = model.celularOficina,
+                    celularOficina = model.celularOficina.Replace(" ", ""),
 
                     jefeId = model.jefeId,
                     jefeNombre = model.jefeNombre,
 
                     extension = model.extension,
-                    salario = model.salario,
+                    salario = model.salario.Replace(" ", ""),
                     cuentaIBAN = model.cuentaIBAN,
-                    celularPersonal = model.celularPersonal,
+                    celularPersonal = model.celularPersonal.Replace(" ", ""),
                     correoPersonal = model.correoPersonal,
-                    telefonoHabitacion = model.telefonoHabitacion,
+                    telefonoHabitacion = model.telefonoHabitacion.Replace(" ", ""),
 
                     licencias = model.licencias,
                     tipoPariente = model.tipoPariente,
                     contactoEmergencia = model.contactoEmergencia,
-                    telefonoEmergencia = model.telefonoEmergencia,
+                    telefonoEmergencia = model.telefonoEmergencia.Replace(" ", ""),
                     padecimientosAlergias = model.padecimientosAlergias,
                     estado = true,
 
@@ -299,20 +300,69 @@ namespace SistemasAnaliticos.Controllers
                         await userManager.AddToRoleAsync(nuevo, "Empleado Normal");
                     }
 
+                    // Detectar sistema operativo y usar el ID de zona horaria adecuado
+                    string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                        ? "Central America Standard Time"           // Windows
+                        : "America/Costa_Rica";                     // Linux/macOS
+
+                    TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                    DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                    DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                    var usuario = await userManager.GetUserAsync(User);
+
+                    // Auditoría
+                    var auditoria = new Auditoria
+                    {
+                        Fecha = hoy,
+                        Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                        Usuario = usuario.nombreCompleto ?? "Desconocido",
+                        Tabla = "Usuario",
+                        Accion = "Nuevo registro"
+                    };
+                    _context.Auditoria.Add(auditoria);
+
                     TempData["SuccessMessage"] = "El empleado se creó correctamente.";
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Error en la creación del empleado.";
-                    return RedirectToAction("Index", "Usuario");
+                    var duplicateUserError = resultado.Errors
+                        .FirstOrDefault(e => e.Code == "DuplicateUserName");
+
+                    if (duplicateUserError != null)
+                    {
+                        TempData["ErrorMessage"] = "Ya existe un usuario registrado con ese correo electrónico.";
+                        return RedirectToAction("Index", "Usuario");
+                    }
+                    else
+                    {
+                        // Manejar otros errores
+                        TempData["ErrorMessage"] = "Error en la creación del empleado.";
+                        return RedirectToAction("Index", "Usuario");
+                    }
+                }
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // Capturar excepciones de base de datos
+                if (dbEx.InnerException is SqlException sqlEx)
+                {
+                    // Verificar si es error de cédula duplicada
+                    if (sqlEx.Message.Contains("IX_AspNetUsers_cedula"))
+                    {
+                        TempData["ErrorMessage"] = "Ya existe un usuario registrado con la misma cédula, intente de nuevo!";
+                        return RedirectToAction("Index", "Usuario");
+                    }
                 }
 
+                // Si no es ninguno de los errores conocidos, mostrar mensaje genérico
+                TempData["ErrorMessage"] = $"Error en la base de datos: {dbEx.InnerException?.Message ?? dbEx.Message}";
+                return RedirectToAction("Index", "Usuario");
             }
             catch
             {
                 TempData["ErrorMessage"] = "Error en el proceso.";
-                return RedirectToAction("Usuario", "Index");
+                return RedirectToAction("Index", "Usuario");
             }
         }
 
@@ -367,7 +417,7 @@ namespace SistemasAnaliticos.Controllers
                 usuario.segundoApellido = model.segundoApellido;
 
                 usuario.noEmpleado = model.noEmpleado;
-                usuario.cedula = model.cedula;
+                usuario.cedula = model.cedula.Replace("-", "");
                 usuario.fechaNacimiento = model.fechaNacimiento;
                 usuario.genero = model.genero;
                 usuario.estadoCivil = model.estadoCivil;
@@ -393,7 +443,7 @@ namespace SistemasAnaliticos.Controllers
                 usuario.Email = model.correoEmpresa;
                 usuario.UserName = model.correoEmpresa;
 
-                usuario.celularOficina = model.celularOficina;
+                usuario.celularOficina = model.celularOficina.Replace(" ", "");
 
                 if (!string.IsNullOrEmpty(model.jefeId))
                 {
@@ -416,16 +466,16 @@ namespace SistemasAnaliticos.Controllers
                 }
 
                 usuario.extension = model.extension;
-                usuario.salario = model.salario;
+                usuario.salario = model.salario.Replace(" ", "");
                 usuario.cuentaIBAN = model.cuentaIBAN;
-                usuario.celularPersonal = model.celularPersonal;
+                usuario.celularPersonal = model.celularPersonal.Replace(" ", "");
                 usuario.correoPersonal = model.correoPersonal;
-                usuario.telefonoHabitacion = model.telefonoHabitacion;
+                usuario.telefonoHabitacion = model.telefonoHabitacion.Replace(" ", "");
 
                 usuario.licencias = model.licencias;
                 usuario.tipoPariente = model.tipoPariente;
                 usuario.contactoEmergencia = model.contactoEmergencia;
-                usuario.telefonoEmergencia = model.telefonoEmergencia;
+                usuario.telefonoEmergencia = model.telefonoEmergencia.Replace(" ", "");
                 usuario.padecimientosAlergias = model.padecimientosAlergias;
 
                 // 🔹 Foto (solo si subió una nueva)
@@ -436,7 +486,29 @@ namespace SistemasAnaliticos.Controllers
 
                 // 🔹 Guardar cambios
                 _context.Update(usuario);
+
+
                 await _context.SaveChangesAsync();
+
+                // Detectar sistema operativo y usar el ID de zona horaria adecuado
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Usuario",
+                    Accion = "Edición del registro, del empleado" + usuario.primerNombre + " " + usuario.primerApellido
+                };
+                _context.Auditoria.Add(auditoria);
 
                 TempData["SuccessMessage"] = "El empleado se actualizó correctamente.";
                 return RedirectToAction(nameof(Index));
@@ -465,6 +537,27 @@ namespace SistemasAnaliticos.Controllers
                 }
 
                 usuario.estado = !usuario.estado;
+
+                // Detectar sistema operativo y usar el ID de zona horaria adecuado
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Usuario",
+                    Accion = "Cambio de Estado de " + usuario.primerNombre + " " + usuario.primerApellido
+                };
+                _context.Auditoria.Add(auditoria);
+
                 await _context.SaveChangesAsync();
 
                 return Json(new { success = true, redirectUrl = Url.Action(nameof(Index)) });
@@ -575,9 +668,25 @@ namespace SistemasAnaliticos.Controllers
             {
                 await signInManager.SignOutAsync();
 
-                // Opcional: Marcar que ya no es primer login
-                // user.lastActivityUtc = DateTime.UtcNow; // Ya se actualizó en el login
-                // await userManager.UpdateAsync(user);
+                // Detectar sistema operativo y usar el ID de zona horaria adecuado
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = user.nombreCompleto ?? "Desconocido",
+                    Tabla = "Usuario",
+                    Accion = "Cambió de Contraseña de " + user.primerNombre + " " + user.primerApellido
+                };
+                _context.Auditoria.Add(auditoria);
 
                 return Json(new
                 {
@@ -638,6 +747,27 @@ namespace SistemasAnaliticos.Controllers
                 }
 
                 usuario.estado = !usuario.estado;
+
+                // Detectar sistema operativo y usar el ID de zona horaria adecuado
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Usuario",
+                    Accion = "Cambio de Estado de " + usuario.primerNombre + " " + usuario.primerApellido
+                };
+                _context.Auditoria.Add(auditoria);
+
                 await _context.SaveChangesAsync();
 
                 return Json(new { success = true, redirectUrl = Url.Action(nameof(MostrarUsers)) });
@@ -696,6 +826,27 @@ namespace SistemasAnaliticos.Controllers
                 {
                     return Json(new { success = false, message = "Error al asignar el nuevo rol" });
                 }
+
+                // Detectar sistema operativo y usar el ID de zona horaria adecuado
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var user = await userManager.GetUserAsync(User);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = user.nombreCompleto ?? "Desconocido",
+                    Tabla = "Usuario",
+                    Accion = "Cambió de Rol por " + rol.Name + " a " + usuario.primerNombre + " " + usuario.primerApellido
+                };
+                _context.Auditoria.Add(auditoria);
 
                 return Json(new
                 {
@@ -805,6 +956,26 @@ namespace SistemasAnaliticos.Controllers
                     // Si no se seleccionó rol, asignar por defecto
                     await userManager.AddToRoleAsync(nuevoUsuario, "Empleado Normal");
                 }
+
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var usuario = await userManager.GetUserAsync(User);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Usuario",
+                    Accion = "Nuevo registro por parte de Admin"
+                };
+                _context.Auditoria.Add(auditoria);
 
                 return Json(new
                 {

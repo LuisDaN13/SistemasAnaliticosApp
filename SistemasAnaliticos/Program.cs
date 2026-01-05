@@ -19,15 +19,15 @@ builder.Services.Configure<ConfiguracionEmail>(
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 
-builder.Services.AddControllersWithViews();
-//builder.Services.AddControllersWithViews(options =>
-//{
-//    var policy = new AuthorizationPolicyBuilder()
-//        .RequireAuthenticatedUser()
-//        .Build();
+//builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
 
-//    options.Filters.Add(new AuthorizeFilter(policy));
-//});
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
 builder.Services.AddScoped<IConstanciaService, ConstanciaService>();
 builder.Services.AddScoped<IFechaLargaService, FechaLargaService>();
 builder.Services.AddScoped<IAlcanceUsuarioService, AlcanceUsuarioService>();

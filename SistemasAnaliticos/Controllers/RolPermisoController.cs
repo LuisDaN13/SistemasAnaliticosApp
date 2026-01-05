@@ -1,21 +1,26 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Auxiliares;
+using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
 using SistemasAnaliticos.ViewModels;
+using System.Runtime.InteropServices;
 
 namespace SistemasAnaliticos.Controllers
 {
     public class RolPermisoController : Controller
     {
         private readonly DBContext _context;
+        private readonly UserManager<Usuario> _userManager;
         private readonly IRolPermisoService _rolPermisoService;
 
-        public RolPermisoController(DBContext context, IRolPermisoService rolPermisoService)
+        public RolPermisoController(DBContext context, UserManager<Usuario> userManager, IRolPermisoService rolPermisoService)
         {
             _context = context;
+            _userManager = userManager;
             _rolPermisoService = rolPermisoService;
         }
 
@@ -79,6 +84,27 @@ namespace SistemasAnaliticos.Controllers
                     model.Id,
                     permisosSeleccionados
                 );
+
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var usuario = await _userManager.GetUserAsync(User);
+                var rol = await _context.Roles.FindAsync(model.Id);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Permisos de Rol",
+                    Accion = "Cambios de Permisos en el rol de" + rol.Name,
+                };
+                _context.Auditoria.Add(auditoria);
 
                 TempData["SuccessMessageRoles"] = "Permisos actualizados correctamente.";
                 return RedirectToAction("Index", "Rol");

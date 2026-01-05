@@ -415,9 +415,28 @@ namespace SistemasAnaliticos.Controllers
                 stream.Position = 0;
 
                 var fileName = $"Viaticos_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-                return File(stream,
-                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                           fileName);
+
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var usuario = await _userManager.GetUserAsync(User);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Viatico",
+                    Accion = "Exportación Excel"
+                };
+                _context.Auditoria.Add(auditoria);
+
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
             catch (Exception ex)
             {
@@ -658,6 +677,27 @@ namespace SistemasAnaliticos.Controllers
 
                 // Devolver PDF
                 var fileName = $"Viaticos_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var usuario = await _userManager.GetUserAsync(User);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Viatico",
+                    Accion = "Exportación PDF"
+                };
+                _context.Auditoria.Add(auditoria);
+
                 return File(memoryStream.ToArray(), "application/pdf", fileName);
             }
             catch (Exception ex)
@@ -818,6 +858,27 @@ namespace SistemasAnaliticos.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? "Central America Standard Time"           // Windows
+                : "America/Costa_Rica";                     // Linux/macOS
+
+            TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+            DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+            var usuario = await _userManager.GetUserAsync(User);
+
+            // Auditoría
+            var auditoria = new Auditoria
+            {
+                Fecha = hoy,
+                Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                Usuario = usuario.nombreCompleto ?? "Desconocido",
+                Tabla = "Viatico",
+                Accion = "Cambio de Estado del no." + string.Join(", ", model.Ids)
+            };
+            _context.Auditoria.Add(auditoria);
+
             TempData["SuccessMessageVia"] = "Se cambiaron los viaticos de estados correctamente.";
             return Ok(new { redirect = Url.Action("VerViaticos") });
         }
@@ -852,6 +913,18 @@ namespace SistemasAnaliticos.Controllers
             };
 
             _context.Add(liquidacion);
+
+            // Auditoría
+            var auditoria = new Auditoria
+            {
+                Fecha = hoy,
+                Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                Usuario = user.nombreCompleto ?? "Desconocido",
+                Tabla = "Viatico",
+                Accion = "Nuevo registro"
+            };
+            _context.Auditoria.Add(auditoria);
+
             await _context.SaveChangesAsync();
 
             // REDIRECCIONA a Edit con el ID recién creado

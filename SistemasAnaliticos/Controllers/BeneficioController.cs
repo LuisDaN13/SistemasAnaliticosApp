@@ -319,9 +319,28 @@ namespace SistemasAnaliticos.Controllers
                 stream.Position = 0;
 
                 var fileName = $"Beneficios_{DateTime.Now:yyyyMMddHHmmss}.xlsx";
-                return File(stream,
-                           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                           fileName);
+
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var usuario = await _userManager.GetUserAsync(User);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Beneficio",
+                    Accion = "Exportación Excel"
+                };
+                _context.Auditoria.Add(auditoria);
+
+                return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
             catch (Exception ex)
             {
@@ -468,6 +487,27 @@ namespace SistemasAnaliticos.Controllers
 
                 // Devolver PDF
                 var fileName = $"Beneficios_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var usuario = await _userManager.GetUserAsync(User);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Beneficio",
+                    Accion = "Exportación PDF"
+                };
+                _context.Auditoria.Add(auditoria);
+
                 return File(memoryStream.ToArray(), "application/pdf", fileName);
             }
             catch (Exception ex)
@@ -625,6 +665,27 @@ namespace SistemasAnaliticos.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? "Central America Standard Time"           // Windows
+                : "America/Costa_Rica";                     // Linux/macOS
+
+            TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+            DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+            var usuario = await _userManager.GetUserAsync(User);
+
+            // Auditoría
+            var auditoria = new Auditoria
+            {
+                Fecha = hoy,
+                Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                Usuario = usuario.nombreCompleto ?? "Desconocido",
+                Tabla = "Beneficio",
+                Accion = "Cambio de Estado del no." + string.Join(", ", model.Ids)
+            };
+            _context.Auditoria.Add(auditoria);
+
             TempData["SuccessMessageBene"] = "Se cambiaron los beneficios de estados correctamente.";
             return Ok(new { redirect = Url.Action("VerBeneficios") });
         }
@@ -716,6 +777,17 @@ namespace SistemasAnaliticos.Controllers
                     // Solo log si hay error en correo, no interrumpir
                     Console.WriteLine($"Error enviando correo: {exEmail.Message}");
                 }
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Beneficio",
+                    Accion = "Nuevo Registro"
+                };
+                _context.Auditoria.Add(auditoria);
 
                 TempData["SuccessMessage"] = "Se creó el beneficio correctamente.";
                 return RedirectToAction("Index", "Permiso");

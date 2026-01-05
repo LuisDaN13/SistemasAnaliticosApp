@@ -340,13 +340,20 @@
                                                 <input class="form-control" asp-for="segundoApellido" placeholder="Ingrese el segundo apellido" required>
                                             </div>
 
-                                            <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
+                                            <div class="col-md-4 border-top" style="margin-top: 2.0rem !important">
                                                 <label style="margin-top: 1.25rem" class="form-label required-field">No.Empleado</label>
                                                 <input type="number" class="form-control" asp-for="noEmpleado" placeholder="Ej: 00000" required>
                                             </div>
-                                            <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
-                                                <label style="margin-top: 1.25rem" class="form-label required-field">No.Cédula</label>
-                                                <input class="form-control" asp-for="cedula" placeholder="Ej: 0-0000-0000" required>
+                                            <div class="col-md-4 border-top" style="margin-top: 2.0rem !important">
+                                                <label style="margin-top: 1.25rem" class="form-label required-field">Tipo de identificación</label>
+                                                <select id="tipoId" class="form-select">
+                                                    <option value="cedula">Cédula Nacional</option>
+                                                    <option value="dimex">DIMEX</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4 border-top" style="margin-top: 2.0rem !important">
+                                                <label style="margin-top: 1.25rem" class="form-label required-field">Número de Cédula</label>
+                                                <input class="form-control" id="identificacion" asp-for="cedula" placeholder="Ej: X-XXXX-XXXX" required>
                                             </div>
 
                                             <div class="col-md-6 border-top" style="margin-top: 2.0rem !important">
@@ -686,7 +693,7 @@
                                             </div>
                                             <div class="col-md-3 border-top" style="margin-top: 2.0rem !important">
                                                 <label style="margin-top: 1.25rem" class="form-label">Celular Empr.</label>
-                                                <input asp-for="celularOficina" type="text" class="form-control" placeholder="Ingrese el número empresarial">
+                                                <input asp-for="celularOficina" type="text" class="form-control celular-cr" maxlength="9" placeholder="Ingrese el número empresarial">
                                             </div>
                                             <div class="col-md-3 border-top" style="margin-top: 2.0rem !important">
                                                 <label style="margin-top: 1.25rem" class="form-label">Extensión</label>
@@ -703,7 +710,7 @@
                                                 <div class="currency-input">
                                                     <div class="input-group">
                                                         <span class="input-group-text">₡</span>
-                                                        <input type="number" class="form-control" asp-for="salario" required>
+                                                        <input type="text" class="form-control salario-cr" asp-for="salario" required>
                                                     </div>
                                                 </div>
                                             </div>
@@ -727,7 +734,7 @@
                                         <div class="row g-3">
                                             <div class="col-md-6" style="margin-top: 2.0rem !important">
                                                 <label class="form-label required-field">Celular Personal</label>
-                                                <input class="form-control" asp-for="celularPersonal" placeholder="Ingrese el número celular" required>
+                                                <input asp-for="celularPersonal" type="text" class="form-control celular-cr" maxlength="9" placeholder="Ingrese el número celular" required>
                                             </div>
                                             <div class="col-md-6" style="margin-top: 2.0rem !important">
                                                 <label class="form-label required-field">Correo Personal</label>
@@ -735,7 +742,7 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Teléfono de Habitación</label>
-                                                <input class="form-control" asp-for="telefonoHabitacion" placeholder="Ingrese el teléfono">
+                                                <input asp-for="telefonoHabitacion" type="text" class="form-control celular-cr" maxlength="9" placeholder="Ingrese el teléfono">
                                             </div>
 
                                             <div class="mt-4 pt-3 border-top" style="margin-top: 2.0rem !important">
@@ -753,7 +760,7 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label required-field">Teléfono</label>
-                                                        <input class="form-control" asp-for="telefonoEmergencia" placeholder="+506 1234 5678" required>
+                                                        <input asp-for="telefonoEmergencia" type="text" class="form-control celular-cr" maxlength="9" placeholder="+506 1234 5678" required>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label required-field">Relación</label>
@@ -805,16 +812,20 @@
             </div>
         </div>
     </div>
-
-
-    <!-- SCRIPT DE LA API DE LA UBICACION -->
-    <script src='~/JS/costaricaLocalEdit.js'></script>
     <script>
         function mostrarImagenModal(base64) {
             var modalImg = document.getElementById("modalFoto");
             modalImg.src = "data:image/jpeg;base64," + base64;
         }
     </script>
+
+    <!-- SCRIPT DE LOS FORMATOS DE CAMPOS-->
+    <script src='~/JS/formatosUsuario.js'></script>
+
+    <!-- SCRIPT DE LA API DE LA UBICACION -->
+    <script src='~/JS/costaricaLocalEdit.js'></script>
+
+    <!-- SCRIPT DE LICENCIAS -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // 🔹 Obtener el valor del campo licencias del modelo Razor

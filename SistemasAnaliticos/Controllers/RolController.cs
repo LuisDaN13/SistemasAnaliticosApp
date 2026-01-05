@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.ViewModels;
+using System.Runtime.InteropServices;
 
 namespace SistemasAnaliticos.Controllers
 {
@@ -105,6 +106,26 @@ namespace SistemasAnaliticos.Controllers
                 _context.Roles.Add(nuevoRol);
                 await _context.SaveChangesAsync();
 
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var usuario = await userManager.GetUserAsync(User);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Rol",
+                    Accion = "Nuevo registro del rol " + nuevoRol.Name,
+                };
+                _context.Auditoria.Add(auditoria);
+
                 TempData["SuccessMessageRoles"] = "Rol creado exitosamente";
                 return RedirectToAction("Index");
             }
@@ -132,6 +153,7 @@ namespace SistemasAnaliticos.Controllers
             try
             {
                 var rol = await _context.Roles.FindAsync(id);
+                var rolNombre = rol?.Name;
                 if (rol == null)
                 {
                     TempData["ErrorMessageRoles"] = "Rol no encontrada";
@@ -139,6 +161,27 @@ namespace SistemasAnaliticos.Controllers
                 }
 
                 _context.Roles.Remove(rol);
+
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var usuario = await userManager.GetUserAsync(User);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Rol",
+                    Accion = "Eliminación del rol " + rolNombre,
+                };
+                _context.Auditoria.Add(auditoria);
+
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessageRoles"] = "Se eliminó correctamente.";
@@ -168,6 +211,27 @@ namespace SistemasAnaliticos.Controllers
                 }
 
                 rol.estado = !rol.estado;
+
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var usuario = await userManager.GetUserAsync(User);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Rol",
+                    Accion = "Inactivación del rol " + rol.Name,
+                };
+                _context.Auditoria.Add(auditoria);
+
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessageRoles"] = "Se cambió correctamente.";

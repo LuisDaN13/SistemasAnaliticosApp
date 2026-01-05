@@ -22,6 +22,7 @@ namespace SistemasAnaliticos.Models
         public DbSet<LiquidacionViatico> LiquidacionViatico { get; set; }
         public DbSet<LiquidacionViaticoDetalle> LiquidacionViaticoDetalle { get; set; }
         public DbSet<AlcanceUsuario> AlcanceUsuario { get; set; }
+        public DbSet<Auditoria> Auditoria { get; set; }
 
         // REGLAS DE MODELO
         protected override void OnModelCreating(ModelBuilder builder)
@@ -32,7 +33,7 @@ namespace SistemasAnaliticos.Models
             builder.Entity<Usuario>(entity =>
             {
                 entity.HasIndex(u => u.primerNombre);
-                entity.HasIndex(u => u.noEmpleado).IsUnique();
+                entity.HasIndex(u => u.noEmpleado);
                 entity.HasIndex(u => u.cedula).IsUnique();
                 entity.HasIndex(u => u.departamento);       
                 entity.HasIndex(u => u.puesto);         
@@ -86,6 +87,26 @@ namespace SistemasAnaliticos.Models
                 entity.HasKey(x => x.idAlcance);
                 entity.Property(x => x.alcance).IsRequired().HasMaxLength(50);
                 entity.HasIndex(x => x.rolId).IsUnique();
+            });
+
+            builder.Entity<Auditoria>(entity =>
+            {
+                entity.HasKey(a => a.idAudit);
+
+                // Índices recomendados
+                entity.HasIndex(a => a.Fecha);
+                entity.HasIndex(a => a.Usuario);
+                entity.HasIndex(a => a.Tabla);
+
+                // Opcional: definir longitud de cadenas para optimizar índice
+                entity.Property(a => a.Usuario)
+                      .HasMaxLength(150);
+
+                entity.Property(a => a.Tabla)
+                      .HasMaxLength(100);
+
+                entity.Property(a => a.Accion)
+                      .HasMaxLength(50);
             });
         }
     }
