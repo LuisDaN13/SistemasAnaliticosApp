@@ -498,13 +498,14 @@ namespace SistemasAnaliticos.Controllers
                 TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
                 DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
                 DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var user = await userManager.GetUserAsync(User);
 
                 // Auditoría
                 var auditoria = new Auditoria
                 {
                     Fecha = hoy,
                     Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
-                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Usuario = user.nombreCompleto ?? "Desconocido",
                     Tabla = "Usuario",
                     Accion = "Edición del registro, del empleado" + usuario.primerNombre + " " + usuario.primerApellido
                 };
@@ -546,13 +547,14 @@ namespace SistemasAnaliticos.Controllers
                 TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
                 DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
                 DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var user = await userManager.GetUserAsync(User);
 
                 // Auditoría
                 var auditoria = new Auditoria
                 {
                     Fecha = hoy,
                     Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
-                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Usuario = user.nombreCompleto ?? "Desconocido",
                     Tabla = "Usuario",
                     Accion = "Cambio de Estado de " + usuario.primerNombre + " " + usuario.primerApellido
                 };
@@ -591,6 +593,27 @@ namespace SistemasAnaliticos.Controllers
 
             if (!result.Succeeded)
             {
+                // Detectar sistema operativo y usar el ID de zona horaria adecuado
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var usuario = await userManager.GetUserAsync(User);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Tabla = "Usuario",
+                    Accion = "Cambió de Contraseña de " + user.primerNombre + " " + user.primerApellido
+                };
+                _context.Auditoria.Add(auditoria);
+
                 return Json(new
                 {
                     success = false,
@@ -676,13 +699,14 @@ namespace SistemasAnaliticos.Controllers
                 TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
                 DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
                 DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var usuario = await userManager.GetUserAsync(User);
 
                 // Auditoría
                 var auditoria = new Auditoria
                 {
                     Fecha = hoy,
                     Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
-                    Usuario = user.nombreCompleto ?? "Desconocido",
+                    Usuario = usuario.nombreCompleto ?? "Desconocido",
                     Tabla = "Usuario",
                     Accion = "Cambió de Contraseña de " + user.primerNombre + " " + user.primerApellido
                 };
@@ -756,13 +780,14 @@ namespace SistemasAnaliticos.Controllers
                 TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
                 DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
                 DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+                var user = await userManager.GetUserAsync(User);
 
                 // Auditoría
                 var auditoria = new Auditoria
                 {
                     Fecha = hoy,
                     Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
-                    Usuario = usuario.nombreCompleto ?? "Desconocido",
+                    Usuario = user.nombreCompleto ?? "Desconocido",
                     Tabla = "Usuario",
                     Accion = "Cambio de Estado de " + usuario.primerNombre + " " + usuario.primerApellido
                 };
