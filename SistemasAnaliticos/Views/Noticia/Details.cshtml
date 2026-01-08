@@ -5,7 +5,6 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <style>
         .bg-gradient-custom {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -93,9 +92,18 @@
                     <div class="row g-4 align-items-start">
                         <!-- Main Image -->
                         <div class="card-img-top">
-                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.foto)"
-                                 class="w-100 news-image"
-                                 alt="Imagen de la Noticia">
+                            @if (Model.foto != null && Model.foto.Length > 0)
+                            {
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.foto)"
+                                     class="w-100 news-image"
+                                     alt="Imagen de la Noticia">
+                            }
+                            else
+                            {
+                                <img src="~/img/sinFondo.jpg"
+                                     class="w-100 news-image"
+                                     alt="Noticia sin imagen">
+                            }
                         </div>
 
                         <div class="card-body p-4 p-md-5">

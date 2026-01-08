@@ -1,0 +1,322 @@
+﻿@model SistemasAnaliticos.Entidades.Extras
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        .card-header-custom {
+            background: linear-gradient(135deg, #012473 0%, #013599 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 1rem 1.25rem;
+        }
+
+        .card-body-custom {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 6px 18px rgba(3, 27, 84, 0.06);
+        }
+
+        .table-soft {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.04);
+        }
+
+            .table-soft thead {
+                background: #f8f9fb;
+            }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .btn-primary-custom {
+            background-color: #2FBD3D;
+            border-color: #2FBD3D;
+        }
+
+            .btn-primary-custom:hover {
+                background-color: #099917;
+                border-color: #099917;
+            }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.12) !important;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <div class="container-xxl py-4">
+
+        <!-- Cabecera -->
+        <div class="card mb-4 mt-4">
+            <div class="card-header card-header-custom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">Horas Extra #@Model.idExtra</h4>
+                        <div class="small opacity-75">
+                            Creada: @Model.fechaCreacion.ToString("dd/MM/yyyy")
+                        </div>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-warning text-dark">@Model.estado</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body card-body-custom">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Empleado</label>
+                        <div class="form-control-plaintext">@Model.nombreEmpleado</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Departamento</label>
+                        <div class="form-control-plaintext">@Model.departamento</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Tipo</label>
+                        <div class="form-control-plaintext">@Model.tipoExtra</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Jefe</label>
+                        <div class="form-control-plaintext">@Model.jefe</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalles -->
+        <div class="d-flex justify-content-between align-items-center card-header card-header-custom">
+            <h5 class="mb-0">Detalles de Horas Extra</h5>
+            <div>
+                <button class="btn btn-primary-custom text-white"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalAgregarDetalle">
+                    <i class="bi bi-plus-lg me-1"></i> Agregar Detalle
+                </button>
+
+                <a asp-action="Index" asp-controller="Liquidacion"
+                   class="btn btn-outline-secondary ms-2">
+                    Finalizar
+                </a>
+            </div>
+        </div>
+
+        <div class="table-responsive table-soft" style="border-radius:0">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th class="text-center">Fecha</th>
+                        <th class="text-center">Horas</th>
+                        <th class="text-center">Lugar</th>
+                        <th class="text-center">Detalle</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Detalles.Any())
+                    {
+                        foreach (var d in Model.Detalles.OrderByDescending(x => x.fecha))
+                        {
+                            <tr>
+                                <td class="text-center">@d.fecha.ToString("dd/MM/yyyy")</td>
+                                <td class="text-center">
+                                    @(
+                                        d.horaInicio.HasValue && d.horaFin.HasValue
+                                        ? $"{DateTime.Today.Add(d.horaInicio.Value):hh:mm tt} - {DateTime.Today.Add(d.horaFin.Value):hh:mm tt}"
+                                        : d.horaInicio.HasValue
+                                        ? $"{DateTime.Today.Add(d.horaInicio.Value):hh:mm tt} - --"
+                                        : d.horaFin.HasValue
+                                        ? $"-- - {DateTime.Today.Add(d.horaFin.Value):hh:mm tt}"
+                                        : "--"
+                                    )
+                                </td>
+                                <td class="text-center">@d.lugar - @d.sucursal</td>
+                                <td class="text-center">@d.detalle</td>
+                                <td class="text-center">
+                                    <form asp-action="EliminarDetalle" method="post" class="d-inline">
+                                        <input type="hidden" name="idDetalle" value="@d.idExtrasDetalle" />
+                                        <input type="hidden" name="idExtra" value="@Model.idExtra" />
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('¿Eliminar este detalle?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                No hay detalles registrados.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-end mt-3">
+            <h4>
+                Total de horas:
+                <span id="totalHoras">@Model.totalHoras</span>
+            </h4>
+        </div>
+    </div>
+
+    <!-- Modal Agregar Detalle -->
+    <div class="modal fade" id="modalAgregarDetalle" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header"
+                     style="background:linear-gradient(to right,#012473,#013599);color:white;">
+                    <h5 class="modal-title fw-bold">Agregar Detalle de Horas Extra</h5>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"></button>
+                </div>
+
+                <form asp-action="AgregarExtrasDetalle"
+                      asp-controller="Extras"
+                      method="post">
+
+                    <div class="modal-body">
+
+                        <input type="hidden" name="idExtra" value="@Model.idExtra" />
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Fecha</label>
+                                <input type="date" name="fecha" class="form-control" required />
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Hora Inicio</label>
+                                <input type="time" name="horaInicio" class="form-control" required />
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Hora Fin</label>
+                                <input type="time" name="horaFin" class="form-control" required />
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label required-field">Detalle</label>
+                                <input type="text" name="detalle" class="form-control" placeholder="agregar el detalle de la extra que se realizo" required />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">ATM</label>
+                                <input type="text" name="atm" class="form-control" placeholder="###"/>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">No. Caso</label>
+                                <input type="text" name="noCaso" class="form-control" placeholder="###"/>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">No. Boleta</label>
+                                <input type="text" name="noBoleta" class="form-control" placeholder="###" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label required-field">Lugar</label>
+                                <select id="lugarSelect" name="lugar" class="form-select" required>
+                                    <option value="">Seleccione un lugar</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Sucursal</label>
+                                <select id="sucursalSelect" name="sucursal" class="form-select" disabled>
+                                    <option value="">Seleccione una sucursal</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light">
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                                class="btn btn-primary-custom text-white">
+                            Guardar Detalle
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LOS LUGARES -->
+    <script src="~/js/lugaresExtras.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            var lugarSelect = document.getElementById("lugarSelect");
+            var sucursalSelect = document.getElementById("sucursalSelect");
+            var modal = document.getElementById("modalAgregarDetalle");
+
+            if (!lugarSelect || !sucursalSelect || !modal) return;
+
+            modal.addEventListener("show.bs.modal", function () {
+
+                lugarSelect.innerHTML = '<option value="">Seleccione un lugar</option>';
+                sucursalSelect.innerHTML = '<option value="">Seleccione una sucursal</option>';
+                sucursalSelect.disabled = true;
+
+                for (var banco in LUGARES_DATA) {
+                    var option = document.createElement("option");
+                    option.value = banco;
+                    option.textContent = banco;
+                    lugarSelect.appendChild(option);
+                }
+            });
+
+            lugarSelect.addEventListener("change", function () {
+
+                var bancoSeleccionado = this.value;
+
+                sucursalSelect.innerHTML = '<option value="">Seleccione una sucursal</option>';
+                sucursalSelect.disabled = true;
+
+                if (!bancoSeleccionado) return;
+
+                var sucursales = LUGARES_DATA[bancoSeleccionado];
+
+                sucursales.forEach(function (sucursal) {
+                    var option = document.createElement("option");
+                    option.value = sucursal;
+                    option.textContent = sucursal;
+                    sucursalSelect.appendChild(option);
+                });
+
+                sucursalSelect.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

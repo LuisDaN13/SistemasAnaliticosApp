@@ -35,6 +35,30 @@ namespace SistemasAnaliticos.Controllers
         // GETS DE DROPDOWNS Y LISTAS
 
         [HttpGet]
+        public IActionResult GetTecnicos()
+        {
+            try
+            {
+                var tecnicos = userManager.Users
+                    .Where(u => u.departamento == "Técnicos NCR")
+                    .OrderBy(u => u.primerNombre)
+                    .ThenBy(u => u.primerApellido)
+                    .Select(u => new
+                    {
+                        id = u.Id,
+                        nombre = u.primerNombre + " " + u.primerApellido
+                    })
+                    .ToList();
+
+                return Json(new { success = true, tecnicos });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetJefes()
         {
             try
@@ -89,7 +113,6 @@ namespace SistemasAnaliticos.Controllers
         public async Task<IActionResult> LogOut()
         {
             await signInManager.SignOutAsync();
-            HttpContext.Session.Clear(); // Limpiar la sesión
             return RedirectToAction("Login", "Usuario");
         }
 
@@ -222,7 +245,6 @@ namespace SistemasAnaliticos.Controllers
         // CREATE = REGISTRAR EMPLEADO CON FORMULARIO Y TODO
         [Authorize(Policy = "Usuarios.Crear")]
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Usuario model, string rolSeleccionado)
         {
             try
@@ -262,22 +284,22 @@ namespace SistemasAnaliticos.Controllers
                     Email = email,
                     UserName = userName,
 
-                    celularOficina = model.celularOficina.Replace(" ", ""),
+                    celularOficina = model.celularOficina?.Replace(" ", ""),
 
                     jefeId = model.jefeId,
                     jefeNombre = model.jefeNombre,
 
                     extension = model.extension,
-                    salario = model.salario.Replace(" ", ""),
+                    salario = model.salario?.Replace(" ", ""),
                     cuentaIBAN = model.cuentaIBAN,
-                    celularPersonal = model.celularPersonal.Replace(" ", ""),
+                    celularPersonal = model.celularPersonal?.Replace(" ", ""),
                     correoPersonal = model.correoPersonal,
-                    telefonoHabitacion = model.telefonoHabitacion.Replace(" ", ""),
+                    telefonoHabitacion = model.telefonoHabitacion?.Replace(" ", ""),
 
                     licencias = model.licencias,
                     tipoPariente = model.tipoPariente,
                     contactoEmergencia = model.contactoEmergencia,
-                    telefonoEmergencia = model.telefonoEmergencia.Replace(" ", ""),
+                    telefonoEmergencia = model.telefonoEmergencia?.Replace(" ", ""),
                     padecimientosAlergias = model.padecimientosAlergias,
                     estado = true,
 
@@ -417,7 +439,7 @@ namespace SistemasAnaliticos.Controllers
                 usuario.segundoApellido = model.segundoApellido;
 
                 usuario.noEmpleado = model.noEmpleado;
-                usuario.cedula = model.cedula.Replace("-", "");
+                usuario.cedula = model.cedula?.Replace("-", "");
                 usuario.fechaNacimiento = model.fechaNacimiento;
                 usuario.genero = model.genero;
                 usuario.estadoCivil = model.estadoCivil;
@@ -443,7 +465,7 @@ namespace SistemasAnaliticos.Controllers
                 usuario.Email = model.correoEmpresa;
                 usuario.UserName = model.correoEmpresa;
 
-                usuario.celularOficina = model.celularOficina.Replace(" ", "");
+                usuario.celularOficina = model.celularOficina?.Replace(" ", "");
 
                 if (!string.IsNullOrEmpty(model.jefeId))
                 {
@@ -466,16 +488,16 @@ namespace SistemasAnaliticos.Controllers
                 }
 
                 usuario.extension = model.extension;
-                usuario.salario = model.salario.Replace(" ", "");
+                usuario.salario = model.salario?.Replace(" ", "");
                 usuario.cuentaIBAN = model.cuentaIBAN;
-                usuario.celularPersonal = model.celularPersonal.Replace(" ", "");
+                usuario.celularPersonal = model.celularPersonal?.Replace(" ", "");
                 usuario.correoPersonal = model.correoPersonal;
-                usuario.telefonoHabitacion = model.telefonoHabitacion.Replace(" ", "");
+                usuario.telefonoHabitacion = model.telefonoHabitacion?.Replace(" ", "");
 
                 usuario.licencias = model.licencias;
                 usuario.tipoPariente = model.tipoPariente;
                 usuario.contactoEmergencia = model.contactoEmergencia;
-                usuario.telefonoEmergencia = model.telefonoEmergencia.Replace(" ", "");
+                usuario.telefonoEmergencia = model.telefonoEmergencia?.Replace(" ", "");
                 usuario.padecimientosAlergias = model.padecimientosAlergias;
 
                 // 🔹 Foto (solo si subió una nueva)
@@ -513,6 +535,23 @@ namespace SistemasAnaliticos.Controllers
 
                 TempData["SuccessMessage"] = "El empleado se actualizó correctamente.";
                 return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException dbEx)
+            {
+                // Capturar excepciones de base de datos
+                if (dbEx.InnerException is SqlException sqlEx)
+                {
+                    // Verificar si es error de cédula duplicada
+                    if (sqlEx.Message.Contains("IX_AspNetUsers_cedula"))
+                    {
+                        TempData["ErrorMessage"] = "Ya existe un usuario registrado con la misma cédula, intente de nuevo!";
+                        return RedirectToAction("Index", "Usuario");
+                    }
+                }
+
+                // Si no es ninguno de los errores conocidos, mostrar mensaje genérico
+                TempData["ErrorMessage"] = $"Error en la base de datos: {dbEx.InnerException?.Message ?? dbEx.Message}";
+                return RedirectToAction("Index", "Usuario");
             }
             catch (Exception ex)
             {

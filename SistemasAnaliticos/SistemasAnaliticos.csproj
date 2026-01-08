@@ -7,11 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\js\costaricaLocalEdit.js" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\js\costaricaLocalEdit.js" />
     <None Include="wwwroot\js\costaricaLocal.js" />
   </ItemGroup>
 

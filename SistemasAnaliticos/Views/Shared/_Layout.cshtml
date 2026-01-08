@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] RRHH - Sistemas AnalÍticos</title>
+    <link rel="icon" type="image/png" href='/img/circulo - logo blanco.png' />
+    <title>RRHH - Sistemas Analíticos</title>
     <!-- Bootstrap desde NuGet (via wwwroot) -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
@@ -157,15 +158,14 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-controller="Permiso" asp-action="Index"><i class="bi-plus-square me-2"></i>Nuevo Permiso</a></li>
-                                <li><a class="dropdown-item" asp-controller="Liquidacion" asp-action="Index"><i class="bi-plus-square me-2"></i>Nueva Liquidación</a></li>
-                                <li><hr class="dropdown-divider"></li>
+@*                                 <li><a class="dropdown-item" asp-controller="Liquidacion" asp-action="Index"><i class="bi-plus-square me-2"></i>Nueva Liquidación</a></li>
+ *@                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" asp-controller="Permiso" asp-action="VerPermisos">Ver Permisos</a></li>
                                 <li><a class="dropdown-item" asp-controller="Constancia" asp-action="VerConstancias">Ver Constancias</a></li>
                                 <li><a class="dropdown-item" asp-controller="Beneficio" asp-action="VerBeneficios">Ver Beneficios</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" asp-controller="Liquidacion" asp-action="VerViaticos">Ver Viáticos</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                            </ul>
+@*                                 <li><a class="dropdown-item" asp-controller="Liquidacion" asp-action="VerViaticos">Ver Viáticos</a></li>
+                                <li><a class="dropdown-item" asp-controller="Extras" asp-action="VerExtras">Ver Extras</a></li>
+ *@                            </ul>
                         </li>
 
                         @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
@@ -247,9 +247,6 @@
 
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <!-- Scripts de tu proyecto -->
-    <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

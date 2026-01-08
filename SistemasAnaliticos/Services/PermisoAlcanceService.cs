@@ -156,5 +156,68 @@
 
             return query.Where(p => subordinadosIds.Contains(p.UsuarioId));
         }
+
+
+        // PARA EXTRAS
+        public async Task<IQueryable<Extras>> AplicarAlcanceExtrasConTipoAsync(
+            IQueryable<Extras> query,
+            ClaimsPrincipal user)
+        {
+            var usuario = await _userManager.GetUserAsync(user);
+            var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(usuario);
+            var departamentoUsuario = usuario.departamento; // propiedad de departamento
+
+            // Administrador y RRHH ven todo (Global)
+            if (alcance == "Global")
+                return query;
+
+            // Jefatura ve subordinados + propios
+            if (alcance == "Subordinados")
+                return await FiltrarSubordinadosExtrasAsync(query, usuario);
+
+            // Para usuarios con alcance "Propio", aplicar la lógica especial
+            var queryPropio = query.Where(p => p.UsuarioId == usuario.Id);
+
+            // AGREGAR LA LÓGICA ESPECIAL: si el usuario pertenece a FinancieroContable u Operaciones
+            // y el Extra es de tipo "Técnico", también debe verlo
+            var departamentosEspeciales = new List<string> { "FinancieroContable", "Operaciones" };
+
+            if (departamentosEspeciales.Contains(departamentoUsuario))
+            {
+                // Unir: sus propios Extras + los Extras de tipo "Técnico"
+                var extrasTecnicos = query.Where(e => e.tipoExtra == "Técnico");
+                queryPropio = queryPropio.Union(extrasTecnicos).Distinct();
+            }
+
+            return queryPropio;
+        }
+
+        private async Task<IQueryable<Extras>> FiltrarSubordinadosExtrasAsync(
+            IQueryable<Extras> query,
+            Usuario usuario)
+        {
+            var subordinadosIds = await _context.Users
+                .Where(u => u.jefeId == usuario.Id)
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            // Añadir al usuario actual
+            subordinadosIds.Add(usuario.Id);
+
+            // Primero: filtrar por subordinados
+            var querySubordinados = query.Where(p => subordinadosIds.Contains(p.UsuarioId));
+
+            // Si el jefe pertenece a FinancieroContable u Operaciones, agregar Extras Técnicos
+            var departamentosEspeciales = new List<string> { "FinancieroContable", "Operaciones" };
+            var departamentoJefe = usuario.departamento;
+
+            if (departamentosEspeciales.Contains(departamentoJefe))
+            {
+                var extrasTecnicos = query.Where(e => e.tipoExtra == "Técnico");
+                querySubordinados = querySubordinados.Union(extrasTecnicos).Distinct();
+            }
+
+            return querySubordinados;
+        }
     }
 }

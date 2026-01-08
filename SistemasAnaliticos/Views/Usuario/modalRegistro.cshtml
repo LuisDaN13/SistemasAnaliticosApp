@@ -231,6 +231,7 @@
         <div class="modal-dialog modal-xl-custom modal-dialog-centered">
             <div class="modal-content">
                 <form id="employeeForm" asp-controller="Usuario" asp-action="Create" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
                     <div class="modal-body p-0">
                         <div class="row g-0 h-100">
                             <!-- Sidebar con Stepper -->
@@ -847,19 +848,19 @@
                                                 </div>
 
                                                 <div class="border-top">
-                                                    @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+@*                                                     @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
                                                     {
-                                                        <div class="col" style="margin-top: 1.5rem !important">
+ *@                                                        <div class="col" style="margin-top: 1.5rem !important">
                                                             <label class="form-label required-field">Rol del Usuario</label>
-                                                            <select class="form-select" id="rolDropdown" name="rolSeleccionado" required>
+                                                            <select class="form-select" id="rolDropdown" name="rolSeleccionado">
                                                                 <option value="" selected disabled>Seleccione un rol</option>
                                                                 <!-- Los roles se cargarán dinámicamente -->
                                                             </select>
                                                             <!-- Campo para mostrar el rol seleccionado -->
                                                             <div id="rolSeleccionadoInfo" class="mt-2 small"></div>
                                                         </div>
-                                                    }
-                                                </div>
+@*                                                     }
+ *@                                                </div>
                                             </div>
                                         </div>
                                     </div>

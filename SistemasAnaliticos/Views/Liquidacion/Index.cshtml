@@ -102,18 +102,10 @@
                 <div class="row g-4">
                     <div class="col-md-4">
                         <button class="btn w-100 h-100 p-4 text-start" style="padding:5rem 1.5rem !important; background-color: #791BDE;"
-                                type="button" data-bs-toggle="modal" data-bs-target="#createConstanciaLModal" data-tipo="Laboral">
+                                type="button" data-bs-toggle="modal" data-bs-target="#modalExtra">
                             <i class="fa-solid fa-helmet-safety fs-1 mb-3 text-white"></i>
                             <h5 class="fw-bold mb-2 text-white">Extras de Empleados</h5>
                             <p class="mb-0 opacity-90 text-white">Registra las horas extra y recargos nocturnos/festivos para el personal técnico.</p>
-                        </button>
-                    </div>
-                    <div class="col-md-4">
-                        <button class="btn btn-success w-100 h-100 p-4 text-start liquidacion-card" style="background-color: #985BD9;"
-                                type="button" data-bs-toggle="modal" data-bs-target="#createConstanciaLModal" data-tipo="Laboral">
-                            <i class="fa-solid fa-user-tie fs-1 mb-3 text-white"></i>
-                            <h5 class="fw-bold mb-2 text-white">Extras de Técnicos</h5>
-                            <p class="mb-0 opacity-90">Registra las horas extra y compensaciones adicionales del personal operativo y administrativo de la empresa.</p>
                         </button>
                     </div>
                     <div class="col-md-4">
@@ -162,6 +154,101 @@
                 </text>
             }
         });
+    </script>
+
+    <!-- Modal de Extras -->
+    <div class="modal fade" id="modalExtra" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar Viático</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">¿El viático es para?</label>
+                        <select class="form-select" id="tipoExtra">
+                            <option value="">Seleccione una opción</option>
+                            <option value="Empleado">Empleado</option>
+                            <option value="Tecnico">Técnico</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 d-none" id="contenedorTecnicos">
+                        <label class="form-label">Seleccione el técnico</label>
+                        <select class="form-select" id="tecnicoId">
+                            <option value="">Seleccione un técnico</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="redirigirCreateViatico()">
+                        Continuar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        const tipoExtra = document.getElementById("tipoExtra");
+        const contenedorTecnicos = document.getElementById("contenedorTecnicos");
+        const tecnicoSelect = document.getElementById("tecnicoId");
+
+        tipoExtra.addEventListener("change", function () {
+            if (this.value === "Tecnico") {
+                contenedorTecnicos.classList.remove("d-none");
+                cargarTecnicos();
+            } else {
+                contenedorTecnicos.classList.add("d-none");
+                tecnicoSelect.innerHTML = '<option value="">Seleccione un técnico</option>';
+            }
+        });
+
+        async function cargarTecnicos() {
+            const response = await fetch('/Usuario/GetTecnicos');
+            const result = await response.json();
+
+            tecnicoSelect.innerHTML = '<option value="">Seleccione un técnico</option>';
+
+            result.tecnicos.forEach(t => {
+                const option = document.createElement("option");
+                option.value = t.id;
+                option.textContent = t.nombre;
+                tecnicoSelect.appendChild(option);
+            });
+        }
+
+        function redirigirCreateViatico() {
+            const tipo = tipoExtra.value;
+            const tecnicoId = tecnicoSelect.value;
+
+            if (!tipo) {
+                alert("Debe seleccionar una opción");
+                return;
+            }
+
+            if (tipo === "Tecnico" && !tecnicoId) {
+                alert("Debe seleccionar un técnico");
+                return;
+            }
+
+            let url = `/Extras/CreateExtra?tipo=${tipo}`;
+
+            if (tipo === "Tecnico") {
+                url += `&tecnicoId=${tecnicoId}`;
+            }
+
+            window.location.href = url;
+        }
     </script>
 </body>
 </html>

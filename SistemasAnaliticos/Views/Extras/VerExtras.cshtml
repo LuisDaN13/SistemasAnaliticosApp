@@ -1,4 +1,4 @@
-﻿@model SistemasAnaliticos.ViewModels.PaginacionConstanciasViewModel
+﻿@model SistemasAnaliticos.ViewModels.PaginacionExtraViewModel
 
 <!DOCTYPE html>
 <html lang="es">
@@ -57,6 +57,14 @@
             padding: 0.375rem 0.75rem;
         }
 
+        .permission-item {
+            transition: background-color 0.3s;
+        }
+
+            .permission-item:hover {
+                background-color: #f8f9fa;
+            }
+
         .action-btn {
             padding: 0.5rem;
             border-radius: 0.5rem;
@@ -78,17 +86,17 @@
             padding: 0.25rem 0.5rem;
         }
 
-        #constanciasContainer {
+        #extrasContainer {
             transition: opacity 0.3s ease;
             opacity: 1;
         }
 
-        .constancia-card {
+        .extras-card {
             transition: all 0.3s ease;
             border: 1px solid #dee2e6;
         }
 
-            .constancia-card:hover {
+            .extras-card:hover {
                 transform: translateY(-2px);
                 box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
                 border-color: var(--primary-color);
@@ -131,53 +139,80 @@
     <!-- Main Content -->
     <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4 pb-0">
 
-        <!-- Titulo de Constancias -->
+        <!-- Titulo de Permisos -->
         <div class="header-card p-4 mt-4 mb-4 d-flex justify-content-between">
-            <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todas las Constancias</h1>
+            <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todas las Extras Laborales</h1>
             <div>
-                @if (!User.IsInRole("Empleado Normal"))
-                {
-                    <button type="button" class="btn btn-primary" onclick="abrirModalMasivo()">Cambiar estado</button>
-                }
-                <button class="btn btn-success" id="exportExcelBtnC">
+                <button type="button" class="btn btn-primary" onclick="abrirModalMasivo()">Cambiar estado</button>
+
+                <button class="btn btn-success" id="exportExcelBtn">
                     <i class="bi bi-file-earmark-excel"></i>
                 </button>
-                <button class="btn btn-danger" id="exportPdfBtnC">
+                <button class="btn btn-danger" id="exportPdfBtn">
                     <i class="bi bi-file-earmark-pdf"></i>
                 </button>
             </div>
-
         </div>
 
-        <!-- constanciaas Types Grid -->
+        <!-- Permission Types Grid -->
         <div class="container my-4">
             <div class="row">
                 <!-- FILTROS PARA CARDS -->
-                <div class="col-lg-3">
+                <div class="col-lg-3 p-0">
                     <div class="card filter-section">
                         <div class="card-body">
-                            <h2 class="h5 card-title fw-bold text-dark mb-4">Filtrar por</h2>
+                            <h2 class="h5 card-title fw-bold text-dark mb-2">Filtrar por</h2>
 
-                            <!-- CHECKS DE TIPOS DE PERMISOS -->
-                            <div class="mb-4 pb-3 border-bottom">
-                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#typeFilter" aria-expanded="true" aria-controls="typeFilter">
-                                    Tipo de Constancia
+                            <!-- CHECKS DE LUGARES -->
+                            <div class="mb-3 pb-1 border-bottom">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#typeFilter"
+                                        aria-expanded="true" aria-controls="typeFilter">
+                                    Lugares
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
                                 <div class="collapse show mt-3" id="typeFilter">
                                     <div class="d-flex flex-column gap-2">
                                         <div class="form-check">
-                                            <input class="form-check-input filter-type" type="checkbox" value="Laboral" id="type-laboral">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-laboral">
-                                                <span>Laboral</span>
-                                                <span class="text-muted" id="count-laboral">(0)</span>
+                                            <input class="form-check-input filter-type" type="checkbox" value="BN" id="type-bn">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-bn">
+                                                <span>BN</span>
+                                                <span class="text-muted" id="count-bn">(0)</span>
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input filter-type" type="checkbox" value="Salarial" id="type-salarial">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-salarial">
-                                                <span>Salarial</span>
-                                                <span class="text-muted" id="count-salarial">(0)</span>
+                                            <input class="form-check-input filter-type" type="checkbox" value="BCR" id="type-bcr">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-bcr">
+                                                <span>BCR</span>
+                                                <span class="text-muted" id="count-bcr">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-type" type="checkbox" value="BCT" id="type-bct">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-bct">
+                                                <span>BCT</span>
+                                                <span class="text-muted" id="count-bct">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-type" type="checkbox" value="Global Exchange" id="type-global">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-global">
+                                                <span>Global Exchange</span>
+                                                <span class="text-muted" id="count-global">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-type" type="checkbox" value="Mutual Alajuela" id="type-mutual">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-mutual">
+                                                <span>Mutual Alajuela</span>
+                                                <span class="text-muted" id="count-mutual">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-type" type="checkbox" value="SASA" id="type-sasa">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="type-sasa">
+                                                <span>SASA</span>
+                                                <span class="text-muted" id="count-sasa">(0)</span>
                                             </label>
                                         </div>
                                     </div>
@@ -186,7 +221,8 @@
 
                             <!-- CHECKS DE ESTADOS DE PERMISOS -->
                             <div class="mb-3 pb-1 border-bottom">
-                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#statusFilter" aria-expanded="false" aria-controls="statusFilter">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold" 
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#statusFilter" aria-expanded="false" aria-controls="statusFilter">
                                     Estado
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
@@ -200,24 +236,17 @@
                                             </label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input filter-status" type="checkbox" value="Aprobada" id="status-approved">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-approved">
-                                                <span>Aprobada</span>
-                                                <span class="text-muted" id="count-approved">(0)</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input filter-status" type="checkbox" value="Pendiente" id="status-pending">
-                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-pending">
-                                                <span>Pendiente</span>
-                                                <span class="text-muted" id="count-pending">(0)</span>
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
                                             <input class="form-check-input filter-status" type="checkbox" value="Rechazada" id="status-rejected">
                                             <label class="form-check-label d-flex justify-content-between w-100" for="status-rejected">
                                                 <span>Rechazada</span>
                                                 <span class="text-muted" id="count-rejected">(0)</span>
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input filter-status" type="checkbox" value="Aprobado" id="status-approved">
+                                            <label class="form-check-label d-flex justify-content-between w-100" for="status-approved">
+                                                <span>Aprobado</span>
+                                                <span class="text-muted" id="count-approved">(0)</span>
                                             </label>
                                         </div>
                                     </div>
@@ -315,7 +344,7 @@
 
                                     <li class="form-check my-2">
                                         <input class="form-check-input filter-departamento" type="checkbox" value="Ventas" id="dropdown-dp-v">
-                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-v">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-ti">
                                             <span>Ventas</span>
                                             <span class="text-muted" id="dropdown-count-v">(0)</span>
                                         </label>
@@ -327,7 +356,7 @@
                             <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
                                         type="button" data-bs-toggle="collapse" data-bs-target="#nameFilter" aria-expanded="true">
-                                    Nombre del Empleado
+                                    Empleado / Sucursal
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
 
@@ -339,10 +368,10 @@
                                         <input type="text"
                                                class="form-control border-start-0 filter-name"
                                                id="filter-name-input"
-                                               placeholder="Escribir nombre..."
+                                               placeholder="Escribir ..."
                                                aria-label="Buscar por nombre">
                                     </div>
-                                    <div class="form-text mt-1">Escribe parte del nombre para buscar</div>
+                                    <div class="form-text mt-1">Escribe para buscar</div>
                                 </div>
                             </div>
 
@@ -390,8 +419,8 @@
 
                 <!-- CONTENIDO DE CARDS -->
                 <div class="col-lg-9">
-                    <div id="constanciasContainer">
-                        <!-- constanciaass will be dynamically loaded here -->
+                    <div id="extrasContainer">
+                        <!-- Permissions will be dynamically loaded here -->
                     </div>
 
                     <!-- Pagination -->
@@ -406,116 +435,41 @@
         </div>
     </main>
 
-    <!-- Modal de la Foto -->
-    <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center">
-                    <img id="modalFoto" src="" alt="Foto ampliada" class="img-fluid rounded" />
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        function mostrarImagenModal(base64) {
-            var modalImg = document.getElementById("modalFoto");
-            modalImg.src = "data:image/jpeg;base64," + base64;
-        }
-    </script>
-
     <!-- Respuestas de los Formularios -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Para mensajes de error
-            @if (TempData["ErrorMessageCons"] != null)
+            @if (TempData["ErrorMessageEx"] != null)
             {
-                <text>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: '@Html.Raw(TempData["ErrorMessageCons"])',
-                        confirmButtonText: 'Aceptar'
-                    });
-                </text>
+                    <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                                text: '@Html.Raw(TempData["ErrorMessageEx"])',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    </text>
             }
 
             // Para mensajes de éxito
-            @if (TempData["SuccessMessageCons"] != null)
+            @if (TempData["SuccessMessageEx"] != null)
             {
-                <text>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Éxito',
-                        text: '@Html.Raw(TempData["SuccessMessageCons"])',
-                        confirmButtonText: 'Aceptar',
-                        timer: 3000
-                    });
-                </text>
+                    <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                                text: '@Html.Raw(TempData["SuccessMessageEx"])',
+                            confirmButtonText: 'Aceptar',
+                            timer: 3000
+                        });
+                    </text>
             }
         });
     </script>
 
-    <!-- Modal de Constancia Salarial -->
-    <div class="modal fade" id="modalSalarial" tabindex="-1" aria-labelledby="modalSalarialLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalSalarialLabel">Campos a Llenar</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formSalarial" action="@Url.Action("HacerConstanciaSalarial", "Constancia")" method="post">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" id="idConstancia" name="idConstancia">
-
-                        <div class="mb-3">
-                            <label for="salarioBruto" class="form-label">Salario Bruto</label>
-                            <input type="number" class="form-control" id="salarioBruto" name="salarioBruto" min="0" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="deducciones" class="form-label">Deducciones</label>
-                            <input type="number" class="form-control" id="deducciones" name="deducciones" min="0" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="salarioNeto" class="form-label">Salario Neto</label>
-                            <input type="number" class="form-control" id="salarioNeto" name="salarioNeto" min="0" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-warning" onclick="enviarFormulario()">Guardar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        function abrirModalSalarial(idConstancia) {
-            // Guardar el ID en el hidden field
-            document.getElementById('idConstancia').value = idConstancia;
-
-            // Limpiar campos
-            document.getElementById('salarioBruto').value = '';
-            document.getElementById('deducciones').value = '';
-            document.getElementById('salarioNeto').value = '';
-
-            // Mostrar modal
-            const modal = new bootstrap.Modal(document.getElementById('modalSalarial'));
-            modal.show();
-        }
-
-        function enviarFormulario() {
-            // Enviar el formulario directamente al controlador
-            document.getElementById('formSalarial').submit();
-        }
-    </script>
-
     <!-- FUNCION DE DESCARGA DE EXCEL -->
     <script>
-        //Funciones para descargar excel
-        document.getElementById('exportExcelBtnC').addEventListener('click', function() {
+        document.getElementById('exportExcelBtn').addEventListener('click', function() {
             const button = this;
 
             // Mostrar indicador de carga
@@ -526,9 +480,9 @@
             // Construir parámetros de filtros
             const params = new URLSearchParams();
 
-            // Agregar tipos
+            // Agregar tipos de detalle (usa el nombre correcto del parámetro)
             filtrosActivos.tipos.forEach(tipo => {
-                params.append('tipos', tipo);
+                params.append('tiposDetalle', tipo);
             });
 
             // Agregar estados
@@ -564,8 +518,8 @@
 
             // Crear enlace de descarga directa
             const downloadLink = document.createElement('a');
-            downloadLink.href = `/Constancia/ExportarConstanciasExcel?${params.toString()}`;
-            downloadLink.download = `Constancias_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.xlsx`;
+            downloadLink.href = `/Liquidacion/ExportarViaticosExcel?${params.toString()}`;
+            downloadLink.download = `Viaticos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.xlsx`;
             downloadLink.style.display = 'none';
 
             // Agregar event listener para restaurar el botón cuando la descarga termine
@@ -591,7 +545,7 @@
 
     <!-- FUNCION DE DESCARGA DE PDF -->
     <script>
-        document.getElementById('exportPdfBtnC').addEventListener('click', async function() {
+        document.getElementById('exportPdfBtn').addEventListener('click', async function() {
             const button = this;
             try {
                 // Mostrar indicador de carga
@@ -599,12 +553,12 @@
                 button.innerHTML = '<i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-2"></i>Generando PDF...';
                 button.disabled = true;
 
-                // Construir parámetros de filtros (misma lógica que Excel)
+                // Construir parámetros de filtros
                 const params = new URLSearchParams();
 
-                // Agregar tipos
+                // Agregar tipos de detalle
                 filtrosActivos.tipos.forEach(tipo => {
-                    params.append('tipos', tipo);
+                    params.append('tiposDetalle', tipo);
                 });
 
                 // Agregar estados
@@ -639,7 +593,7 @@
                 }
 
                 // Realizar la solicitud
-                const response = await fetch(`/Constancia/ExportarConstanciasPDF?${params.toString()}`);
+                const response = await fetch(`/Liquidacion/ExportarViaticosPDF?${params.toString()}`);
 
                 if (response.ok) {
                     // Obtener el blob
@@ -654,18 +608,32 @@
                     const a = document.createElement('a');
                     a.style.display = 'none';
                     a.href = url;
-                    a.download = `Constancias_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.pdf`;
+                    a.download = `Viaticos_${new Date().toISOString().slice(0, 19).replace(/:/g, '')}.pdf`;
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
                     document.body.removeChild(a);
 
                 } else {
-                    throw new Error('Error al generar el PDF');
+                    // Intentar obtener el mensaje de error
+                    let errorMessage = 'Error al generar el PDF';
+                    try {
+                        const errorData = await response.text();
+                        if (errorData) errorMessage = errorData;
+                    } catch {}
+
+                    throw new Error(errorMessage);
                 }
             } catch (error) {
                 console.error('Error al exportar a PDF:', error);
-                alert('Error al generar el archivo PDF');
+
+                // Mostrar alerta más informativa
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al generar PDF',
+                    text: error.message || 'Ocurrió un error al generar el archivo PDF',
+                    confirmButtonText: 'Aceptar'
+                });
 
                 // Restaurar el botón en caso de error
                 button.innerHTML = originalText;
@@ -674,66 +642,18 @@
         });
     </script>
 
-    <!-- PARA ICONOS -->
-    <script>
-        // Función para obtener icono según tipo de archivo
-        function obtenerIconoArchivo(nombreArchivo, tipoMIME) {
-            const extension = obtenerExtension(nombreArchivo).toLowerCase();
-
-            const iconos = {
-                'pdf': 'bi-file-pdf',
-                'doc': 'bi-file-word',
-                'docx': 'bi-file-word',
-                'xls': 'bi-file-excel',
-                'xlsx': 'bi-file-excel',
-                'ppt': 'bi-file-ppt',
-                'pptx': 'bi-file-ppt',
-                'jpg': 'bi-file-image',
-                'jpeg': 'bi-file-image',
-                'png': 'bi-file-image',
-                'gif': 'bi-file-image',
-                'zip': 'bi-file-zip',
-                'rar': 'bi-file-zip'
-            };
-
-            const icono = iconos[extension] || 'bi-file-earmark';
-            return `<i class="bi ${icono} me-1"></i>`;
-        }
-
-        // Función para obtener extensión del archivo
-        function obtenerExtension(nombreArchivo) {
-            return nombreArchivo.split('.').pop() || 'file';
-        }
-
-        // Función para formatear tamaño de archivo
-        function formatearTamanoArchivo(bytes) {
-            if (bytes === 0 || !bytes) return '0 B';
-
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-    </script>
-
-    <!-- SCRIPT PARA DEJAR LISTO ROL DE EMPLEADO PARA USAR JS -->
-    <script>
-        const esEmpleadoNormal = @User.IsInRole("Empleado Normal").ToString();
-    </script>
-
     <!-- FILTRADO Y CONTADORES MEJORADOS -->
     <script>
-        const constanciasPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Constancias));
+        const extrasPaginaActual = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Extras));
         const totalPaginas = @Model.TotalPaginas;
         let paginaActual = @Model.PaginaActual;
 
-        const constanciasContainer = document.getElementById("constanciasContainer");
+        const extrasContainer = document.getElementById("extrasContainer");
         const pagination = document.getElementById("pagination");
 
         // Estado global de filtros
         let filtrosActivos = {
-            tipos: [],
+            lugar: [],
             estados: [],
             departamentos: [],
             nombre: '',
@@ -750,8 +670,8 @@
             const params = new URLSearchParams();
 
             // Tipos
-            filtrosActivos.tipos.forEach(tipo => {
-                params.append('tipos', tipo);
+            filtrosActivos.lugar.forEach(lugar => {
+                params.append('lugar', lugar);
             });
 
             // Estados
@@ -788,11 +708,11 @@
             return params;
         }
 
-        // Inicializar contadores con TODAS las constancias
-        async function filtrarConstancias() {
+        // Inicializar contadores con TODAS las EXTRAS
+        async function filtrarExtras() {
             try {
                 // Mostrar loader
-                constanciasContainer.innerHTML = `
+                extrasContainer.innerHTML = `
                     <div class="text-center py-5" id="filter-loading">
                         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
                             <span class="visually-hidden">Cargando...</span>
@@ -802,14 +722,14 @@
                     </div>
                 `;
 
-                constanciasContainer.style.opacity = '1';
+                extrasContainer.style.opacity = '1';
 
                 const params = construirParametrosFiltros();
-                const response = await fetch(`/Constancia/ObtenerConstanciasFiltradasCompletas?${params.toString()}`);
+                const response = await fetch(`/Extras/ObtenerExtrasFiltradosCompletos?${params.toString()}`);
 
                 if (response.ok) {
-                    const constanciasFiltradas = await response.json();
-                    return constanciasFiltradas;
+                    const extrasFiltrados = await response.json();
+                    return extrasFiltrados;
                 } else {
                     return [];
                 }
@@ -821,15 +741,15 @@
 
         // Función para aplicar filtros y renderizar
         async function aplicarFiltros() {
-            const constanciasFiltradas = await filtrarConstancias();
+            const extrasFiltrados = await filtrarExtras();
 
             // Asegurar que el mensaje de "Aplicando filtros..." se vea por al menos 1 segundo
             setTimeout(async () => {
-                await renderConstanciasWithFade(constanciasFiltradas);
+                await renderrenderExtrasWithFade(extrasFiltrados);
 
                 // Ocultar paginación cuando hay filtros activos
                 const hayFiltrosActivos =
-                    filtrosActivos.tipos.length > 0 ||
+                    filtrosActivos.lugar.length > 0 ||
                     filtrosActivos.estados.length > 0 ||
                     filtrosActivos.departamentos.length > 0 ||
                     (filtrosActivos.nombre && filtrosActivos.nombre.trim().length > 0) ||
@@ -857,22 +777,25 @@
             }
         }
 
-        // Función para inicializar contadores con TODAS las constancias
+        // Función para inicializar contadores con TODAS las EXTRAS
         async function inicializarContadores() {
             try {
-                const response = await fetch('/Constancia/ObtenerContadoresFiltros');
+                const response = await fetch('/Extras/ObtenerContadoresFiltros');
                 if (response.ok) {
                     const contadores = await response.json();
 
-                    // Actualizar contadores de tipos
-                    document.getElementById('count-laboral').textContent = `(${contadores.laboral})`;
-                    document.getElementById('count-salarial').textContent = `(${contadores.salarial})`;
-                    A
+                    // Actualizar contadores de lugares
+                    document.getElementById('count-bn').textContent = `(${contadores.bn})`;
+                    document.getElementById('count-bcr').textContent = `(${contadores.bcr})`;
+                    document.getElementById('count-bct').textContent = `(${contadores.bct})`;
+                    document.getElementById('count-global').textContent = `(${contadores.global})`;
+                    document.getElementById('count-mutual').textContent = `(${contadores.mutual})`;
+                    document.getElementById('count-sasa').textContent = `(${contadores.sasa})`;
+
                     // Actualizar contadores de estados
                     document.getElementById('count-creada').textContent = `(${contadores.creada})`;
-                    document.getElementById('count-approved').textContent = `(${contadores.aprobado})`;
-                    document.getElementById('count-pending').textContent = `(${contadores.pendiente})`;
-                    document.getElementById('count-rejected').textContent = `(${contadores.rechazado})`;
+                    document.getElementById('count-approved').textContent = `(${contadores.aprobada})`;
+                    document.getElementById('count-rejected').textContent = `(${contadores.rechazada})`;
 
                     // Actualizar contadores de departamentos
                     document.getElementById('dropdown-count-bo').textContent = `(${contadores.bodega})`;
@@ -919,161 +842,102 @@
             }, 50);
         }
 
-        // Función para renderizar constancias con efectos de fade
-        async function renderConstanciasWithFade(data) {
-            fadeOut(constanciasContainer, () => {
-                renderConstancias(data);
+        // Función para renderizar extras con efectos de fade
+        async function renderExtrasWithFade(data) {
+            fadeOut(extrasContainer, () => {
+                renderExtras(data);
             });
         }
 
-        // Función para renderizar constancias
-        function renderConstancias(data) {
-            if (data.length === 0) {
-                constanciasContainer.innerHTML = `
+        // Función para renderizar extras
+        function renderExtras(data) {
+            if (!data || data.length === 0) {
+                extrasContainer.innerHTML = `
                     <div class="no-results">
                         <i class="bi bi-inbox display-1 d-block mb-3"></i>
-                        <h3 class="h4 text-muted">No se encontraron constancias</h3>
+                        <h3 class="h4 text-muted">No se encontraron extras</h3>
                         <p class="text-muted">Intenta ajustar los filtros para ver más resultados.</p>
                     </div>
                 `;
-                // Aplicar fade in al contenido vacío
-                fadeIn(constanciasContainer);
+                fadeIn(extrasContainer);
                 return;
             }
 
-            constanciasContainer.innerHTML = data.map(constanciaas => `
-            <div class="card constancia-card mb-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-end">
-                            <input type="checkbox"
-                                   class="form-check-input permiso-check"
-                                   value="${constanciaas.idConstancia}"
-                                   style="width:18px; height:18px; cursor:pointer; padding:10px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);">
-                        </div>
-                        <div class="mb-2"
+            extrasContainer.innerHTML = data.map(extra => `
+            <div class="card extras-card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-end">
+                        <input type="checkbox"
+                               class="form-check-input extra-check"
+                               value="${extra.idExtra}"
+                               style="width:18px; height:18px; cursor:pointer; padding:10px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);">
+                    </div>
+                    <div class="mb-2"
                          style="cursor: pointer;"
-                         onclick="window.location.href='/Constancia/Details/${constanciaas.idConstancia}'">
-                            <div class="d-flex align-items-start justify-content-between gap-1 mb-2 flex-wrap">
-                                <h3 class="h6 fw-bold text-dark mb-0" style="padding: 5px">
-                                    <i class="fa-solid fa-user me-3"></i>${constanciaas.nombreEmpleado}
-                                </h3>
-                                <h5 class="h6 text-white small mb-0" style="padding: 5px; background-color: #012473; border-radius: 5px">
-                                    #${constanciaas.idConstancia}
-                                </h5>
-                            </div>
-                            <div class="d-flex align-items-center flex-wrap mb-2" style="gap: 1.5rem; padding-left: 5%; padding-right: 5%;">
-                                <span class="badge custom-badge ${
-                                    constanciaas.estado === "Creada" || constanciaas.estado === "Aprobada"
-                                        ? "bg-success"
-                                        : constanciaas.estado === "Pendiente"
-                                            ? "bg-warning"
-                                            : constanciaas.estado === "Rechazada"
-                                                ? "bg-danger"
-                                                : "bg-secondary"
-                                }">
-                                    ${constanciaas.estado}
-                                </span>
-                                <span class="badge custom-badge"
-                                      style="
-                                        background-color: ${
-                                            constanciaas.tipo === 'Laboral' ? '#F58E53' :
-                                            constanciaas.tipo === 'Salarial' ? '#dc3545' :
-                                            '#6c757d'
-                                        };
-                                        color: #fff;
-                                      ">
-                                    ${constanciaas.tipo}
-                                </span>
+                         onclick="window.location.href='/Extras/DetailsExtras/${extra.idExtra}'">
+                        <div class="d-flex align-items-start justify-content-between gap-1 mb-2 flex-wrap">
+                            <h3 class="h6 fw-bold text-dark mb-0" style="padding: 5px">
+                                <i class="fa-solid fa-user me-3"></i>${extra.nombreEmpleado || 'Sin nombre'}
+                            </h3>
+                            <h5 class="h6 text-white small mb-0" style="padding: 5px; background-color: #012473; border-radius: 5px">
+                                #${extra.idExtra}
+                            </h5>
+                        </div>
+                        <div class="d-flex align-items-center flex-wrap mb-2" style="gap: 1.5rem; padding-left: 5%; padding-right: 5%;">
+                            <span class="badge custom-badge ${
+                                extra.estado === "Creada" || extra.estado === "Aprobada"
+                                    ? "bg-success"
+                                        : extra.estado === "Rechazada"
+                                            ? "bg-danger"
+                                            : "bg-secondary"
+                            }">
+                                ${extra.estado || 'Sin estado'}
+                            </span>
 
-                                <!-- AGREGAR BADGE DE DEPARTAMENTO -->
-                                ${constanciaas.departamento ? `
-                                <span class="badge colorcito text-white">
-                                    ${constanciaas.departamento}
-                                </span>
-                                ` : ''}
+                            ${extra.departamento ? `
+                            <span class="badge colorcito">
+                                ${extra.departamento}
+                            </span>
+                            ` : ''}
 
-                                <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
-                                    <div class="col d-flex align-items-center gap-1">
-                                        <span class="text-muted fw-semibold">Creación:</span>
-                                        <span class="text-dark fw-medium ms-1">${new Date(constanciaas.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}</span>
-                                    </div>
-                                    ${constanciaas.tipo === "Laboral" ? `
-                                      <div class="col d-flex align-items-center gap-1">
-                                        <span class="text-muted fw-semibold">Dirigido:</span>
-                                        <span class="text-dark fw-medium ms-1">${constanciaas.dirijido ?? 'Sin dirigido'}</span>
-                                      </div>
-                                    ` : ''}
-                                    <div class="col d-flex align-items-center gap-1">
-                                        <span class="text-muted fw-semibold">Requerida:</span>
-                                        <span class="text-dark fw-medium ms-1">${new Date(constanciaas.fechaRequerida).toLocaleDateString('es-CR')}</span>
-                                    </div>
+                            <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
+                                <div class="col">
+                                    <span class="text-muted fw-bold">Creación:</span>
+                                    <span class="text-dark fw-medium ms-1">
+                                        ${new Date(extra.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}
+                                    </span>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="pt-2 border-top">
-                            <div class="row small d-flex align-items-center flex-wrap justify-content-around" style="gap: 0.5rem; padding-left: 5%; padding-right: 5%;">
-                                <div class="col d-flex align-items-center gap-1">
-                                    <span class="text-muted fw-semibold d-block">Comentarios:</span>
-                                    <span class="text-dark fw-medium ms-1" d-block>${constanciaas.comentarios ?? 'Sin comentario'}</span>
-                                </div>
-                                <div class="col">
-                                    ${
-                                        constanciaas.nombreArchivo && constanciaas.nombreArchivo.trim() !== ''
-                                            ? (
-                                                constanciaas.estado === 'Aprobada'
-                                                    // 1️⃣ HAY ARCHIVO Y ESTÁ APROBADA
-                                                    ? `
-                                                        <div class="mt-1 d-flex align-items-center gap-1">
-                                                            <a href="/Constancia/descargar-adjunto/${constanciaas.idConstancia}"
-                                                                class="btn btn-sm btn-outline-primary d-flex align-items-center"
-                                                                style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: 80%"
-                                                                title="Descargar ${constanciaas.nombreArchivo}">
-                                                                ${obtenerIconoArchivo(constanciaas.nombreArchivo, constanciaas.tipoMIME)}
-                                                                <span class="text-truncate d-block" style="max-width: 220px;">
-                                                                    ${constanciaas.nombreArchivo}
-                                                                </span>
-                                                            </a>
-                                                            <small class="text-muted text-center d-block mt-1">
-                                                                ${formatearTamanoArchivo(constanciaas.tamanoArchivo)} •
-                                                                ${obtenerExtension(constanciaas.nombreArchivo)}
-                                                            </small>
-                                                        </div>
-                                                    `
-                                                    // 2️⃣ HAY ARCHIVO PERO NO ESTÁ APROBADA
-                                                    : `
-                                                        <span class="text-danger d-inline-block text-center small"
-                                                            style="width:100%; padding: 0.25rem; background:#fff3cd; border-radius:5px;">
-                                                            Archivo disponible tras aprobación
-                                                        </span>
-                                                    `
-                                            )
-                                            // 3️⃣ NO HAY ARCHIVO
-                                            : (
-                                                constanciaas.tipo === "Salarial"
-                                                    ? `
-                                                        <button class="btn btn-sm btn-warning w-100"
-                                                                onclick="abrirModalSalarial(${constanciaas.idConstancia})">
-                                                            Crear Constancia Salarial
-                                                        </button>
-                                                    `
-                                                    : `
-                                                        <span class="text-muted d-inline-block text-center small"
-                                                            style="width:100%; padding: 0.25rem; background:#f0f0f0; border-radius:5px;">
-                                                            Sin archivo
-                                                        </span>
-                                                    `
-                                            )
-                                    }
-                                </div>                                
+                    <div class="pt-2 border-top">
+                        <div class="row small d-flex align-items-center flex-wrap justify-content-around" style="gap: 0.5rem; padding-left: 5%; padding-right: 5%;">
+                            <div class="col">
+                                <span class="text-muted fw-semibold d-block">Jefe:</span>
+                                <span class="text-dark fw-medium ms-1 d-block">${extra.jefe || 'Sin jefe'}</span>
+                            </div>
+                            <div class="col">
+                                <span class="text-muted fw-semibold d-block">Total Horas:</span>
+                                <span class="text-dark fw-medium ms-1 d-block">
+                                    ₡${extra.totalHoras?.toLocaleString('es-CR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) || '0.00'}
+                                </span>
+                            </div>
+                            <div class="col">
+                                <span class="text-muted fw-semibold d-block">Cantidad de Detalles:</span>
+                                <span class="badge bg-info">${extra.cantidadDetalle || 0}</span>
+                            </div>
+                            <div class="col">
+                                <span class="text-muted fw-semibold d-block">Tipos de Detalles:</span>
+                                <span class="text-dark fw-medium ms-1 d-block">${extra.lugares || 'Sin detalles'}</span>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
             `).join('');
 
-            // Aplicar fade in al nuevo contenido
-            fadeIn(constanciasContainer);
+            fadeIn(extrasContainer);
         }
 
         function renderPagination() {
@@ -1103,13 +967,13 @@
         // ================= EVENT LISTENERS =================
         document.addEventListener('DOMContentLoaded', function() {
 
-            // Event listeners para tipos
+            // Event listeners para lugar
             document.querySelectorAll('.filter-type').forEach(checkbox => {
                 checkbox.addEventListener('change', async function() {
                     if (this.checked) {
-                        filtrosActivos.tipos.push(this.value);
+                        filtrosActivos.lugar.push(this.value);
                     } else {
-                        filtrosActivos.tipos = filtrosActivos.tipos.filter(tipo => tipo !== this.value);
+                        filtrosActivos.lugar = filtrosActivos.lugar.filter(lugar => lugar !== this.value);
                     }
                     await aplicarFiltros();
                 });
@@ -1195,7 +1059,7 @@
                 document.getElementById("rangeDateContainer").classList.add("d-none");
 
                 // Limpiar estado de filtros
-                filtrosActivos.tipos = [];
+                filtrosActivos.lugar = [];
                 filtrosActivos.estados = [];
                 filtrosActivos.departamentos = [];
                 filtrosActivos.nombre = '';
@@ -1206,16 +1070,16 @@
                     fechaHasta: null
                 };
 
-                // Mostrar constancias iniciales (de la paginación)
-                renderConstanciasWithFade(constanciasPaginaActual);
+                // Mostrar permisos iniciales (de la paginación)
+                renderExtrasWithFade(extrasPaginaActual);
                 pagination.style.display = 'flex';
             });
 
             // Inicializar contadores y renderizar
             (async function() {
                 await inicializarContadores();
-                constanciasContainer.style.opacity = '0';
-                renderConstancias(constanciasPaginaActual);
+                extrasContainer.style.opacity = '0';
+                renderExtras(extrasPaginaActual);
                 renderPagination();
             })();
         });
@@ -1233,7 +1097,7 @@
 
                 <div class="modal-body text-center">
 
-                    <input type="hidden" id="constanciaIdSeleccionada">
+                    <input type="hidden" id="extraIdSeleccionado">
 
                     <p class="mb-3">Seleccione el nuevo estado:</p>
 
@@ -1242,41 +1106,32 @@
                         Creada
                     </button>
 
-                    <button class="btn btn-warning w-100 mb-2"
-                            onclick="cambiarEstado('Pendiente')">
-                        Pendiente
-                    </button>
-
                     <button class="btn btn-danger w-100 mb-2"
                             onclick="cambiarEstado('Rechazada')">
                         Rechazada
                     </button>
 
-                    <button class="btn btn-outline-success w-100 mb-2"
-                            onclick="cambiarEstado('Aprobada')">
-                        Aprobada
-                    </button>
                 </div>
             </div>
         </div>
     </div>
     <script>
         function abrirModalMasivo() {
-            const seleccionados = [...document.querySelectorAll(".permiso-check:checked")]
+            const seleccionados = [...document.querySelectorAll(".extra-check:checked")]
                 .map(c => parseInt(c.value));
 
             if (seleccionados.length === 0) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'Debes seleccionar mínimo una constancia',
+                    text: 'Debes seleccionar mínimo una extra',
                     confirmButtonText: 'Aceptar'
                 });
                 return;
             }
 
             window.idsSeleccionados = seleccionados;
-            document.getElementById("constanciaIdSeleccionada").value = "";
+            document.getElementById("extraIdSeleccionado").value = "";
 
             const modal = new bootstrap.Modal(document.getElementById('estadoModal'));
             modal.show();
@@ -1285,13 +1140,13 @@
     <script>
         function cambiarEstado(nuevoEstado) {
 
-            const idIndividual = document.getElementById("constanciaIdSeleccionada").value;
+            const idIndividual = document.getElementById("extraIdSeleccionado").value;
 
             const ids = window.idsSeleccionados?.length
                 ? window.idsSeleccionados
                 : [parseInt(idIndividual)];
 
-            fetch("/Constancia/CambiarEstadoMasivo", {
+            fetch("/Extra/CambiarEstadoMasivo", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ ids, estado: nuevoEstado })

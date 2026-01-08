@@ -1,6 +1,6 @@
 ﻿@model SistemasAnaliticos.Entidades.Usuario
 
-<!DOCTYPE html>
+<!DOCTYPE tml>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
@@ -127,11 +127,20 @@
                         <!-- Large Avatar -->
                         <div class="col-md-auto text-center">
                             <div id="employeeAvatarContainer">
-                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.foto)"
-                                     class="avatar-large mb-3"
-                                     alt="Foto del empleado"
-                                     data-bs-toggle="modal"
-                                     data-bs-target="#imageModal">
+                                @if (Model.foto != null && Model.foto.Length > 0)
+                                {
+                                    <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.foto)"
+                                         class="avatar-large mb-3"
+                                         alt="Foto del empleado"
+                                         data-bs-toggle="modal"
+                                         data-bs-target="#imageModal">
+                                }
+                                else
+                                {
+                                    <img src="/img/sin foto.png"
+                                         class="avatar-large mb-3"
+                                         alt="Empleado sin foto">
+                                }
                             </div>
                         </div>
 
@@ -257,12 +266,15 @@
                                     <div class="mb-3">
                                         <p class="text-muted mb-1 small">Hijos</p>
                                         <div style="display: flex; justify-content: space-between;">
-                                            <P class="fw-medium @(Model.hijos)">
-                                                @(Model.hijos ? "Si" : "No")
-                                            </P>
-                                            @if (Model.hijos == true)
+                                            <p class="fw-medium @(Model.hijos ? "text-success" : "text-muted")">
+                                                @(Model.hijos ? "Sí" : "No")
+                                            </p>
+
+                                            @if (Model.hijos)
                                             {
-                                                <p class="fw-medium pe-5">Cantidad: @Model.cantidadHijos</p>
+                                                <p class="fw-medium pe-5">
+                                                    Cantidad: @Model.cantidadHijos
+                                                </p>
                                             }
                                         </div>
                                     </div>

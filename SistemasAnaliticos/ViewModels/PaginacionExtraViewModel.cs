@@ -1,8 +1,8 @@
 ﻿namespace SistemasAnaliticos.ViewModels
 {
-    public class PaginacionExtraViewModel
+    public class PaginacionLiquidacionViaticoViewModel
     {
-        public List<ExtraViewModel> Extras { get; set; }
+        public List<LiquidacionViaticoViewModel> LiquidacionesViaticos { get; set; }
         public int PaginaActual { get; set; }
         public int TotalPaginas { get; set; }
     }

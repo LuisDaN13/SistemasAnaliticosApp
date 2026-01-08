@@ -22,6 +22,8 @@ namespace SistemasAnaliticos.Models
         public DbSet<LiquidacionViatico> LiquidacionViatico { get; set; }
         public DbSet<LiquidacionViaticoDetalle> LiquidacionViaticoDetalle { get; set; }
         public DbSet<AlcanceUsuario> AlcanceUsuario { get; set; }
+        public DbSet<Extras> Extras { get; set; }
+        public DbSet<ExtrasDetalle> ExtrasDetalle { get; set; }
         public DbSet<Auditoria> Auditoria { get; set; }
 
         // REGLAS DE MODELO
@@ -66,6 +68,8 @@ namespace SistemasAnaliticos.Models
             });
 
             builder.Entity<LiquidacionViatico>().HasMany(l => l.Detalles).WithOne(d => d.Liquidacion).HasForeignKey(d => d.idViatico).OnDelete(DeleteBehavior.Cascade); // si se borra la liquidación, se borran los detalles
+
+            builder.Entity<Extras>().HasMany(l => l.Detalles).WithOne(d => d.Extra).HasForeignKey(d => d.idExtra).OnDelete(DeleteBehavior.Cascade); // si se borra la liquidación, se borran los detalles
 
             builder.Entity<RolPermiso>(entity =>
             {
