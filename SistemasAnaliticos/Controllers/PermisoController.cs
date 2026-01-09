@@ -768,6 +768,43 @@ namespace SistemasAnaliticos.Controllers
                 {
                     permiso.estado = model.estado;
                 }
+                var usuarioPermiso = await _userManager.FindByIdAsync(permiso.UsuarioId);
+                try
+                {
+                    if (permiso.estado == "Aprobada")
+                    {
+                        // 1. Correo Aprobado
+                        var htmlEmpleado = PlantillasEmail.ConfirmacionEmpleado(
+                            nombreEmpleado: usuarioPermiso.nombreCompleto,
+                            tipoPermiso: permiso.tipo
+                        );
+
+                        await _emailService.SendEmailAsync(
+                            toEmail: usuarioPermiso.Email,
+                            toName: usuarioPermiso.nombreCompleto,
+                            subject: $"Aprobación del Permiso - {usuarioPermiso.nombreCompleto}",
+                            htmlBody: htmlEmpleado
+                        );
+                    } else if (permiso.estado == "Rechazada")
+                    {
+                        // 2. Correo Rechazado
+                        var htmlEmpleado = PlantillasEmail.EstadoEmpleado(
+                            nombreEmpleado: usuarioPermiso.nombreCompleto,
+                            tipoPermiso: permiso.tipo,
+                            estado: permiso.estado
+                        );
+                        await _emailService.SendEmailAsync(
+                            toEmail: usuarioPermiso.Email,
+                            toName: usuarioPermiso.nombreCompleto,
+                            subject: $"Rechazo del Permiso - {usuarioPermiso.nombreCompleto}",
+                            htmlBody: htmlEmpleado
+                        );
+                    }
+                catch (Exception exEmail)
+                {
+                    // Solo log si hay error en correo, no interrumpir
+                    Console.WriteLine($"Error enviando correo: {exEmail.Message}");
+                }
             }
 
             await _context.SaveChangesAsync();
