@@ -860,20 +860,19 @@
                                     ${beneficion.departamento}
                                 </span>
                                 ` : ''}
-
-                                <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
-                                    <div class="col-3">
-                                        <span class="text-muted fw-semibold">Creación:</span>
-                                                <span class="text-dark fw-medium ms-1">${new Date(beneficion.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}</span>
-                                    </div>
-                                    <div class="col-3">
-                                        <span class="text-muted fw-semibold">Monto:</span>
-                                        <span class="text-dark fw-medium ms-1">₡${beneficion.monto != null ? new Intl.NumberFormat('es-CR').format(beneficion.monto) : 'Sin monto'}</span>
-                                    </div>
-                                    <div class="col-5">
-                                        <span class="text-muted fw-semibold d-block">Comentarios:</span>
-                                        <span class="text-dark fw-medium ms-1" d-block>${beneficion.comentarios ?? 'Sin comentario'}</span>
-                                    </div>
+                            </div>
+                            <div class="row small d-flex justify-content-around" style="gap: 1.5rem; padding-left: 5%; padding-right: 5%;">
+                                <div class="col-2" style="display: flex;flex-direction: column;">
+                                    <span class="text-muted fw-semibold">Creación:</span>
+                                    <span class="text-dark fw-medium ms-1">${new Date(beneficion.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}</span>
+                                </div>
+                                <div class="col-2" style="display: flex;flex-direction: column;">
+                                    <span class="text-muted fw-semibold">Monto:</span>
+                                    <span class="text-dark fw-medium ms-1">₡${beneficion.monto != null ? new Intl.NumberFormat('es-CR').format(beneficion.monto) : 'Sin monto'}</span>
+                                </div>
+                                <div class="col-2" style="display: flex;flex-direction: column;">
+                                    <span class="text-muted fw-semibold d-block">Comentarios:</span>
+                                    <span class="text-dark fw-medium ms-1" d-block>${beneficion.comentarios ?? 'Sin comentario'}</span>
                                 </div>
                             </div>
                         </div>

@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SistemasAnaliticos.Auxiliares;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Helpers;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
 using SistemasAnaliticos.ViewModels;
 using System.Runtime.InteropServices;
-using static SistemasAnaliticos.Models.codigoFotos;
+using static SistemasAnaliticos.Auxiliares.codigoFotos;
 
 namespace SistemasAnaliticos.Controllers
 {
@@ -33,6 +34,10 @@ namespace SistemasAnaliticos.Controllers
         [Authorize(Policy = "Permiso.Crear")]
         public async Task<IActionResult> Index()
         {
+            var user = await _userManager.GetUserAsync(User);
+
+            ViewBag.DiasVacaciones = user.diasVacaciones;
+
             return View();
         }
 
@@ -774,7 +779,7 @@ namespace SistemasAnaliticos.Controllers
                     if (permiso.estado == "Aprobada")
                     {
                         // 1. Correo Aprobado
-                        var htmlEmpleado = PlantillasEmail.ConfirmacionEmpleado(
+                        var htmlEmpleado = PlantillasEmail.EstadoEmpleadoAprob(
                             nombreEmpleado: usuarioPermiso.nombreCompleto,
                             tipoPermiso: permiso.tipo
                         );
@@ -785,13 +790,18 @@ namespace SistemasAnaliticos.Controllers
                             subject: $"Aprobación del Permiso - {usuarioPermiso.nombreCompleto}",
                             htmlBody: htmlEmpleado
                         );
-                    } else if (permiso.estado == "Rechazada")
+
+                        int diasSolicitados = (permiso.fechaFinalizacion.Value.Date - permiso.fechaInicio.Value.Date).Days + 1;
+                        usuarioPermiso.diasVacaciones -= diasSolicitados;
+
+                        await _userManager.UpdateAsync(usuarioPermiso);
+                    }
+                    else if (permiso.estado == "Rechazada")
                     {
                         // 2. Correo Rechazado
-                        var htmlEmpleado = PlantillasEmail.EstadoEmpleado(
+                        var htmlEmpleado = PlantillasEmail.EstadoEmpleadoRechaz(
                             nombreEmpleado: usuarioPermiso.nombreCompleto,
-                            tipoPermiso: permiso.tipo,
-                            estado: permiso.estado
+                            tipoPermiso: permiso.tipo
                         );
                         await _emailService.SendEmailAsync(
                             toEmail: usuarioPermiso.Email,
@@ -800,6 +810,7 @@ namespace SistemasAnaliticos.Controllers
                             htmlBody: htmlEmpleado
                         );
                     }
+                }
                 catch (Exception exEmail)
                 {
                     // Solo log si hay error en correo, no interrumpir

@@ -154,6 +154,16 @@
     </div>
 
     <script>
+        const modal = document.getElementById('createVacacionesModal');
+
+        modal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const diasDisponibles = parseInt(button.getAttribute('data-dias-vacaciones')) || 0;
+
+            window.diasVacaciones = diasDisponibles;
+        });
+    </script>
+    <script>
         // SISTEMA DE VALIDACIÓN ESPECÍFICO
         document.addEventListener('DOMContentLoaded', function() {
             inicializarValidacionVacas();
@@ -307,8 +317,25 @@
             const fechaInicio = document.getElementById('fechaInicioVacas');
             const fechaFin = document.getElementById('fechaFinalizacionVacas');
             const fechaRegreso = document.getElementById('fechaRegresoLaboralVacas');
+            const diasDisponibles = window.diasVacaciones ?? 0;
 
             let fechasValidas = true;
+
+            // Normalizar hoy (sin hora)
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            if (fechaInicio.value) {
+                const inicio = new Date(fechaInicio.value);
+                inicio.setDate(inicio.getDate() + 1);
+                inicio.setHours(0, 0, 0, 0);
+
+                if (inicio < hoy) {
+                    showValidationErrorVacas('La fecha de inicio no puede ser anterior a hoy.');
+                    fechaInicio.classList.add('is-invalid');
+                    fechasValidas = false;
+                }
+            }
 
             if (fechaInicio.value && fechaFin.value) {
                 const inicio = new Date(fechaInicio.value);
@@ -318,6 +345,19 @@
                     showValidationErrorVacas('La fecha de fin no puede ser anterior a la fecha de inicio.');
                     fechaFin.classList.add('is-invalid');
                     fechasValidas = false;
+                } else {
+                    // Calcular la diferencia en días entre fecha inicio y fecha fin
+                    // Agregamos 1 para incluir tanto el día de inicio como el de fin
+                    const diferenciaMs = fin - inicio;
+                    const diasSolicitados = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24)) + 1;
+
+                    // Validar que no exceda los días disponibles
+                    if (diasSolicitados > diasDisponibles) {
+                        showValidationErrorVacas(`No tiene suficientes días de vacaciones disponibles.
+                            Solicita: ${diasSolicitados} días, Disponibles: ${diasDisponibles} días.`);
+                        fechaFin.classList.add('is-invalid');
+                        fechasValidas = false;
+                    }
                 }
             }
 

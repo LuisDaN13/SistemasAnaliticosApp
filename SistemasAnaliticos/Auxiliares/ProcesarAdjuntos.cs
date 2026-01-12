@@ -1,4 +1,4 @@
-﻿namespace SistemasAnaliticos.Models
+﻿namespace SistemasAnaliticos.Auxiliares
 {
     public class ProcesarAdjuntos
     {

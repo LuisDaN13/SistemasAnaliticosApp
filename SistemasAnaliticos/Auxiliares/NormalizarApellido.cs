@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
-namespace SistemasAnaliticos.Models
+namespace SistemasAnaliticos.Auxiliares
 {
     public static class NormalizarApellido
     {

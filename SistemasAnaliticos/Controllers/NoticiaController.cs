@@ -6,7 +6,7 @@ using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.ViewModels;
 using System.Runtime.InteropServices;
-using static SistemasAnaliticos.Models.codigoFotos;
+using static SistemasAnaliticos.Auxiliares.codigoFotos;
 
 namespace SistemasAnaliticos.Controllers
 {

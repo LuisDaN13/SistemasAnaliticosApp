@@ -12,7 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text.Json;
-using static SistemasAnaliticos.Models.codigoFotos;
+using static SistemasAnaliticos.Auxiliares.codigoFotos;
 
 namespace SistemasAnaliticos.Controllers
 {
@@ -151,6 +151,9 @@ namespace SistemasAnaliticos.Controllers
                 ModelState.AddModelError("", "Credenciales inválidas");
                 return View(model);
             }
+
+            // Comprobación de Dias de Vacaciones
+            user.ActualizarVacaciones();
 
             // 🔍 Detectar si es el primer inicio de sesión
             var esPrimerInicio = user.lastActivityUtc == null;

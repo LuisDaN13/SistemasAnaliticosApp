@@ -1,4 +1,4 @@
-﻿using SistemasAnaliticos.Models;
+﻿using SistemasAnaliticos.Auxiliares;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

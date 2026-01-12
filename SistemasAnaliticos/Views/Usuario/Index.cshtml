@@ -540,18 +540,21 @@
                                     <span class="text-break">@(empleado.TelefonoEmp != null && !string.IsNullOrEmpty(empleado.TelefonoEmp) ? empleado.TelefonoEmp : "Sin Celular Empresarial")</span>
                                 </div>
                             </div>
-                            <div class="employee-info-item">
-                                <div class="employee-info-text">
-                                    <strong>Correo Personal:</strong><br>
-                                    <span class="text-break">@(empleado.CorreoPerso != null && !string.IsNullOrEmpty(empleado.CorreoPerso) ? empleado.CorreoPerso : "Sin Correo Personal")</span>
+                            @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                            {
+                                <div class="employee-info-item">
+                                    <div class="employee-info-text">
+                                        <strong>Correo Personal:</strong><br>
+                                        <span class="text-break">@(empleado.CorreoPerso != null && !string.IsNullOrEmpty(empleado.CorreoPerso) ? empleado.CorreoPerso : "Sin Correo Personal")</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="employee-info-item">
-                                <div class="employee-info-text">
-                                    <strong>Teléfono Personal:</strong><br>
-                                    <span class="text-break">@(empleado.TelefonoPerso != null && !string.IsNullOrEmpty(empleado.TelefonoPerso) ? empleado.TelefonoPerso : "Sin Celular Personal")</span>
+                                <div class="employee-info-item">
+                                    <div class="employee-info-text">
+                                        <strong>Teléfono Personal:</strong><br>
+                                        <span class="text-break">@(empleado.TelefonoPerso != null && !string.IsNullOrEmpty(empleado.TelefonoPerso) ? empleado.TelefonoPerso : "Sin Celular Personal")</span>
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         </div>
                         @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
                         {

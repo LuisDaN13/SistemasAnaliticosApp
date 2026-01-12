@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SistemasAnaliticos.Auxiliares;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Helpers;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.Services;
 using SistemasAnaliticos.ViewModels;
 using System.Runtime.InteropServices;
-using static SistemasAnaliticos.Models.codigoFotos;
+using static SistemasAnaliticos.Auxiliares.codigoFotos;
 
 namespace SistemasAnaliticos.Controllers
 {
@@ -661,6 +662,44 @@ namespace SistemasAnaliticos.Controllers
                 if (beneficio != null)
                 {
                     beneficio.estado = model.estado;
+                }
+                var usuarioPermiso = await _userManager.FindByIdAsync(beneficio.UsuarioId);
+                try
+                {
+                    if (beneficio.estado == "Aprobada")
+                    {
+                        // 1. Correo Aprobado
+                        var htmlEmpleado = PlantillasEmail.EstadoEmpleadoAprob(
+                            nombreEmpleado: usuarioPermiso.nombreCompleto,
+                            tipoPermiso: beneficio.tipo
+                        );
+
+                        await _emailService.SendEmailAsync(
+                            toEmail: usuarioPermiso.Email,
+                            toName: usuarioPermiso.nombreCompleto,
+                            subject: $"Aprobación del Beneficio - {usuarioPermiso.nombreCompleto}",
+                            htmlBody: htmlEmpleado
+                        );
+                    }
+                    else if (beneficio.estado == "Rechazada")
+                    {
+                        // 2. Correo Rechazado
+                        var htmlEmpleado = PlantillasEmail.EstadoEmpleadoRechaz(
+                            nombreEmpleado: usuarioPermiso.nombreCompleto,
+                            tipoPermiso: beneficio.tipo
+                        );
+                        await _emailService.SendEmailAsync(
+                            toEmail: usuarioPermiso.Email,
+                            toName: usuarioPermiso.nombreCompleto,
+                            subject: $"Rechazo del Beneficio - {usuarioPermiso.nombreCompleto}",
+                            htmlBody: htmlEmpleado
+                        );
+                    }
+                }
+                catch (Exception exEmail)
+                {
+                    // Solo log si hay error en correo, no interrumpir
+                    Console.WriteLine($"Error enviando correo: {exEmail.Message}");
                 }
             }
 

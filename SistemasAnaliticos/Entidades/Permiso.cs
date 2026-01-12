@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.SqlServer.Server;
+using SistemasAnaliticos.Auxiliares;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using System;

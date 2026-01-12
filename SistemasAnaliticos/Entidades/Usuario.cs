@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using SistemasAnaliticos.Auxiliares;
 using SistemasAnaliticos.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -41,7 +42,6 @@ namespace SistemasAnaliticos.Entidades
 
         [StringLength(5)]
         public string? tipoSangre { get; set; }
-
         public bool hijos { get; set; }
         public int? cantidadHijos { get; set; }
 
@@ -161,6 +161,9 @@ namespace SistemasAnaliticos.Entidades
                 .Where(x => !string.IsNullOrWhiteSpace(x)));
 
         public int? edad => fechaNacimiento.HasValue ? DateTime.Now.Year - fechaNacimiento.Value.Year - (DateTime.Now.Date < fechaNacimiento.Value.AddYears(DateTime.Now.Year - fechaNacimiento.Value.Year) ? 1 : 0) : null;
+        public int? diasVacaciones { get; set; }
+        public DateTime? ultimaFechaCalculoVacaciones { get; set; }
+
 
         // AÑOS LABORANDO 
         public int aniosLaborando
@@ -220,5 +223,33 @@ namespace SistemasAnaliticos.Entidades
                 }
             }
         }
+
+        // Metodo para Vacaciones
+        public void ActualizarVacaciones()
+        {
+            if (!fechaIngreso.HasValue)
+                return;
+
+            DateTime hoy = DateTime.Today;
+
+            // Primera vez: usar fecha de ingreso
+            DateTime baseCalculo = ultimaFechaCalculoVacaciones ?? fechaIngreso.Value.Date;
+
+            int meses = 0;
+            DateTime temp = baseCalculo;
+
+            while (temp.AddMonths(1) <= hoy)
+            {
+                temp = temp.AddMonths(1);
+                meses++;
+            }
+
+            if (meses > 0)
+            {
+                diasVacaciones += meses;
+                ultimaFechaCalculoVacaciones = temp;
+            }
+        }
+
     }
 }

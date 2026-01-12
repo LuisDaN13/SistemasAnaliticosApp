@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using SistemasAnaliticos.Entidades;
 using System.Security.Claims;
 
-namespace SistemasAnaliticos.Middlewares
+namespace SistemasAnaliticos.Auxiliares
 {
     public class SessionValidationMiddleware
     {

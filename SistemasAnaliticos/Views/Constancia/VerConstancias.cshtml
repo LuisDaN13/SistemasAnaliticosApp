@@ -991,22 +991,23 @@
                                     ${constanciaas.departamento}
                                 </span>
                                 ` : ''}
-
-                                <div class="row small d-flex justify-content-around" style="gap: 0.5rem">
-                                    <div class="col d-flex align-items-center gap-1">
-                                        <span class="text-muted fw-semibold">Creación:</span>
-                                        <span class="text-dark fw-medium ms-1">${new Date(constanciaas.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}</span>
-                                    </div>
-                                    ${constanciaas.tipo === "Laboral" ? `
-                                      <div class="col d-flex align-items-center gap-1">
+                            </div>
+                            <div class="row small d-flex justify-content-around" style="gap: 1.5rem; padding-left: 5%; padding-right: 5%;">
+                                <div class="col-2" style="display: flex;flex-direction: column;">
+                                    <span class="text-muted fw-semibold">Creación:</span>
+                                    <span class="text-dark fw-medium ms-1">${new Date(constanciaas.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}</span>
+                                </div>
+                                ${constanciaas.tipo === "Laboral" ? `
+                                    <div class="col-2" style="display: flex;flex-direction: column;">
                                         <span class="text-muted fw-semibold">Dirigido:</span>
-                                        <span class="text-dark fw-medium ms-1">${constanciaas.dirijido ?? 'Sin dirigido'}</span>
-                                      </div>
-                                    ` : ''}
-                                    <div class="col d-flex align-items-center gap-1">
-                                        <span class="text-muted fw-semibold">Requerida:</span>
-                                        <span class="text-dark fw-medium ms-1">${new Date(constanciaas.fechaRequerida).toLocaleDateString('es-CR')}</span>
+                                        <span class="${constanciaas.dirijido ? 'text-dark fw-medium' : 'text-danger fw-bold'} ms-1">
+                                            ${constanciaas.dirijido ? constanciaas.dirijido : 'N/A'}
+                                        </span>
                                     </div>
+                                ` : ''}
+                                <div class="col-2" style="display: flex;flex-direction: column;">
+                                    <span class="text-muted fw-semibold">Requerida:</span>
+                                    <span class="text-dark fw-medium ms-1">${new Date(constanciaas.fechaRequerida).toLocaleDateString('es-CR')}</span>
                                 </div>
                             </div>
                         </div>

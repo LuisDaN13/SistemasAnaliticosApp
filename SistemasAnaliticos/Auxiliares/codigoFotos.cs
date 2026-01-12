@@ -1,6 +1,6 @@
 ﻿using SistemasAnaliticos.Entidades;
 
-namespace SistemasAnaliticos.Models
+namespace SistemasAnaliticos.Auxiliares
 {
     public class codigoFotos
     {

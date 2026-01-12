@@ -319,8 +319,26 @@
             const fechaInicio = document.getElementById('fechaInicioOtros');
             const fechaFin = document.getElementById('fechaFinalizacionOtros');
             const fechaRegreso = document.getElementById('fechaRegresoLaboralOtros');
+            const tipoPermiso = document.getElementById('tipoPermiso').value;
+
+            // Obtener la fecha actual (sin horas/minutos/segundos para comparación correcta)
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
 
             let fechasValidas = true;
+
+            // Validación para fecha de inicio (solo para Incapacidad)
+            if (fechaInicio.value && tipoPermiso === 'Incapacidad') {
+                const inicio = new Date(fechaInicio.value);
+                inicio.setDate(inicio.getDate() + 1);
+                inicio.setHours(0, 0, 0, 0);
+
+                if (inicio < hoy) {
+                    showValidationErrorOtros('La fecha de inicio no puede ser anterior a hoy para una incapacidad.');
+                    fechaInicio.classList.add('is-invalid');
+                    fechasValidas = false;
+                }
+            }
 
             if (fechaInicio.value && fechaFin.value) {
                 const inicio = new Date(fechaInicio.value);

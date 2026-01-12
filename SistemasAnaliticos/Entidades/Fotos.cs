@@ -1,4 +1,5 @@
-﻿using SistemasAnaliticos.Models;
+﻿using SistemasAnaliticos.Auxiliares;
+using SistemasAnaliticos.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
