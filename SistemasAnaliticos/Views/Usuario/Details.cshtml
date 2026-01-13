@@ -328,30 +328,41 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3">
-                                <p class="text-muted mb-1 small">Fecha de Ingreso</p>
-                                <p class="fw-medium">@string.Format("{0:dd-MM-yyyy}", Model.fechaIngreso)</p>
-                            </div>
-                            <div class="mb-3">
-                                <p class="text-muted mb-1 small">Cuenta IBAN</p>
-                                <p class="fw-medium">@Model.cuentaIBAN</p>
-                            </div>
-                            <div class="mb-3">
-                                <p class="text-muted mb-1 small">Salario</p>
-                                <p class="fs-3 fw-bold employee-id">₡ <span id="salarioFormateado"></span> CRC</p>
+                            <div class="row">
+                                <!-- Columna izquierda -->
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <p class="text-muted mb-1 small">Fecha de Ingreso</p>
+                                        <p class="fw-medium">@string.Format("{0:dd-MM-yyyy}", Model.fechaIngreso)</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p class="text-muted mb-1 small">Cuenta IBAN</p>
+                                        <p class="fw-medium">@Model.cuentaIBAN</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p class="text-muted mb-1 small">Salario</p>
+                                        <p class="fs-3 fw-bold employee-id">₡ <span id="salarioFormateado"></span> CRC</p>
 
-                                <script>
-                                    const salario = @Model.salario;
+                                        <script>
+                                            const salario = @Model.salario;
 
-                                    // Formatear
-                                    document.getElementById('salarioFormateado').textContent = formatearNumero(salario);
+                                            // Formatear
+                                            document.getElementById('salarioFormateado').textContent = formatearNumero(salario);
 
-                                    function formatearNumero(numero) {
-                                        const num = Number(numero);
-                                        if (isNaN(num)) return '0';
-                                        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                                    }
-                                </script>
+                                            function formatearNumero(numero) {
+                                                const num = Number(numero);
+                                                if (isNaN(num)) return '0';
+                                                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                                            }
+                                        </script>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <p class="text-muted mb-1 small">Días Acumulados de Vacaciones</p>
+                                        <p class="fw-bold">@Model.diasVacaciones días</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

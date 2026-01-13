@@ -1,4 +1,8 @@
 ﻿@using System.Web
+@using System.Security.Claims
+@{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+}
 @model IEnumerable<SistemasAnaliticos.ViewModels.CardsViewModel>
 
 <!DOCTYPE html>
@@ -556,22 +560,36 @@
                                 </div>
                             }
                         </div>
-                        @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
-                        {
-                            <div class="card-employee-footer">
-                                <div class="footer-actions">
+                        <div class="card-employee-footer">
+                            <div class="footer-actions">
+
+                                @* DETAILS: visible para ADMIN/RRHH siempre, y para el usuario de su propio perfil *@
+                                @if (User.IsInRole("Administrador") || User.IsInRole("RRHH") || userId == empleado.Id)
+                                {
                                     <div class="footer-slot-details">
-                                        <a asp-action="Details" asp-controller="Usuario" asp-route-id="@empleado.Id"
-                                            class="action-btn btn-details" title="Detalles">
+                                        <a asp-action="Details"
+                                           asp-controller="Usuario"
+                                           asp-route-id="@empleado.Id"
+                                           class="action-btn btn-details"
+                                           title="Detalles">
                                             <i class="bi bi-file-text"></i>
                                         </a>
                                     </div>
+                                }
+
+                                @* ACCIONES ADMIN / RRHH *@
+                                @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
+                                {
                                     <div class="footer-slot-edit">
-                                        <a asp-action="Edit" asp-controller="Usuario" asp-route-id="@empleado.Id"
-                                            class="action-btn btn-edit" title="Editar">
+                                        <a asp-action="Edit"
+                                           asp-controller="Usuario"
+                                           asp-route-id="@empleado.Id"
+                                           class="action-btn btn-edit"
+                                           title="Editar">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                     </div>
+
                                     <div class="footer-slot-delete">
                                         <button class="action-btn btn-delete"
                                                 title="Inactivar"
@@ -582,6 +600,7 @@
                                             <i class="bi bi-slash-circle"></i>
                                         </button>
                                     </div>
+
                                     <div class="footer-slot-password">
                                         <button class="action-btn btn-password"
                                                 title="Cambiar Contraseña"
@@ -592,9 +611,9 @@
                                             <i class="bi bi-key"></i>
                                         </button>
                                     </div>
-                                </div>
+                                }
                             </div>
-                        }
+                        </div>
                     </div>
                 }
             </div>

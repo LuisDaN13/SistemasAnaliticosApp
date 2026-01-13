@@ -225,31 +225,48 @@ namespace SistemasAnaliticos.Entidades
         }
 
         // Metodo para Vacaciones
-        public void ActualizarVacaciones()
+        // === MÉTODO SIMPLE PARA ACUMULAR Y GUARDAR ===
+        public int AcumularDiasHastaHoy()
         {
             if (!fechaIngreso.HasValue)
-                return;
+                return 0;
 
             DateTime hoy = DateTime.Today;
-
-            // Primera vez: usar fecha de ingreso
             DateTime baseCalculo = ultimaFechaCalculoVacaciones ?? fechaIngreso.Value.Date;
 
-            int meses = 0;
+            int mesesAcumulados = 0;
             DateTime temp = baseCalculo;
 
+            // Contar meses completos desde la última fecha
             while (temp.AddMonths(1) <= hoy)
             {
                 temp = temp.AddMonths(1);
-                meses++;
+                mesesAcumulados++;
             }
 
-            if (meses > 0)
+            // Si hay meses acumulados, actualizar propiedades
+            if (mesesAcumulados > 0)
             {
-                diasVacaciones += meses;
+                diasVacaciones = (diasVacaciones ?? 0) + mesesAcumulados;
                 ultimaFechaCalculoVacaciones = temp;
             }
+
+            return mesesAcumulados;
         }
 
+        // === MÉTODO PARA RESTAR DÍAS ===
+        public bool RestarDiasVacaciones(int diasARestar)
+        {
+            // Primero acumular cualquier día pendiente
+            AcumularDiasHastaHoy();
+
+            // Verificar que tenga suficientes días
+            if ((diasVacaciones ?? 0) < diasARestar)
+                return false;
+
+            // Restar
+            diasVacaciones -= diasARestar;
+            return true;
+        }
     }
 }

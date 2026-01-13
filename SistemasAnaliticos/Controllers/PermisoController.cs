@@ -701,7 +701,7 @@ namespace SistemasAnaliticos.Controllers
         {
             if (id == null)
             {
-                TempData["ErrorMessage"] = "No se proporcionó un identificador de permiso válido.";
+                TempData["ErrorMessagePermi"] = "No se proporcionó un identificador de permiso válido.";
                 return RedirectToAction("VerPermisos", "Permiso");
             }
 
@@ -709,7 +709,7 @@ namespace SistemasAnaliticos.Controllers
 
             if (permiso == null)
             {
-                TempData["ErrorMessage"] = "El permiso que intentas editar no existe o fue eliminado.";
+                TempData["ErrorMessagePermi"] = "El permiso que intentas editar no existe o fue eliminado.";
                 return RedirectToAction("VerPermisos", "Permiso");
             }
 
@@ -769,6 +769,8 @@ namespace SistemasAnaliticos.Controllers
             foreach (var id in model.Ids)
             {
                 var permiso = await _context.Permiso.FindAsync(id);
+                string estadoAnterior = permiso.estado;
+
                 if (permiso != null)
                 {
                     permiso.estado = model.estado;
@@ -778,43 +780,82 @@ namespace SistemasAnaliticos.Controllers
                 {
                     if (permiso.estado == "Aprobada")
                     {
-                        // 1. Correo Aprobado
-                        var htmlEmpleado = PlantillasEmail.EstadoEmpleadoAprob(
-                            nombreEmpleado: usuarioPermiso.nombreCompleto,
-                            tipoPermiso: permiso.tipo
-                        );
+                        if (permiso.tipo == "Vacaciones")
+                        {
+                            // 1. Calcular días solicitados
+                            int diasSolicitados = 0;
+                            if (permiso.fechaInicio.HasValue && permiso.fechaFinalizacion.HasValue)
+                            {
+                                diasSolicitados = (permiso.fechaFinalizacion.Value.Date - permiso.fechaInicio.Value.Date).Days + 1;
+                            }
+                            else
+                            {
+                                TempData["ErrorMessagePermi"] = "Fechas del permiso inválidas.";
+                                permiso.estado = estadoAnterior;
+                                continue;
+                            }
 
-                        await _emailService.SendEmailAsync(
-                            toEmail: usuarioPermiso.Email,
-                            toName: usuarioPermiso.nombreCompleto,
-                            subject: $"Aprobación del Permiso - {usuarioPermiso.nombreCompleto}",
-                            htmlBody: htmlEmpleado
-                        );
+                            // 2. Usar el método para restar días (que incluye acumulación automática)
+                            bool puedeRestar = usuarioPermiso.RestarDiasVacaciones(diasSolicitados);
 
-                        int diasSolicitados = (permiso.fechaFinalizacion.Value.Date - permiso.fechaInicio.Value.Date).Days + 1;
-                        usuarioPermiso.diasVacaciones -= diasSolicitados;
+                            // 4. Guardar cambios en el usuario
+                            var updateResult = await _userManager.UpdateAsync(usuarioPermiso);
+                            if (!updateResult.Succeeded)
+                            {
+                                // Revertir si falla
+                                permiso.estado = estadoAnterior;
+                                continue;
+                            }
+                        }
 
-                        await _userManager.UpdateAsync(usuarioPermiso);
+                        // ✅ GUARDAR CAMBIOS DEL PERMISO
+                        _context.Permiso.Update(permiso);
+                        await _context.SaveChangesAsync();
+
+                        try
+                        {
+                            var htmlEmpleado = PlantillasEmail.EstadoEmpleadoAprob(
+                                nombreEmpleado: usuarioPermiso.nombreCompleto,
+                                tipoPermiso: permiso.tipo
+                            );
+
+                            await _emailService.SendEmailAsync(
+                                toEmail: usuarioPermiso.Email,
+                                toName: usuarioPermiso.nombreCompleto,
+                                subject: $"Aprobación del Permiso - {usuarioPermiso.nombreCompleto}",
+                                htmlBody: htmlEmpleado
+                            );
+                        }
+                        catch (Exception exEmail)
+                        {
+                            Console.WriteLine($"Error enviando correo para permiso {id}: {exEmail.Message}");
+                        }
                     }
-                    else if (permiso.estado == "Rechazada")
+                    else if (model.estado == "Rechazada")
                     {
-                        // 2. Correo Rechazado
-                        var htmlEmpleado = PlantillasEmail.EstadoEmpleadoRechaz(
-                            nombreEmpleado: usuarioPermiso.nombreCompleto,
-                            tipoPermiso: permiso.tipo
-                        );
-                        await _emailService.SendEmailAsync(
-                            toEmail: usuarioPermiso.Email,
-                            toName: usuarioPermiso.nombreCompleto,
-                            subject: $"Rechazo del Permiso - {usuarioPermiso.nombreCompleto}",
-                            htmlBody: htmlEmpleado
-                        );
+                        try
+                        {
+                            var htmlEmpleado = PlantillasEmail.EstadoEmpleadoRechaz(
+                                nombreEmpleado: usuarioPermiso.nombreCompleto,
+                                tipoPermiso: permiso.tipo
+                            );
+
+                            await _emailService.SendEmailAsync(
+                                toEmail: usuarioPermiso.Email,
+                                toName: usuarioPermiso.nombreCompleto,
+                                subject: $"Rechazo del Permiso - {usuarioPermiso.nombreCompleto}",
+                                htmlBody: htmlEmpleado
+                            );
+                        }
+                        catch (Exception exEmail)
+                        {
+                            Console.WriteLine($"Error enviando correo para permiso {id}: {exEmail.Message}");
+                        }
                     }
                 }
                 catch (Exception exEmail)
                 {
-                    // Solo log si hay error en correo, no interrumpir
-                    Console.WriteLine($"Error enviando correo: {exEmail.Message}");
+                    Console.WriteLine($"Error del cambio del permiso: {exEmail.Message}");
                 }
             }
 

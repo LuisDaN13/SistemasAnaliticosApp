@@ -152,9 +152,6 @@ namespace SistemasAnaliticos.Controllers
                 return View(model);
             }
 
-            // Comprobación de Dias de Vacaciones
-            user.ActualizarVacaciones();
-
             // 🔍 Detectar si es el primer inicio de sesión
             var esPrimerInicio = user.lastActivityUtc == null;
 
@@ -236,12 +233,19 @@ namespace SistemasAnaliticos.Controllers
         public async Task<ActionResult> Details(string id)
         {
             var details = await _context.Users
-                .AsNoTracking()
                 .Where(x => x.Id == id)
                 .FirstOrDefaultAsync();
 
-            return View(details);
+            int diasAcumulados = details.AcumularDiasHastaHoy();
 
+            // 3. ✅ GUARDAR EN BD SI HUBO CAMBIOS
+            if (diasAcumulados > 0)
+            {
+                // UserManager guarda los cambios automáticamente
+                await userManager.UpdateAsync(details);
+            }
+            
+            return View(details);
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
