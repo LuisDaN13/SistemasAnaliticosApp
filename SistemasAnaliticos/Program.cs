@@ -51,6 +51,7 @@ builder.Services.AddControllersWithViews(options =>
 });
 
 // Servicios esenciales
+builder.Services.AddMemoryCache();
 builder.Services.Configure<ConfiguracionEmail>(builder.Configuration.GetSection("Smtp"));
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IConstanciaService, ConstanciaService>();
@@ -87,6 +88,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
+app.UseSessionValidation();
 app.UseAuthorization();
 
 app.MapControllerRoute(

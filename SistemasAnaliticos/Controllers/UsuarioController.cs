@@ -12,6 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.Extensions.Caching.Memory;
 using static SistemasAnaliticos.Auxiliares.codigoFotos;
 
 namespace SistemasAnaliticos.Controllers
@@ -22,13 +23,15 @@ namespace SistemasAnaliticos.Controllers
         private readonly UserManager<Usuario> userManager;
         private readonly RoleManager<Rol> roleManager;
         private readonly DBContext _context;
+        private readonly IMemoryCache _cache;
 
-        public UsuarioController(SignInManager<Usuario> signInManager, UserManager<Usuario> userManager, RoleManager<Rol> roleManager, DBContext context)
+        public UsuarioController(SignInManager<Usuario> signInManager, UserManager<Usuario> userManager, RoleManager<Rol> roleManager, DBContext context, IMemoryCache cache)
         {
             this.signInManager = signInManager;
             this.userManager = userManager;
             this.roleManager = roleManager;
             _context = context;
+            _cache = cache;
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------
@@ -160,6 +163,19 @@ namespace SistemasAnaliticos.Controllers
             user.sessionId = newSessionId;
             user.lastActivityUtc = DateTime.UtcNow;
             await userManager.UpdateAsync(user);
+
+            // --- NUEVO: invalidar cache del usuario para que el middleware lea la BD actualizada ---
+            try
+            {
+                var cacheKey = $"UserSession_{user.Id}";
+                _cache.Remove(cacheKey);
+                _cache.Remove($"LastActivity_{user.Id}");
+                _cache.Remove($"DbUpdate_{user.Id}");
+            }
+            catch
+            {
+                // No bloquear el login por problemas de cache
+            }
 
             // 🔑 Crear principal con claim SessionId
             var principal = await signInManager.CreateUserPrincipalAsync(user);
@@ -670,6 +686,17 @@ namespace SistemasAnaliticos.Controllers
             // 🔥 INVALIDAR TODAS LAS SESIONES
             await userManager.UpdateSecurityStampAsync(user);
 
+            // --- NUEVO: limpiar cache del usuario al invalidar sesiones ---
+            try
+            {
+                _cache.Remove($"UserSession_{user.Id}");
+                _cache.Remove($"LastActivity_{user.Id}");
+                _cache.Remove($"DbUpdate_{user.Id}");
+            }
+            catch
+            {
+            }
+
             // 🔐 Logout inmediato si es el mismo usuario
             var usuarioActualId = userManager.GetUserId(User);
 
@@ -729,6 +756,17 @@ namespace SistemasAnaliticos.Controllers
 
             // 🔥 INVALIDAR TODAS LAS SESIONES
             await userManager.UpdateSecurityStampAsync(user);
+
+            // --- NUEVO: limpiar cache del usuario al invalidar sesiones ---
+            try
+            {
+                _cache.Remove($"UserSession_{user.Id}");
+                _cache.Remove($"LastActivity_{user.Id}");
+                _cache.Remove($"DbUpdate_{user.Id}");
+            }
+            catch
+            {
+            }
 
             // 🔐 Logout inmediato si es el mismo usuario
             var usuarioActualId = userManager.GetUserId(User);
