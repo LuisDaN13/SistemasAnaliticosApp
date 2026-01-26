@@ -68,6 +68,11 @@ namespace SistemasAnaliticos.Controllers
                 })
                 .ToListAsync();
 
+            // 🔐 VERIFICAR ROLES DEL USUARIO ACTUAL
+            var user = await _userManager.GetUserAsync(User);
+            var roles = await _userManager.GetRolesAsync(user);
+            ViewBag.UserRoles = roles;
+
             var viewModel = new PaginacionConstanciasViewModel
             {
                 Constancias = constancias,
@@ -898,6 +903,8 @@ namespace SistemasAnaliticos.Controllers
                 {
                     var nuevo = new Constancia
                     {
+                        UsuarioId = usuario.Id,
+
                         fechaCreacion = hoy,
                         nombreEmpleado = usuario.nombreCompleto,
                         departamento = usuario.departamento,

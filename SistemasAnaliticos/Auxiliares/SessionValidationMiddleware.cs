@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+锘縰sing Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -27,7 +27,7 @@ namespace SistemasAnaliticos.Auxiliares
             _scopeFactory = scopeFactory;
 
             // Valores por defecto; considera mover a IOptions si quieres configurarlo.
-            _timeout = TimeSpan.FromMinutes(1);
+            _timeout = TimeSpan.FromMinutes(40);
             _excludedPaths = new List<PathString>
             {
                 new PathString("/Usuario/Login"),
@@ -43,9 +43,10 @@ namespace SistemasAnaliticos.Auxiliares
 
         public async Task InvokeAsync(HttpContext context, UserManager<Usuario> userManager, SignInManager<Usuario> signInManager)
         {
-            // 1. Excluir rutas que no necesitan validaci髇
+            // 1. Excluir rutas que no necesitan validaci贸n
             if (ShouldSkipValidation(context.Request.Path))
             {
+                _logger.LogDebug("SessionValidation: ruta excluida {Path}", context.Request.Path);
                 await _next(context);
                 return;
             }
@@ -53,40 +54,69 @@ namespace SistemasAnaliticos.Auxiliares
             if (context.User?.Identity?.IsAuthenticated == true)
             {
                 var userId = userManager.GetUserId(context.User);
+                _logger.LogDebug("SessionValidation: usuario autenticado, userId={UserId}", userId);
+
                 if (string.IsNullOrEmpty(userId))
                 {
+                    _logger.LogWarning("SessionValidation: userId vac铆o, forzando signout");
                     await SignOutAndRedirect(context, signInManager);
                     return;
                 }
 
                 var cacheKey = $"UserSession_{userId}";
 
-                // 2. Obtener user desde cache o BD (usar FindByIdAsync para evitar depender de ClaimsPrincipal internamente)
-                var userSession = await _cache.GetOrCreateAsync(cacheKey, async entry =>
+                // 2. Obtener user directamente desde BD para validar SessionId (evita problemas por cache obsoleta)
+                Usuario? userSession = null;
+                try
                 {
-                    entry.SlidingExpiration = TimeSpan.FromMinutes(5);
-                    var u = await userManager.FindByIdAsync(userId);
-                    return u;
-                });
+                    userSession = await userManager.FindByIdAsync(userId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "SessionValidation: error al buscar usuario en BD {UserId}", userId);
+                }
 
                 if (userSession == null)
                 {
-                    _logger.LogInformation("Usuario no existe en BD: {UserId}", userId);
+                    _logger.LogInformation("SessionValidation: Usuario no existe en BD: {UserId}", userId);
                     await SignOutAndRedirect(context, signInManager);
                     return;
                 }
 
                 // 3. Validar SessionId (claim vs BD)
                 var claimSessionId = context.User.FindFirst("SessionId")?.Value;
+                _logger.LogDebug("SessionValidation: claimSessionId={Claim}, dbSessionId={Db}", claimSessionId ?? "<null>", userSession.sessionId ?? "<null>");
+
                 if (string.IsNullOrEmpty(claimSessionId) || userSession.sessionId != claimSessionId)
                 {
-                    _logger.LogInformation("SessionId inv醠ida para {UserId}", userId);
-                    _cache.Remove(cacheKey);
+                    _logger.LogInformation("SessionValidation: SessionId inv谩lida para {UserId} (claim:{Claim}, db:{Db})", userId, claimSessionId, userSession.sessionId);
+                    // asegurar limpieza de cache relacionada
+                    try
+                    {
+                        _cache.Remove(cacheKey);
+                        _cache.Remove($"LastActivity_{userId}");
+                        _cache.Remove($"DbUpdate_{userId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "SessionValidation: fallo al limpiar cache para {UserId}", userId);
+                    }
+
+                    // Forzar eliminaci贸n de cookie en la respuesta + signout del manager
+                    try
+                    {
+                        await context.SignOutAsync(IdentityConstants.ApplicationScheme);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "SessionValidation: context.SignOutAsync fall贸 para {UserId}", userId);
+                    }
+
                     await SignOutAndRedirect(context, signInManager);
                     return;
                 }
 
-                // 4. Control de inactividad: preferir cache para checks r醦idos
+                // 4. Control de inactividad: preferir cache para checks r谩pidos
                 var lastActivityKey = $"LastActivity_{userId}";
                 if (!_cache.TryGetValue<DateTime?>(lastActivityKey, out var lastActivity))
                 {
@@ -94,16 +124,30 @@ namespace SistemasAnaliticos.Auxiliares
                 }
 
                 var last = lastActivity.GetValueOrDefault(DateTime.MinValue);
+                _logger.LogDebug("SessionValidation: lastActivityUtc={Last} now={Now}", last, DateTime.UtcNow);
+
                 if (DateTime.UtcNow - last > _timeout)
                 {
-                    _logger.LogInformation("Inactividad excedida para {UserId}", userId);
-                    _cache.Remove(cacheKey);
-                    _cache.Remove(lastActivityKey);
+                    _logger.LogInformation("SessionValidation: Inactividad excedida para {UserId}", userId);
+                    try
+                    {
+                        _cache.Remove(cacheKey);
+                        _cache.Remove(lastActivityKey);
+                        _cache.Remove($"DbUpdate_{userId}");
+                    }
+                    catch { }
+
+                    try
+                    {
+                        await context.SignOutAsync(IdentityConstants.ApplicationScheme);
+                    }
+                    catch { }
+
                     await SignOutAndRedirect(context, signInManager);
                     return;
                 }
 
-                // 5. Actualizar cache de 鷏tima actividad (r醦ido)
+                // 5. Actualizar cache de 煤ltima actividad (r谩pido)
                 _cache.Set(lastActivityKey, DateTime.UtcNow, TimeSpan.FromMinutes(10));
 
                 // 6. Actualizar BD de forma segura: crear scope nuevo dentro del background task
@@ -122,8 +166,8 @@ namespace SistemasAnaliticos.Auxiliares
                             {
                                 u.lastActivityUtc = DateTime.UtcNow;
                                 await scopedUserManager.UpdateAsync(u);
-                                // Actualizar tambi閚 el cache de sesi髇 para mantener coherencia
-                                _cache.Set(cacheKey, u, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(5) });
+                                // Actualizar cache solo de 煤ltima actividad para coherencia
+                                _cache.Set(lastActivityKey, DateTime.UtcNow, TimeSpan.FromMinutes(10));
                             }
                             _cache.Set(dbUpdateKey, true, TimeSpan.FromSeconds(30));
                         }
@@ -133,6 +177,10 @@ namespace SistemasAnaliticos.Auxiliares
                         }
                     });
                 }
+            }
+            else
+            {
+                _logger.LogDebug("SessionValidation: request no autenticado para path {Path}", context.Request.Path);
             }
 
             await _next(context);
@@ -155,7 +203,26 @@ namespace SistemasAnaliticos.Auxiliares
 
         private async Task SignOutAndRedirect(HttpContext context, SignInManager<Usuario> signInManager)
         {
-            await signInManager.SignOutAsync();
+            _logger.LogInformation("SessionValidation: realizando SignOut y redirigiendo a /Usuario/Login para path {Path}", context.Request.Path);
+
+            // Forzar cierre de cookie del esquema de Identity
+            try
+            {
+                await context.SignOutAsync(IdentityConstants.ApplicationScheme);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "SessionValidation: context.SignOutAsync fall贸");
+            }
+
+            try
+            {
+                await signInManager.SignOutAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "SessionValidation: signInManager.SignOutAsync fall贸");
+            }
 
             // Si es request de API devolvemos 401 y no redirigimos
             if (context.Request.Path.StartsWithSegments("/api", StringComparison.OrdinalIgnoreCase))

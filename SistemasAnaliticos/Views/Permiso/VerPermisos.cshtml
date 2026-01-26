@@ -455,6 +455,21 @@
             }
         });
     </script>
+    <script>
+        function formatearHoraAMPM(time) {
+            if (!time) return 'N/A';
+
+            const partes = time.split(':');
+            let horas = parseInt(partes[0], 10);
+            const minutos = partes[1];
+            const ampm = horas >= 12 ? 'PM' : 'AM';
+
+            horas = horas % 12;
+            horas = horas ? horas : 12; // 0 => 12
+
+            return `${horas}:${minutos} ${ampm}`;
+        }
+    </script>
 
     <!-- Modal de la Foto -->
     <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
@@ -973,9 +988,7 @@
                                 <div class="col-2" style="display: flex;flex-direction: column;">
                                     <span class="text-muted fw-semibold">Hora:</span>
                                     <span class="${permission.horaCita ? 'text-dark fw-medium' : 'text-danger fw-bold'} ms-1">
-                                        ${permission.horaCita
-                                            ? new Date(permission.horaCita).toLocaleDateString('es-CR')
-                                            : 'N/A'}
+                                        ${permission.horaCita ? formatearHoraAMPM(permission.horaCita) : 'N/A'}
                                     </span>
                                 </div>
                              </div>

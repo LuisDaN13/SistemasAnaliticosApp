@@ -719,7 +719,7 @@
 
     <!-- SCRIPT PARA DEJAR LISTO ROL DE EMPLEADO PARA USAR JS -->
     <script>
-        const esEmpleadoNormal = @User.IsInRole("Empleado Normal").ToString();
+
     </script>
 
     <!-- FILTRADO Y CONTADORES MEJORADOS -->
@@ -928,6 +928,20 @@
 
         // Función para renderizar constancias
         function renderConstancias(data) {
+        @{
+            bool esEmpNormal = User.IsInRole("Empleado Normal");
+            bool esJef = User.IsInRole("Jefatura");
+            bool esRrhh = User.IsInRole("RRHH");
+            bool esAdmin = User.IsInRole("Administrador");
+        }
+
+        const esEmpleadoNormal = @esEmpNormal.ToString().ToLower();
+        const esJefatura = @esJef.ToString().ToLower();
+        const esRRHH = @esRrhh.ToString().ToLower();
+        const esAdministrador = @esAdmin.ToString().ToLower();
+
+        const tieneRolAlto = esRRHH === true || esAdministrador === true;
+
             if (data.length === 0) {
                 constanciasContainer.innerHTML = `
                     <div class="no-results">
@@ -1018,55 +1032,97 @@
                                     <span class="text-muted fw-semibold d-block">Comentarios:</span>
                                     <span class="text-dark fw-medium ms-1" d-block>${constanciaas.comentarios ?? 'Sin comentario'}</span>
                                 </div>
-                                <div class="col">
-                                    ${
-                                        constanciaas.nombreArchivo && constanciaas.nombreArchivo.trim() !== ''
-                                            ? (
-                                                constanciaas.estado === 'Aprobada'
-                                                    // 1️⃣ HAY ARCHIVO Y ESTÁ APROBADA
-                                                    ? `
-                                                        <div class="mt-1 d-flex align-items-center gap-1">
-                                                            <a href="/Constancia/descargar-adjunto/${constanciaas.idConstancia}"
-                                                                class="btn btn-sm btn-outline-primary d-flex align-items-center"
-                                                                style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: 80%"
-                                                                title="Descargar ${constanciaas.nombreArchivo}">
-                                                                ${obtenerIconoArchivo(constanciaas.nombreArchivo, constanciaas.tipoMIME)}
-                                                                <span class="text-truncate d-block" style="max-width: 220px;">
-                                                                    ${constanciaas.nombreArchivo}
-                                                                </span>
-                                                            </a>
-                                                            <small class="text-muted text-center d-block mt-1">
-                                                                ${formatearTamanoArchivo(constanciaas.tamanoArchivo)} •
-                                                                ${obtenerExtension(constanciaas.nombreArchivo)}
-                                                            </small>
-                                                        </div>
-                                                    `
-                                                    // 2️⃣ HAY ARCHIVO PERO NO ESTÁ APROBADA
-                                                    : `
-                                                        <span class="text-danger d-inline-block text-center small"
-                                                            style="width:100%; padding: 0.25rem; background:#fff3cd; border-radius:5px;">
-                                                            Archivo disponible tras aprobación
-                                                        </span>
-                                                    `
-                                            )
-                                            // 3️⃣ NO HAY ARCHIVO
-                                            : (
-                                                constanciaas.tipo === "Salarial"
-                                                    ? `
-                                                        <button class="btn btn-sm btn-warning w-100"
-                                                                onclick="abrirModalSalarial(${constanciaas.idConstancia})">
-                                                            Crear Constancia Salarial
-                                                        </button>
-                                                    `
-                                                    : `
-                                                        <span class="text-muted d-inline-block text-center small"
-                                                            style="width:100%; padding: 0.25rem; background:#f0f0f0; border-radius:5px;">
-                                                            Sin archivo
-                                                        </span>
-                                                    `
-                                            )
-                                    }
-                                </div>                                
+        <div class="col">
+            ${
+                // Verificar si existe archivo adjunto
+                constanciaas.nombreArchivo && constanciaas.nombreArchivo.trim() !== ''
+                    ? (
+                        // CASO: SÍ HAY ARCHIVO ADJUNTO
+                        constanciaas.estado === "Aprobada"
+                            // ✅ ESTADO APROBADA - TODOS PUEDEN DESCARGAR (SALARIAL O LABORAL)
+                            ? `
+                                <div class="mt-1 d-flex align-items-center gap-1">
+                                    <a href="/Constancia/descargar-adjunto/${constanciaas.idConstancia}"
+                                        class="btn btn-sm btn-outline-primary d-flex align-items-center"
+                                        style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: 80%"
+                                        title="Descargar ${constanciaas.nombreArchivo}">
+                                        ${obtenerIconoArchivo(constanciaas.nombreArchivo, constanciaas.tipoMIME)}
+                                        <span class="text-truncate d-block" style="max-width: 220px;">
+                                            ${constanciaas.nombreArchivo}
+                                        </span>
+                                    </a>
+                                    <small class="text-muted text-center d-block mt-1">
+                                        ${formatearTamanoArchivo(constanciaas.tamanoArchivo)} •
+                                        ${obtenerExtension(constanciaas.nombreArchivo)}
+                                    </small>
+                                </div>
+                            `
+                            // ESTADO CREADA O OTRO
+                            : (
+                                // Solo roles altos pueden ver/descargar constancias en estado "Creada"
+                                tieneRolAlto
+                                    ? `
+                                        <div class="mt-1 d-flex align-items-center gap-1">
+                                            <a href="/Constancia/descargar-adjunto/${constanciaas.idConstancia}"
+                                                class="btn btn-sm btn-outline-primary d-flex align-items-center"
+                                                style="font-size: 0.75rem; padding: 0.25rem 0.5rem; width: 80%"
+                                                title="Descargar ${constanciaas.nombreArchivo}">
+                                                ${obtenerIconoArchivo(constanciaas.nombreArchivo, constanciaas.tipoMIME)}
+                                                <span class="text-truncate d-block" style="max-width: 220px;">
+                                                    ${constanciaas.nombreArchivo}
+                                                </span>
+                                            </a>
+                                            <small class="text-muted text-center d-block mt-1">
+                                                ${formatearTamanoArchivo(constanciaas.tamanoArchivo)} •
+                                                ${obtenerExtension(constanciaas.nombreArchivo)}
+                                            </small>
+                                        </div>
+                                    `
+                                    // Empleado Normal ve mensaje de aprobación pendiente
+                                    : `
+                                        <span class="text-danger d-inline-block text-center small"
+                                            style="width:100%; padding: 0.25rem; background:#fff3cd; border-radius:5px;">
+                                            Archivo disponible tras aprobación
+                                        </span>
+                                    `
+                            )
+                    )
+                    // CASO: NO HAY ARCHIVO ADJUNTO
+                    : (
+                        // Solo roles altos pueden crear constancias Salariales
+                        constanciaas.tipo === "Salarial" && constanciaas.estado === "Creada" && tieneRolAlto
+                            ? `
+                                <button class="btn btn-sm btn-warning w-100"
+                                        onclick="abrirModalSalarial(${constanciaas.idConstancia})">
+                                    Crear Constancia Salarial
+                                </button>
+                            `
+                            // Estado "Aprobada" sin archivo
+                            : constanciaas.estado === "Aprobada"
+                            ? `
+                                <span class="text-danger d-inline-block text-center small"
+                                    style="width:100%; padding: 0.25rem; background:#fff3cd; border-radius:5px;">
+                                    Constancia aprobada sin archivo adjunto
+                                </span>
+                            `
+                            // Estado "Creada" sin archivo para Empleado Normal
+                            : constanciaas.estado === "Creada"
+                            ? `
+                                <span class="text-warning d-inline-block text-center small"
+                                    style="width:100%; padding: 0.25rem; background:#fff8e1; border-radius:5px;">
+                                    Constancia en proceso de creación
+                                </span>
+                            `
+                            // Otros casos
+                            : `
+                                <span class="text-muted d-inline-block text-center small"
+                                    style="width:100%; padding: 0.25rem; background:#f0f0f0; border-radius:5px;">
+                                    Sin archivo
+                                </span>
+                            `
+                    )
+            }
+        </div>
                             </div>
                         </div>
                     </div>

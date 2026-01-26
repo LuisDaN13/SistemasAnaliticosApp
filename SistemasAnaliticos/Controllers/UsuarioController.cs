@@ -66,25 +66,45 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var usuarioEnRol = await userManager.GetUsersInRoleAsync("Jefatura");
+                var rolesPermitidos = new HashSet<string>
+                    {
+                        "Jefatura",
+                        "Administrador",
+                        "RRHH"
+                    };
 
-                var jefes = usuarioEnRol
-                    .Where(u => u.estado == true)
+                var usuarios = await userManager.Users
+                    .Where(u => u.estado)
+                    .ToListAsync();
+
+                var usuariosConRoles = new List<Usuario>();
+
+                foreach (var user in usuarios)
+                {
+                    var userRoles = await userManager.GetRolesAsync(user);
+
+                    if (userRoles.Any(r => rolesPermitidos.Contains(r)))
+                    {
+                        usuariosConRoles.Add(user);
+                    }
+                }
+
+                var jefes = usuariosConRoles
                     .OrderBy(u => u.primerNombre)
                     .ThenBy(u => u.primerApellido)
                     .Select(u => new
                     {
                         Id = u.Id,
-                        NombreCompleto = $"{u.nombreCompleto}",
+                        NombreCompleto = u.nombreCompleto,
                         Departamento = u.departamento
                     })
                     .ToList();
 
                 return Json(new { success = true, jefes });
             }
-            catch (Exception ex)
+            catch
             {
-                return Json(new { success = false, message = ex.Message });
+                return Json(new { success = false, message = "Error al obtener jefes" });
             }
         }
 
@@ -115,7 +135,28 @@ namespace SistemasAnaliticos.Controllers
 
         public async Task<IActionResult> LogOut()
         {
+            Console.WriteLine("=== LOGOUT INICIADO ===");
+
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                var user = await userManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    Console.WriteLine($"Usuario haciendo logout: {user.Email}");
+                    Console.WriteLine($"SessionId actual: {user.sessionId}");
+
+                    // 🔥 IMPORTANTE: Poner sessionId a NULL en BD
+                    // Esto hará que cualquier otra sesión sea inválida
+                    user.sessionId = null;
+                    user.lastActivityUtc = DateTime.UtcNow;
+
+                    var updateResult = await userManager.UpdateAsync(user);
+                    Console.WriteLine($"BD actualizada en logout: {(updateResult.Succeeded ? "ÉXITO" : "FALLO")}");
+                }
+            }
+
             await signInManager.SignOutAsync();
+            Console.WriteLine("Sesión cerrada, redirigiendo a Login");
             return RedirectToAction("Login", "Usuario");
         }
 
@@ -136,13 +177,13 @@ namespace SistemasAnaliticos.Controllers
             var user = await userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                ModelState.AddModelError("", "Credenciales inválidas");
+                ModelState.AddModelError(string.Empty, "Cuenta Inexistente");
                 return View(model);
             }
 
             if (!user.estado)
             {
-                ModelState.AddModelError("", "Su cuenta está desactivada. Contacte al administrador.");
+                ModelState.AddModelError(string.Empty, "Su cuenta está desactivada. Contacte al administrador.");
                 return View(model);
             }
 
@@ -151,50 +192,53 @@ namespace SistemasAnaliticos.Controllers
 
             if (!result.Succeeded)
             {
-                ModelState.AddModelError("", "Credenciales inválidas");
+                ModelState.AddModelError(string.Empty, "Credenciales Inválidas");
                 return View(model);
             }
 
             // 🔍 Detectar si es el primer inicio de sesión
             var esPrimerInicio = user.lastActivityUtc == null;
 
-            // 🔄 Generar nueva sesión (invalida las anteriores)
+            // 🔥 Generar NUEVA sesión (esto invalida cualquier sesión anterior)
             var newSessionId = Guid.NewGuid().ToString();
+
+            // Actualizar BD inmediatamente
             user.sessionId = newSessionId;
             user.lastActivityUtc = DateTime.UtcNow;
-            await userManager.UpdateAsync(user);
 
-            // --- NUEVO: invalidar cache del usuario para que el middleware lea la BD actualizada ---
-            try
+            var updateResult = await userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
             {
-                var cacheKey = $"UserSession_{user.Id}";
-                _cache.Remove(cacheKey);
-                _cache.Remove($"LastActivity_{user.Id}");
-                _cache.Remove($"DbUpdate_{user.Id}");
-            }
-            catch
-            {
-                // No bloquear el login por problemas de cache
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Ocurrió un error interno al crear la sesión. Intente nuevamente."
+                );
+                return View(model);
             }
 
-            // 🔑 Crear principal con claim SessionId
+            // 🔑 Crear claims con NUEVO SessionId
             var principal = await signInManager.CreateUserPrincipalAsync(user);
             var identity = (ClaimsIdentity)principal.Identity!;
 
+            // Remover claim viejo si existe
             var existing = identity.FindFirst("SessionId");
             if (existing != null)
+            {
                 identity.RemoveClaim(existing);
+            }
 
+            // Agregar NUEVO claim
             identity.AddClaim(new Claim("SessionId", newSessionId));
 
-            // 🍪 Firmar cookie de Identity
+            // 🍪 Crear NUEVA cookie de sesión
             await HttpContext.SignInAsync(
                 IdentityConstants.ApplicationScheme,
                 principal,
                 new AuthenticationProperties
                 {
                     IsPersistent = false,
-                    AllowRefresh = true
+                    AllowRefresh = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(8) // Coincide con el timeout
                 });
 
             // 📋 Si es primer inicio, almacenar info para mostrar modal
@@ -215,9 +259,6 @@ namespace SistemasAnaliticos.Controllers
             return View();
         }
 
-
-
-
         // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX = PRESENTAR A LOS EMPLEADOS CON CARDS PARA SCINICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
         [Authorize(Policy = "Usuarios.Ver")]
@@ -226,6 +267,7 @@ namespace SistemasAnaliticos.Controllers
             var cards = await _context.Users
                 .AsNoTracking()
                 .OrderByDescending(x => x.primerNombre)
+                .Where(x => x.primerApellido != "Montilla")
                 .Select(x => new CardsViewModel
                 {
                     Id = x.Id,
@@ -1017,6 +1059,7 @@ namespace SistemasAnaliticos.Controllers
                 }
 
                 // 4. Crear el usuario con los datos del modal (simplificado)
+                var random = new Random();
                 var nuevoUsuario = new Usuario
                 {
                     primerNombre = primerNombre,
@@ -1026,7 +1069,8 @@ namespace SistemasAnaliticos.Controllers
                     correoEmpresa = correo,
                     Email = correo,
                     UserName = correo,
-                    estado = true
+                    estado = true,
+                    cedula = random.Next(10000, 100000).ToString()
                 };
 
                 // 5. Crear usuario con la contraseña proporcionada (NO fija)
