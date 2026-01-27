@@ -992,14 +992,14 @@ namespace SistemasAnaliticos.Controllers
             if (idConstancia == null)
             {
                 TempData["ErrorMessage"] = "No se proporcionó un identificador de empleado válido.";
-                return RedirectToAction("Index", "Usuario");
+                return RedirectToAction("VerConstancias", "Constancia");
             }
 
             var constancia = await _context.Constancia.FindAsync(idConstancia);
             if (constancia == null)
             {
                 TempData["ErrorMessage"] = "El empleado que intentas editar no existe o fue eliminado.";
-                return RedirectToAction("Index", "Usuario");
+                return RedirectToAction("VerConstancias", "Constancia");
             }
 
             try
@@ -1015,6 +1015,109 @@ namespace SistemasAnaliticos.Controllers
 
                 // 🔹 Guardar cambios
                 _context.Update(constancia);
+
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = user.nombreCompleto ?? "Desconocido",
+                    Tabla = "Constancia",
+                    Accion = "Creo el documento de Constancia Salarial"
+                }; 
+
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessageCons"] = "Se creó correctamente la constancia salarial.";
+                return RedirectToAction("VerConstancias", "Constancia");
+            }
+            catch (Exception ex)
+            {
+                // 🧩 Manejo de error
+                TempData["ErrorMessageCons"] = "Ocurrió un error al crear la constancia: " + ex.Message;
+                return RedirectToAction("VerConstancias", "Constancia");
+            }
+        }
+
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // SUBIR ARCHIVO DE CONSTANCIA
+        [Authorize(Policy = "Constancia.CambiarEstado")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ArchivoPDF(long idConstancia, IFormFile archivoPdf)
+        {
+            if (idConstancia == null)
+            {
+                TempData["ErrorMessageCons"] = "No se proporcionó un identificador de empleado válido.";
+                return RedirectToAction("VerConstancias", "Constancia");
+            }
+
+            if (archivoPdf == null || archivoPdf.Length == 0)
+            {
+                TempData["ErrorMessageCons"] = "Debe adjuntar un archivo PDF.";
+                return RedirectToAction("VerConstancias", "Constancia");
+            }
+
+            if (archivoPdf.ContentType != "application/pdf")
+            {
+                TempData["ErrorMessageCons"] = "El archivo debe ser un PDF válido.";
+                return RedirectToAction("VerConstancias", "Constancia");
+            }
+
+            var constancia = await _context.Constancia.FindAsync(idConstancia);
+            if (constancia == null)
+            {
+                TempData["ErrorMessageCons"] = "La constancia que intentas editar no existe o fue eliminado.";
+                return RedirectToAction("VerConstancias", "Constancia");
+            }
+
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                byte[] pdfBytes;
+
+                using (var ms = new MemoryStream())
+                {
+                    await archivoPdf.CopyToAsync(ms);
+                    pdfBytes = ms.ToArray();
+                }
+
+                // 🔹 Actualizar campos personales
+                constancia.datosAdjuntos = pdfBytes;
+                constancia.nombreArchivo = $"Constancia_Firmada_{constancia.nombreEmpleado}.pdf";
+                constancia.tipoMIME = "application/pdf";
+                constancia.tamanoArchivo = pdfBytes.Length;
+
+                // 🔹 Guardar cambios
+                _context.Update(constancia);
+
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = user.nombreCompleto ?? "Desconocido",
+                    Tabla = "Constancia",
+                    Accion = "Subió Constancia"
+                };
+                _context.Auditoria.Add(auditoria);
+
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessageCons"] = "Se creó correctamente la constancia salarial.";

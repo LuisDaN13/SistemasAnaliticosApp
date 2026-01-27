@@ -77,12 +77,13 @@
                             <!-- Motivo -->
                             <div class="mb-3">
                                 <label class="form-label required-field">Monto de la Solicitud de Beneficio</label>
-                                <input type="number"
-                                       asp-for="monto"
-                                       id="montoBeneficiario"
-                                       class="form-control"
-                                       placeholder="Ingrese el monto deseado"
-                                       required>
+                                <input type="text" asp-for="monto"
+                                    id="montoBeneficiario"
+                                    class="form-control salario-cr"  
+                                    placeholder="Ingrese el monto deseado"
+                                    maxlength="11" 
+                                    required
+                                    data-input-type="monto">
                             </div>
 
                             <!-- Notas -->
@@ -107,6 +108,9 @@
             </div>
         </div>
     </div>
+
+    <!-- SCRIPT DE LOS FORMATOS DE CAMPOS-->
+    <script src='~/JS/formatosUsuario.js'></script>
 
     <!-- Pasar palabra de tipo -->
     <script>

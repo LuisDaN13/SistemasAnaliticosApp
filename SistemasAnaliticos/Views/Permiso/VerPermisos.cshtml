@@ -968,7 +968,7 @@
                                 </span>
                                 ` : ''}                                
                             </div>
-                            <div class="row small d-flex justify-content-around" style="gap: 1.5rem; padding-left: 5%; padding-right: 5%;"">
+                            <div class="row small d-flex justify-content-around" style="gap: 1.5rem; padding-left: 5%; padding-right: 5%;">
                                 <div class="col-2" style="display: flex;flex-direction: column;">
                                     <span class="text-muted fw-semibold">Creación:</span>
                                     <span class="text-dark fw-medium ms-1">${new Date(permission.fechaCreacion + "T00:00:00").toLocaleDateString('es-CR')}</span>
@@ -985,12 +985,17 @@
                                     <span class="text-muted fw-semibold">Regreso:</span>
                                     <span class="text-dark fw-medium ms-1">${new Date(permission.fechaRegresoLaboral).toLocaleDateString('es-CR')}</span>
                                 </div>
-                                <div class="col-2" style="display: flex;flex-direction: column;">
-                                    <span class="text-muted fw-semibold">Hora:</span>
-                                    <span class="${permission.horaCita ? 'text-dark fw-medium' : 'text-danger fw-bold'} ms-1">
-                                        ${permission.horaCita ? formatearHoraAMPM(permission.horaCita) : 'N/A'}
-                                    </span>
-                                </div>
+                                ${permission.tipo == "Cita Médica"
+                                    ? `
+                                        <div class="col-2" style="display: flex; flex-direction: column;">
+                                            <span class="text-muted fw-semibold">Hora:</span>
+                                            <span class="${permission.horaCita ? 'text-dark fw-medium' : 'text-danger fw-bold'} ms-1">
+                                                ${permission.horaCita ? formatearHoraAMPM(permission.horaCita) : 'N/A'}
+                                            </span>
+                                        </div>
+                                      `
+                                    : ''
+                                }
                              </div>
                         </div>
 

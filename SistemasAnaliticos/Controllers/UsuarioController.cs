@@ -859,7 +859,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // ADMINISTRADOR
-
+        [Authorize(Policy = "Rol.Ver")]
         [HttpGet]
         public async Task<IActionResult> MostrarUsers()
         {

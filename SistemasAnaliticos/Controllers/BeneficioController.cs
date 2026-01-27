@@ -764,12 +764,15 @@ namespace SistemasAnaliticos.Controllers
 
                 var nuevo = new Beneficio
                 {
+                    UsuarioId = usuario.Id,
+
                     fechaCreacion = hoy,
                     nombreEmpleado = usuario.nombreCompleto,
                     departamento = usuario.departamento,
                     tipo = model.tipo,
 
                     monto = model.monto,
+
                     comentarios = model.comentarios,
 
                     estado = "Creada"

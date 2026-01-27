@@ -1,4 +1,14 @@
 ﻿@model SistemasAnaliticos.Entidades.Constancia
+@{
+    bool esAdmin = User.IsInRole("Administrador");
+    bool esRRHH = User.IsInRole("RRHH");
+    bool esEmpleado = User.IsInRole("Empleado Normal");
+
+    bool puedeDescargar =
+        esAdmin ||
+        esRRHH ||
+        (esEmpleado && Model.estado == "Aprobada");
+}
 
 <!DOCTYPE html>
 <html lang="es">
@@ -186,26 +196,26 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <!-- Columna izquierda -->
                                 <div class="col-md-12">
+                                    <!-- Sección Laboral -->
                                     @if (Model.tipo == "Laboral")
                                     {
-                                        <div class="mb-3 justify-content-center">
+                                        <div class="d-flex justify-content-center align-items-center mb-3">
                                             <p class="text-muted mb-1 small">Dirigido a</p>
-
-                                            <pre class="fw-medium mb-0 text-break @(Model.dirijido == null ? "text-decoration-line-through text-danger" : "")"
-                                                 style="white-space: pre-wrap; background: transparent; border: none; padding: 0; font-family: inherit;">
-                                                 @(Model.dirijido ?? "N/A")
-                                            </pre>
+                                            <p class="fw-medium mb-0 text-break @(Model.dirijido == null ? "text-danger fw-bold" : "") text-end"
+                                               style="white-space: pre-wrap; background: transparent; border: none; padding: 0; font-family: inherit;">
+                                                @(Model.dirijido ?? "N/A")
+                                            </p>
                                         </div>
                                     }
-                                    <div class="mb-3 justify-content-center">
-                                        <p class="text-muted mb-1 small">Comentarios</p>
 
-                                        <pre class="fw-medium mb-0 text-break @(Model.comentarios == null ? "text-decoration-line-through text-danger" : "")"
-                                             style="white-space: pre-wrap; background: transparent; border: none; padding: 0; font-family: inherit;">
-                                                @(Model.comentarios ?? "N/A")
-                                        </pre>
+                                    <!-- Comentarios -->
+                                    <div class="d-flex justify-content-center align-items-center mb-3">
+                                        <p class="text-muted mb-1 small me-2">Comentarios</p>
+                                        <p class="fw-medium mb-0 text-break @(Model.comentarios == null ? "text-danger fw-bold" : "") text-end"
+                                           style="white-space: pre-wrap; background: transparent; border: none; padding: 0; font-family: inherit;">
+                                            @(Model.comentarios ?? "N/A")
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -223,35 +233,48 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3 d-flex justify-content-center" style="height: 100%; gap: 40%; align-items: center;">
+                            <div class="mb-3 d-flex justify-content-center"
+                                 style="height: 100%; gap: 40%; align-items: center;">
+
                                 <p class="text-muted mb-1 small">Archivo adjunto</p>
+
                                 @if (!string.IsNullOrWhiteSpace(Model.nombreArchivo))
                                 {
                                     <div class="mt-1">
-                                        <a href="/Constancia/descargar-adjunto/@Model.idConstancia"
-                                           class="btn btn-sm btn-outline-primary d-flex align-items-center archivo-adjunto"
-                                           style="font-size: 0.75rem; padding: 0.25rem 0.5rem;"
-                                           title="Descargar @Model.nombreArchivo"
-                                           data-nombre-archivo="@Model.nombreArchivo"
-                                           data-tipo-mime="@Model.tipoMIME"
-                                           data-tamano-archivo="@Model.tamanoArchivo">
-                                            <!-- El icono se insertará con JavaScript -->
-                                            <span class="text-truncate d-block" style="max-width: 80px;">
-                                                @Model.nombreArchivo
-                                            </span>
-                                        </a>
-                                        <small class="text-muted text-center d-block mt-1 tamano-archivo">
-                                            <!-- El tamaño se mostrará con JavaScript -->
-                                        </small>
-                                        <!-- BOTÓN VISTA PREVIA -->
-                                        <div class="d-flex justify-content-center mt-2">
-                                            <a href="/Constancia/Preview/@Model.idConstancia"
-                                               target="_blank"
-                                               class="btn btn-sm btn-secondary d-flex justify-content-center align-items-center"
-                                               style="width: 34px; height: 34px; border-radius: 6px;">
-                                                <i class="fa-solid fa-eye"></i>
+
+                                        @if (puedeDescargar)
+                                        {
+                                            <a href="/Constancia/descargar-adjunto/@Model.idConstancia"
+                                               class="btn btn-sm btn-outline-primary d-flex align-items-center archivo-adjunto"
+                                               style="font-size: 0.75rem; padding: 0.25rem 0.5rem;"
+                                               title="Descargar @Model.nombreArchivo"
+                                               data-nombre-archivo="@Model.nombreArchivo"
+                                               data-tipo-mime="@Model.tipoMIME"
+                                               data-tamano-archivo="@Model.tamanoArchivo">
+
+                                                <span class="text-truncate d-block" style="max-width: 80px;">
+                                                    @Model.nombreArchivo
+                                                </span>
                                             </a>
-                                        </div>
+
+                                            <small class="text-muted text-center d-block mt-1 tamano-archivo"></small>
+
+                                            <div class="d-flex justify-content-center mt-2">
+                                                <a href="/Constancia/Preview/@Model.idConstancia"
+                                                   target="_blank"
+                                                   class="btn btn-sm btn-secondary d-flex justify-content-center align-items-center"
+                                                   style="width: 34px; height: 34px; border-radius: 6px;">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-warning fw-bold d-block text-center"
+                                                  style="max-width: 120px;">
+                                                Descarga no disponible
+                                            </span>
+                                        }
                                     </div>
                                 }
                                 else
