@@ -267,7 +267,7 @@ namespace SistemasAnaliticos.Controllers
             var cards = await _context.Users
                 .AsNoTracking()
                 .OrderByDescending(x => x.primerNombre)
-                .Where(x => x.primerApellido != "Montilla")
+                .Where(x => x.primerApellido != "Montilla" && x.primerApellido != "Admin")
                 .Select(x => new CardsViewModel
                 {
                     Id = x.Id,
@@ -692,6 +692,7 @@ namespace SistemasAnaliticos.Controllers
                 return Json(new { success = false, message = "Usuario no encontrado" });
             }
 
+            user = await userManager.FindByIdAsync(model.Id.ToString());
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
             var result = await userManager.ResetPasswordAsync(user, token, model.NuevaContrasena);
 

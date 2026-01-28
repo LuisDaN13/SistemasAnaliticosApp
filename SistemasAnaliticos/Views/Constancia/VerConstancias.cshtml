@@ -145,7 +145,7 @@
         <div class="header-card p-4 mt-4 mb-4 d-flex justify-content-between">
             <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todas las Constancias</h1>
             <div>
-                @if (!User.IsInRole("Empleado Normal"))
+                @if(!User.IsInRole("Empleado Normal") && !User.IsInRole("Jefatura"))
                 {
                     <button type="button" class="btn btn-primary" onclick="abrirModalMasivo()">Cambiar estado</button>
                 }

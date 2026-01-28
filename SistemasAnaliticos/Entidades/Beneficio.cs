@@ -28,7 +28,7 @@ namespace SistemasAnaliticos.Entidades
         [Required]
         [Column(TypeName = "decimal(12,2)")]
         public decimal monto { get; set; }
-        public string comentarios { get; set; }
+        public string? comentarios { get; set; }
 
         [Required]
         public string estado { get; set; }

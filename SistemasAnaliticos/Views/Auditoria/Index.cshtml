@@ -10,6 +10,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+
     <style>
         :root {
             --primary-color: #012473;
@@ -41,10 +47,52 @@
             background-color: white;
         }
 
+        /* Estilos para DataTables */
+        .dataTables_wrapper {
+            padding: 0 1rem 1rem 1rem;
+        }
+
+        .dataTables_length select {
+            border-radius: 6px;
+            padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+        }
+
+        .dataTables_filter input {
+            border-radius: 6px;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid #ced4da;
+            margin-left: 0.5rem;
+        }
+
+        .dataTables_info {
+            padding-top: 1rem !important;
+            color: #6c757d;
+        }
+
+        .dataTables_paginate .paginate_button {
+            border-radius: 6px !important;
+            margin: 0 2px;
+            padding: 0.375rem 0.75rem !important;
+            border: 1px solid #dee2e6 !important;
+        }
+
+            .dataTables_paginate .paginate_button.current {
+                background-color: #012473 !important;
+                border-color: #012473 !important;
+                color: white !important;
+            }
+
+            .dataTables_paginate .paginate_button:hover {
+                background-color: #e9ecef !important;
+                border-color: #dee2e6 !important;
+            }
+
         /* Estilos para la tabla */
         .table-custom {
-            width: 100%;
+            width: 100% !important;
             border-collapse: collapse;
+            margin-top: 1rem;
         }
 
             .table-custom th {
@@ -65,6 +113,21 @@
             .table-custom tr:hover {
                 background-color: #f8f9fa;
             }
+
+        /* Botones de exportación */
+        .dt-buttons .btn {
+            background-color: #012473;
+            color: white;
+            border: none;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            margin-right: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+            .dt-buttons .btn:hover {
+                background-color: #013599;
+            }
     </style>
 </head>
 <body class="bg-gradient-custom min-vh-100">
@@ -78,7 +141,7 @@
             </h1>
         </div>
 
-        <!-- Tabla de Fotos -->
+        <!-- Tabla de Auditoría -->
         <div class="card shadow-sm">
             <div class="card-body p-0">
                 @if (!listaAudit.Any())
@@ -87,7 +150,7 @@
                         <div style="border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); background-color: white;">
                             <div style="display: flex; align-items: center; justify-content: space-around; padding: 2rem;">
                                 <p style="color: #6c757d; margin: 0; text-align: left; font-size: 1rem;">
-                                    No se encontraron datos de auditorias.
+                                    No se encontraron datos de auditorías.
                                 </p>
 
                                 <div id="lottie-animation" style="width: 110px; height: 110px; flex-shrink: 0;"></div>
@@ -109,7 +172,7 @@
                 else
                 {
                     <div class="table-responsive">
-                        <table class="table table-custom table-hover mb-0">
+                        <table id="auditTable" class="table table-custom table-hover mb-0">
                             <thead>
                                 <tr>
                                     <th class="text-center">Fecha</th>
@@ -139,5 +202,91 @@
             </div>
         </div>
     </main>
+
+    <!-- jQuery (requerido por DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <!-- Inicialización de DataTables -->
+    <script>
+        $(document).ready(function() {
+            // Inicializar DataTable con opciones personalizadas
+            $('#auditTable').DataTable({
+                responsive: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' // Español
+                },
+                dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>' +
+                     '<"row"<"col-sm-12"tr>>' +
+                     '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fas fa-file-excel"></i> Excel',
+                        className: 'btn btn-success',
+                        title: 'Auditorías'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fas fa-file-pdf"></i> PDF',
+                        className: 'btn btn-danger',
+                        title: 'Auditorías'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fas fa-print"></i> Imprimir',
+                        className: 'btn btn-info',
+                        title: 'Lista de Auditorías'
+                    }
+                ],
+                order: [[0, 'desc']], // Ordenar por fecha descendente por defecto
+                pageLength: 10, // Mostrar 10 registros por página
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+                columnDefs: [
+                    {
+                        targets: [0, 1, 2, 3, 4], // Todas las columnas
+                        className: 'text-center'
+                    },
+                    {
+                        targets: 0, // Columna de fecha
+                        type: 'date', // Para ordenamiento correcto de fechas
+                        render: function(data, type, row) {
+                            if (type === 'sort') {
+                                // Convertir a formato ordenable
+                                const dateParts = data.split(' ');
+                                const monthNames = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+                                const monthIndex = monthNames.indexOf(dateParts[1].toLowerCase());
+                                const year = dateParts[2];
+                                const day = dateParts[0];
+                                return new Date(year, monthIndex, day).getTime();
+                            }
+                            return data;
+                        }
+                    }
+                ],
+                initComplete: function() {
+                    // Personalizar la apariencia de los botones
+                    $('.dt-buttons .btn').removeClass('dt-button');
+
+                    // Agregar íconos si usas FontAwesome
+                    $('.btn-success').prepend('<i class="fas fa-file-excel me-2"></i>');
+                    $('.btn-danger').prepend('<i class="fas fa-file-pdf me-2"></i>');
+                    $('.btn-info').prepend('<i class="fas fa-print me-2"></i>');
+                }
+            });
+
+            // Estilizar los inputs de búsqueda y select
+            $('.dataTables_filter label').addClass('d-flex align-items-center');
+            $('.dataTables_length label').addClass('d-flex align-items-center');
+        });
+    </script>
+
 </body>
 </html>

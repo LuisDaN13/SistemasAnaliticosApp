@@ -337,7 +337,7 @@
             </body>
             </html>";
         }
-        public static string EstadoConstanciaRechaz(string nombreEmpleado, string tipoPermiso)
+        public static string EstadoConstanciaRechaz(string nombreEmpleado, string tipoConstancia)
         {
             return $@"
             <!DOCTYPE html>
@@ -356,7 +356,7 @@
                                             A quien corresponda, {nombreEmpleado}
                                         </p>
                                         <p style='margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #555555;'>
-                                            Mediante la presente notificación por correo electrónico, se confirma el rechazo de su constancia del tipo {tipoPermiso} en el sistema.
+                                            Mediante la presente notificación por correo electrónico, se confirma el rechazo de su constancia del tipo {tipoConstancia} en el sistema.
                                         </p>
                                         <p style='margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #555555;'>
                                             Si deseas observar más información, ingresa al sistema de Recursos Humanos para consultar el detalle del permiso.
@@ -392,7 +392,7 @@
             </body>
             </html>";
         }
-        public static string EstadoConstanciaAprob(string nombreEmpleado, string tipoPermiso)
+        public static string EstadoConstanciaAprob(string nombreEmpleado, string tipoConstancia)
         {
             return $@"
             <!DOCTYPE html>
@@ -411,7 +411,7 @@
                                             A quien corresponda, {nombreEmpleado}
                                         </p>
                                         <p style='margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #555555;'>
-                                            Mediante la presente notificación por correo electrónico, se confirma la aprobación de su constancia del tipo {tipoPermiso} en el sistema.
+                                            Mediante la presente notificación por correo electrónico, se confirma la aprobación de su constancia del tipo {tipoConstancia} en el sistema.
                                         </p>
                                         <p style='margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #555555;'>
                                             Si deseas observar más información, ingresa al sistema de Recursos Humanos para consultar el detalle del permiso.
@@ -560,7 +560,7 @@
             </body>
             </html>";
         }
-        public static string EstadoBeneficioRechaz(string nombreEmpleado, string tipoPermiso)
+        public static string EstadoBeneficioRechaz(string nombreEmpleado, string tipoBeneficio)
         {
             return $@"
             <!DOCTYPE html>
@@ -579,7 +579,7 @@
                                             A quien corresponda, {nombreEmpleado}
                                         </p>
                                         <p style='margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #555555;'>
-                                            Mediante la presente notificación por correo electrónico, se confirma el rechazo de su solicitud de beneficio del tipo {tipoPermiso} en el sistema.
+                                            Mediante la presente notificación por correo electrónico, se confirma el rechazo de su solicitud de beneficio del tipo {tipoBeneficio} en el sistema.
                                         </p>
                                         <p style='margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #555555;'>
                                             Si deseas observar más información, ingresa al sistema de Recursos Humanos para consultar el detalle del permiso.
@@ -615,7 +615,7 @@
             </body>
             </html>";
         }
-        public static string EstadoBeneficioAprob(string nombreEmpleado, string tipoPermiso)
+        public static string EstadoBeneficioAprob(string nombreEmpleado, string tipoBeneficio)
         {
             return $@"
             <!DOCTYPE html>
@@ -634,7 +634,7 @@
                                             A quien corresponda, {nombreEmpleado}
                                         </p>
                                         <p style='margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #555555;'>
-                                            Mediante la presente notificación por correo electrónico, se confirma la aprobación de su solicitud de beneficio del tipo {tipoPermiso} en el sistema.
+                                            Mediante la presente notificación por correo electrónico, se confirma la aprobación de su solicitud de beneficio del tipo {tipoBeneficio} en el sistema.
                                         </p>
                                         <p style='margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #555555;'>
                                             Si deseas observar más información, ingresa al sistema de Recursos Humanos para consultar el detalle del permiso.

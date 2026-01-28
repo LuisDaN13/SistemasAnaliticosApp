@@ -669,9 +669,9 @@ namespace SistemasAnaliticos.Controllers
                     if (beneficio.estado == "Aprobada")
                     {
                         // 1. Correo Aprobado
-                        var htmlEmpleado = PlantillasEmail.EstadoEmpleadoAprob(
+                        var htmlEmpleado = PlantillasEmail.EstadoBeneficioAprob(
                             nombreEmpleado: usuarioPermiso.nombreCompleto,
-                            tipoPermiso: beneficio.tipo
+                            tipoBeneficio: beneficio.tipo
                         );
 
                         await _emailService.SendEmailAsync(
@@ -684,9 +684,9 @@ namespace SistemasAnaliticos.Controllers
                     else if (beneficio.estado == "Rechazada")
                     {
                         // 2. Correo Rechazado
-                        var htmlEmpleado = PlantillasEmail.EstadoEmpleadoRechaz(
+                        var htmlEmpleado = PlantillasEmail.EstadoBeneficioRechaz(
                             nombreEmpleado: usuarioPermiso.nombreCompleto,
-                            tipoPermiso: beneficio.tipo
+                            tipoBeneficio: beneficio.tipo
                         );
                         await _emailService.SendEmailAsync(
                             toEmail: usuarioPermiso.Email,
@@ -784,31 +784,31 @@ namespace SistemasAnaliticos.Controllers
                 try
                 {
                     // 1. Correo al empleado
-                    var htmlEmpleado = PlantillasEmail.ConfirmacionEmpleado(
+                    var htmlEmpleado = PlantillasEmail.ConfirmacionEmpleadoBene(
                         nombreEmpleado: usuario.nombreCompleto,
-                        tipoPermiso: model.tipo
+                        tipoBeneficio: model.tipo
                     );
 
                     await _emailService.SendEmailAsync(
                         toEmail: usuario.Email,
                         toName: usuario.nombreCompleto,
-                        subject: $"Confirmación de Permiso - {usuario.nombreCompleto}",
+                        subject: $"Confirmación de Beneficio - {usuario.nombreCompleto}",
                         htmlBody: htmlEmpleado
                     );
 
                     //2.Correo de notificación al jefe(si tiene)
                     if (!string.IsNullOrEmpty(usuario.jefeId))
                     {
-                        var htmlJefe = PlantillasEmail.NotificacionJefatura(
+                        var htmlJefe = PlantillasEmail.NotificacionJefaturaBene(
                             nombreEmpleado: usuario.nombreCompleto,
-                            tipoPermiso: model.tipo,
+                            tipoBeneficio: model.tipo,
                             nombreJefe: nombreJefe
                         );
 
                         await _emailService.SendEmailAsync(
                             toEmail: correoJefe,
                             toName: nombreJefe,
-                            subject: $"Solicitud de permiso pendiente - {usuario.nombreCompleto}",
+                            subject: $"Solicitud de beneficio pendiente - {usuario.nombreCompleto}",
                             htmlBody: htmlJefe
                         );
                     }
