@@ -63,13 +63,18 @@
         {
             var usuario = await _userManager.GetUserAsync(user);
             var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(usuario);
+            var roles = await _userManager.GetRolesAsync(usuario);
+
+            // 🔴 REGLA ESPECIAL DEL MÓDULO CONSTANCIAS
+            if (roles.Contains("Jefatura"))
+            {
+                return query.Where(p => p.UsuarioId == usuario.Id);
+            }
 
             return alcance switch
             {
                 "Global" => query,
-
                 "Subordinados" => await FiltrarSubordinadosConstanciaAsync(query, usuario),
-
                 _ => query.Where(p => p.UsuarioId == usuario.Id)
             };
         }
@@ -97,13 +102,18 @@
         {
             var usuario = await _userManager.GetUserAsync(user);
             var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(usuario);
+            var roles = await _userManager.GetRolesAsync(usuario);
+
+            // 🔴 REGLA ESPECIAL DEL MÓDULO BENEFICIOS
+            if (roles.Contains("Jefatura"))
+            {
+                return query.Where(p => p.UsuarioId == usuario.Id);
+            }
 
             return alcance switch
             {
                 "Global" => query,
-
                 "Subordinados" => await FiltrarSubordinadosBeneficioAsync(query, usuario),
-
                 _ => query.Where(p => p.UsuarioId == usuario.Id)
             };
         }

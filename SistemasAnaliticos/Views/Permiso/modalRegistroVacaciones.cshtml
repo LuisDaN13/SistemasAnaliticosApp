@@ -93,6 +93,34 @@
                                            required>
                                 </div>
 
+                                <script>
+                                    function esFinDeSemana(fechaStr) {
+                                        const fecha = parseFechaLocal(fechaStr);
+                                        if (!fecha) return false;
+
+                                        const dia = fecha.getDay();
+                                        return dia === 0 || dia === 6; // 0 = domingo, 6 = sábado
+                                    }
+
+                                    function validarFecha(input) {
+                                        input.addEventListener("change", function () {
+                                            if (esFinDeSemana(this.value)) {
+                                                this.setCustomValidity("No se permiten seleccionar sábados ni domingos.");
+                                                this.reportValidity();
+                                                this.value = "";
+                                            } else {
+                                                this.setCustomValidity(""); // Limpiar error
+                                            }
+                                        });
+                                    }
+
+                                    document.addEventListener("DOMContentLoaded", function () {
+                                        validarFecha(document.getElementById("fechaInicioVacas"));
+                                        validarFecha(document.getElementById("fechaFinalizacionVacas"));
+                                    });
+                                </script>
+
+
                                 <div class="col-md-4 mt-1 mb-2">
                                     <label class="form-label required-field">Fecha de Regreso Laboral</label>
                                     <input type="date"
@@ -313,22 +341,65 @@
             return esValido;
         }
 
-        function validarFechasVacas() {
+        // Función para parsear fechas de inputs type="date" correctamente (sin problemas de zona horaria)
+        function parseFechaLocal(valor) {
+            if (!valor) return null;
+
+            // El formato es YYYY-MM-DD
+            const [year, month, day] = valor.split('-').map(Number);
+
+            // new Date(año, mes-1, día) crea la fecha en hora local
+            return new Date(year, month - 1, day, 0, 0, 0, 0);
+        }
+
+        // Función para obtener hoy en fecha local (sin problemas de zona horaria)
+        function getHoyLocal() {
+            const hoy = new Date();
+            return new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0, 0);
+        }
+
+        function calcularDiasHabiles(inicioStr, finStr) {
+            // Parsear las fechas correctamente
+            const startDate = parseFechaLocal(inicioStr);
+            const endDate = parseFechaLocal(finStr);
+
+            // Inicializar contador
+            let count = 0;
+            let currentDate = new Date(startDate);
+
+            // Iterar día por día
+            while (currentDate <= endDate) {
+                const dayOfWeek = currentDate.getDay();
+
+                // Si no es sábado (6) ni domingo (0), contar como día hábil
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    count++;
+                }
+
+                // Avanzar al siguiente día
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            return count;
+        }
+
+                function validarFechasVacas() {
             const fechaInicio = document.getElementById('fechaInicioVacas');
             const fechaFin = document.getElementById('fechaFinalizacionVacas');
             const fechaRegreso = document.getElementById('fechaRegresoLaboralVacas');
             const diasDisponibles = window.diasVacaciones ?? 0;
 
             let fechasValidas = true;
+            const hoy = getHoyLocal();
 
-            // Normalizar hoy (sin hora)
-            const hoy = new Date();
-            hoy.setHours(0, 0, 0, 0);
+            // Limpiar errores previos
+            [fechaInicio, fechaFin, fechaRegreso].forEach(field => {
+                if (field) field.classList.remove('is-invalid');
+            });
 
+            // Validar fecha de inicio
             if (fechaInicio.value) {
-                const inicio = new Date(fechaInicio.value);
-                inicio.setDate(inicio.getDate() + 1);
-                inicio.setHours(0, 0, 0, 0);
+                const inicio = parseFechaLocal(fechaInicio.value);
 
                 if (inicio < hoy) {
                     showValidationErrorVacas('La fecha de inicio no puede ser anterior a hoy.');
@@ -337,36 +408,43 @@
                 }
             }
 
-            if (fechaInicio.value && fechaFin.value) {
-                const inicio = new Date(fechaInicio.value);
-                const fin = new Date(fechaFin.value);
+            // Validar fechas inicio y fin juntas
+            if (fechaInicio.value && fechaFin.value && fechasValidas) {
+                const inicio = parseFechaLocal(fechaInicio.value);
+                const fin = parseFechaLocal(fechaFin.value);
 
                 if (fin < inicio) {
                     showValidationErrorVacas('La fecha de fin no puede ser anterior a la fecha de inicio.');
                     fechaFin.classList.add('is-invalid');
                     fechasValidas = false;
                 } else {
-                    // Calcular la diferencia en días entre fecha inicio y fecha fin
-                    // Agregamos 1 para incluir tanto el día de inicio como el de fin
-                    const diferenciaMs = fin - inicio;
-                    const diasSolicitados = Math.floor(diferenciaMs / (1000 * 60 * 60 * 24)) + 1;
+                    // Calcular días hábiles (excluyendo fines de semana)
+                    const diasSolicitados = calcularDiasHabiles(fechaInicio.value, fechaFin.value);
 
                     // Validar que no exceda los días disponibles
                     if (diasSolicitados > diasDisponibles) {
                         showValidationErrorVacas(`No tiene suficientes días de vacaciones disponibles.
-                            Solicita: ${diasSolicitados} días, Disponibles: ${diasDisponibles} días.`);
+                            Solicita: ${diasSolicitados} días hábiles, Disponibles: ${diasDisponibles} días.`);
                         fechaFin.classList.add('is-invalid');
                         fechasValidas = false;
+                    }
+
+                    // Opcional: Mostrar información útil
+                    if (fechasValidas) {
+                        const diasTotales = Math.floor((fin - inicio) / (1000 * 60 * 60 * 24)) + 1;
+                        const finesDeSemana = diasTotales - diasSolicitados;
+                        console.log(`Vacaciones: ${diasTotales} días totales, ${diasSolicitados} días hábiles, ${finesDeSemana} fines de semana`);
                     }
                 }
             }
 
-            if (fechaRegreso.value && fechaFin.value) {
-                const fin = new Date(fechaFin.value);
-                const regreso = new Date(fechaRegreso.value);
+            // Validar fecha de regreso
+            if (fechaRegreso.value && fechaFin.value && fechasValidas) {
+                const fin = parseFechaLocal(fechaFin.value);
+                const regreso = parseFechaLocal(fechaRegreso.value);
 
-                if (regreso < fin) {
-                    showValidationErrorVacas('La fecha de regreso laboral no puede ser anterior a la fecha de fin de las vacaciones.');
+                if (regreso <= fin) {
+                    showValidationErrorVacas('La fecha de regreso laboral debe ser posterior a la fecha de fin de las vacaciones.');
                     fechaRegreso.classList.add('is-invalid');
                     fechasValidas = false;
                 }

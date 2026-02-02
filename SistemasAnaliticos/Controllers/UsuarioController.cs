@@ -113,7 +113,20 @@ namespace SistemasAnaliticos.Controllers
         {
             try
             {
-                var roles = await roleManager.Roles
+                var user = await userManager.GetUserAsync(User);
+                var userRoles = await userManager.GetRolesAsync(user);
+
+                var query = roleManager.Roles.AsQueryable();
+
+                // 🔐 Regla especial: si es RRHH, no puede ver RRHH ni Administrador
+                if (userRoles.Contains("RRHH"))
+                {
+                    query = query.Where(r =>
+                        r.Name != "RRHH" &&
+                        r.Name != "Administrador");
+                }
+
+                var roles = await query
                     .OrderBy(r => r.Name)
                     .Select(r => new
                     {
