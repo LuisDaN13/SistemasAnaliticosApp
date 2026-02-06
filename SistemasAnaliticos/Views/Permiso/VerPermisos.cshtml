@@ -316,6 +316,14 @@
                                     </li>
 
                                     <li class="form-check my-2">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Servicios Generales" id="dropdown-dp-sg">
+                                        <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-sg">
+                                            <span>Servicios Generales</span>
+                                            <span class="text-muted" id="dropdown-count-sg">(0)</span>
+                                        </label>
+                                    </li>
+
+                                    <li class="form-check my-2">
                                         <input class="form-check-input filter-departamento" type="checkbox" value="Tecnicos NCR" id="dropdown-dp-tncr">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-tncr">
                                             <span>Técnicos NCR</span>
@@ -857,6 +865,7 @@
                     document.getElementById('dropdown-count-l').textContent = `(${contadores.legal})`;
                     document.getElementById('dropdown-count-o').textContent = `(${contadores.operaciones})`;
                     document.getElementById('dropdown-count-rrhh').textContent = `(${contadores.recursosHumanos})`;
+                    document.getElementById('dropdown-count-sg').textContent = `(${contadores.serviciosGenerales})`;
                     document.getElementById('dropdown-count-tncr').textContent = `(${contadores.tecnicosNCR})`;
                     document.getElementById('dropdown-count-ti').textContent = `(${contadores.tecnologiasInformacion})`;
                     document.getElementById('dropdown-count-v').textContent = `(${contadores.ventas})`;

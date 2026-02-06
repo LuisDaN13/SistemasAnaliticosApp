@@ -80,10 +80,19 @@
         {
             <!-- Back Button -->
             <div class="mb-4">
-                <a asp-controller="Noticia" asp-action="Index" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-2"></i>
-                    Volver a Noticias
-                </a>
+                @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                {
+                    <a asp-controller="Noticia" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Volver a Noticias
+                    </a>
+                } else
+                {
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Volver al Inicio
+                    </a>
+                }
             </div>
 
             <!-- Employee Header Card -->
@@ -140,15 +149,18 @@
                                 </p>
                             </div>
 
-                            <!-- Action Buttons -->
-                            <div class="d-flex gap-3 pt-4 border-top">
-                                <a class="btn btn-custom d-flex align-items-center" onclick="abrirModalInactivar('@Url.Action("Inactivar", "Noticia", new { id = Model.idNoticia })')">
-                                    Inactivar Noticia
-                                </a>
-                                <a class="btn btn-custom d-flex align-items-center" onclick="abrirModalEliminar('@Url.Action("Delete", "Noticia", new { id = Model.idNoticia })')">
-                                    Eliminar Noticia
-                                </a>
-                            </div>
+                            @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                            {
+                                <!-- Action Buttons -->
+                                <div class="d-flex gap-3 pt-4 border-top">
+                                    <a class="btn btn-custom d-flex align-items-center" onclick="abrirModalInactivar('@Url.Action("Inactivar", "Noticia", new { id = Model.idNoticia })')">
+                                        Inactivar Noticia
+                                    </a>
+                                    <a class="btn btn-custom d-flex align-items-center" onclick="abrirModalEliminar('@Url.Action("Delete", "Noticia", new { id = Model.idNoticia })')">
+                                        Eliminar Noticia
+                                    </a>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>

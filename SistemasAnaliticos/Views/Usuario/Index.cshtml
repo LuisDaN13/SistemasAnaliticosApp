@@ -469,27 +469,14 @@
 
         <!-- Employees Cards -->
         <div>
-            <!-- Mensaje cuando no hay resultados -->
-            <div id="noResults">
+            <!-- Mensaje cuando no hay resultados - OCULTO INICIALMENTE -->
+            <div id="noResults" class="d-none">
                 <div style="border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); background-color: white; margin-bottom: 1.5rem;">
                     <div style="display: flex; align-items: center; justify-content: space-around; padding: 2rem;">
                         <p style="color: #6c757d; margin: 0; flex: 1; text-align: left; font-size: 1rem;">
                             No se encontraron empleados que coincidan con la búsqueda.
                         </p>
                         <div id="lottie-animation" style="width: 110px; height: 110px; flex-shrink: 0;"></div>
-
-                        <script>
-                            // Inicializar la animación
-                            const animation = document.createElement('lottie-player');
-                            animation.setAttribute('src', '/lottie/loading.json'); // Ruta a tu JSON
-                            animation.setAttribute('background', 'transparent');
-                            animation.setAttribute('speed', '1');
-                            animation.setAttribute('style', 'width: 110px; height: 110px;');
-                            animation.setAttribute('loop', '');
-                            animation.setAttribute('autoplay', '');
-
-                            document.getElementById('lottie-animation').appendChild(animation);
-                        </script>
                     </div>
                 </div>
             </div>
@@ -710,6 +697,90 @@
 
     @section Scripts {
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar animación Lottie solo cuando sea necesario
+            let lottieInitialized = false;
+
+            function initLottieAnimation() {
+                if (lottieInitialized) return;
+
+                const lottieContainer = document.getElementById('lottie-animation');
+                if (lottieContainer) {
+                    const animation = document.createElement('lottie-player');
+                    animation.setAttribute('src', '/lottie/loading.json');
+                    animation.setAttribute('background', 'transparent');
+                    animation.setAttribute('speed', '1');
+                    animation.setAttribute('style', 'width: 110px; height: 110px;');
+                    animation.setAttribute('loop', '');
+                    animation.setAttribute('autoplay', '');
+                    lottieContainer.appendChild(animation);
+                    lottieInitialized = true;
+                }
+            }
+
+            function normalizarTexto(texto) {
+                return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            }
+
+            function filterEmployees(searchTerm) {
+                const cards = document.querySelectorAll('.card-employee');
+                let visibleCount = 0;
+                const searchNormalized = normalizarTexto(searchTerm);
+
+                cards.forEach(card => {
+                    const employeeName = card.querySelector('.employee-name')?.textContent || '';
+                    const tags = card.querySelectorAll('.employee-tag');
+                    const position = tags[0]?.textContent || '';
+                    const department = tags[1]?.textContent || '';
+
+                    const nameNormalized = normalizarTexto(employeeName);
+                    const positionNormalized = normalizarTexto(position);
+                    const departmentNormalized = normalizarTexto(department);
+
+                    const matches = nameNormalized.includes(searchNormalized) ||
+                                    positionNormalized.includes(searchNormalized) ||
+                                    departmentNormalized.includes(searchNormalized);
+
+                    if (matches) {
+                        card.classList.remove('d-none');
+                        visibleCount++;
+                    } else {
+                        card.classList.add('d-none');
+                    }
+                });
+
+                // Actualizar contador
+                const employeeCount = document.getElementById('employeeCount');
+                if (employeeCount) {
+                    employeeCount.textContent = visibleCount;
+                }
+
+                // Mostrar/ocultar mensaje
+                const noResults = document.getElementById('noResults');
+                if (noResults) {
+                    if (visibleCount === 0) {
+                        noResults.classList.remove('d-none');
+                        initLottieAnimation();
+                    } else {
+                        noResults.classList.add('d-none');
+                    }
+                }
+            }
+
+            // Configurar búsqueda
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    filterEmployees(e.target.value.trim());
+                });
+
+                // Filtrar inicialmente (esto ocultará inmediatamente el mensaje #noResults)
+                filterEmployees('');
+            }
+        });
+    </script>
+
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
 
             const modalCambiarContrasena = document.getElementById('modalCambiarContrasena');
@@ -816,23 +887,6 @@
                         timer: 3000
                     });
                 </text>
-            }
-
-            if (result.success) {
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Éxito',
-                    text: result.message
-                }).then(() => {
-
-                    if (result.logout) {
-                        // 🔥 redirige al login
-                        window.location.href = '/Usuario/Login';
-                    } else {
-                        location.reload();
-                    }
-                });
             }
         });
     </script>

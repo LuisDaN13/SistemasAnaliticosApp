@@ -634,6 +634,7 @@ namespace SistemasAnaliticos.Controllers
                         Legal = g.Count(p => p.departamento == "Legal"),
                         Operaciones = g.Count(p => p.departamento == "Operaciones"),
                         RecursosHumanos = g.Count(p => p.departamento == "Recursos Humanos"),
+                        ServiciosGenerales = g.Count(b => b.departamento == "Servicios Generales"),
                         TecnicosNCR = g.Count(p => p.departamento == "Técnicos NCR"),
                         TecnologiasInformacion = g.Count(p => p.departamento == "Tecnologías de Información"),
                         Ventas = g.Count(p => p.departamento == "Ventas")
@@ -659,6 +660,7 @@ namespace SistemasAnaliticos.Controllers
                     Legal = 0,
                     Operaciones = 0,
                     RecursosHumanos = 0,
+                    ServiciosGenerales = 0,
                     TecnicosNCR = 0,
                     TecnologiasInformacion = 0,
                     Ventas = 0
@@ -685,6 +687,7 @@ namespace SistemasAnaliticos.Controllers
                     Legal = 0,
                     Operaciones = 0,
                     RecursosHumanos = 0,
+                    ServiciosGenerales = 0,
                     TecnicosNCR = 0,
                     TecnologiasInformacion = 0,
                     Ventas = 0

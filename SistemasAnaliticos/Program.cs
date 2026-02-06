@@ -44,10 +44,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Controladores con auth global
 builder.Services.AddControllersWithViews(options =>
 {
-    options.Filters.Add(new AuthorizeFilter(
-        new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build()));
+    //options.Filters.Add(new AuthorizeFilter(
+    //    new AuthorizationPolicyBuilder()
+    //    .RequireAuthenticatedUser()
+    //    .Build()));
 });
 
 // Servicios esenciales

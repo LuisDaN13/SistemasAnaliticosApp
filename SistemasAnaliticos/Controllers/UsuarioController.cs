@@ -279,7 +279,7 @@ namespace SistemasAnaliticos.Controllers
         {
             var cards = await _context.Users
                 .AsNoTracking()
-                .OrderByDescending(x => x.primerNombre)
+                .OrderBy(x => x.primerNombre)
                 .Where(x => x.primerApellido != "Montilla" && x.primerApellido != "Admin")
                 .Select(x => new CardsViewModel
                 {

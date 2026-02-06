@@ -351,17 +351,15 @@
             <div class="news-header d-flex align-items-center">
                 <h2 class="mb-0 fw-bold">NOTICIAS</h2>
             </div>
-            @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
-            {
             <div class="news-nav flex-grow-1">
-                <a asp-controller="Noticia"
-                   asp-action="Index"
-                   class="btn text-white">
-                    Ver todas las noticias
-                    <i class="bi bi-chevron-right ms-2"></i>
-                </a>
+                @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                {
+                    <a asp-controller="Noticia" asp-action="Index" class="btn text-white">
+                        Ver todas las noticias
+                        <i class="bi bi-chevron-right ms-2"></i>
+                    </a>
+                }
             </div>
-            }
         </div>
 
         <!-- News Grid -->
