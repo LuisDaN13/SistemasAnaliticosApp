@@ -772,16 +772,14 @@ namespace SistemasAnaliticos.Controllers
             foreach (var id in model.Ids)
             {
                 var permiso = await _context.Permiso.FindAsync(id);
-                string estadoAnterior = permiso.estado;
+                if (permiso == null) continue; // Agregado: si no existe, salta
 
-                if (permiso != null)
-                {
-                    permiso.estado = model.estado;
-                }
                 var usuarioPermiso = await _userManager.FindByIdAsync(permiso.UsuarioId);
+                if (usuarioPermiso == null) continue; // Agregado: validación básica
+
                 try
                 {
-                    if (permiso.estado == "Aprobada")
+                    if (model.estado == "Aprobada")
                     {
                         if (permiso.tipo == "Vacaciones")
                         {
@@ -794,34 +792,72 @@ namespace SistemasAnaliticos.Controllers
                             else
                             {
                                 TempData["ErrorMessagePermi"] = "Fechas del permiso inválidas.";
-                                permiso.estado = estadoAnterior;
                                 continue;
                             }
 
-                            // 2. Usar el método para restar días (que incluye acumulación automática)
-                            bool puedeRestar = usuarioPermiso.RestarDiasVacaciones(diasSolicitados);
+                            // 2. Intentar descontar
+                            bool puedeRestar = usuarioPermiso.DescontarVacaciones(diasSolicitados);
 
-                            // 4. Guardar cambios en el usuario
-                            var updateResult = await _userManager.UpdateAsync(usuarioPermiso);
-                            if (!updateResult.Succeeded)
+                            if (puedeRestar)
                             {
-                                // Revertir si falla
-                                permiso.estado = estadoAnterior;
+                                var updateResult = await _userManager.UpdateAsync(usuarioPermiso);
+                                if (!updateResult.Succeeded)
+                                {
+                                    // Manejar error en actualización de usuario
+                                    TempData["ErrorMessagePermi"] = $"Error al actualizar usuario para permiso {id}.";
+                                    continue;
+                                }
+
+                                // ✅ AQUÍ recién se aprueba
+                                permiso.estado = "Aprobada";
+                            }
+                            else
+                            {
+                                // Rechazar automáticamente
+                                permiso.estado = "Rechazada";
+                                _context.Permiso.Update(permiso);
+                                await _context.SaveChangesAsync();
+
+                                TempData["ErrorMessagePermi"] = $"El permiso {id} fue rechazado automáticamente por falta de días de vacaciones disponibles para {usuarioPermiso.nombreCompleto}.";
+
+                                // Enviar correo de rechazo
+                                try
+                                {
+                                    var htmlEmpleado = PlantillasEmail.EstadoEmpleadoRechaz(
+                                        nombreEmpleado: usuarioPermiso.nombreCompleto,
+                                        tipoPermiso: permiso.tipo
+                                    );
+                                    await _emailService.SendEmailAsync(
+                                        toEmail: usuarioPermiso.Email,
+                                        toName: usuarioPermiso.nombreCompleto,
+                                        subject: $"Rechazo del Permiso - {usuarioPermiso.nombreCompleto}",
+                                        htmlBody: htmlEmpleado
+                                    );
+                                }
+                                catch (Exception exEmail)
+                                {
+                                    Console.WriteLine($"Error enviando correo de rechazo para permiso {id}: {exEmail.Message}");
+                                }
                                 continue;
                             }
                         }
+                        else
+                        {
+                            // Para otros tipos, aprobar directamente (asumiendo que no hay validaciones extra)
+                            permiso.estado = "Aprobada";
+                        }
 
-                        // ✅ GUARDAR CAMBIOS DEL PERMISO
+                        // ✅ GUARDAR CAMBIOS DEL PERMISO (solo si se aprobó)
                         _context.Permiso.Update(permiso);
                         await _context.SaveChangesAsync();
 
+                        // Enviar correo de aprobación
                         try
                         {
                             var htmlEmpleado = PlantillasEmail.EstadoEmpleadoAprob(
                                 nombreEmpleado: usuarioPermiso.nombreCompleto,
                                 tipoPermiso: permiso.tipo
                             );
-
                             await _emailService.SendEmailAsync(
                                 toEmail: usuarioPermiso.Email,
                                 toName: usuarioPermiso.nombreCompleto,
@@ -836,13 +872,17 @@ namespace SistemasAnaliticos.Controllers
                     }
                     else if (model.estado == "Rechazada")
                     {
+                        permiso.estado = "Rechazada";
+                        _context.Permiso.Update(permiso);
+                        await _context.SaveChangesAsync();
+
+                        // Enviar correo de rechazo
                         try
                         {
                             var htmlEmpleado = PlantillasEmail.EstadoEmpleadoRechaz(
                                 nombreEmpleado: usuarioPermiso.nombreCompleto,
                                 tipoPermiso: permiso.tipo
                             );
-
                             await _emailService.SendEmailAsync(
                                 toEmail: usuarioPermiso.Email,
                                 toName: usuarioPermiso.nombreCompleto,
@@ -856,24 +896,23 @@ namespace SistemasAnaliticos.Controllers
                         }
                     }
                 }
-                catch (Exception exEmail)
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"Error del cambio del permiso: {exEmail.Message}");
+                    Console.WriteLine($"Error procesando permiso {id}: {ex.Message}");
+                    // Opcional: agregar a TempData un mensaje de error general
                 }
             }
 
-            await _context.SaveChangesAsync();
-
+            // Auditoría (igual que antes)
             string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? "Central America Standard Time"           // Windows
-                : "America/Costa_Rica";                     // Linux/macOS
+                ? "Central America Standard Time"
+                : "America/Costa_Rica";
 
             TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
             DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
             DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
             var usuario = await _userManager.GetUserAsync(User);
 
-            // Auditoría
             var auditoria = new Auditoria
             {
                 Fecha = hoy,
@@ -883,6 +922,7 @@ namespace SistemasAnaliticos.Controllers
                 Accion = "Cambio de Estado del no." + string.Join(", ", model.Ids)
             };
             _context.Auditoria.Add(auditoria);
+            await _context.SaveChangesAsync();
 
             TempData["SuccessMessagePermi"] = "Se cambiaron los permisos de estados correctamente.";
             return Ok(new { redirect = Url.Action("VerPermisos") });

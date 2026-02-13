@@ -225,47 +225,47 @@ namespace SistemasAnaliticos.Entidades
         }
 
         // Metodo para Vacaciones
-        // === MÉTODO SIMPLE PARA ACUMULAR Y GUARDAR ===
-        public int AcumularDiasHastaHoy()
+        public void ActualizarVacaciones()
         {
-            if (!fechaIngreso.HasValue)
-                return 0;
+            // Si no hay fecha de ingreso, no se puede calcular nada
+            if (fechaIngreso == null)
+                return;
 
-            DateTime hoy = DateTime.Today;
-            DateTime baseCalculo = ultimaFechaCalculoVacaciones ?? fechaIngreso.Value.Date;
+            var hoy = DateTime.UtcNow;
 
-            int mesesAcumulados = 0;
-            DateTime temp = baseCalculo;
+            // Si nunca se ha calculado, usar fechaIngreso
+            var fechaBase = ultimaFechaCalculoVacaciones.Value;
 
-            // Contar meses completos desde la última fecha
-            while (temp.AddMonths(1) <= hoy)
+            int meses = ((hoy.Year - fechaBase.Year) * 12) + hoy.Month - fechaBase.Month;
+
+            // Solo meses completos
+            if (hoy.Day < fechaBase.Day)
+                meses--;
+
+            if (meses > 0)
             {
-                temp = temp.AddMonths(1);
-                mesesAcumulados++;
-            }
+                // Si diasVacaciones es null, iniciar en 0
+                diasVacaciones = (diasVacaciones ?? 0) + meses;
 
-            // Si hay meses acumulados, actualizar propiedades
-            if (mesesAcumulados > 0)
-            {
-                diasVacaciones = (diasVacaciones ?? 0) + mesesAcumulados;
-                ultimaFechaCalculoVacaciones = temp;
+                // Avanzar la fecha exactamente a donde quedó el cálculo
+                ultimaFechaCalculoVacaciones = fechaBase.AddMonths(meses);
             }
-
-            return mesesAcumulados;
         }
-
-        // === MÉTODO PARA RESTAR DÍAS ===
-        public bool RestarDiasVacaciones(int diasARestar)
+        public bool DescontarVacaciones(int diasSolicitados)
         {
-            // Primero acumular cualquier día pendiente
-            AcumularDiasHastaHoy();
+            // Primero asegurar que el saldo esté al día
+            ActualizarVacaciones();
 
-            // Verificar que tenga suficientes días
-            if ((diasVacaciones ?? 0) < diasARestar)
+            int saldoActual = diasVacaciones ?? 0;
+
+            if (diasSolicitados <= 0)
                 return false;
 
-            // Restar
-            diasVacaciones -= diasARestar;
+            if (saldoActual < diasSolicitados)
+                return false;
+
+            diasVacaciones = saldoActual - diasSolicitados;
+
             return true;
         }
     }

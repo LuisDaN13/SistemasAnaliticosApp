@@ -215,6 +215,9 @@ namespace SistemasAnaliticos.Controllers
             // 🔥 Generar NUEVA sesión (esto invalida cualquier sesión anterior)
             var newSessionId = Guid.NewGuid().ToString();
 
+            // ✅ ACTUALIZAR VACACIONES AQUÍ
+            user.ActualizarVacaciones();
+
             // Actualizar BD inmediatamente
             user.sessionId = newSessionId;
             user.lastActivityUtc = DateTime.UtcNow;
@@ -277,10 +280,21 @@ namespace SistemasAnaliticos.Controllers
         [Authorize(Policy = "Usuarios.Ver")]
         public async Task<ActionResult> Index()
         {
-            var cards = await _context.Users
+            var user = await userManager.GetUserAsync(User);
+            var userRoles = await userManager.GetRolesAsync(user);
+
+            var query = _context.Users
                 .AsNoTracking()
+                .Where(x => x.primerApellido != "Montilla" && x.primerApellido != "Admin");
+
+            // Si es empleado normal, solo ve activos
+            if (userRoles.Contains("Empleado Normal") || userRoles.Contains("Jefatura"))
+            {
+                query = query.Where(x => x.estado);
+            }
+
+            var cards = await query
                 .OrderBy(x => x.primerNombre)
-                .Where(x => x.primerApellido != "Montilla" && x.primerApellido != "Admin")
                 .Select(x => new CardsViewModel
                 {
                     Id = x.Id,
@@ -295,6 +309,7 @@ namespace SistemasAnaliticos.Controllers
                     Foto = x.foto
                 })
                 .ToListAsync();
+
             return View(cards);
         }
 
@@ -307,15 +322,6 @@ namespace SistemasAnaliticos.Controllers
                 .Where(x => x.Id == id)
                 .FirstOrDefaultAsync();
 
-            int diasAcumulados = details.AcumularDiasHastaHoy();
-
-            // 3. ✅ GUARDAR EN BD SI HUBO CAMBIOS
-            if (diasAcumulados > 0)
-            {
-                // UserManager guarda los cambios automáticamente
-                await userManager.UpdateAsync(details);
-            }
-            
             return View(details);
         }
 
