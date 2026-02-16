@@ -264,7 +264,7 @@ namespace SistemasAnaliticos.Controllers
                 TempData["FirstLoginUserId"] = user.Id;
             }
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("HomeInicial", "Home");
         }
 
         [AllowAnonymous]

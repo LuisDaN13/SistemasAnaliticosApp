@@ -26,6 +26,9 @@ namespace SistemasAnaliticos.Models
         public DbSet<ExtrasDetalle> ExtrasDetalle { get; set; }
         public DbSet<Auditoria> Auditoria { get; set; }
 
+
+        public DbSet<Garantia> Garantia { get; set; }
+
         // REGLAS DE MODELO
         protected override void OnModelCreating(ModelBuilder builder)
         {

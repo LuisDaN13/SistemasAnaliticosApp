@@ -1,6 +1,7 @@
 ﻿@model SistemasAnaliticos.ViewModels.HomeIndexViewModel
 
 @{
+    Layout = "_Layout";
     var listaFotos = Model?.FotosCarousel ?? Enumerable.Empty<FotoViewModel>();
     var tieneFotos = listaFotos.Any(f => f.foto != null && f.foto.Length > 0);
 

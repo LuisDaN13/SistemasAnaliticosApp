@@ -64,5 +64,15 @@ namespace SistemasAnaliticos.Controllers
                 });
             }
         }
+
+        public ActionResult HomeInicial()
+        {
+            return View();
+        }
+
+        public ActionResult HomeFinanciero()
+        {
+            return View();
+        }
     }
 }

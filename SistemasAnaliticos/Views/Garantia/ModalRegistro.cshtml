@@ -1,0 +1,1206 @@
+﻿@model SistemasAnaliticos.Entidades.Garantia
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        /* Modal más grande sin scroll */
+        .modal-xl-custom {
+            max-width: 1200px !important;
+            margin: 0 auto;
+        }
+
+        .modal-dialog-centered {
+            min-height: calc(100% - 3.5rem);
+            display: flex;
+            align-items: center;
+            margin: 1.75rem auto;
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: none;
+            height: auto;
+            max-height: 90vh;
+        }
+
+        .modal-body {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .stepper-sidebar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            height: 750px; /* Aumentado para 3 pasos */
+            border-radius: 12px 0 0 12px;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            height: 750px; /* Misma altura que el sidebar */
+            background-color: white;
+        }
+
+        .form-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+            /* Scrollbar más delgado y elegante */
+            .form-content::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .form-content::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 10px;
+            }
+
+            .form-content::-webkit-scrollbar-thumb {
+                background: var(--primary-color);
+                border-radius: 10px;
+            }
+
+                .form-content::-webkit-scrollbar-thumb:hover {
+                    background: var(--secondary-color);
+                }
+
+        .step-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+            .step-item:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .step-item.active {
+                background-color: rgba(255, 255, 255, 0.2);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .step-item.completed {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+        .step-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+
+            .step-icon.active {
+                background-color: white;
+                color: var(--primary-color);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .step-icon.completed {
+                background-color: var(--success-color);
+                color: white;
+            }
+
+            .step-icon.inactive {
+                background-color: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+
+        .step-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .step-description {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .required-field::after {
+            content: " *";
+            color: var(--danger-color);
+            font-weight: bold;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .section-subtitle {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+
+        /* Tamaño de fuente reducido para inputs y placeholders */
+        .form-control, .form-select {
+            font-size: 0.95rem !important;
+        }
+
+            .form-control::placeholder {
+                font-size: 0.9rem !important;
+                color: #adb5bd;
+                opacity: 0.8;
+            }
+
+        /* Input groups con fuente más pequeña */
+        .input-group-text {
+            font-size: 0.95rem !important;
+        }
+
+        .btn-primary-custom {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.95rem;
+        }
+
+            .btn-primary-custom:hover {
+                background-color: var(--secondary-color);
+                border-color: var(--secondary-color);
+                color: white;
+            }
+
+        .btn-success-custom {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.95rem;
+        }
+
+            .btn-success-custom:hover {
+                background-color: #146c43;
+                border-color: #146c43;
+            }
+
+        .btn-outline-secondary {
+            font-size: 0.95rem;
+        }
+
+        /* Estilos para las cards de moneda */
+        .moneda-cards {
+            display: flex;
+            gap: 2.5rem;
+            margin-top: 0.5rem;
+            justify-content: space-around;
+        }
+
+        .moneda-card {
+            flex: 1;
+            max-width: 500px;
+            max-height: 300px;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+
+            .moneda-card:hover {
+                border-color: var(--primary-color);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(1, 36, 115, 0.15);
+            }
+
+            .moneda-card.selected {
+                border-color: var(--primary-color);
+                background: linear-gradient(135deg, rgba(1, 36, 115, 0.05), rgba(1, 53, 153, 0.1));
+                box-shadow: 0 4px 12px rgba(1, 36, 115, 0.2);
+            }
+
+            .moneda-card .moneda-simbolo {
+                font-size: 2.5rem;
+                font-weight: bold;
+                color: var(--primary-color);
+                margin-bottom: 0.5rem;
+            }
+
+            .moneda-card .moneda-nombre {
+                font-size: 1rem;
+                color: #6c757d;
+                font-weight: 500;
+            }
+
+            .moneda-card.selected .moneda-simbolo,
+            .moneda-card.selected .moneda-nombre {
+                color: var(--primary-color);
+                font-weight: 600;
+            }
+
+        /* Fila de A Favor De y Nombre Licitación con flex-end */
+        .row-flex-end {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+            .row-flex-end > div {
+                flex: 1;
+            }
+
+        .tipo-licitacion-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .tipo-card {
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+
+            .tipo-card:hover {
+                border-color: var(--primary-color);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(1, 36, 115, 0.15);
+            }
+
+            .tipo-card.selected {
+                border-color: var(--primary-color);
+                background: linear-gradient(135deg, rgba(1, 36, 115, 0.05), rgba(1, 53, 153, 0.1));
+            }
+
+            .tipo-card .tipo-codigo {
+                font-size: 1.8rem;
+                font-weight: bold;
+                color: var(--primary-color);
+                margin-bottom: 0.25rem;
+                line-height: 1.2;
+            }
+
+            .tipo-card .tipo-nombre {
+                font-size: 0.9rem;
+                color: #6c757d;
+                font-weight: 500;
+            }
+
+            .tipo-card.selected .tipo-codigo,
+            .tipo-card.selected .tipo-nombre {
+                color: var(--primary-color);
+                font-weight: 600;
+            }
+
+        .prorroga-container {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border: 1px solid #dee2e6;
+        }
+
+        .prorroga-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .prorroga-switch {
+            transform: scale(1.5);
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+
+            .prorroga-switch:checked {
+                background-color: var(--success-color);
+                border-color: var(--success-color);
+            }
+
+        .numero-garantia-field {
+            transition: all 0.3s ease;
+            animation: slideDown 0.3s ease;
+        }
+
+        /* Estilos para la sección de adjuntos */
+        .adjuntos-container {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #dee2e6;
+        }
+
+        .adjunto-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+            .adjunto-item:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                border-color: var(--primary-color);
+            }
+
+        .adjunto-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .adjunto-numero {
+            background-color: var(--primary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .btn-eliminar-adjunto {
+            color: var(--danger-color);
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+            .btn-eliminar-adjunto:hover {
+                background-color: rgba(224, 3, 25, 0.1);
+            }
+
+            .btn-eliminar-adjunto:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
+            }
+
+        .btn-agregar-adjunto {
+            border: 2px dashed var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            padding: 1rem;
+            border-radius: 10px;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+            .btn-agregar-adjunto:hover:not(:disabled) {
+                background-color: rgba(1, 36, 115, 0.05);
+                transform: translateY(-2px);
+            }
+
+            .btn-agregar-adjunto:disabled {
+                border-color: #ced4da;
+                color: #6c757d;
+                cursor: not-allowed;
+            }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+            .file-info i {
+                color: var(--primary-color);
+            }
+
+        .file-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-size {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .modal-footer-custom {
+            background-color: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+            padding: 1rem 2rem;
+            margin-top: auto;
+        }
+
+        @keyframes slideDown {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        .currency-input .input-group-text {
+            background: linear-gradient(135deg, #e9ecef, #dee2e6);
+            border-right: none;
+            font-size: 0.95rem !important;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .currency-input .form-control {
+            border-left: none;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(1, 36, 115, 0.25);
+        }
+
+        .stepper-progress {
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .is-invalid {
+            border-color: var(--danger-color) !important;
+        }
+
+            .is-invalid:focus {
+                box-shadow: 0 0 0 0.2rem rgba(224, 3, 25, 0.25) !important;
+            }
+
+        .border-top {
+            border-top: 2px solid #e9ecef !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Botón para abrir modal (solo para prueba) -->
+        <div class="text-center mb-4">
+            <button type="button" class="btn btn-primary-custom btn-lg" data-bs-toggle="modal" data-bs-target="#createGarantiaModal">
+                <i class="bi bi-plus-circle me-2"></i>Nueva Garantía
+            </button>
+        </div>
+
+        <!-- Modal de Creación de Garantía -->
+        <div class="modal fade" id="createGarantiaModal" tabindex="-1" aria-labelledby="createGarantiaModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl-custom modal-dialog-centered">
+                <div class="modal-content">
+                    <form id="garantiaForm" onsubmit="return false;" enctype="multipart/form-data">
+                        <!-- Campos ocultos que se llenan automáticamente -->
+                        <input type="hidden" asp-for="fechaCreacion" id="fechaCreacion" />
+                        <input type="hidden" asp-for="nombreEmpleado" id="nombreEmpleado" />
+                        <input type="hidden" asp-for="UsuarioId" id="UsuarioId" />
+
+                        <div class="modal-body p-0">
+                            <div class="row g-0">
+                                <!-- Sidebar con Stepper (3 pasos) -->
+                                <div class="col-md-4 stepper-sidebar p-4">
+                                    <div class="mb-4">
+                                        <h4 class="text-white fw-bold mb-1">Nueva Garantía</h4>
+                                        <p class="text-light mb-0 small opacity-75">Complete los pasos para registrar la garantía</p>
+                                    </div>
+
+                                    <div class="stepper-steps mb-4">
+                                        <!-- Paso 1 -->
+                                        <div class="step-item active p-3 mb-3" data-step="1">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <div class="step-icon active">
+                                                    <i class="bi bi-file-text-fill"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="step-title">Información General</div>
+                                                    <div class="step-description">Datos básicos y monto</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Paso 2 -->
+                                        <div class="step-item p-3 mb-3" data-step="2">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <div class="step-icon inactive">
+                                                    <i class="bi bi-briefcase-fill"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="step-title">Datos de Licitación</div>
+                                                    <div class="step-description">Tipo, fechas y observaciones</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Paso 3 -->
+                                        <div class="step-item p-3 mb-3" data-step="3">
+                                            <div class="d-flex align-items-start gap-3">
+                                                <div class="step-icon inactive">
+                                                    <i class="bi bi-paperclip"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="step-title">Documentos Adjuntos</div>
+                                                    <div class="step-description">Hasta 5 archivos</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="stepper-progress mt-4 pt-3">
+                                        <div class="text-center">
+                                            <div class="h1 fw-bold mb-1 text-white" id="stepCounter">1/3</div>
+                                            <div class="text-light small opacity-75">Pasos completados</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Contenido del Formulario -->
+                                <div class="col-md-8">
+                                    <div class="form-container">
+                                        <div class="form-content">
+                                            <!-- Paso 1: Información General -->
+                                            <div class="step-content" id="step1">
+                                                <h3 class="section-title">
+                                                    <i class="bi bi-info-circle me-2" style="color: var(--primary-color);"></i>
+                                                    Información General
+                                                </h3>
+                                                <p class="section-subtitle">Ingrese los datos básicos de la garantía</p>
+
+                                                <div class="row g-4">
+                                                    <!-- Monto -->
+                                                    <div class="col-12">
+                                                        <label class="form-label required-field">Monto de la Garantía</label>
+                                                        <div class="currency-input">
+                                                            <div class="input-group">
+                                                                <span class="input-group-text" id="monedaSimbolo">₡</span>
+                                                                <input type="text" class="form-control" asp-for="monto" placeholder="0.00" required>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Selector de Moneda con Cards -->
+                                                    <div class="col-12">
+                                                        <label class="form-label required-field">Moneda</label>
+                                                        <div class="moneda-cards">
+                                                            <div class="moneda-card" data-moneda="CRC" onclick="seleccionarMoneda('CRC')">
+                                                                <div class="moneda-simbolo">₡</div>
+                                                                <div class="moneda-nombre">Colones</div>
+                                                            </div>
+                                                            <div class="moneda-card" data-moneda="USD" onclick="seleccionarMoneda('USD')">
+                                                                <div class="moneda-simbolo">$</div>
+                                                                <div class="moneda-nombre">Dólares</div>
+                                                            </div>
+                                                        </div>
+                                                        <input type="hidden" asp-for="moneda" id="monedaSeleccionada" required>
+                                                    </div>
+
+                                                    <!-- A Favor De y Nombre de Licitación con flex-end -->
+                                                    <div class="row-flex-end">
+                                                        <div>
+                                                            <label class="form-label required-field">A Favor De</label>
+                                                            <input type="text" class="form-control" asp-for="aFavorDe" placeholder="Nombre de la persona o entidad" required>
+                                                        </div>
+                                                        <div>
+                                                            <label class="form-label required-field">Nombre de la Licitación</label>
+                                                            <input type="text" class="form-control" asp-for="nombreLicitacion" placeholder="Nombre completo de la licitación" required>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Prórroga con Switch -->
+                                                    <div class="col-12">
+                                                        <div class="prorroga-container">
+                                                            <div class="prorroga-header">
+                                                                <label class="form-label fw-semibold mb-0 fs-5">¿Incluye Prórroga?</label>
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input prorroga-switch" type="checkbox" role="switch" id="prorrogaSwitch" asp-for="prorroga">
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Campo Número de Garantía (visible solo si prórroga está activada) -->
+                                                            <div class="numero-garantia-field" id="numeroGarantiaField" style="display: none;">
+                                                                <label class="form-label required-field">Número de Garantía</label>
+                                                                <input type="text" class="form-control" asp-for="numeroGarantia" placeholder="Ingrese el número de garantía">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Paso 2: Datos de Licitación -->
+                                            <div class="step-content d-none" id="step2">
+                                                <h3 class="section-title">
+                                                    <i class="bi bi-briefcase me-2" style="color: var(--primary-color);"></i>
+                                                    Datos de Licitación
+                                                </h3>
+                                                <p class="section-subtitle">Tipo, fechas y observaciones</p>
+
+                                                <div class="row g-4">
+                                                    <!-- Tipo de Licitación con Cards -->
+                                                    <div class="col-12">
+                                                        <label class="form-label required-field">Tipo de Licitación</label>
+                                                        <div class="tipo-licitacion-cards">
+                                                            <div class="tipo-card" data-tipo="LY" onclick="seleccionarTipo('LY')">
+                                                                <div class="tipo-codigo">LY</div>
+                                                                <div class="tipo-nombre">Mayor</div>
+                                                            </div>
+                                                            <div class="tipo-card" data-tipo="LE" onclick="seleccionarTipo('LE')">
+                                                                <div class="tipo-codigo">LE</div>
+                                                                <div class="tipo-nombre">Menor</div>
+                                                            </div>
+                                                            <div class="tipo-card" data-tipo="LD" onclick="seleccionarTipo('LD')">
+                                                                <div class="tipo-codigo">LD</div>
+                                                                <div class="tipo-nombre">Reducida</div>
+                                                            </div>
+                                                            <div class="tipo-card" data-tipo="PX" onclick="seleccionarTipo('PX')">
+                                                                <div class="tipo-codigo">PX</div>
+                                                                <div class="tipo-nombre">Excepción</div>
+                                                            </div>
+                                                        </div>
+                                                        <input type="hidden" asp-for="tipoLicitacion" id="tipoLicitacionSeleccionado" required>
+                                                    </div>
+
+                                                    <!-- Fechas -->
+                                                    <div class="col-md-6">
+                                                        <label class="form-label required-field">Fecha de Inicio</label>
+                                                        <input type="date" class="form-control" asp-for="fechaInicio" required>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <label class="form-label required-field">Fecha de Finalización</label>
+                                                        <input type="date" class="form-control" asp-for="fechaFinalizacion" required>
+                                                    </div>
+
+                                                    <!-- Plazo -->
+                                                    <div class="col-12">
+                                                        <label class="form-label required-field">Plazo</label>
+                                                        <input type="text" class="form-control" asp-for="plazo" placeholder="Ej: 30 días, 6 meses, 1 año" required>
+                                                    </div>
+
+                                                    <!-- Observación -->
+                                                    <div class="col-12">
+                                                        <label class="form-label">Observación</label>
+                                                        <textarea asp-for="observacion"
+                                                                  class="form-control"
+                                                                  rows="4"
+                                                                  placeholder="Ingrese cualquier observación adicional relevante..."></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Paso 3: Documentos Adjuntos -->
+                                            <div class="step-content d-none" id="step3">
+                                                <h3 class="section-title">
+                                                    <i class="bi bi-paperclip me-2" style="color: var(--primary-color);"></i>
+                                                    Documentos Adjuntos
+                                                </h3>
+                                                <p class="section-subtitle">Agregue hasta 5 archivos relacionados con la garantía</p>
+
+                                                <div class="adjuntos-container">
+                                                    <div id="adjuntosList">
+                                                        <!-- Los adjuntos se agregarán dinámicamente aquí -->
+                                                    </div>
+
+                                                    <button type="button" class="btn-agregar-adjunto" id="btnAgregarAdjunto" onclick="agregarAdjunto()">
+                                                        <i class="bi bi-plus-circle me-2"></i>Agregar Adjunto
+                                                    </button>
+
+                                                    <small class="text-muted d-block mt-3">
+                                                        <i class="bi bi-info-circle me-1"></i>
+                                                        Formatos permitidos: PDF, JPG, PNG, DOC, DOCX (Máx. 10MB por archivo)
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Botones de Navegación -->
+                                        <div class="modal-footer-custom">
+                                            <div class="d-flex justify-content-between w-100">
+                                                <button type="button" class="btn btn-outline-secondary" id="prevBtn" disabled>
+                                                    <i class="bi bi-arrow-left me-2"></i>Anterior
+                                                </button>
+                                                <button type="button" class="btn btn-primary-custom" id="nextBtn">
+                                                    Siguiente<i class="bi bi-arrow-right ms-2"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-success-custom d-none" id="submitBtn">
+                                                    <i class="bi bi-check-lg me-2"></i>Crear Garantía
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS y Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Variables globales para adjuntos
+        let adjuntosCount = 0;
+        const maxAdjuntos = 5;
+
+        // Configuración inicial - llenar campos automáticos
+        document.addEventListener('DOMContentLoaded', function() {
+            // Establecer fecha actual
+            const fechaInput = document.getElementById('fechaCreacion');
+            if (fechaInput) {
+                const ahora = new Date();
+                const año = ahora.getFullYear();
+                const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+                const dia = String(ahora.getDate()).padStart(2, '0');
+                const horas = String(ahora.getHours()).padStart(2, '0');
+                const minutos = String(ahora.getMinutes()).padStart(2, '0');
+                fechaInput.value = `${año}-${mes}-${dia}T${horas}:${minutos}`;
+            }
+
+            // Simular información del usuario actual (para prueba)
+            document.getElementById('UsuarioId').value = 'USR001';
+            document.getElementById('nombreEmpleado').value = 'Juan Pérez González';
+
+            console.log('Empleado actual:', document.getElementById('nombreEmpleado').value);
+        });
+
+        // Función para seleccionar moneda
+        function seleccionarMoneda(moneda) {
+            // Remover selección anterior
+            document.querySelectorAll('.moneda-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Seleccionar la nueva card
+            const cardSeleccionada = document.querySelector(`.moneda-card[data-moneda="${moneda}"]`);
+            if (cardSeleccionada) {
+                cardSeleccionada.classList.add('selected');
+            }
+
+            // Actualizar campo oculto
+            const monedaInput = document.getElementById('monedaSeleccionada');
+            monedaInput.value = moneda;
+
+            // Actualizar símbolo en el campo de monto
+            const simbolo = document.getElementById('monedaSimbolo');
+            simbolo.textContent = moneda === 'USD' ? '$' : '₡';
+        }
+
+        // Función para seleccionar tipo de licitación
+        function seleccionarTipo(tipo) {
+            // Remover selección anterior
+            document.querySelectorAll('.tipo-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Seleccionar la nueva card
+            const cardSeleccionada = document.querySelector(`.tipo-card[data-tipo="${tipo}"]`);
+            if (cardSeleccionada) {
+                cardSeleccionada.classList.add('selected');
+            }
+
+            // Actualizar campo oculto
+            const tipoInput = document.getElementById('tipoLicitacionSeleccionado');
+            tipoInput.value = tipo;
+        }
+
+        // Función para agregar adjunto
+        function agregarAdjunto() {
+            if (adjuntosCount >= maxAdjuntos) {
+                alert(`Solo puede agregar hasta ${maxAdjuntos} adjuntos`);
+                return;
+            }
+
+            adjuntosCount++;
+            const adjuntosList = document.getElementById('adjuntosList');
+            const adjuntoId = `adjunto_${adjuntosCount}`;
+
+            const adjuntoHtml = `
+                <div class="adjunto-item" id="${adjuntoId}">
+                    <div class="adjunto-header">
+                        <div class="adjunto-numero">${adjuntosCount}</div>
+                        <button type="button" class="btn-eliminar-adjunto" onclick="eliminarAdjunto('${adjuntoId}')" ${adjuntosCount === 1 ? 'disabled' : ''}>
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Archivo</label>
+                            <input type="file" class="form-control" name="adjuntos[]" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="mostrarInfoArchivo(this, '${adjuntoId}')">
+                        </div>
+                    </div>
+                    <div class="file-info" id="info_${adjuntoId}" style="display: none;">
+                        <i class="bi bi-file-earmark-check"></i>
+                        <span class="file-name" id="nombre_${adjuntoId}"></span>
+                        <span class="file-size" id="tamano_${adjuntoId}"></span>
+                    </div>
+                </div>
+            `;
+
+            adjuntosList.insertAdjacentHTML('beforeend', adjuntoHtml);
+            actualizarBotonAgregar();
+        }
+
+        // Función para eliminar adjunto
+        function eliminarAdjunto(adjuntoId) {
+            const elemento = document.getElementById(adjuntoId);
+            if (elemento) {
+                elemento.remove();
+                adjuntosCount--;
+
+                // Renumerar los adjuntos restantes
+                const adjuntos = document.querySelectorAll('.adjunto-item');
+                adjuntos.forEach((adjunto, index) => {
+                    const numero = adjunto.querySelector('.adjunto-numero');
+                    if (numero) {
+                        numero.textContent = index + 1;
+                    }
+
+                    // Actualizar el botón eliminar del primer elemento
+                    const btnEliminar = adjunto.querySelector('.btn-eliminar-adjunto');
+                    if (btnEliminar) {
+                        btnEliminar.disabled = index === 0;
+                    }
+                });
+
+                actualizarBotonAgregar();
+            }
+        }
+
+        // Función para mostrar información del archivo seleccionado
+        function mostrarInfoArchivo(input, adjuntoId) {
+            const infoDiv = document.getElementById(`info_${adjuntoId}`);
+            const nombreSpan = document.getElementById(`nombre_${adjuntoId}`);
+            const tamanoSpan = document.getElementById(`tamano_${adjuntoId}`);
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const fileSize = (file.size / 1024).toFixed(2); // KB
+
+                nombreSpan.textContent = file.name;
+                tamanoSpan.textContent = fileSize > 1024
+                    ? `${(fileSize / 1024).toFixed(2)} MB`
+                    : `${fileSize} KB`;
+
+                infoDiv.style.display = 'flex';
+            } else {
+                infoDiv.style.display = 'none';
+            }
+        }
+
+        // Función para actualizar el botón agregar adjunto
+        function actualizarBotonAgregar() {
+            const btnAgregar = document.getElementById('btnAgregarAdjunto');
+            if (btnAgregar) {
+                btnAgregar.disabled = adjuntosCount >= maxAdjuntos;
+                btnAgregar.innerHTML = adjuntosCount >= maxAdjuntos
+                    ? '<i class="bi bi-exclamation-circle me-2"></i>Límite de adjuntos alcanzado'
+                    : '<i class="bi bi-plus-circle me-2"></i>Agregar Adjunto';
+            }
+        }
+
+        // Manejar visibilidad del campo número de garantía según prórroga
+        function toggleNumeroGarantia() {
+            const prorrogaSwitch = document.getElementById('prorrogaSwitch');
+            const numeroGarantiaField = document.getElementById('numeroGarantiaField');
+            const numeroGarantiaInput = document.querySelector('input[asp-for="numeroGarantia"]');
+
+            if (prorrogaSwitch.checked) {
+                numeroGarantiaField.style.display = 'block';
+                numeroGarantiaInput.required = true;
+            } else {
+                numeroGarantiaField.style.display = 'none';
+                numeroGarantiaInput.required = false;
+                numeroGarantiaInput.value = '';
+            }
+        }
+
+        // Validación de fechas
+        function validarFechas() {
+            const fechaInicio = document.querySelector('input[asp-for="fechaInicio"]');
+            const fechaFin = document.querySelector('input[asp-for="fechaFinalizacion"]');
+
+            if (fechaInicio && fechaFin) {
+                fechaFin.addEventListener('change', function() {
+                    if (fechaInicio.value && this.value) {
+                        if (new Date(this.value) < new Date(fechaInicio.value)) {
+                            this.classList.add('is-invalid');
+                            alert('La fecha de finalización no puede ser menor a la fecha de inicio');
+                        } else {
+                            this.classList.remove('is-invalid');
+                        }
+                    }
+                });
+
+                fechaInicio.addEventListener('change', function() {
+                    if (this.value && fechaFin.value) {
+                        if (new Date(fechaFin.value) < new Date(this.value)) {
+                            fechaFin.classList.add('is-invalid');
+                            alert('La fecha de finalización no puede ser menor a la fecha de inicio');
+                        } else {
+                            fechaFin.classList.remove('is-invalid');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Inicializar stepper
+        function inicializarStepper() {
+            let currentStep = 1;
+            const totalSteps = 3;
+
+            const stepCounter = document.getElementById('stepCounter');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const stepItems = document.querySelectorAll('.step-item');
+
+            function updateStepDisplay() {
+                // Actualizar contador
+                if (stepCounter) {
+                    stepCounter.textContent = `${currentStep}/${totalSteps}`;
+                }
+
+                // Mostrar/ocultar contenido
+                document.querySelectorAll('.step-content').forEach((content, index) => {
+                    if (index + 1 === currentStep) {
+                        content.classList.remove('d-none');
+                    } else {
+                        content.classList.add('d-none');
+                    }
+                });
+
+                // Actualizar botones
+                prevBtn.disabled = currentStep === 1;
+
+                if (currentStep === totalSteps) {
+                    nextBtn.classList.add('d-none');
+                    submitBtn.classList.remove('d-none');
+                } else {
+                    nextBtn.classList.remove('d-none');
+                    submitBtn.classList.add('d-none');
+                }
+
+                // Actualizar estado visual del stepper
+                stepItems.forEach((item, index) => {
+                    const stepNumber = index + 1;
+                    const stepIcon = item.querySelector('.step-icon');
+
+                    item.classList.remove('active', 'completed');
+                    stepIcon.classList.remove('active', 'completed', 'inactive');
+
+                    if (stepNumber === currentStep) {
+                        item.classList.add('active');
+                        stepIcon.classList.add('active');
+                    } else if (stepNumber < currentStep) {
+                        item.classList.add('completed');
+                        stepIcon.classList.add('completed');
+                    } else {
+                        stepIcon.classList.add('inactive');
+                    }
+                });
+            }
+
+            function validateCurrentStep() {
+                const currentStepElement = document.getElementById(`step${currentStep}`);
+                if (!currentStepElement) return false;
+
+                const requiredFields = currentStepElement.querySelectorAll('[required]');
+                let isValid = true;
+
+                requiredFields.forEach(field => {
+                    field.classList.remove('is-invalid');
+
+                    if (field.type === 'hidden') {
+                        if (!field.value) {
+                            isValid = false;
+                            if (field.id === 'monedaSeleccionada') {
+                                showTemporaryMessage('Por favor seleccione una moneda', 'warning');
+                            } else if (field.id === 'tipoLicitacionSeleccionado') {
+                                showTemporaryMessage('Por favor seleccione un tipo de licitación', 'warning');
+                            }
+                        }
+                    } else {
+                        const value = field.value ? field.value.trim() : '';
+                        if (value === '') {
+                            isValid = false;
+                            field.classList.add('is-invalid');
+                        }
+                    }
+                });
+
+                return isValid;
+            }
+
+            function showTemporaryMessage(message, type) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+                alertDiv.style.zIndex = '9999';
+                alertDiv.innerHTML = `
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.body.appendChild(alertDiv);
+
+                setTimeout(() => {
+                    alertDiv.remove();
+                }, 3000);
+            }
+
+            // Event listeners
+            prevBtn.addEventListener('click', function() {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateStepDisplay();
+                }
+            });
+
+            nextBtn.addEventListener('click', function() {
+                if (currentStep < totalSteps && validateCurrentStep()) {
+                    currentStep++;
+                    updateStepDisplay();
+                }
+            });
+
+            stepItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const step = parseInt(this.getAttribute('data-step'));
+                    if (step <= currentStep) {
+                        currentStep = step;
+                        updateStepDisplay();
+                    }
+                });
+            });
+
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Validar todos los pasos
+                let allValid = true;
+
+                for (let step = 1; step <= totalSteps; step++) {
+                    const stepElement = document.getElementById(`step${step}`);
+                    const requiredFields = stepElement.querySelectorAll('[required]');
+
+                    requiredFields.forEach(field => {
+                        if (field.type === 'hidden') {
+                            if (!field.value) {
+                                allValid = false;
+                                showTemporaryMessage(`Complete todos los campos requeridos en el paso ${step}`, 'warning');
+                            }
+                        } else {
+                            if (!field.value.trim()) {
+                                allValid = false;
+                                showTemporaryMessage(`Complete todos los campos requeridos en el paso ${step}`, 'warning');
+                            }
+                        }
+                    });
+                }
+
+                if (allValid) {
+                    // Verificar moneda y tipo
+                    const moneda = document.getElementById('monedaSeleccionada').value;
+                    const tipo = document.getElementById('tipoLicitacionSeleccionado').value;
+
+                    if (!moneda) {
+                        showTemporaryMessage('Por favor seleccione una moneda', 'warning');
+                        return;
+                    }
+
+                    if (!tipo) {
+                        showTemporaryMessage('Por favor seleccione un tipo de licitación', 'warning');
+                        return;
+                    }
+
+                    showTemporaryMessage('¡Garantía creada exitosamente!', 'success');
+
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('createGarantiaModal'));
+                        if (modal) modal.hide();
+                    }, 2000);
+                }
+            });
+
+            updateStepDisplay();
+        }
+
+        // Inicializar todo
+        document.addEventListener('DOMContentLoaded', function() {
+            inicializarStepper();
+            validarFechas();
+
+            const prorrogaSwitch = document.getElementById('prorrogaSwitch');
+            if (prorrogaSwitch) {
+                prorrogaSwitch.addEventListener('change', toggleNumeroGarantia);
+                toggleNumeroGarantia();
+            }
+
+            setTimeout(() => {
+                seleccionarMoneda('CRC');
+            }, 100);
+
+            setTimeout(() => {
+                agregarAdjunto();
+            }, 200);
+        });
+    </script>
+</body>
+</html>
