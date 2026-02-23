@@ -23,7 +23,11 @@ namespace SistemasAnaliticos.Entidades
         public string departamento { get; set; }
 
         [Required]
-        public char moneda { get; set; }
+        public string moneda { get; set; }
+
+        [Required]
+        [Range(0.01, double.MaxValue, ErrorMessage = "El monto debe ser mayor a 0")]
+        public decimal? monto { get; set; }
 
         [Required]
         public string aFavorDe { get; set; }
@@ -34,6 +38,7 @@ namespace SistemasAnaliticos.Entidades
         [Required]
         public bool prorroga { get; set; }
 
+        public string? numeroGarantia { get; set; }
         public string? numeroLicitacion { get; set; }
 
         [Required]

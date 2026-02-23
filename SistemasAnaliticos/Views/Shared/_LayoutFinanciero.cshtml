@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href='/img/circulo - logo blanco.png' />
-    <title>RRHH - Sistemas Analíticos</title>
+    <title>Financiero - Sistemas Analíticos</title>
     <!-- Bootstrap desde NuGet (via wwwroot) -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
@@ -123,9 +123,9 @@
             <div class="container-xxl px-4 px-sm-6 px-lg-8">
                 <!-- Logo y marca -->
                 <a class="d-flex align-items-center gap-2 logo-container-rh text-white text-decoration-none"
-                        asp-controller="Home" asp-action="HomeFinanciero">
+                   asp-controller="Home" asp-action="HomeFinanciero">
                     <img src='/Img/circulo - logo blanco.png' alt="logo-circulo" class="logo-rh">
-                    <span class="fs-4 fw-bold">Departamento de Financiero</span>
+                    <span class="fs-4 fw-bold">Departmento Financiero</span>
                 </a>
 
                 <!-- Botón responsive -->
@@ -146,38 +146,11 @@
                                 Acciones
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" asp-controller="Garantia" asp-action="Index"><i class="bi-plus-square me-2"></i>Nuevas Solicitudes</a></li>
+                                <li><a class="dropdown-item" asp-controller="Garantia" asp-action="Index"><i class="bi-plus-square me-2"></i>Nueva Solicitud</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" asp-controller="Garantia" asp-action="VerGarantias">Ver Garantías</a></li>
                             </ul>
                         </li>
-
-                        @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
-                        {
-                            <!-- Otros -->
-                            <li class="nav-item dropdown">
-                                <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Otros
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Foto" asp-action="Index">Fotos Empresariales</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Noticia" asp-action="Index">Noticias Empresariales</a></li>
-                                </ul>
-                            </li>
-                        }
-                        @if (User.IsInRole("Administrador"))
-                        {
-                            <!-- Admin Roles -->
-                            <li class="nav-item dropdown">
-                                <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Admin
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Rol" asp-action="Index">Gestión</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Auditoria" asp-action="Index">Auditoria</a></li>
-                                </ul>
-                            </li>
-                        }
                     </ul>
 
                     <!-- Controles de usuario -->

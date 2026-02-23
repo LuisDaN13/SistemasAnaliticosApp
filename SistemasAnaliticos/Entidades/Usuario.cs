@@ -227,30 +227,45 @@ namespace SistemasAnaliticos.Entidades
         // Metodo para Vacaciones
         public void ActualizarVacaciones()
         {
-            // Si no hay fecha de ingreso, no se puede calcular nada
             if (fechaIngreso == null)
                 return;
 
             var hoy = DateTime.UtcNow;
+            var fechaBase = ultimaFechaCalculoVacaciones ?? fechaIngreso.Value;
 
-            // Si nunca se ha calculado, usar fechaIngreso
-            var fechaBase = ultimaFechaCalculoVacaciones.Value;
+            int mesesTranscurridos =
+                ((hoy.Year - fechaBase.Year) * 12) + hoy.Month - fechaBase.Month;
 
-            int meses = ((hoy.Year - fechaBase.Year) * 12) + hoy.Month - fechaBase.Month;
-
-            // Solo meses completos
             if (hoy.Day < fechaBase.Day)
-                meses--;
+                mesesTranscurridos--;
 
-            if (meses > 0)
+            if (mesesTranscurridos <= 0)
+                return;
+
+            int diasAAgregar = 0;
+
+            for (int i = 1; i <= mesesTranscurridos; i++)
             {
-                // Si diasVacaciones es null, iniciar en 0
-                diasVacaciones = (diasVacaciones ?? 0) + meses;
+                var fechaMes = fechaBase.AddMonths(i);
 
-                // Avanzar la fecha exactamente a donde quedó el cálculo
-                ultimaFechaCalculoVacaciones = fechaBase.AddMonths(meses);
+                int totalMesesDesdeIngreso =
+                    ((fechaMes.Year - fechaIngreso.Value.Year) * 12) +
+                    fechaMes.Month - fechaIngreso.Value.Month;
+
+                if (fechaMes.Day < fechaIngreso.Value.Day)
+                    totalMesesDesdeIngreso--;
+
+                // Si cumple año exacto (12, 24, 36...)
+                if (totalMesesDesdeIngreso > 0 && totalMesesDesdeIngreso % 12 == 0)
+                    diasAAgregar += 3;   // 1 normal + 2 adicionales
+                else
+                    diasAAgregar += 1;
             }
+
+            diasVacaciones = (diasVacaciones ?? 0) + diasAAgregar;
+            ultimaFechaCalculoVacaciones = fechaBase.AddMonths(mesesTranscurridos);
         }
+
         public bool DescontarVacaciones(int diasSolicitados)
         {
             // Primero asegurar que el saldo esté al día

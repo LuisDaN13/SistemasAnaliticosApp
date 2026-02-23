@@ -874,9 +874,6 @@ namespace SistemasAnaliticos.Controllers
             });
         }
 
-
-
-
         // -------------------------------------------------------------------------------------------------------------------------------
         // ADMINISTRADOR
         [Authorize(Policy = "Rol.Ver")]

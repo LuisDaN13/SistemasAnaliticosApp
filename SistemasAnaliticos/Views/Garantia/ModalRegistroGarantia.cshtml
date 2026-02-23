@@ -1,17 +1,10 @@
-﻿@model SistemasAnaliticos.Entidades.Garantia
+﻿@model SistemasAnaliticos.ViewModels.GarantiaViewModel
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-
     <style>
         :root {
             --primary-color: #012473;
@@ -22,7 +15,6 @@
 
         body {
             background-color: #f0f2f5;
-            padding: 20px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         }
 
@@ -364,6 +356,11 @@
             animation: slideDown 0.3s ease;
         }
 
+        .numero-licitacion-field {
+            transition: all 0.3s ease;
+            animation: slideDown 0.3s ease;
+        }
+
         /* Estilos para la sección de adjuntos */
         .adjuntos-container {
             background-color: #f8f9fa;
@@ -483,19 +480,16 @@
             margin-top: auto;
         }
 
-        @keyframes slideDown {
-            from
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
 
-        {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .currency-input .input-group-text {
@@ -534,21 +528,14 @@
 </head>
 <body>
     <div class="container py-4">
-        <!-- Botón para abrir modal (solo para prueba) -->
-        <div class="text-center mb-4">
-            <button type="button" class="btn btn-primary-custom btn-lg" data-bs-toggle="modal" data-bs-target="#createGarantiaModal">
-                <i class="bi bi-plus-circle me-2"></i>Nueva Garantía
-            </button>
-        </div>
-
         <!-- Modal de Creación de Garantía -->
         <div class="modal fade" id="createGarantiaModal" tabindex="-1" aria-labelledby="createGarantiaModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl-custom modal-dialog-centered">
                 <div class="modal-content">
-                    <form id="garantiaForm" onsubmit="return false;" enctype="multipart/form-data">
+                    <form id="garantiaForm" asp-action="Create" method="post" enctype="multipart/form-data">
                         <!-- Campos ocultos que se llenan automáticamente -->
-                        <input type="hidden" asp-for="fechaCreacion" id="fechaCreacion" />
-                        <input type="hidden" asp-for="nombreEmpleado" id="nombreEmpleado" />
+                        <input type="hidden" asp-for="FechaCreacion" id="fechaCreacion" />
+                        <input type="hidden" asp-for="NombreEmpleado" id="nombreEmpleado" />
                         <input type="hidden" asp-for="UsuarioId" id="UsuarioId" />
 
                         <div class="modal-body p-0">
@@ -628,7 +615,8 @@
                                                         <div class="currency-input">
                                                             <div class="input-group">
                                                                 <span class="input-group-text" id="monedaSimbolo">₡</span>
-                                                                <input type="text" class="form-control" asp-for="monto" placeholder="0.00" required>
+                                                                <input type="text" class="form-control salario-cr" asp-for="Monto" placeholder="0.00" required>
+                                                                <span asp-validation-for="Monto" class="text-danger"></span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -646,18 +634,18 @@
                                                                 <div class="moneda-nombre">Dólares</div>
                                                             </div>
                                                         </div>
-                                                        <input type="hidden" asp-for="moneda" id="monedaSeleccionada" required>
+                                                        <input type="hidden" asp-for="Moneda" id="monedaSeleccionada" required>
                                                     </div>
 
                                                     <!-- A Favor De y Nombre de Licitación con flex-end -->
                                                     <div class="row-flex-end">
                                                         <div>
                                                             <label class="form-label required-field">A Favor De</label>
-                                                            <input type="text" class="form-control" asp-for="aFavorDe" placeholder="Nombre de la persona o entidad" required>
+                                                            <input type="text" class="form-control" asp-for="AFavorDe" placeholder="Nombre de la persona o entidad" required>
                                                         </div>
                                                         <div>
                                                             <label class="form-label required-field">Nombre de la Licitación</label>
-                                                            <input type="text" class="form-control" asp-for="nombreLicitacion" placeholder="Nombre completo de la licitación" required>
+                                                            <input type="text" class="form-control" asp-for="NombreLicitacion" placeholder="Nombre completo de la licitación" required>
                                                         </div>
                                                     </div>
 
@@ -667,14 +655,23 @@
                                                             <div class="prorroga-header">
                                                                 <label class="form-label fw-semibold mb-0 fs-5">¿Incluye Prórroga?</label>
                                                                 <div class="form-check form-switch">
-                                                                    <input class="form-check-input prorroga-switch" type="checkbox" role="switch" id="prorrogaSwitch" asp-for="prorroga">
+                                                                    <input class="form-check-input prorroga-switch" type="checkbox" role="switch" id="prorrogaSwitch" asp-for="Prorroga" onchange="toggleCamposProrroga()">
                                                                 </div>
                                                             </div>
 
-                                                            <!-- Campo Número de Garantía (visible solo si prórroga está activada) -->
-                                                            <div class="numero-garantia-field" id="numeroGarantiaField" style="display: none;">
-                                                                <label class="form-label required-field">Número de Garantía</label>
-                                                                <input type="text" class="form-control" asp-for="numeroGarantia" placeholder="Ingrese el número de garantía">
+                                                            <!-- Contenedor para los campos que aparecen SOLO con prórroga en paso 1 -->
+                                                            <div id="prorrogaFieldsPaso1" style="display: none;">
+                                                                <!-- Campo Número de Garantía -->
+                                                                <div class="numero-garantia-field mb-3" id="numeroGarantiaField">
+                                                                    <label class="form-label required-field">Número de Garantía</label>
+                                                                    <input type="text" class="form-control" asp-for="NumeroGarantia" placeholder="Ingrese el número de garantía">
+                                                                </div>
+
+                                                                <!-- Campo Número de Licitación (solo con prórroga) -->
+                                                                <div class="numero-licitacion-field" id="numeroLicitacionPaso1Field">
+                                                                    <label class="form-label required-field">Número de Licitación</label>
+                                                                    <input type="text" class="form-control" asp-for="NumeroLicitacion1" placeholder="Ingrese el número de licitación">
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -711,30 +708,36 @@
                                                                 <div class="tipo-nombre">Excepción</div>
                                                             </div>
                                                         </div>
-                                                        <input type="hidden" asp-for="tipoLicitacion" id="tipoLicitacionSeleccionado" required>
+                                                        <input type="hidden" asp-for="TipoLicitacion" id="tipoLicitacionSeleccionado" required>
+                                                    </div>
+
+                                                    <!-- Número de Licitación (solo SIN prórroga) -->
+                                                    <div class="col-12" id="numeroLicitacionPaso2Field" style="display: none;">
+                                                        <label class="form-label required-field">Número de Licitación</label>
+                                                        <input type="text" class="form-control" asp-for="NumeroLicitacion2" placeholder="Ingrese el número de licitación">
                                                     </div>
 
                                                     <!-- Fechas -->
                                                     <div class="col-md-6">
                                                         <label class="form-label required-field">Fecha de Inicio</label>
-                                                        <input type="date" class="form-control" asp-for="fechaInicio" required>
+                                                        <input type="date" class="form-control" asp-for="FechaInicio" required>
                                                     </div>
 
                                                     <div class="col-md-6">
                                                         <label class="form-label required-field">Fecha de Finalización</label>
-                                                        <input type="date" class="form-control" asp-for="fechaFinalizacion" required>
+                                                        <input type="date" class="form-control" asp-for="FechaFinalizacion" required>
                                                     </div>
 
                                                     <!-- Plazo -->
                                                     <div class="col-12">
                                                         <label class="form-label required-field">Plazo</label>
-                                                        <input type="text" class="form-control" asp-for="plazo" placeholder="Ej: 30 días, 6 meses, 1 año" required>
+                                                        <input type="text" class="form-control" asp-for="Plazo" placeholder="Ej: 30 días, 6 meses, 1 año" required>
                                                     </div>
 
                                                     <!-- Observación -->
                                                     <div class="col-12">
                                                         <label class="form-label">Observación</label>
-                                                        <textarea asp-for="observacion"
+                                                        <textarea asp-for="Observacion"
                                                                   class="form-control"
                                                                   rows="4"
                                                                   placeholder="Ingrese cualquier observación adicional relevante..."></textarea>
@@ -791,13 +794,14 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS y Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SCRIPT DE LOS FORMATOS DE CAMPOS-->
+    <script src='~/JS/formatosUsuario.js'></script>
 
     <script>
         // Variables globales para adjuntos
         let adjuntosCount = 0;
         const maxAdjuntos = 5;
+        let prorrogaActiva = false;
 
         // Configuración inicial - llenar campos automáticos
         document.addEventListener('DOMContentLoaded', function() {
@@ -882,7 +886,7 @@
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label">Archivo</label>
-                            <input type="file" class="form-control" name="adjuntos[]" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="mostrarInfoArchivo(this, '${adjuntoId}')">
+                            <input type="file" class="form-control" name="Adjuntos" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="mostrarInfoArchivo(this, '${adjuntoId}')">
                         </div>
                     </div>
                     <div class="file-info" id="info_${adjuntoId}" style="display: none;">
@@ -955,26 +959,57 @@
             }
         }
 
-        // Manejar visibilidad del campo número de garantía según prórroga
-        function toggleNumeroGarantia() {
+        // Función mejorada para manejar la visibilidad de campos según prórroga
+        function toggleCamposProrroga() {
             const prorrogaSwitch = document.getElementById('prorrogaSwitch');
-            const numeroGarantiaField = document.getElementById('numeroGarantiaField');
-            const numeroGarantiaInput = document.querySelector('input[asp-for="numeroGarantia"]');
+            const prorrogaFieldsPaso1 = document.getElementById('prorrogaFieldsPaso1');
+            const numeroLicitacionPaso2Field = document.getElementById('numeroLicitacionPaso2Field');
 
-            if (prorrogaSwitch.checked) {
-                numeroGarantiaField.style.display = 'block';
+            // Referencias a los inputs
+            const numeroGarantiaInput = document.querySelector('input[name="NumeroGarantia"]');
+            const numeroLicitacion1Input = document.querySelector('input[name="NumeroLicitacion1"]');
+            const numeroLicitacion2Input = document.querySelector('input[name="NumeroLicitacion2"]');
+
+            prorrogaActiva = prorrogaSwitch.checked;
+
+            if (prorrogaActiva) {
+                // CON PRÓRROGA: Mostrar campos en paso 1, ocultar en paso 2
+                prorrogaFieldsPaso1.style.display = 'block';
+                numeroLicitacionPaso2Field.style.display = 'none';
+
+                // Ambos campos son requeridos
                 numeroGarantiaInput.required = true;
+                numeroLicitacion1Input.required = true;
+                numeroLicitacion2Input.required = false;
+                numeroLicitacion2Input.value = ''; // Limpiar valor
+
+                // Si estamos en paso 2 y hay prórroga, mostrar advertencia
+                if (document.getElementById('step2').classList.contains('d-none') === false) {
+                    showTemporaryMessage('La prórroga está activada. Complete los números en el paso 1', 'info');
+                }
             } else {
-                numeroGarantiaField.style.display = 'none';
+                // SIN PRÓRROGA: Ocultar campos en paso 1, mostrar en paso 2
+                prorrogaFieldsPaso1.style.display = 'none';
+                numeroLicitacionPaso2Field.style.display = 'block';
+
+                // Solo el número de licitación 2 es requerido
                 numeroGarantiaInput.required = false;
-                numeroGarantiaInput.value = '';
+                numeroGarantiaInput.value = ''; // Limpiar valor
+                numeroLicitacion1Input.required = false;
+                numeroLicitacion1Input.value = ''; // Limpiar valor
+                numeroLicitacion2Input.required = true;
+
+                // Si estamos en paso 1 y no hay prórroga, mostrar mensaje
+                if (document.getElementById('step1').classList.contains('d-none') === false) {
+                    showTemporaryMessage('Complete el número de licitación en el paso 2', 'info');
+                }
             }
         }
 
         // Validación de fechas
         function validarFechas() {
-            const fechaInicio = document.querySelector('input[asp-for="fechaInicio"]');
-            const fechaFin = document.querySelector('input[asp-for="fechaFinalizacion"]');
+            const fechaInicio = document.querySelector('input[name="FechaInicio"]');
+            const fechaFin = document.querySelector('input[name="FechaFinalizacion"]');
 
             if (fechaInicio && fechaFin) {
                 fechaFin.addEventListener('change', function() {
@@ -1020,8 +1055,18 @@
 
                 // Mostrar/ocultar contenido
                 document.querySelectorAll('.step-content').forEach((content, index) => {
-                    if (index + 1 === currentStep) {
+                    const stepNumber = index + 1;
+                    if (stepNumber === currentStep) {
                         content.classList.remove('d-none');
+
+                        // Mostrar mensajes contextuales según el paso y estado de prórroga
+                        if (stepNumber === 1 && prorrogaActiva) {
+                            showTemporaryMessage('Complete los números de garantía y licitación', 'info');
+                        } else if (stepNumber === 2 && !prorrogaActiva) {
+                            showTemporaryMessage('Complete el número de licitación', 'info');
+                        } else if (stepNumber === 2 && prorrogaActiva) {
+                            showTemporaryMessage('La prórroga está activada. Los números ya fueron ingresados en el paso 1', 'info');
+                        }
                     } else {
                         content.classList.add('d-none');
                     }
@@ -1067,6 +1112,12 @@
 
                 requiredFields.forEach(field => {
                     field.classList.remove('is-invalid');
+
+                    // Validación especial para campos que pueden estar ocultos
+                    if (field.closest('[style*="display: none"]')) {
+                        // Si el campo está oculto, no lo validamos
+                        return;
+                    }
 
                     if (field.type === 'hidden') {
                         if (!field.value) {
@@ -1141,6 +1192,11 @@
                     const requiredFields = stepElement.querySelectorAll('[required]');
 
                     requiredFields.forEach(field => {
+                        if (field.closest('[style*="display: none"]')) {
+                            // Si el campo está oculto, no lo validamos
+                            return;
+                        }
+
                         if (field.type === 'hidden') {
                             if (!field.value) {
                                 allValid = false;
@@ -1170,12 +1226,8 @@
                         return;
                     }
 
-                    showTemporaryMessage('¡Garantía creada exitosamente!', 'success');
-
-                    setTimeout(() => {
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('createGarantiaModal'));
-                        if (modal) modal.hide();
-                    }, 2000);
+                    // Enviar el formulario
+                    document.getElementById('garantiaForm').submit();
                 }
             });
 
@@ -1189,8 +1241,8 @@
 
             const prorrogaSwitch = document.getElementById('prorrogaSwitch');
             if (prorrogaSwitch) {
-                prorrogaSwitch.addEventListener('change', toggleNumeroGarantia);
-                toggleNumeroGarantia();
+                prorrogaSwitch.addEventListener('change', toggleCamposProrroga);
+                toggleCamposProrroga(); // Estado inicial
             }
 
             setTimeout(() => {
@@ -1203,4 +1255,4 @@
         });
     </script>
 </body>
-</html>
+</html>s

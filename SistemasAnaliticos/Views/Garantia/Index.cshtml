@@ -1,0 +1,153 @@
+﻿@model SistemasAnaliticos.ViewModels.PermisoViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutFinanciero.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        .bg-gradient-custom {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        :root {
+            --primary-color: #012473;
+            --secondary-color: #013599;
+            --danger-color: #E00319;
+            --success-color: #198754;
+        }
+
+        .header-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            background-color: white;
+        }
+    </style>
+    <style>
+        .category-header {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .category-header:hover {
+                background-color: #f8f9fa !important;
+            }
+
+        .border-left-accent1 {
+            border-left-color: #0d6efd;
+            border-left-width: 4px !important;
+            border-left-style: solid;
+        }        
+        
+        .border-left-accent2 {
+            border-left-color: #146c43;
+            border-left-width: 4px !important;
+            border-left-style: solid;
+        }
+
+        .badge-status {
+            font-size: 0.75rem;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .permission-item {
+            transition: background-color 0.3s;
+        }
+
+            .permission-item:hover {
+                background-color: #f8f9fa;
+            }
+
+        .action-btn {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s;
+        }
+
+        .chevron-icon {
+            color: #0d6efd;
+            transition: transform 0.3s;
+        }
+
+        .chevron-rotated {
+            transform: rotate(180deg);
+        }
+
+        .note-highlight {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="bg-gradient-custom min-vh-100">
+
+    <!-- Main Content -->
+    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4">
+
+        <!-- Titulo de Permisos -->
+        <div class="header-card p-4 mt-4 mb-4">
+            <h1 class="h2 fw-bold text-gray-900 mb-2">Creaciones de Solicitudes</h1>
+            <p class="text-muted mb-0">Solicita todos los solicitudes relacionadas con el departamento financiero de la empresa</p>
+        </div>
+
+        <!-- Permission Types Grid -->
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <button class="btn w-100 h-100 p-4 text-start permission-card" style="background-color: #22C55E;"
+                                data-bs-toggle="modal" data-bs-target="#createGarantiaModal">
+                            <i class="fa-solid fa-stethoscope fs-1 mb-3 text-white"></i>
+                            <h5 class="fw-bold mb-2 text-white">Garantía</h5>
+                            <p class="mb-0 opacity-90 text-white">Solicita garantía para licitaciones</p>
+                        </button>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Respuestas de los Formularios -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Para mensajes de error
+            @if (TempData["ErrorMessageGarantia"] != null)
+            {
+                <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: '@Html.Raw(TempData["ErrorMessageGarantia"])',
+                        confirmButtonText: 'Aceptar'
+                    });
+                </text>
+            }
+
+            // Para mensajes de éxito
+            @if (TempData["SuccessMessageGarantia"] != null)
+            {
+                <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Éxito',
+                        text: '@Html.Raw(TempData["SuccessMessageGarantia"])',
+                        confirmButtonText: 'Aceptar',
+                        timer: 3000
+                    });
+                </text>
+            }
+        });
+    </script>
+        
+    <!-- Modal de Registro de Citas Medicas -->
+    <partial name="~/Views/Garantia/modalRegistroGarantia.cshtml" model="new SistemasAnaliticos.ViewModels.GarantiaViewModel()" />
+</body>
+</html>

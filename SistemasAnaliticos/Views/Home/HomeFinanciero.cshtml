@@ -1,7 +1,7 @@
 ﻿@model SistemasAnaliticos.ViewModels.HomeIndexViewModel
 
 @{
-    Layout = "_LayoutFinanciero";
+    Layout = "~/Views/Shared/_LayoutFinanciero.cshtml";
 }
 
 <!DOCTYPE html>
@@ -37,28 +37,28 @@
                 // Para mensajes de error
                 @if (TempData["ErrorMessageHome"] != null)
                 {
-                            <text>
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: '@Html.Raw(TempData["ErrorMessageHome"])',
-                                    confirmButtonText: 'Aceptar'
-                                });
-                            </text>
+                    <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: '@Html.Raw(TempData["ErrorMessageHome"])',
+                            confirmButtonText: 'Aceptar'
+                        });
+                    </text>
                 }
 
                 // Para mensajes de éxito
                 @if (TempData["SuccessMessageHome"] != null)
                 {
-                            <text>
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Éxito',
-                                    text: '@Html.Raw(TempData["SuccessMessageHome"])',
-                                    confirmButtonText: 'Aceptar',
-                                    timer: 3000
-                                });
-                            </text>
+                    <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: '@Html.Raw(TempData["SuccessMessageHome"])',
+                            confirmButtonText: 'Aceptar',
+                            timer: 3000
+                        });
+                    </text>
                 }
             });
         </script>
