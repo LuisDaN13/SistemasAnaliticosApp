@@ -23,9 +23,7 @@
         }
 
         // PARA PERMISOS   
-        public async Task<IQueryable<Permiso>> AplicarAlcancePermisoAsync(
-            IQueryable<Permiso> query,
-            ClaimsPrincipal user)
+        public async Task<IQueryable<Permiso>> AplicarAlcancePermisoAsync(IQueryable<Permiso> query, ClaimsPrincipal user)
         {
             var usuario = await _userManager.GetUserAsync(user);
             var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(usuario);
@@ -40,9 +38,7 @@
             };
         }
 
-        private async Task<IQueryable<Permiso>> FiltrarSubordinadosPermisoAsync(
-            IQueryable<Permiso> query,
-            Usuario usuario)
+        private async Task<IQueryable<Permiso>> FiltrarSubordinadosPermisoAsync(IQueryable<Permiso> query, Usuario usuario)
         {
             var subordinadosIds = await _context.Users
                 .Where(u => u.jefeId == usuario.Id)
@@ -57,9 +53,7 @@
 
 
         // PARA CONSTANCIAS   
-        public async Task<IQueryable<Constancia>> AplicarAlcanceConstanciaAsync(
-            IQueryable<Constancia> query,
-            ClaimsPrincipal user)
+        public async Task<IQueryable<Constancia>> AplicarAlcanceConstanciaAsync(IQueryable<Constancia> query, ClaimsPrincipal user)
         {
             var usuario = await _userManager.GetUserAsync(user);
             var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(usuario);
@@ -79,9 +73,7 @@
             };
         }
 
-        private async Task<IQueryable<Constancia>> FiltrarSubordinadosConstanciaAsync(
-            IQueryable<Constancia> query,
-            Usuario usuario)
+        private async Task<IQueryable<Constancia>> FiltrarSubordinadosConstanciaAsync(IQueryable<Constancia> query, Usuario usuario)
         {
             var subordinadosIds = await _context.Users
                 .Where(u => u.jefeId == usuario.Id)
@@ -96,9 +88,7 @@
 
 
         // PARA BENEFICIOS   
-        public async Task<IQueryable<Beneficio>> AplicarAlcanceBeneficioAsync(
-            IQueryable<Beneficio> query,
-            ClaimsPrincipal user)
+        public async Task<IQueryable<Beneficio>> AplicarAlcanceBeneficioAsync(IQueryable<Beneficio> query, ClaimsPrincipal user)
         {
             var usuario = await _userManager.GetUserAsync(user);
             var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(usuario);
@@ -118,9 +108,7 @@
             };
         }
 
-        private async Task<IQueryable<Beneficio>> FiltrarSubordinadosBeneficioAsync(
-            IQueryable<Beneficio> query,
-            Usuario usuario)
+        private async Task<IQueryable<Beneficio>> FiltrarSubordinadosBeneficioAsync(IQueryable<Beneficio> query, Usuario usuario)
         {
             var subordinadosIds = await _context.Users
                 .Where(u => u.jefeId == usuario.Id)
@@ -135,9 +123,7 @@
 
 
         // PARA VIATICOS   
-        public async Task<IQueryable<LiquidacionViatico>> AplicarAlcanceViaticoAsync(
-            IQueryable<LiquidacionViatico> query,
-            ClaimsPrincipal user)
+        public async Task<IQueryable<LiquidacionViatico>> AplicarAlcanceViaticoAsync(IQueryable<LiquidacionViatico> query, ClaimsPrincipal user)
         {
             var usuario = await _userManager.GetUserAsync(user);
             var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(usuario);
@@ -152,9 +138,7 @@
             };
         }
 
-        private async Task<IQueryable<LiquidacionViatico>> FiltrarSubordinadosViaticoAsync(
-            IQueryable<LiquidacionViatico> query,
-            Usuario usuario)
+        private async Task<IQueryable<LiquidacionViatico>> FiltrarSubordinadosViaticoAsync(IQueryable<LiquidacionViatico> query, Usuario usuario)
         {
             var subordinadosIds = await _context.Users
                 .Where(u => u.jefeId == usuario.Id)
@@ -169,9 +153,7 @@
 
 
         // PARA EXTRAS
-        public async Task<IQueryable<Extras>> AplicarAlcanceExtrasConTipoAsync(
-            IQueryable<Extras> query,
-            ClaimsPrincipal user)
+        public async Task<IQueryable<Extras>> AplicarAlcanceExtrasConTipoAsync(IQueryable<Extras> query, ClaimsPrincipal user)
         {
             var usuario = await _userManager.GetUserAsync(user);
             var alcance = await _alcanceUsuarioService.ObtenerAlcanceAsync(usuario);
@@ -202,9 +184,7 @@
             return queryPropio;
         }
 
-        private async Task<IQueryable<Extras>> FiltrarSubordinadosExtrasAsync(
-            IQueryable<Extras> query,
-            Usuario usuario)
+        private async Task<IQueryable<Extras>> FiltrarSubordinadosExtrasAsync(IQueryable<Extras> query, Usuario usuario)
         {
             var subordinadosIds = await _context.Users
                 .Where(u => u.jefeId == usuario.Id)
@@ -228,6 +208,20 @@
             }
 
             return querySubordinados;
+        }
+
+
+        // PARA GARANTIAS FINANCIERO   
+        public async Task<IQueryable<Garantia>> AplicarAlcanceGarantiaAsync(IQueryable<Garantia> query, ClaimsPrincipal user)
+        {
+            var usuario = await _userManager.GetUserAsync(user);
+            var alcance = await _alcanceUsuarioService.ObtenerAlcanceFinancieroAsync(usuario);
+
+            return alcance switch
+            {
+                "Global" => query,
+                _ => query.Where(p => p.UsuarioId == usuario.Id)
+            };
         }
     }
 }

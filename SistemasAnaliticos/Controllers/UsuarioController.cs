@@ -148,28 +148,21 @@ namespace SistemasAnaliticos.Controllers
 
         public async Task<IActionResult> LogOut()
         {
-            Console.WriteLine("=== LOGOUT INICIADO ===");
-
             if (User?.Identity?.IsAuthenticated == true)
             {
                 var user = await userManager.GetUserAsync(User);
                 if (user != null)
                 {
-                    Console.WriteLine($"Usuario haciendo logout: {user.Email}");
-                    Console.WriteLine($"SessionId actual: {user.sessionId}");
-
                     // 🔥 IMPORTANTE: Poner sessionId a NULL en BD
                     // Esto hará que cualquier otra sesión sea inválida
                     user.sessionId = null;
                     user.lastActivityUtc = DateTime.UtcNow;
 
                     var updateResult = await userManager.UpdateAsync(user);
-                    Console.WriteLine($"BD actualizada en logout: {(updateResult.Succeeded ? "ÉXITO" : "FALLO")}");
                 }
             }
 
             await signInManager.SignOutAsync();
-            Console.WriteLine("Sesión cerrada, redirigiendo a Login");
             return RedirectToAction("Login", "Usuario");
         }
 
@@ -711,7 +704,6 @@ namespace SistemasAnaliticos.Controllers
                 return Json(new { success = false, message = "Usuario no encontrado" });
             }
 
-            user = await userManager.FindByIdAsync(model.Id.ToString());
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
             var result = await userManager.ResetPasswordAsync(user, token, model.NuevaContrasena);
 
@@ -785,27 +777,69 @@ namespace SistemasAnaliticos.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CambiarContrasena2(CambiarContrasenaViewModel model)
         {
+            // Validación temprana
             if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                return Json(new
+                {
+                    success = false,
+                    message = errors.FirstOrDefault() ?? "Datos inválidos",
+                    errors = errors
+                });
+            }
+
+            // Validar que la contraseña no sea vacía
+            if (string.IsNullOrWhiteSpace(model.NuevaContrasena))
             {
                 return Json(new
                 {
                     success = false,
-                    message = "Datos inválidos",
-                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                    message = "La contraseña no puede estar vacía"
                 });
             }
 
             var user = await userManager.FindByIdAsync(model.Id);
-
             if (user == null)
             {
-                return Json(new { success = false, message = "Usuario no encontrado" });
+                return Json(new
+                {
+                    success = false,
+                    message = "Usuario no encontrado"
+                });
+            }
+
+            // Verificar que no sea la misma contraseña actual
+            var passwordValid = await userManager.CheckPasswordAsync(user, model.NuevaContrasena);
+            if (passwordValid)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "La nueva contraseña no puede ser igual a la actual"
+                });
+            }
+
+            // Validar política de contraseñas (si no está ya en el ViewModel)
+            var passwordValidator = new PasswordValidator<Usuario>();
+            var passwordValidation = await passwordValidator.ValidateAsync(userManager, user, model.NuevaContrasena);
+            if (!passwordValidation.Succeeded)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = passwordValidation.Errors.FirstOrDefault()?.Description ?? "La contraseña no cumple con los requisitos"
+                });
             }
 
             // Generar token y cambiar contraseña
             var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            user = await userManager.FindByIdAsync(user.Id); // Recargar antes de ResetPassword
             var result = await userManager.ResetPasswordAsync(user, token, model.NuevaContrasena);
-
             if (!result.Succeeded)
             {
                 return Json(new
@@ -816,47 +850,22 @@ namespace SistemasAnaliticos.Controllers
                 });
             }
 
-            // 🔥 INVALIDAR TODAS LAS SESIONES
+            // 🔥 INVALIDAR TODAS LAS SESIONES Y ACTUALIZAR SECURITY STAMP
             await userManager.UpdateSecurityStampAsync(user);
 
-            // --- NUEVO: limpiar cache del usuario al invalidar sesiones ---
-            try
-            {
-                _cache.Remove($"UserSession_{user.Id}");
-                _cache.Remove($"LastActivity_{user.Id}");
-                _cache.Remove($"DbUpdate_{user.Id}");
-            }
-            catch
-            {
-            }
+            // Limpiar caché de manera segura
+            await ClearUserCacheAsync(user.Id);
 
-            // 🔐 Logout inmediato si es el mismo usuario
+            // Obtener usuario actual
             var usuarioActualId = userManager.GetUserId(User);
 
+            // Auditoría
+            await LogPasswordChangeAuditAsync(user, usuarioActualId == user.Id);
+
+            // Si es el mismo usuario, hacer logout
             if (usuarioActualId == user.Id)
             {
                 await signInManager.SignOutAsync();
-
-                // Detectar sistema operativo y usar el ID de zona horaria adecuado
-                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                    ? "Central America Standard Time"           // Windows
-                    : "America/Costa_Rica";                     // Linux/macOS
-
-                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
-                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
-                var usuario = await userManager.GetUserAsync(User);
-
-                // Auditoría
-                var auditoria = new Auditoria
-                {
-                    Fecha = hoy,
-                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
-                    Usuario = usuario.nombreCompleto ?? "Desconocido",
-                    Tabla = "Usuario",
-                    Accion = "Cambió de Contraseña de " + user.primerNombre + " " + user.primerApellido
-                };
-                _context.Auditoria.Add(auditoria);
 
                 return Json(new
                 {
@@ -872,6 +881,68 @@ namespace SistemasAnaliticos.Controllers
                 message = "Contraseña cambiada correctamente",
                 logout = false
             });
+        }
+
+        // Métodos auxiliares para mantener el código limpio
+        private async Task ClearUserCacheAsync(string userId)
+        {
+            try
+            {
+                var cacheKeys = new[]
+                {
+                    $"UserSession_{userId}",
+                    $"LastActivity_{userId}",
+                    $"DbUpdate_{userId}"
+                };
+
+                foreach (var key in cacheKeys)
+                {
+                    _cache.Remove(key);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        private async Task LogPasswordChangeAuditAsync(Usuario user, bool isSelfChange)
+        {
+            try
+            {
+                var timeZoneId = GetTimeZoneId();
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+
+                var usuarioActual = await userManager.GetUserAsync(User);
+                var nombreCompleto = usuarioActual?.nombreCompleto ?? "Desconocido";
+
+                var accion = isSelfChange
+                    ? $"Cambió su propia contraseña"
+                    : $"Cambió la contraseña de {user.primerNombre} {user.primerApellido}";
+
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = nombreCompleto,
+                    Tabla = "Usuario",
+                    Accion = accion
+                };
+
+                _context.Auditoria.Add(auditoria);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        private string GetTimeZoneId()
+        {
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? "Central America Standard Time"  // Windows
+                : "America/Costa_Rica";            // Linux/macOS
         }
 
         // -------------------------------------------------------------------------------------------------------------------------------

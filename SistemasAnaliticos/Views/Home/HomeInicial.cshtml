@@ -304,12 +304,88 @@
             </section>
         </main>
     </div>
+
+    <!-- Modal para primer login -->
+    <div class="modal fade" id="firstLoginPasswordModal" tabindex="-1" aria-labelledby="firstLoginPasswordModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="firstLoginPasswordModalLabel">
+                        <i class="bi bi-shield-exclamation"></i> Cambio de Contraseña Requerido
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <div class="alert alert-info mb-3">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Primer inicio de sesión detectado.</strong><br>
+                        Por seguridad, debe cambiar su contraseña antes de continuar.
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nueva Contraseña</label>
+                        <div class="input-group">
+                            <input type="password"
+                                   class="form-control"
+                                   id="firstLoginNewPassword"
+                                   placeholder="Ingrese nueva contraseña"
+                                   required>
+                            <button class="btn btn-outline-secondary" type="button" id="toggleFirstLoginPassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            <small>Debe contener: 8+ caracteres, mayúscula, minúscula, número y carácter especial.</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Confirmar Contraseña</label>
+                        <div class="input-group">
+                            <input type="password"
+                                   class="form-control"
+                                   id="firstLoginConfirmPassword"
+                                   placeholder="Confirme la contraseña"
+                                   required>
+                            <button class="btn btn-outline-secondary" type="button" id="toggleFirstLoginConfirm">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div id="firstLoginPasswordError" class="text-danger small mt-1"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnFirstLoginChangePassword">
+                        <i class="bi bi-key"></i> Cambiar Contraseña
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery (SIEMPRE primero) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- Bootstrap Bundle desde NuGet -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- FontAwesome Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        window.firstLoginConfig = {
+            showModal: '@(TempData["ShowPasswordChangeModal"]?.ToString().ToLower() ?? "false")',
+            userId: '@(TempData["FirstLoginUserId"] ?? "")',
+            cambiarContrasenaUrl: '@Url.Action("CambiarContrasena2", "Usuario")',
+            loginUrl: '@Url.Action("Login", "Usuario")'
+        };
+    </script>
+
+    <!-- SCRIPT DE LA CONTRA -->
+    <script src='~/JS/primerInicioContra.js'></script>
+
 </body>
-
-<!-- Bootstrap Bundle desde NuGet -->
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- FontAwesome Script -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 </html>

@@ -28,5 +28,15 @@ namespace SistemasAnaliticos.Services
 
             return "Propio";
         }
+
+        public async Task<string> ObtenerAlcanceFinancieroAsync(Usuario user)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+
+            if (roles.Contains("Administrador") || roles.Contains("Financiero"))
+                return "Global";
+
+            return "Propio";
+        }
     }
 }

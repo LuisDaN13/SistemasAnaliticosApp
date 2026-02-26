@@ -10,5 +10,6 @@ namespace SistemasAnaliticos.Services
         Task<IQueryable<Beneficio>> AplicarAlcanceBeneficioAsync(IQueryable<Beneficio> query, ClaimsPrincipal user);
         Task<IQueryable<LiquidacionViatico>> AplicarAlcanceViaticoAsync(IQueryable<LiquidacionViatico> query, ClaimsPrincipal user);
         Task<IQueryable<Extras>> AplicarAlcanceExtrasConTipoAsync(IQueryable<Extras> query, ClaimsPrincipal user);
+        Task<IQueryable<Garantia>> AplicarAlcanceGarantiaAsync(IQueryable<Garantia> query, ClaimsPrincipal user);
     }
 }

@@ -73,7 +73,7 @@ builder.Services.AddAuthorization(options =>
 
 // Base de datos (simple)
 builder.Services.AddDbContext<DBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("pruebas")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ambiente")));
 
 var app = builder.Build();
 
