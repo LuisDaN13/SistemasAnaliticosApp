@@ -404,17 +404,23 @@
                                                     </td>
                                                     <td class="pe-4 py-3 align-middle border-bottom text-end">
                                                         <div class="d-flex justify-content-end gap-2">
-                                                            <button class="btn btn-sm btn-outline-warning rounded-circle"
+                                                            <button class="btn btn-sm btn-outline-primary rounded-circle"
                                                                     onclick="abrirModalCambiarRol('@usuario.Id', '@usuario.NombreCompleto', '@usuario.RolNombre')"
                                                                     title="Cambiar rol"
                                                                     style="width: 36px; height: 36px;">
                                                                 <i class="fas fa-exchange-alt"></i>
                                                             </button>
-                                                            <button class="btn btn-sm btn-outline-danger rounded-circle"
+                                                            <button class="btn btn-sm btn-outline-warning rounded-circle"
                                                                     onclick="abrirModalInactivar('@usuario.Id', '@usuario.NombreCompleto', @usuario.Estado.ToString().ToLower())"
                                                                     title="Cambiar estado"
                                                                     style="width: 36px; height: 36px;">
                                                                 <i class="fa-solid fa-ban"></i>
+                                                            </button>
+                                                            <button class="btn btn-sm btn-outline-success rounded-circle"
+                                                                    onclick="abrirModalDatos('@usuario.Id')"
+                                                                    title="Ingresar días y fecha"
+                                                                    style="width: 36px; height: 36px;">
+                                                                <i class="fa-solid fa-umbrella-beach"></i>
                                                             </button>
                                                         </div>
                                                     </td>
@@ -1203,7 +1209,6 @@
             }
         });
     </script>
-
     <style>
         /* Estilos para campos con error */
         .campo-validacion.error {
@@ -1249,6 +1254,140 @@
             cursor: not-allowed;
         }
     </style>
+
+    <!-- Modal para poner cantidad de días y fecha d Usuario Básico -->
+    <div class="modal fade" id="modalDatos" tabindex="-1" aria-labelledby="modalDatosLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalDatosLabel">Ingresar Datos de Vacaciones</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-calendar-alt fa-3x text-success mb-3"></i>
+                        <p class="text-muted" id="usuarioInfoDatos"></p>
+                    </div>
+                    <form id="formDatos" method="post" asp-action="VacacionesSet" asp-controller="Usuario">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" id="usuarioIdHidden" name="id">
+
+                        <div class="mb-4">
+                            <label for="diasInput" class="form-label fw-bold">
+                                <i class="fas fa-sun me-2"></i>Días de Vacaciones (0 - 20):
+                            </label>
+                            <input type="number" class="form-control form-control-lg" id="diasInput" name="dias"
+                                   min="0" max="20" step="1" required placeholder="Ingrese días entre 0 y 20">
+                            <div class="invalid-feedback">
+                                El valor debe estar entre 0 y 20 días.
+                            </div>
+                            <small class="text-muted">Rango permitido: 0 a 20 días</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fechaInput" class="form-label fw-bold">
+                                <i class="fas fa-calendar-check me-2"></i>Fecha de Referencia:
+                            </label>
+                            <input type="date" class="form-control form-control-lg" id="fechaInput" name="fecha" required>
+                            <div class="invalid-feedback">
+                                Por favor seleccione una fecha.
+                            </div>
+                        </div>
+
+                        <div class="modal-footer d-flex justify-content-around mt-4">
+                            <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save me-2"></i>Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+                document.addEventListener('DOMContentLoaded', function() {
+            const formDatos = document.getElementById('formDatos');
+
+            if (formDatos) {
+                formDatos.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    // Validar campos
+                    const dias = document.getElementById('diasInput');
+                    const fecha = document.getElementById('fechaInput');
+                    const diasValue = parseInt(dias.value);
+
+                    if (isNaN(diasValue) || diasValue < 0 || diasValue > 20) {
+                        dias.classList.add('is-invalid');
+                        alert('Por favor, ingrese un número de días válido entre 0 y 20.');
+                        return;
+                    }
+
+                    if (!fecha.value) {
+                        alert('Por favor, seleccione una fecha.');
+                        return;
+                    }
+
+                    // Obtener el ID del usuario
+                    const usuarioId = document.getElementById('usuarioIdHidden').value;
+
+                    // Crear FormData
+                    const formData = new FormData();
+                    formData.append('id', usuarioId);
+                    formData.append('dias', diasValue);
+                    formData.append('fecha', fecha.value);
+
+                    // Obtener el token antifalsificación
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                    try {
+                        const response = await fetch(`/Usuario/VacacionesSet/${usuarioId}`, {
+                            method: 'POST',
+                            headers: {
+                                'RequestVerificationToken': token
+                            },
+                            body: formData
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            // Cerrar modal
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('modalDatos'));
+                            modal.hide();
+
+                            // Mostrar mensaje de éxito
+                            alert('Datos guardados correctamente');
+
+                            // Redirigir si es necesario
+                            if (result.redirectUrl) {
+                                window.location.href = result.redirectUrl;
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            alert('Error: ' + result.message);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Ocurrió un error al guardar los datos');
+                    }
+                });
+            }
+        });
+
+        function abrirModalDatos(usuarioId) {
+            document.getElementById('usuarioIdHidden').value = usuarioId;
+            document.getElementById('diasInput').value = '';
+            document.getElementById('fechaInput').value = '';
+
+            const modal = new bootstrap.Modal(document.getElementById('modalDatos'));
+            modal.show();
+        }
+    </script>
 
     @section Scripts {
         <!-- DATA TABLE -->

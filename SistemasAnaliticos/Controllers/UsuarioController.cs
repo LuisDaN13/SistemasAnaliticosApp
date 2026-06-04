@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Azure;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SistemasAnaliticos.Entidades;
 using SistemasAnaliticos.Models;
 using SistemasAnaliticos.ViewModels;
@@ -12,7 +14,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text.Json;
-using Microsoft.Extensions.Caching.Memory;
 using static SistemasAnaliticos.Auxiliares.codigoFotos;
 
 namespace SistemasAnaliticos.Controllers
@@ -123,6 +124,7 @@ namespace SistemasAnaliticos.Controllers
                 {
                     query = query.Where(r =>
                         r.Name != "RRHH" &&
+                        r.Name != "RRHH (Solo Vista)" &&
                         r.Name != "Administrador");
                 }
 
@@ -271,8 +273,12 @@ namespace SistemasAnaliticos.Controllers
         // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX = PRESENTAR A LOS EMPLEADOS CON CARDS PARA SCINICIO DE SESIÓN DE LA APLICACIÓN CON CORREO Y CONTRASEÑA
         [Authorize(Policy = "Usuarios.Ver")]
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(int page = 1, int pageSize = 10, string search = "")
         {
+            var allowedPageSizes = new[] { 4, 8, 12, 16, 32, 36, 100 };
+            if (!allowedPageSizes.Contains(pageSize)) pageSize = 4;
+            if (page < 1) page = 1;
+
             var user = await userManager.GetUserAsync(User);
             var userRoles = await userManager.GetRolesAsync(user);
 
@@ -280,14 +286,30 @@ namespace SistemasAnaliticos.Controllers
                 .AsNoTracking()
                 .Where(x => x.primerApellido != "Montilla" && x.primerApellido != "Admin");
 
-            // Si es empleado normal, solo ve activos
             if (userRoles.Contains("Empleado Normal") || userRoles.Contains("Jefatura"))
-            {
                 query = query.Where(x => x.estado);
+
+            // Filtro de búsqueda en servidor
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var s = search.Trim().ToLower();
+                query = query.Where(x =>
+                    x.primerNombre.ToLower().Contains(s) ||
+                    x.primerApellido.ToLower().Contains(s) ||
+                    x.segundoApellido.ToLower().Contains(s) ||
+                    x.puesto.ToLower().Contains(s) ||
+                    x.departamento.ToLower().Contains(s));
             }
+
+            var totalEmpleados = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalEmpleados / (double)pageSize);
+
+            if (totalPages > 0 && page > totalPages) page = 1; // reset a 1 si búsqueda cambia
 
             var cards = await query
                 .OrderBy(x => x.primerNombre)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(x => new CardsViewModel
                 {
                     Id = x.Id,
@@ -302,6 +324,13 @@ namespace SistemasAnaliticos.Controllers
                     Foto = x.foto
                 })
                 .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.TotalEmpleados = totalEmpleados;
+            ViewBag.AllowedPageSizes = allowedPageSizes;
+            ViewBag.Search = search; // para mantener el texto en el input
 
             return View(cards);
         }
@@ -709,7 +738,6 @@ namespace SistemasAnaliticos.Controllers
 
             if (!result.Succeeded)
             {
-                // Detectar sistema operativo y usar el ID de zona horaria adecuado
                 string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? "Central America Standard Time"           // Windows
                     : "America/Costa_Rica";                     // Linux/macOS
@@ -719,7 +747,7 @@ namespace SistemasAnaliticos.Controllers
                 DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
                 var usuario = await userManager.GetUserAsync(User);
 
-                // Auditoría
+                // AUDITORIA DE AGREGAR INTENTO DE CAMBIO DE CONTRASEÑA
                 var auditoria = new Auditoria
                 {
                     Fecha = hoy,
@@ -737,21 +765,25 @@ namespace SistemasAnaliticos.Controllers
                 });
             }
 
-            // 🔥 INVALIDAR TODAS LAS SESIONES
+            // INVALIDAR TODAS LAS SESIONES
             await userManager.UpdateSecurityStampAsync(user);
 
-            // --- NUEVO: limpiar cache del usuario al invalidar sesiones ---
+            // LIMPIAR CACHE DEL USUARIO AL INVALIDAR SESIONES
             try
             {
                 _cache.Remove($"UserSession_{user.Id}");
                 _cache.Remove($"LastActivity_{user.Id}");
-                _cache.Remove($"DbUpdate_{user.Id}");
+                _cache.Remove($"DbUpdate_{user.Id}");                
             }
-            catch
-            {
-            }
+            catch { }
 
-            // 🔐 Logout inmediato si es el mismo usuario
+            // LIMPIAR VARIABLES: LastActivity y UserSession
+            user.lastActivityUtc = null;
+            user.sessionId = null;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            // LOGOUT INMEDIATO SI ES EL MISMO USUARIO
             var usuarioActualId = userManager.GetUserId(User);
 
             if (usuarioActualId == user.Id)
@@ -1236,6 +1268,67 @@ namespace SistemasAnaliticos.Controllers
                     success = false,
                     message = "Error interno del servidor. Por favor, intente nuevamente."
                 });
+            }
+        }
+
+        [HttpPost("Usuario/VacacionesSet/{id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> VacacionesSet(string id, int dias, DateTime fecha)
+        {
+            try
+            {
+                var usuario = await userManager.FindByIdAsync(id);
+                if (usuario == null)
+                {
+                    return Json(new { success = false, message = "Usuario no encontrado" });
+                }
+
+                // Validar los datos recibidos
+                if (dias < 0 || dias > 20)
+                {
+                    return Json(new { success = false, message = "Los días deben estar entre 0 y 20" });
+                }
+
+                // Actualizar los campos del usuario (ajusta los nombres según tu modelo)
+                usuario.diasVacaciones = dias;  // Ajusta el nombre de la propiedad
+                usuario.ultimaFechaCalculoVacaciones = fecha;  // Ajusta el nombre de la propiedad
+
+                // Detectar sistema operativo y usar el ID de zona horaria adecuado
+                string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? "Central America Standard Time"           // Windows
+                    : "America/Costa_Rica";                     // Linux/macOS
+
+                TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+                DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+
+                var user = await userManager.GetUserAsync(User);
+
+                // Auditoría
+                var auditoria = new Auditoria
+                {
+                    Fecha = hoy,
+                    Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                    Usuario = user?.nombreCompleto ?? "Desconocido",
+                    Tabla = "Usuario",
+                    Accion = $"{usuario.primerNombre} {usuario.primerApellido} paso a {dias} dias y fecha:{fecha:dd/MM/yyyy}"
+                };
+                _context.Auditoria.Add(auditoria);
+
+                // Guardar cambios del usuario
+                var updateResult = await userManager.UpdateAsync(usuario);
+                if (!updateResult.Succeeded)
+                {
+                    return Json(new { success = false, message = "Error al actualizar el usuario" });
+                }
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, redirectUrl = Url.Action(nameof(MostrarUsers)) });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
             }
         }
     }

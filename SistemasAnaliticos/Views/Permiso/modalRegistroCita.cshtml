@@ -179,8 +179,7 @@
 
         function inicializarResetCita() {
             const modal = document.getElementById('createCitaModal');
-            const form = document.getElementById('citaForm');
-            const cancelBtn = document.querySelector('.btn-outline-secondary');
+            const cancelBtn = modal.querySelector('.btn-outline-secondary');
 
             // Resetear cuando el modal se cierra
             modal.addEventListener('hidden.bs.modal', resetearFormularioCita);
@@ -211,7 +210,8 @@
             const tipoTexto = document.getElementById('tipoTexto');
             if (tipoTexto) tipoTexto.textContent = '';
 
-            console.log('Formulario de permisos reseteado');
+            const submitBtn = document.getElementById('submitBtnCita');
+            if (submitBtn) submitBtn.disabled = false;
         }
 
         function inicializarValidacionCita() {
@@ -220,6 +220,7 @@
             // MANEJAR ENVÍO
             submitBtn.addEventListener('click', function(e) {
                 e.preventDefault();
+                this.disabled = true;
 
                 // Validar TODOS los campos antes de enviar
                 let formularioValido = true;
@@ -268,6 +269,7 @@
 
                 // MOSTRAR ERRORES
                 if (!formularioValido) {
+                    this.disabled = false;
                     showValidationErrorCita('Por favor complete todos los campos requeridos antes de enviar el formulario.');
 
                     if (invalidFields.length > 0) {

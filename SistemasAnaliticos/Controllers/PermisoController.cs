@@ -136,7 +136,9 @@ namespace SistemasAnaliticos.Controllers
             [FromQuery] string fechaTipo = null,
             [FromQuery] string fechaUnica = null,
             [FromQuery] string fechaDesde = null,
-            [FromQuery] string fechaHasta = null)
+            [FromQuery] string fechaHasta = null,
+            [FromQuery] string fechaInicioDesde = null, 
+            [FromQuery] string fechaInicioHasta = null) 
         {
             try
             {
@@ -197,6 +199,18 @@ namespace SistemasAnaliticos.Controllers
                     }
                 }
 
+                if (!string.IsNullOrEmpty(fechaInicioDesde) && DateOnly.TryParse(fechaInicioDesde, out DateOnly inicioDesdeDate))
+                {
+                    var inicioDesdeDateTime = inicioDesdeDate.ToDateTime(TimeOnly.MinValue); // 00:00:00
+                    query = query.Where(p => p.fechaInicio >= inicioDesdeDateTime);
+                }
+
+                if (!string.IsNullOrEmpty(fechaInicioHasta) && DateOnly.TryParse(fechaInicioHasta, out DateOnly inicioHastaDate))
+                {
+                    var inicioHastaDateTime = inicioHastaDate.ToDateTime(TimeOnly.MaxValue); // 23:59:59
+                    query = query.Where(p => p.fechaInicio <= inicioHastaDateTime);
+                }
+
                 var permisos = await query
                     .OrderByDescending(x => x.fechaCreacion)
                     .Select(p => new {
@@ -237,7 +251,9 @@ namespace SistemasAnaliticos.Controllers
         [FromQuery] string fechaTipo = null,
         [FromQuery] string fechaUnica = null,
         [FromQuery] string fechaDesde = null,
-        [FromQuery] string fechaHasta = null)
+        [FromQuery] string fechaHasta = null,
+        [FromQuery] string fechaInicioDesde = null,
+        [FromQuery] string fechaInicioHasta = null)
         {
             try
             {
@@ -287,6 +303,18 @@ namespace SistemasAnaliticos.Controllers
                             );
                         }
                     }
+                }
+
+                if (!string.IsNullOrEmpty(fechaInicioDesde) && DateOnly.TryParse(fechaInicioDesde, out DateOnly inicioDesdeDate))
+                {
+                    var inicioDesdeDateTime = inicioDesdeDate.ToDateTime(TimeOnly.MinValue); // 00:00:00
+                    query = query.Where(p => p.fechaInicio >= inicioDesdeDateTime);
+                }
+
+                if (!string.IsNullOrEmpty(fechaInicioHasta) && DateOnly.TryParse(fechaInicioHasta, out DateOnly inicioHastaDate))
+                {
+                    var inicioHastaDateTime = inicioHastaDate.ToDateTime(TimeOnly.MaxValue); // 23:59:59
+                    query = query.Where(p => p.fechaInicio <= inicioHastaDateTime);
                 }
 
                 var permisos = await query
@@ -404,7 +432,9 @@ namespace SistemasAnaliticos.Controllers
         [FromQuery] string fechaTipo = null,
         [FromQuery] string fechaUnica = null,
         [FromQuery] string fechaDesde = null,
-        [FromQuery] string fechaHasta = null)
+        [FromQuery] string fechaHasta = null,
+        [FromQuery] string fechaInicioDesde = null,
+        [FromQuery] string fechaInicioHasta = null)
         {
             try
             {
@@ -449,6 +479,18 @@ namespace SistemasAnaliticos.Controllers
                             );
                         }
                     }
+                }
+
+                if (!string.IsNullOrEmpty(fechaInicioDesde) && DateOnly.TryParse(fechaInicioDesde, out DateOnly inicioDesdeDate))
+                {
+                    var inicioDesdeDateTime = inicioDesdeDate.ToDateTime(TimeOnly.MinValue); // 00:00:00
+                    query = query.Where(p => p.fechaInicio >= inicioDesdeDateTime);
+                }
+
+                if (!string.IsNullOrEmpty(fechaInicioHasta) && DateOnly.TryParse(fechaInicioHasta, out DateOnly inicioHastaDate))
+                {
+                    var inicioHastaDateTime = inicioHastaDate.ToDateTime(TimeOnly.MaxValue); // 23:59:59
+                    query = query.Where(p => p.fechaInicio <= inicioHastaDateTime);
                 }
 
                 var permisos = await query
@@ -769,6 +811,16 @@ namespace SistemasAnaliticos.Controllers
         [HttpPost]
         public async Task<IActionResult> CambiarEstadoMasivo([FromBody] EstadoMasivoViewModel model)
         {
+            // Auditoría (igual que antes)
+            string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? "Central America Standard Time"
+                : "America/Costa_Rica";
+
+            TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+            DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+            var usuario = await _userManager.GetUserAsync(User);
+
             foreach (var id in model.Ids)
             {
                 var permiso = await _context.Permiso.FindAsync(id);
@@ -779,7 +831,35 @@ namespace SistemasAnaliticos.Controllers
 
                 try
                 {
-                    if (model.estado == "Aprobada")
+                    if (permiso.estado == "Aprobada")
+                    {
+                        var auditoriaApro = new Auditoria
+                        {
+                            Fecha = hoy,
+                            Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                            Usuario = usuario.nombreCompleto ?? "Desconocido",
+                            Tabla = "Permiso",
+                            Accion = "Intento de Cambio de Permiso ya aprobada del no." + id + " del permiso de " + usuarioPermiso.nombreCompleto
+                        };
+                        _context.Auditoria.Add(auditoriaApro);
+
+                        TempData["ErrorMessagePermi"] = $"El permiso {id} no cambió de estado porque ya tenia estado anteriormente, del permiso de {usuarioPermiso.nombreCompleto}.";
+                    }
+                    else if (permiso.estado == "Rechazada")
+                    {
+                        var auditoriaRecha = new Auditoria
+                        {
+                            Fecha = hoy,
+                            Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                            Usuario = usuario.nombreCompleto ?? "Desconocido",
+                            Tabla = "Permiso",
+                            Accion = "Intento de Cambio de Permiso ya rechazada del no." + id + " del permiso de " + usuarioPermiso.nombreCompleto
+                        };
+                        _context.Auditoria.Add(auditoriaRecha);
+
+                        TempData["ErrorMessagePermi"] = $"El permiso {id} no cambió de estado porque ya tenia estado anteriormente, del permiso de {usuarioPermiso.nombreCompleto}.";
+                    }
+                    else if (model.estado == "Aprobada")
                     {
                         if (permiso.tipo == "Vacaciones")
                         {
@@ -903,16 +983,6 @@ namespace SistemasAnaliticos.Controllers
                 }
             }
 
-            // Auditoría (igual que antes)
-            string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? "Central America Standard Time"
-                : "America/Costa_Rica";
-
-            TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-            DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
-            DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
-            var usuario = await _userManager.GetUserAsync(User);
-
             var auditoria = new Auditoria
             {
                 Fecha = hoy,
@@ -1014,7 +1084,7 @@ namespace SistemasAnaliticos.Controllers
 
                     await _emailService.SendEmailAsync(
                         toEmail: usuario.Email,
-                        toName: usuario.nombreCompleto,
+                        toName: usuario.nombreCompleto ?? usuario.UserName ?? "Usuario",
                         subject: $"Confirmación de Permiso - {usuario.nombreCompleto}",
                         htmlBody: htmlEmpleado
                     );
@@ -1030,8 +1100,8 @@ namespace SistemasAnaliticos.Controllers
 
                         await _emailService.SendEmailAsync(
                             toEmail: correoJefe,
-                            toName: nombreJefe,
-                            subject: $"Solicitud de permiso pendiente - {usuario.nombreCompleto}",
+                            toName: nombreJefe ?? "Jefe",
+                            subject: $"Solicitud de Permiso Pendiente - {usuario.nombreCompleto}",
                             htmlBody: htmlJefe
                         );
                     }

@@ -292,7 +292,9 @@
                                     </div>
                                     <div class="mb-3">
                                         <p class="text-muted mb-1 small">Licencia</p>
-                                        <p class="fw-medium">@Model.licencias</p>
+                                        <p class="fw-mediummb-0 text-break @(Model.licencias == null ? "text-decoration-line-through text-danger" : "")">
+                                            @(Model.licencias ?? "N/A")
+                                        </p>
                                     </div>
                                 </div>
 

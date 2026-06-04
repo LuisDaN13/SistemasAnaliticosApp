@@ -276,7 +276,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-departamento" type="checkbox" value="Ingenieria" id="dropdown-dp-i">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Ingeniería" id="dropdown-dp-i">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-i">
                                             <span>Ingeniería</span>
                                             <span class="text-muted" id="dropdown-count-i">(0)</span>
@@ -324,7 +324,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-departamento" type="checkbox" value="Tecnicos NCR" id="dropdown-dp-tncr">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Técnicos NCR" id="dropdown-dp-tncr">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-tncr">
                                             <span>Técnicos NCR</span>
                                             <span class="text-muted" id="dropdown-count-tncr">(0)</span>
@@ -332,7 +332,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-departamento" type="checkbox" value="Tecnologias de Informacion" id="dropdown-dp-ti">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Tecnologías de Información" id="dropdown-dp-ti">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-ti">
                                             <span>Tecnologías de Información</span>
                                             <span class="text-muted" id="dropdown-count-ti">(0)</span>
@@ -372,11 +372,11 @@
                                 </div>
                             </div>
 
-                            <!-- FILTRO POR FECHA -->
+                            <!-- FILTRO POR FECHA DE CREACIÓN -->
                             <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
                                         type="button" data-bs-toggle="collapse" data-bs-target="#dateFilter" aria-expanded="false">
-                                    Fecha
+                                    Fecha de Creación
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
 
@@ -403,6 +403,21 @@
                                         <input type="date" class="form-control filter-date" id="filter-date-to">
                                     </div>
 
+                                </div>
+                            </div>
+
+                            <!-- FILTRO POR FECHA DE INICIO -->
+                            <div class="mb-3 pb-1 border-bottom">
+                                <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#startDateFilter" aria-expanded="false">
+                                    Fecha de Inicio
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                                <div class="collapse mt-3" id="startDateFilter">
+                                    <label class="form-label">Desde</label>
+                                    <input type="date" class="form-control mb-2 filter-start-date" id="filter-start-date-from">
+                                    <label class="form-label">Hasta</label>
+                                    <input type="date" class="form-control filter-start-date" id="filter-start-date-to">
                                 </div>
                             </div>
 
@@ -463,6 +478,8 @@
             }
         });
     </script>
+
+    <!-- Arreglo de Horas -->
     <script>
         function formatearHoraAMPM(time) {
             if (!time) return 'N/A';
@@ -476,6 +493,93 @@
             horas = horas ? horas : 12; // 0 => 12
 
             return `${horas}:${minutos} ${ampm}`;
+        }
+    </script>
+
+    <!-- MODAL CAMBIAR ESTADO -->
+    <div class="modal fade" id="estadoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Cambiar estado</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body text-center">
+
+                    <input type="hidden" id="permisoIdSeleccionado">
+
+                    <p class="mb-3">Seleccione el nuevo estado:</p>
+
+                    <button class="btn btn-warning w-100 mb-2"
+                            onclick="cambiarEstado('Pendiente')">
+                        Pendiente
+                    </button>
+
+                    <button class="btn btn-danger w-100 mb-2"
+                            onclick="cambiarEstado('Rechazada')">
+                        Rechazada
+                    </button>
+
+                    <button class="btn btn-outline-success w-100 mb-2"
+                            onclick="cambiarEstado('Aprobada')">
+                        Aprobada
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function abrirModalMasivo() {
+            const seleccionados = [...document.querySelectorAll(".permiso-check:checked")]
+                .map(c => parseInt(c.value));
+
+            if (seleccionados.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Debes seleccionar mínimo un permiso',
+                    confirmButtonText: 'Aceptar'
+                });
+                return;
+            }
+
+            window.idsSeleccionados = seleccionados;
+            document.getElementById("permisoIdSeleccionado").value = "";
+
+            const modal = new bootstrap.Modal(document.getElementById('estadoModal'));
+            modal.show();
+        }
+    </script>
+    <script>
+        function cambiarEstado(nuevoEstado) {
+
+            const idIndividual = document.getElementById("permisoIdSeleccionado").value;
+
+            const ids = window.idsSeleccionados?.length
+                ? window.idsSeleccionados
+                : [parseInt(idIndividual)];
+
+            fetch("/Permiso/CambiarEstadoMasivo", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ids, estado: nuevoEstado })
+            })
+            .then(res => res.json())
+            .then(data => {
+
+                // Cerrar modal
+                bootstrap.Modal.getInstance(
+                    document.getElementById("estadoModal")
+                ).hide();
+
+                // Redirigir para que muestre TempData
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            })
+            .catch(err => console.error(err));
         }
     </script>
 
@@ -544,6 +648,14 @@
                         params.append('fechaHasta', filtrosActivos.fecha.fechaHasta);
                     }
                 }
+            }
+
+            // Agregar filtros de fecha de inicio
+            if (filtrosActivos.fechaInicio.fechaDesde) {
+                params.append('fechaInicioDesde', filtrosActivos.fechaInicio.fechaDesde);
+            }
+            if (filtrosActivos.fechaInicio.fechaHasta) {
+                params.append('fechaInicioHasta', filtrosActivos.fechaInicio.fechaHasta);
             }
 
             // Crear enlace de descarga directa
@@ -620,6 +732,14 @@
                             params.append('fechaHasta', filtrosActivos.fecha.fechaHasta);
                         }
                     }
+                }
+
+                // Agregar filtros de fecha de inicio
+                if (filtrosActivos.fechaInicio.fechaDesde) {
+                    params.append('fechaInicioDesde', filtrosActivos.fechaInicio.fechaDesde);
+                }
+                if (filtrosActivos.fechaInicio.fechaHasta) {
+                    params.append('fechaInicioHasta', filtrosActivos.fechaInicio.fechaHasta);
                 }
 
                 // Realizar la solicitud
@@ -721,6 +841,10 @@
                 fechaUnica: null,
                 fechaDesde: null,
                 fechaHasta: null
+            },
+            fechaInicio: {
+                fechaDesde: null,
+                fechaHasta: null
             }
         };
 
@@ -748,7 +872,7 @@
                 params.append('nombre', filtrosActivos.nombre.trim());
             }
 
-            // Fechas
+            // Para Fecha de Creación
             if (filtrosActivos.fecha.tipo) {
                 params.append('fechaTipo', filtrosActivos.fecha.tipo);
 
@@ -762,6 +886,14 @@
                         params.append('fechaHasta', filtrosActivos.fecha.fechaHasta);
                     }
                 }
+            }
+
+            // Para Fechas de inicio
+            if (filtrosActivos.fechaInicio.fechaDesde) {
+                params.append('fechaInicioDesde', filtrosActivos.fechaInicio.fechaDesde);
+            }
+            if (filtrosActivos.fechaInicio.fechaHasta) {
+                params.append('fechaInicioHasta', filtrosActivos.fechaInicio.fechaHasta);
             }
 
             return params;
@@ -813,7 +945,9 @@
                     filtrosActivos.departamentos.length > 0 ||
                     (filtrosActivos.nombre && filtrosActivos.nombre.trim().length > 0) ||
                     (filtrosActivos.fecha.tipo === 'single' && filtrosActivos.fecha.fechaUnica) ||
-                    (filtrosActivos.fecha.tipo === 'range' && (filtrosActivos.fecha.fechaDesde || filtrosActivos.fecha.fechaHasta));
+                    (filtrosActivos.fecha.tipo === 'range' && (filtrosActivos.fecha.fechaDesde || filtrosActivos.fecha.fechaHasta))
+                    filtrosActivos.fechaInicio.fechaDesde ||
+                    filtrosActivos.fechaInicio.fechaHasta;
 
                 pagination.style.display = hayFiltrosActivos ? 'none' : 'flex';
             }, 1200); // 1 segundo de delay mínimo
@@ -1070,15 +1204,61 @@
             fadeIn(permissionsContainer);
         }
 
-            function renderPagination() {
+        // Función para la paginación de los registros
+        function renderPagination() {
             pagination.innerHTML = '';
+
+            const delta = 2; // páginas a mostrar a cada lado de la actual
+            const range = [];
+            const rangeWithDots = [];
+
+            // Siempre incluir primera, última y las cercanas a la actual
             for (let i = 1; i <= totalPaginas; i++) {
-                pagination.innerHTML += `
-                    <li class="page-item ${i === paginaActual ? 'active' : ''}">
-                        <a class="page-link" href="?page=${i}">${i}</a>
-                    </li>
-                `;
+                if (
+                    i === 1 ||
+                    i === totalPaginas ||
+                    (i >= paginaActual - delta && i <= paginaActual + delta)
+                ) {
+                    range.push(i);
+                }
             }
+
+            // Agregar "..." donde hay saltos
+            let prev = 0;
+            for (const i of range) {
+                if (prev && i - prev > 1) {
+                    rangeWithDots.push('...');
+                }
+                rangeWithDots.push(i);
+                prev = i;
+            }
+
+            // Botón anterior
+            pagination.innerHTML += `
+                <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="?page=${paginaActual - 1}">‹</a>
+                </li>`;
+
+            // Números y puntos suspensivos
+            for (const item of rangeWithDots) {
+                if (item === '...') {
+                    pagination.innerHTML += `
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>`;
+                } else {
+                    pagination.innerHTML += `
+                        <li class="page-item ${item === paginaActual ? 'active' : ''}">
+                            <a class="page-link" href="?page=${item}">${item}</a>
+                        </li>`;
+                }
+            }
+
+            // Botón siguiente
+            pagination.innerHTML += `
+                <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
+                    <a class="page-link" href="?page=${paginaActual + 1}">›</a>
+                </li>`;
         }
 
         // Función debounce para optimizar búsquedas por nombre
@@ -1172,6 +1352,15 @@
                 });
             }
 
+            // Event listeners para fecha de inicio
+            document.querySelectorAll('.filter-start-date').forEach(input => {
+                input.addEventListener('change', async function () {
+                    filtrosActivos.fechaInicio.fechaDesde = document.getElementById('filter-start-date-from').value || null;
+                    filtrosActivos.fechaInicio.fechaHasta = document.getElementById('filter-start-date-to').value || null;
+                    await aplicarFiltros();
+                });
+            });
+
             // Limpiar filtros
             document.getElementById('clear-filters').addEventListener('click', function() {
                 // Desmarcar checkboxes
@@ -1187,6 +1376,8 @@
                 document.getElementById('dateRangeSwitch').checked = false;
                 document.getElementById("singleDateContainer").classList.remove("d-none");
                 document.getElementById("rangeDateContainer").classList.add("d-none");
+                document.getElementById('filter-start-date-from').value = '';
+                document.getElementById('filter-start-date-to').value = '';
 
                 // Limpiar estado de filtros
                 filtrosActivos.tipos = [];
@@ -1196,6 +1387,10 @@
                 filtrosActivos.fecha = {
                     tipo: 'single',
                     fechaUnica: null,
+                    fechaDesde: null,
+                    fechaHasta: null
+                };
+                filtrosActivos.fechaInicio = {
                     fechaDesde: null,
                     fechaHasta: null
                 };
@@ -1213,93 +1408,6 @@
                 renderPagination();
             })();
         });
-    </script>
-
-    <!-- MODAL CAMBIAR ESTADO -->
-    <div class="modal fade" id="estadoModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title">Cambiar estado</h5>
-                    <button class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body text-center">
-
-                    <input type="hidden" id="permisoIdSeleccionado">
-
-                    <p class="mb-3">Seleccione el nuevo estado:</p>
-
-                    <button class="btn btn-warning w-100 mb-2"
-                            onclick="cambiarEstado('Pendiente')">
-                        Pendiente
-                    </button>
-
-                    <button class="btn btn-danger w-100 mb-2"
-                            onclick="cambiarEstado('Rechazada')">
-                        Rechazada
-                    </button>
-
-                    <button class="btn btn-outline-success w-100 mb-2"
-                            onclick="cambiarEstado('Aprobada')">
-                        Aprobada
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        function abrirModalMasivo() {
-            const seleccionados = [...document.querySelectorAll(".permiso-check:checked")]
-                .map(c => parseInt(c.value));
-
-            if (seleccionados.length === 0) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Debes seleccionar mínimo un permiso',
-                    confirmButtonText: 'Aceptar'
-                });
-                return;
-            }
-
-            window.idsSeleccionados = seleccionados;
-            document.getElementById("permisoIdSeleccionado").value = "";
-
-            const modal = new bootstrap.Modal(document.getElementById('estadoModal'));
-            modal.show();
-        }
-    </script>
-    <script>
-        function cambiarEstado(nuevoEstado) {
-
-            const idIndividual = document.getElementById("permisoIdSeleccionado").value;
-
-            const ids = window.idsSeleccionados?.length
-                ? window.idsSeleccionados
-                : [parseInt(idIndividual)];
-
-            fetch("/Permiso/CambiarEstadoMasivo", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ids, estado: nuevoEstado })
-            })
-            .then(res => res.json())
-            .then(data => {
-
-                // Cerrar modal
-                bootstrap.Modal.getInstance(
-                    document.getElementById("estadoModal")
-                ).hide();
-
-                // Redirigir para que muestre TempData
-                if (data.redirect) {
-                    window.location.href = data.redirect;
-                }
-            })
-            .catch(err => console.error(err));
-        }
     </script>
 </body>
 </html>

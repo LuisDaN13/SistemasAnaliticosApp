@@ -20,7 +20,7 @@ namespace SistemasAnaliticos.Services
         {
             var roles = await _userManager.GetRolesAsync(user);
 
-            if (roles.Contains("Administrador") || roles.Contains("RRHH"))
+            if (roles.Contains("Administrador") || roles.Contains("RRHH") || roles.Contains("RRHH (Solo Vista)"))
                 return "Global";
 
             if (roles.Contains("Jefatura"))

@@ -129,7 +129,9 @@ namespace SistemasAnaliticos.Controllers
             [FromQuery] string fechaTipo = null,
             [FromQuery] string fechaUnica = null,
             [FromQuery] string fechaDesde = null,
-            [FromQuery] string fechaHasta = null)
+            [FromQuery] string fechaHasta = null,
+            [FromQuery] string fechaInicioDesde = null,
+            [FromQuery] string fechaInicioHasta = null)
         {
             try
             {
@@ -190,6 +192,18 @@ namespace SistemasAnaliticos.Controllers
                     }
                 }
 
+                if (!string.IsNullOrEmpty(fechaInicioDesde) && DateOnly.TryParse(fechaInicioDesde, out DateOnly inicioDesdeDate))
+                {
+                    var inicioDesdeDateTime = inicioDesdeDate.ToDateTime(TimeOnly.MinValue); // 00:00:00
+                    query = query.Where(p => p.fechaRequerida >= inicioDesdeDateTime);
+                }
+
+                if (!string.IsNullOrEmpty(fechaInicioHasta) && DateOnly.TryParse(fechaInicioHasta, out DateOnly inicioHastaDate))
+                {
+                    var inicioHastaDateTime = inicioHastaDate.ToDateTime(TimeOnly.MaxValue); // 23:59:59
+                    query = query.Where(p => p.fechaRequerida <= inicioHastaDateTime);
+                }
+
                 var contancias = await query
                     .OrderByDescending(x => x.fechaCreacion)
                     .Select(p => new {
@@ -226,7 +240,9 @@ namespace SistemasAnaliticos.Controllers
         [FromQuery] string fechaTipo = null,
         [FromQuery] string fechaUnica = null,
         [FromQuery] string fechaDesde = null,
-        [FromQuery] string fechaHasta = null)
+        [FromQuery] string fechaHasta = null,
+        [FromQuery] string fechaInicioDesde = null,
+        [FromQuery] string fechaInicioHasta = null)
         {
             try
             {
@@ -276,6 +292,18 @@ namespace SistemasAnaliticos.Controllers
                             );
                         }
                     }
+                }
+
+                if (!string.IsNullOrEmpty(fechaInicioDesde) && DateOnly.TryParse(fechaInicioDesde, out DateOnly inicioDesdeDate))
+                {
+                    var inicioDesdeDateTime = inicioDesdeDate.ToDateTime(TimeOnly.MinValue); // 00:00:00
+                    query = query.Where(p => p.fechaRequerida >= inicioDesdeDateTime);
+                }
+
+                if (!string.IsNullOrEmpty(fechaInicioHasta) && DateOnly.TryParse(fechaInicioHasta, out DateOnly inicioHastaDate))
+                {
+                    var inicioHastaDateTime = inicioHastaDate.ToDateTime(TimeOnly.MaxValue); // 23:59:59
+                    query = query.Where(p => p.fechaRequerida <= inicioHastaDateTime);
                 }
 
                 var contancias = await query
@@ -386,7 +414,9 @@ namespace SistemasAnaliticos.Controllers
         [FromQuery] string fechaTipo = null,
         [FromQuery] string fechaUnica = null,
         [FromQuery] string fechaDesde = null,
-        [FromQuery] string fechaHasta = null)
+        [FromQuery] string fechaHasta = null,
+        [FromQuery] string fechaInicioDesde = null,
+        [FromQuery] string fechaInicioHasta = null)
         {
             try
             {
@@ -432,6 +462,18 @@ namespace SistemasAnaliticos.Controllers
                             );
                         }
                     }
+                }
+
+                if (!string.IsNullOrEmpty(fechaInicioDesde) && DateOnly.TryParse(fechaInicioDesde, out DateOnly inicioDesdeDate))
+                {
+                    var inicioDesdeDateTime = inicioDesdeDate.ToDateTime(TimeOnly.MinValue); // 00:00:00
+                    query = query.Where(p => p.fechaRequerida >= inicioDesdeDateTime);
+                }
+
+                if (!string.IsNullOrEmpty(fechaInicioHasta) && DateOnly.TryParse(fechaInicioHasta, out DateOnly inicioHastaDate))
+                {
+                    var inicioHastaDateTime = inicioHastaDate.ToDateTime(TimeOnly.MaxValue); // 23:59:59
+                    query = query.Where(p => p.fechaRequerida <= inicioHastaDateTime);
                 }
 
                 var contancias = await query
@@ -610,7 +652,7 @@ namespace SistemasAnaliticos.Controllers
                         Operaciones = g.Count(p => p.departamento == "Operaciones"),
                         RecursosHumanos = g.Count(p => p.departamento == "Recursos Humanos"),
                         ServiciosGenerales = g.Count(b => b.departamento == "Servicios Generales"),
-                        TecnicosNCR = g.Count(p => p.departamento == "Tecnicos NCR"),
+                        TecnicosNCR = g.Count(p => p.departamento == "Técnicos NCR"),
                         TecnologiasInformacion = g.Count(p => p.departamento == "Tecnologías de Información"),
                         Ventas = g.Count(p => p.departamento == "Ventas")
                     })

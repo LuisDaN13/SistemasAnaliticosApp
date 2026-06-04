@@ -225,7 +225,6 @@
         }
 
 
-
         // Plantillas de Constancias
         public static string ConfirmacionEmpleadoCons(string nombreEmpleado, string tipoConstancia)
         {
@@ -672,6 +671,7 @@
         }
 
 
+        // Plantillas de Garantías
         public static string ConfirmacionEmpleadoGarantia(string nombreEmpleado, string nombreLicitacion)
         {
             return $@"

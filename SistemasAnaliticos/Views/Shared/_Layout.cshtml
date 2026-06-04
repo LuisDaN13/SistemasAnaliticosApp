@@ -150,6 +150,9 @@
                                 <li>
                                     <a class="dropdown-item" asp-controller="Usuario" asp-action="Index"><i class="bi bi-people me-2"></i>Directorio</a>
                                 </li>
+@*                                 <li>
+                                    <a class="dropdown-item" asp-controller="Organigrama" asp-action="Index"><i class="bi bi-diagram-3 me-2"></i>Organigrama</a>
+                                </li> *@
                             </ul>
                         </li>
 
@@ -160,17 +163,21 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-controller="Permiso" asp-action="Index"><i class="bi-plus-square me-2"></i>Nuevo Permiso</a></li>
-                                @*                                 <li><a class="dropdown-item" asp-controller="Liquidacion" asp-action="Index"><i class="bi-plus-square me-2"></i>Nueva Liquidación</a></li>
- *@                                <li><hr class="dropdown-divider"></li>
+                                @if ((User.IsInRole("Administrador"))) {
+                                    <li><a class="dropdown-item" asp-controller="Liquidacion" asp-action="Index"><i class="bi-plus-square me-2"></i>Nueva Liquidación</a></li>
+                                }
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" asp-controller="Permiso" asp-action="VerPermisos">Ver Permisos</a></li>
                                 <li><a class="dropdown-item" asp-controller="Constancia" asp-action="VerConstancias">Ver Constancias</a></li>
                                 <li><a class="dropdown-item" asp-controller="Beneficio" asp-action="VerBeneficios">Ver Beneficios</a></li>
-                                @*                                 <li><a class="dropdown-item" asp-controller="Liquidacion" asp-action="VerViaticos">Ver Viáticos</a></li>
-                                <li><a class="dropdown-item" asp-controller="Extras" asp-action="VerExtras">Ver Extras</a></li>
- *@                            </ul>
+                                @if ((User.IsInRole("Administrador"))) {
+                                    <li><a class="dropdown-item" asp-controller="Liquidacion" asp-action="VerViaticos">Ver Viáticos</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Extras" asp-action="VerExtras">Ver Extras</a></li>
+                                }
+                            </ul>
                         </li>
 
-                        @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                        @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH") || User.IsInRole("RRHH (Solo Vista)"))
                         {
                             <!-- Otros -->
                             <li class="nav-item dropdown">
@@ -250,6 +257,13 @@
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- D3 -->
+    <script src="~/lib/d3orgchart/d3.min.js"></script>
+    <script src="~/lib/d3orgchart/d3-flextree.min.js"></script>
+    <script src="~/lib/d3orgchart/d3-org-chart.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+    

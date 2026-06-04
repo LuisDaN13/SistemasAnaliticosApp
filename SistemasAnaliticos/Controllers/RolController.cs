@@ -27,6 +27,7 @@ namespace SistemasAnaliticos.Controllers
         {
             var roles = await _context.Roles
                 .AsNoTracking()
+                .OrderBy(x => x.Name)
                 .Select(x => new RolViewModel
                 {
                     Id = x.Id,

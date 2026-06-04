@@ -183,7 +183,8 @@
             const tipoTexto = document.getElementById('tipoTexto');
             if (tipoTexto) tipoTexto.textContent = '';
 
-            console.log('Formulario de beneficios reseteado');
+            const submitBtn = document.getElementById('submitBtnBene');
+            if (submitBtn) submitBtn.disabled = false;
         }
 
         function inicializarValidacionBene() {
@@ -200,9 +201,13 @@
                 e.preventDefault();
                 e.stopPropagation();
 
+                const submitBtn = document.getElementById('submitBtnBene');
+                submitBtn.disabled = true;
+
                 if (validarFormularioBene()) {
-                    // Si todo es válido, enviar el formulario
                     this.submit();
+                } else {
+                    submitBtn.disabled = false; 
                 }
             });
 
@@ -211,8 +216,12 @@
                 e.preventDefault();
                 e.stopPropagation();
 
+                this.disabled = true;    
+
                 if (validarFormularioBene()) {
                     form.submit();
+                } else {
+                    this.disabled = false;    
                 }
             });
 

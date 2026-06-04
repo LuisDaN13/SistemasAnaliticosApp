@@ -38,8 +38,7 @@
         .card-employee {
             display: flex;
             flex-direction: column;
-            height: 95%; /* CLAVE */
-
+            height: 95%;
             border-radius: 12px;
             border: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -47,6 +46,7 @@
             margin-bottom: 1.5rem;
             overflow: hidden;
         }
+
             .card-employee:hover {
                 transform: translateY(-5px);
                 box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
@@ -61,23 +61,21 @@
         .employee-avatar {
             width: 180px;
             height: 180px;
-            
             object-fit: cover;
         }
 
         .employee-name {
             font-size: 1.25rem;
-            font-weight: 600;
+            font-weight: 700;
             margin-top: 0.8rem;
             margin-bottom: 0.8rem;
-            font-weight: 700;
             color: black;
         }
 
         .employee-tags {
             display: flex;
-            gap: 0.5rem; /* espacio entre las burbujas */
-            flex-wrap: wrap; /* por si se hace muy pequeño el contenedor */
+            gap: 0.5rem;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: center;
         }
@@ -88,13 +86,13 @@
             color: black;
             margin: 0;
             padding: 4px 10px;
-            border-radius: 20px; /* forma de burbuja */
+            border-radius: 20px;
             display: inline-block;
             font-weight: 500;
         }
 
         .card-employee-body {
-            flex: 1; /* CLAVE */
+            flex: 1;
             padding: 1.5rem 1.5rem 0 1.5rem;
         }
 
@@ -116,7 +114,6 @@
             font-size: 0.8rem;
             font-weight: 500;
             width: 100px;
-
             display: flex;
             justify-content: center;
             align-items: center;
@@ -160,27 +157,24 @@
 
         .card-employee-footer {
             padding: 1rem 1.5rem;
-            margin-top: auto; /* refuerzo extra (opcional pero recomendado) */
+            margin-top: auto;
         }
 
-        /* Contenedor principal del footer */
         .footer-actions {
             display: flex;
             width: 100%;
         }
 
-        /* Cada "slot" de botón */
         .footer-slot-details,
         .footer-slot-edit,
         .footer-slot-delete,
         .footer-slot-password {
-            flex: 1; /* Ahora todos ocupan el mismo espacio */
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Botones (ya definidos por ti, aquí solo aseguramos consistencia visual) */
         .action-btn {
             border: none;
             background: transparent;
@@ -198,19 +192,10 @@
                 color: var(--dark-color);
             }
 
-        .btn-details {
-            color: #64B5F6;
-        }
+        .btn-details { color: #64B5F6; }
+        .btn-edit    { color: #ffc107; }
+        .btn-delete  { color: #dc3545; }
 
-        .btn-edit {
-            color: #ffc107;
-        }
-
-        .btn-delete {
-            color: #dc3545;
-        }
-
-        /* Estilo para el botón de contraseña */
         .btn-password {
             color: #6a11cb;
         }
@@ -219,6 +204,20 @@
                 color: #2575fc;
                 background-color: rgba(106, 17, 203, 0.1);
             }
+
+        /* Paginación */
+        .pagination .page-item.active .page-link {
+            background-color: #012473;
+            border-color: #012473;
+        }
+
+        .pagination .page-link {
+            color: #012473;
+        }
+
+        .pagination .page-link:hover {
+            color: #013599;
+        }
     </style>
 
     <!-- ESTILOS DEL MODAL -->
@@ -230,9 +229,7 @@
             --success-color: #198754;
         }
 
-        .modal-xl-custom {
-            max-width: 1000px;
-        }
+        .modal-xl-custom { max-width: 1000px; }
 
         .stepper-sidebar {
             background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
@@ -245,115 +242,50 @@
             cursor: pointer;
         }
 
-            .step-item:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-            }
-
-            .step-item.active {
-                background-color: rgba(255, 255, 255, 0.2);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            }
-
-            .step-item.completed {
-                background-color: rgba(255, 255, 255, 0.1);
-            }
+            .step-item:hover  { background-color: rgba(255,255,255,0.1); }
+            .step-item.active { background-color: rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+            .step-item.completed { background-color: rgba(255,255,255,0.1); }
 
         .step-icon {
-            width: 48px;
-            height: 48px;
+            width: 48px; height: 48px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
         }
 
-            .step-icon.active {
-                background-color: white;
-                color: var(--primary-color);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            }
+            .step-icon.active   { background-color: white; color: var(--primary-color); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+            .step-icon.completed{ background-color: var(--success-color); color: white; }
+            .step-icon.inactive { background-color: rgba(255,255,255,0.2); color: white; }
 
-            .step-icon.completed {
-                background-color: var(--success-color);
-                color: white;
-            }
+        .step-title       { font-weight: 600; font-size: 0.9rem; }
+        .step-description { font-size: 0.8rem; color: rgba(255,255,255,0.8); }
 
-            .step-icon.inactive {
-                background-color: rgba(255, 255, 255, 0.2);
-                color: white;
-            }
+        .required-field::after { content: " *"; color: var(--danger-color); }
 
-        .step-title {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
+        .section-title    { color: var(--primary-color); font-weight: 700; margin-bottom: 0.5rem; }
+        .section-subtitle { color: #6c757d; margin-bottom: 1.5rem; }
 
-        .step-description {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
+        .form-label { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; }
 
-        .required-field::after {
-            content: " *";
-            color: var(--danger-color);
-        }
-
-        .section-title {
-            color: var(--primary-color);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .section-subtitle {
-            color: #6c757d;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .emergency-contact-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
+        .emergency-contact-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
 
         .emergency-icon {
-            width: 32px;
-            height: 32px;
+            width: 32px; height: 32px;
             border-radius: 50%;
             background-color: var(--danger-color);
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: 0.9rem;
         }
 
-        .currency-input {
-            position: relative;
-            z-index: 1;
-        }
-
-            .currency-input .input-group-text {
-                background-color: #e9ecef;
-                border-right: none;
-            }
-
-            .currency-input .form-control {
-                border-left: none;
-            }
+        .currency-input { position: relative; z-index: 1; }
+            .currency-input .input-group-text { background-color: #e9ecef; border-right: none; }
+            .currency-input .form-control     { border-left: none; }
 
         .btn-primary-custom {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
         }
-
             .btn-primary-custom:hover {
                 background-color: var(--secondary-color);
                 border-color: var(--secondary-color);
@@ -364,55 +296,29 @@
             border-color: var(--success-color);
         }
 
-        .modal-content {
-            border-radius: 12px;
-            overflow: hidden;
-        }
+        .modal-content { border-radius: 12px; overflow: hidden; }
+        .modal-body    { padding: 0; }
 
-        .modal-body {
-            padding: 0;
-        }
-
-        /* NUEVO ESTILO: Contenedor principal con flexbox */
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%; /* Altura fija del modal */
-        }
-
-        .form-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 2rem;
-        }
+        .form-container  { display: flex; flex-direction: column; height: 100%; }
+        .form-content    { flex: 1; overflow-y: auto; padding: 2rem; }
 
         .modal-footer-custom {
             background-color: #f8f9fa;
             border-top: 1px solid #dee2e6;
             padding: 1rem 2rem;
-            margin-top: auto; /* Empuja los botones hacia abajo */
+            margin-top: auto;
         }
-
 
         .corner-triangle {
             position: absolute;
-            top: 0;
-            right: 0;
-            width: 50px; /* tamaño de la esquina */
-            height: 50px;
-            clip-path: polygon(0 0, 100% 0, 100% 100%); /* forma de “doblez” */
+            top: 0; right: 0;
+            width: 50px; height: 50px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%);
             z-index: 2;
         }
 
-        /* Colores según estado */
-        .corner-green {
-            background-color: #2dbd4d; /* verde */
-        }
-
-        .corner-red {
-            background-color: #dc3545; /* rojo */
-        }
-
+        .corner-green { background-color: #2dbd4d; }
+        .corner-red   { background-color: #dc3545; }
     </style>
 </head>
 <body class="bg-gradient-custom min-vh-100">
@@ -423,35 +329,41 @@
         <!-- Header -->
         <div class="header-card p-4 mt-4">
             <h1 class="h2 fw-bold text-gray-900 mb-2">Gestión de Empleados</h1>
-            <p class="text-muted mb-0">Administra la información de todos los <strong><span id="employeeCount">@Model.Count()</span></strong> empleados de la empresa</p>
+            <p class="text-muted mb-0">
+                Administra la información de todos los
+                <strong><span id="employeeCount">@ViewBag.TotalEmpleados</span></strong>
+                empleados de la empresa
+            </p>
         </div>
 
         <!-- Actions Bar -->
         <div class="header-card p-4 mt-4 mb-4">
             <div class="card-body">
                 <div class="row g-3 align-items-center">
-                    @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                    @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
                     {
                         <div class="col-md-6 col-lg-9">
                             <div class="position-relative" style="z-index: 1;">
                                 <i class="bi bi-search text-muted search-icon"></i>
                                 <input type="text"
-                                class="form-control ps-5"
-                                id="searchInput"
-                                placeholder="Buscar por nombre, departamento o puesto...">
+                                       class="form-control ps-5"
+                                       id="searchInput"
+                                       placeholder="Buscar por nombre, departamento o puesto..."
+                                       value="@ViewBag.Search">
                             </div>
                         </div>
                         <div class="col-md-6 col-lg-3">
                             <div class="d-flex gap-2">
                                 <button class="btn btn-primary-custom text-white d-flex align-items-center"
-                                data-bs-toggle="modal"
-                                data-bs-target="#createEmployeeModal">
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#createEmployeeModal">
                                     <i class="bi bi-plus me-2"></i>
                                     Nuevo Empleado
                                 </button>
                             </div>
                         </div>
-                    } else                    
+                    }
+                    else
                     {
                         <div class="col-lg-12">
                             <div class="position-relative" style="z-index: 1;">
@@ -459,7 +371,8 @@
                                 <input type="text"
                                        class="form-control ps-5"
                                        id="searchInput"
-                                       placeholder="Buscar por nombre, departamento o puesto...">
+                                       placeholder="Buscar por nombre, departamento o puesto..."
+                                       value="@ViewBag.Search">
                             </div>
                         </div>
                     }
@@ -467,11 +380,91 @@
             </div>
         </div>
 
+        <!-- ===================== PAGINACIÓN ===================== -->
+        @if (ViewBag.TotalPages > 0)
+        {
+            <div class="header-card p-3 mt-4 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                <!-- Info -->
+                <small class="text-muted">
+                    Página <strong>@ViewBag.CurrentPage</strong> de <strong>@ViewBag.TotalPages</strong>
+                    &mdash; @ViewBag.TotalEmpleados empleados en total
+                </small>
+
+                <!-- Selector de tamaño de página -->
+                <div class="d-flex align-items-center gap-2">
+                    <small class="text-muted">Por página:</small>
+                    <select class="form-select form-select-sm w-auto" id="pageSizeSelect">
+                        @foreach (var size in (int[])ViewBag.AllowedPageSizes)
+                        {
+                            if (size == (int)ViewBag.PageSize)
+                            {
+                                <option value="@size" selected>@size</option>
+                            }
+                            else
+                            {
+                                <option value="@size">@size</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Botones de navegación -->
+                <nav aria-label="Paginación de empleados">
+                    <ul class="pagination pagination-sm mb-0">
+
+                        <!-- Anterior -->
+                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               href="?page=@(ViewBag.CurrentPage - 1)&pageSize=@ViewBag.PageSize&search=@ViewBag.Search"
+                               aria-label="Anterior">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        @{
+                            int current = (int)ViewBag.CurrentPage;
+                            int total = (int)ViewBag.TotalPages;
+                        }
+
+                        @for (int i = 1; i <= total; i++)
+                        {
+                            if (i == 1 || i == total || (i >= current - 1 && i <= current + 1))
+                            {
+                                <li class="page-item @(i == current ? "active" : "")">
+                                    <a class="page-link"
+                                       href="?page=@i&pageSize=@ViewBag.PageSize&search=@ViewBag.Search">@i</a>
+                                </li>
+                            }
+                            else if (i == current - 2 || i == current + 2)
+                            {
+                                <li class="page-item disabled">
+                                    <span class="page-link">…</span>
+                                </li>
+                            }
+                        }
+
+                        <!-- Siguiente -->
+                        <li class="page-item @(ViewBag.CurrentPage == total ? "disabled" : "")">
+                            <a class="page-link"
+                               href="?page=@(ViewBag.CurrentPage + 1)&pageSize=@ViewBag.PageSize&search=@ViewBag.Search"
+                               aria-label="Siguiente">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+        }
+        <!-- =================== FIN PAGINACIÓN =================== -->
+
         <!-- Employees Cards -->
         <div>
-            <!-- Mensaje cuando no hay resultados - OCULTO INICIALMENTE -->
-            <div id="noResults" class="d-none">
-                <div style="border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); background-color: white; margin-bottom: 1.5rem;">
+            <!-- Mensaje cuando no hay resultados -->
+            @if (!Model.Any())
+            {
+                <div style="border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background-color: white; margin-bottom: 1.5rem;">
                     <div style="display: flex; align-items: center; justify-content: space-around; padding: 2rem;">
                         <p style="color: #6c757d; margin: 0; flex: 1; text-align: left; font-size: 1rem;">
                             No se encontraron empleados que coincidan con la búsqueda.
@@ -479,36 +472,36 @@
                         <div id="lottie-animation" style="width: 110px; height: 110px; flex-shrink: 0;"></div>
                     </div>
                 </div>
-            </div>
+            }
 
             <div id="employeesCards" class="employees-grid">
                 @foreach (var empleado in Model)
                 {
                     <div class="card card-employee">
                         <div class="card-employee-header text-center">
-                            <div class="position-relative d-inline-block w-100" style="background-color: rgba(1, 36, 115, 0.1); z-index: 1;">
+                            <div class="position-relative d-inline-block w-100"
+                                 style="background-color: rgba(1, 36, 115, 0.1); z-index: 1;">
 
-                                @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                                @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
                                 {
-                                    <!-- Indicador de estado (esquina superior derecha) -->
                                     <span class="corner-triangle @(empleado.Estado ? "corner-green" : "corner-red")"></span>
                                 }
 
                                 @if (empleado.Foto != null && empleado.Foto.Length > 0)
                                 {
                                     <img src="data:image/jpeg;base64,@Convert.ToBase64String(empleado.Foto)"
-                                            alt="foto de Empleado"
-                                            class="employee-avatar"
-                                            style="cursor: pointer;"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#fotoModal"
-                                            onclick="mostrarImagenModal('@Convert.ToBase64String(empleado.Foto)')">
+                                         alt="foto de Empleado"
+                                         class="employee-avatar"
+                                         style="cursor: pointer;"
+                                         data-bs-toggle="modal"
+                                         data-bs-target="#fotoModal"
+                                         onclick="mostrarImagenModal('@Convert.ToBase64String(empleado.Foto)')">
                                 }
                                 else
                                 {
                                     <img src="/Img/sin foto.png"
-                                            alt="foto de Empleado"
-                                            class="employee-avatar">
+                                         alt="foto de Empleado"
+                                         class="employee-avatar">
                                 }
                             </div>
 
@@ -518,20 +511,47 @@
                                 <p class="employee-tag">@empleado.Departamento</p>
                             </div>
                         </div>
+
                         <div class="card-employee-body">
                             <div class="employee-info-item">
                                 <div class="employee-info-text">
                                     <strong>Correo Empresarial:</strong><br>
-                                    <span class="text-break">@(empleado.CorreoEmp != null && !string.IsNullOrEmpty(empleado.CorreoEmp) ? empleado.CorreoEmp : "Sin Correo Empresarial")</span>
+                                    <span class="text-break"
+                                          onclick="copiarAlPortapapeles('@(empleado.CorreoEmp?.Replace("'", "\\'"))')"
+                                          style="cursor: pointer; text-decoration: underline dotted;"
+                                          title="Haz clic para copiar el correo">
+                                        @(empleado.CorreoEmp ?? "Sin Correo Empresarial")
+                                    </span>
+                                    @if (!string.IsNullOrEmpty(empleado.CorreoEmp))
+                                    {
+                                        <small class="text-muted">📋</small>
+                                    }
+                                </div>
                             </div>
-                            </div>
+
+                            <script>
+                                function copiarAlPortapapeles(texto) {
+                                    if (!texto || texto === "Sin Correo Empresarial") return;
+
+                                    navigator.clipboard.writeText(texto).then(() => {
+                                    }).catch(() => {
+                                        // Fallback
+                                        const textarea = document.createElement('textarea');
+                                        textarea.value = texto;
+                                        document.body.appendChild(textarea);
+                                        textarea.select();
+                                        document.execCommand('copy');
+                                        document.body.removeChild(textarea);
+                                    });
+                                }
+                            </script>
                             <div class="employee-info-item">
                                 <div class="employee-info-text">
                                     <strong>Teléfono Empresarial:</strong><br>
                                     <span class="text-break">@(empleado.TelefonoEmp != null && !string.IsNullOrEmpty(empleado.TelefonoEmp) ? empleado.TelefonoEmp : "Sin Celular Empresarial")</span>
                                 </div>
                             </div>
-                            @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                            @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
                             {
                                 <div class="employee-info-item">
                                     <div class="employee-info-text">
@@ -547,10 +567,10 @@
                                 </div>
                             }
                         </div>
+
                         <div class="card-employee-footer">
                             <div class="footer-actions">
 
-                                @* DETAILS: visible para ADMIN/RRHH siempre, y para el usuario de su propio perfil *@
                                 @if (User.IsInRole("Administrador") || User.IsInRole("RRHH") || userId == empleado.Id)
                                 {
                                     <div class="footer-slot-details">
@@ -564,7 +584,6 @@
                                     </div>
                                 }
 
-                                @* ACCIONES ADMIN / RRHH *@
                                 @if (User.IsInRole("Administrador") || User.IsInRole("RRHH"))
                                 {
                                     <div class="footer-slot-edit">
@@ -654,7 +673,6 @@
                                 Nueva Contraseña <span class="text-danger">*</span>
                             </label>
 
-                            <!-- Input + botón -->
                             <div class="input-group">
                                 <input type="password"
                                        class="form-control"
@@ -670,7 +688,6 @@
                                 </button>
                             </div>
 
-                            <!-- Especificaciones debajo -->
                             <div class="mt-2">
                                 <small class="text-muted">
                                     <i class="bi bi-info-circle me-1"></i>
@@ -695,89 +712,25 @@
     </div>
 
     @section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Inicializar animación Lottie solo cuando sea necesario
-            let lottieInitialized = false;
 
-            function initLottieAnimation() {
-                if (lottieInitialized) return;
-
-                const lottieContainer = document.getElementById('lottie-animation');
-                if (lottieContainer) {
-                    const animation = document.createElement('lottie-player');
-                    animation.setAttribute('src', '/lottie/loading.json');
-                    animation.setAttribute('background', 'transparent');
-                    animation.setAttribute('speed', '1');
-                    animation.setAttribute('style', 'width: 110px; height: 110px;');
-                    animation.setAttribute('loop', '');
-                    animation.setAttribute('autoplay', '');
-                    lottieContainer.appendChild(animation);
-                    lottieInitialized = true;
-                }
-            }
-
-            function normalizarTexto(texto) {
-                return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-            }
-
-            function filterEmployees(searchTerm) {
-                const cards = document.querySelectorAll('.card-employee');
-                let visibleCount = 0;
-                const searchNormalized = normalizarTexto(searchTerm);
-
-                cards.forEach(card => {
-                    const employeeName = card.querySelector('.employee-name')?.textContent || '';
-                    const tags = card.querySelectorAll('.employee-tag');
-                    const position = tags[0]?.textContent || '';
-                    const department = tags[1]?.textContent || '';
-
-                    const nameNormalized = normalizarTexto(employeeName);
-                    const positionNormalized = normalizarTexto(position);
-                    const departmentNormalized = normalizarTexto(department);
-
-                    const matches = nameNormalized.includes(searchNormalized) ||
-                                    positionNormalized.includes(searchNormalized) ||
-                                    departmentNormalized.includes(searchNormalized);
-
-                    if (matches) {
-                        card.classList.remove('d-none');
-                        visibleCount++;
-                    } else {
-                        card.classList.add('d-none');
-                    }
-                });
-
-                // Actualizar contador
-                const employeeCount = document.getElementById('employeeCount');
-                if (employeeCount) {
-                    employeeCount.textContent = visibleCount;
-                }
-
-                // Mostrar/ocultar mensaje
-                const noResults = document.getElementById('noResults');
-                if (noResults) {
-                    if (visibleCount === 0) {
-                        noResults.classList.remove('d-none');
-                        initLottieAnimation();
-                    } else {
-                        noResults.classList.add('d-none');
-                    }
-                }
-            }
-
-            // Configurar búsqueda
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', function(e) {
-                    filterEmployees(e.target.value.trim());
-                });
-
-                // Filtrar inicialmente (esto ocultará inmediatamente el mensaje #noResults)
-                filterEmployees('');
-            }
-        });
-    </script>
+    <!-- Lottie (solo si no hay resultados) -->
+    @if (!Model.Any())
+    {
+        <script>
+            (function () {
+                const c = document.getElementById('lottie-animation');
+                if (!c) return;
+                const a = document.createElement('lottie-player');
+                a.setAttribute('src', '/lottie/loading.json');
+                a.setAttribute('background', 'transparent');
+                a.setAttribute('speed', '1');
+                a.setAttribute('style', 'width:110px;height:110px;');
+                a.setAttribute('loop', '');
+                a.setAttribute('autoplay', '');
+                c.appendChild(a);
+            })();
+        </script>
+    }
 
     <!-- SCRIPT DE LA CONTRA -->
     <script src='~/JS/regexContra.js'></script>
@@ -787,49 +740,44 @@
 
     <!-- Respuestas de los Formularios -->
     <script>
-        document.addEventListener("DOMContentLoaded", function () 
-        {
-            // Para mensajes de error
+        document.addEventListener("DOMContentLoaded", function () {
             @if (TempData["ErrorMessage"] != null)
             {
                 <text>
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: '@Html.Raw(TempData["ErrorMessage"])',
-                        confirmButtonText: 'Aceptar'
-                    });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: '@Html.Raw(TempData["ErrorMessage"])',
+                    confirmButtonText: 'Aceptar'
+                });
                 </text>
             }
 
-            // Para mensajes de éxito
             @if (TempData["SuccessMessage"] != null)
             {
                 <text>
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Éxito',
-                        text: '@Html.Raw(TempData["SuccessMessage"])',
-                        confirmButtonText: 'Aceptar',
-                        timer: 3000
-                    });
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: '@Html.Raw(TempData["SuccessMessage"])',
+                    confirmButtonText: 'Aceptar',
+                    timer: 3000
+                });
                 </text>
             }
         });
     </script>
 
-    <!-- Codigo sobre el modal de inactivar -->
+    <!-- Modal Inactivar -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const modalInactivar = document.getElementById('modalInactivar');
             const form = document.getElementById('formInactivar');
 
             modalInactivar.addEventListener('show.bs.modal', function (event) {
-                const button = event.relatedTarget;
-                const id = button.getAttribute('data-id');
-                const nombre = button.getAttribute('data-nombre');
-                document.getElementById('idEmpleadoInactivar').value = id;
-                document.getElementById('nombreInactivar').textContent = nombre;
+                const btn = event.relatedTarget;
+                document.getElementById('idEmpleadoInactivar').value = btn.getAttribute('data-id');
+                document.getElementById('nombreInactivar').textContent  = btn.getAttribute('data-nombre');
             });
 
             form.addEventListener('submit', async function (e) {
@@ -844,112 +792,66 @@
                         }
                     });
 
-                    const result = await response.json(); // Leer la respuesta JSON
+                    const result = await response.json();
 
                     if (result.success) {
-                        const modal = bootstrap.Modal.getInstance(modalInactivar);
-                        modal.hide();                                                
-
+                        bootstrap.Modal.getInstance(modalInactivar).hide();
                         Swal.fire({
                             icon: 'success',
                             title: 'Éxito',
                             text: 'El estado del empleado fue cambiado correctamente',
                             timer: 6000
-                        }).then(() => {
-                            window.location.href = result.redirectUrl;
-                        });
-
+                        }).then(() => { window.location.href = result.redirectUrl; });
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
                             text: 'Error al inactivar el usuario: ' + (result.message || 'Error desconocido'),
                             timer: 6000
-                        }).then(() => {
-                            window.location.href = result.redirectUrl;
-                        });
+                        }).then(() => { window.location.href = result.redirectUrl; });
                     }
                 } catch (error) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Error de red: ' + (result.message || 'Error desconocido'),
+                        text: 'Error de red: ' + error.message,
                         timer: 6000
-                    }).then(() => {
-                        window.location.href = result.redirectUrl;
                     });
                 }
             });
         });
     </script>
+
+    <!-- Búsqueda en servidor + cambio de página -->
     <script>
-        // Función para normalizar texto (quitar tildes)
-        function normalizarTexto(texto) {
-            return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-        }
+        // Búsqueda con debounce: espera 400ms después de dejar de escribir
+        let searchTimeout;
+        const searchInput = document.getElementById('searchInput');
 
-        // Función para filtrar empleados en el cliente (búsqueda en tiempo real)
-        function filterEmployees(searchTerm) {
-            const cards = document.querySelectorAll('.card-employee');
-            let visibleCount = 0;
-            const searchNormalized = normalizarTexto(searchTerm);
-
-            cards.forEach(card => {
-                const employeeName = card.querySelector('.employee-name')?.textContent || '';
-                const tags = card.querySelectorAll('.employee-tag');
-
-                // Obtener puesto (primer tag) y departamento (segundo tag)
-                const position = tags[0]?.textContent || '';
-                const department = tags[1]?.textContent || '';
-
-                // Normalizar todos los textos para comparar
-                const nameNormalized = normalizarTexto(employeeName);
-                const positionNormalized = normalizarTexto(position);
-                const departmentNormalized = normalizarTexto(department);
-
-                const matches = nameNormalized.includes(searchNormalized) ||
-                               positionNormalized.includes(searchNormalized) ||
-                               departmentNormalized.includes(searchNormalized);
-
-                // Usar clases de Bootstrap en lugar de style.display
-                if (matches) {
-                    card.classList.remove('d-none');
-                    visibleCount++;
-                } else {
-                    card.classList.add('d-none');
-                }
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('search', this.value.trim());
+                    url.searchParams.set('page', '1');
+                    url.searchParams.set('pageSize', '@ViewBag.PageSize');
+                    window.location.href = url.toString();
+                }, 400);
             });
-
-            // Actualizar contador
-            const employeeCount = document.getElementById('employeeCount');
-            if (employeeCount) {
-                employeeCount.textContent = visibleCount;
-            }
-
-            // Mostrar/ocultar mensaje de no resultados (si existe)
-            const noResults = document.getElementById('noResults');
-            if (noResults) {
-                if (visibleCount === 0) {
-                    noResults.classList.remove('d-none');
-                } else {
-                    noResults.classList.add('d-none');
-                }
-            }
         }
 
-        // Inicializar la página
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configurar búsqueda en tiempo real
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', function(e) {
-                    filterEmployees(e.target.value.trim());
-                });
-            }
-
-            // Filtrar inicialmente para contar correctamente
-            filterEmployees('');
-        });
+        // Cambio de tamaño de página
+        const pageSizeSelect = document.getElementById('pageSizeSelect');
+        if (pageSizeSelect) {
+            pageSizeSelect.addEventListener('change', function () {
+                const url = new URL(window.location.href);
+                url.searchParams.set('pageSize', this.value);
+                url.searchParams.set('page', '1');
+                url.searchParams.set('search', '@ViewBag.Search');
+                window.location.href = url.toString();
+            });
+        }
     </script>
     }
 </body>

@@ -10,6 +10,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .row {
+            margin: 0 !important;
+        }
+
         .bg-gradient-custom {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         }
@@ -21,16 +31,229 @@
             --success-color: #198754;
         }
 
+        .bg-main {
+            background-color: #012473;
+        }
+
+        .btn-card {
+            border-radius: 16px;
+            transition: all 0.2s ease;
+        }
+
+            .btn-card:hover {
+                transform: scale(1.02);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+
+        .btn-primary-custom {
+            background-color: #012473;
+            color: white;
+        }
+
+            .btn-primary-custom:hover {
+                background-color: #15224d;
+            }
+
+        .icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-lg {
+            width: 60px;
+            height: 60px;
+        }
+
+        .geo-left-panel {
+            position: relative;
+            overflow: hidden;
+            background: #0b1628;
+        }
+
+        /* Canvas ocupa todo */
+        .geo-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Overlay igual a Next.js */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient( to right, rgba(11, 22, 40, 0.85), rgba(11, 22, 40, 0.4) );
+            z-index: 2;
+        }
+
+        /* Icono glass */
+        .icon-box {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 <body class="bg-gradient-custom min-vh-100">
 
     <!-- Main Content -->
-    <main class="container-xxl px-4 px-sm-6 px-lg-8 py-4 mt-4">
+    <div class="row g-0 vh-100">
 
-    </main>
+        <!-- LEFT PANEL -->
+        <div class="col-lg-4 d-none d-lg-flex position-relative p-0 geo-left-panel">
 
+            <!-- CANVAS BACKGROUND -->
+            <canvas id="geoCanvas" class="geo-canvas"></canvas>
+
+            <!-- OVERLAY (igual que tu diseño original) -->
+            <div class="overlay d-flex flex-column justify-content-center px-5">
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="col-lg-8 d-flex align-items-center">
+            <div class="w-100 px-4 px-lg-5">
+
+                <!-- TEXT -->
+                <div class="mb-4">
+                    <h2 class="fw-bold">Seleccione una opción</h2>
+                    <p class="text-muted">Administre sus garantías de forma rápida y segura</p>
+                </div>
+
+                <!-- BUTTONS -->
+                <div class="d-grid gap-3">
+
+                    <!-- VOLVER -->
+                    <a asp-controller="Home" asp-action="HomeInicial" class="text-decoration-none">
+                        <div class="p-3 border btn-card d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="icon-box bg-light">
+                                    <i class="bi bi-house" style="color: #012473"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold" style="color: #012473">Volver al Menú Inicial</div>
+                                    <small class="text-muted">Regresar a la página principal</small>
+                                </div>
+                            </div>
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </a>
+
+                    <!-- CREAR -->
+                    <buttom class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#createGarantiaModal">
+                        <div class="p-3 btn-primary-custom btn-card d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="icon-box icon-lg bg-white bg-opacity-25 text-white">
+                                    <i class="bi bi-file-earmark-plus fs-4"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">Crear Garantía</div>
+                                    <small class="text-white-50">Registrar una nueva garantía</small>
+                                </div>
+                            </div>
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </buttom>
+
+                    <!-- REGISTROS -->
+                    <a asp-controller="Garantia" asp-action="VerGarantias" class="text-decoration-none">
+                        <div class="p-3 border btn-card d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="icon-box bg-primary bg-opacity-10 text-primary">
+                                    <i class="bi bi-clipboard-data" style="color: #012473"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold" style="color: #012473">Ver Registros</div>
+                                    <small class="text-muted">Consultar garantías existentes</small>
+                                </div>
+                            </div>
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <partial name="~/Views/Garantia/modalRegistroGarantia.cshtml" model="new SistemasAnaliticos.ViewModels.GarantiaRegistroViewModel()" />
+ 
     @section Scripts {
+        <script>
+            const cv = document.getElementById('geoCanvas');
+            const cx = cv.getContext('2d');
+
+            function resize() {
+                cv.width = cv.offsetWidth;
+                cv.height = cv.offsetHeight;
+                draw();
+            }
+
+            function poly(pts) {
+                cx.beginPath();
+                cx.moveTo(pts[0][0], pts[0][1]);
+                for (let i = 1; i < pts.length; i++) {
+                    cx.lineTo(pts[i][0], pts[i][1]);
+                }
+                cx.closePath();
+            }
+
+            function draw() {
+                const W = cv.width, H = cv.height;
+                cx.clearRect(0, 0, W, H);
+
+                cx.fillStyle = '#0b1628';
+                cx.fillRect(0, 0, W, H);
+
+                const shapes = [
+                    { pts: [[0,0],[W*0.55,0],[W*0.3,H*0.45],[0,H*0.3]], color: '#1a3058' },
+                    { pts: [[W*0.55,0],[W,0],[W,H*0.38],[W*0.62,H*0.22]], color: '#213870' },
+                    { pts: [[W,0],[W,H*0.38],[W*0.62,H*0.22],[W*0.78,0]], color: '#2a4880' },
+                    { pts: [[0,H*0.3],[W*0.3,H*0.45],[W*0.18,H*0.72],[0,H*0.6]], color: '#162848' },
+                    { pts: [[W*0.3,H*0.45],[W*0.62,H*0.22],[W*0.85,H*0.5],[W*0.5,H*0.68]], color: '#2e507a' },
+                    { pts: [[W*0.62,H*0.22],[W,H*0.38],[W,H*0.65],[W*0.85,H*0.5]], color: '#3a608e' },
+                    { pts: [[0,H*0.6],[W*0.18,H*0.72],[W*0.1,H],[0,H]], color: '#1c3360' },
+                    { pts: [[W*0.18,H*0.72],[W*0.5,H*0.68],[W*0.38,H],[W*0.1,H]], color: '#253f68' },
+                    { pts: [[W*0.5,H*0.68],[W*0.85,H*0.5],[W,H*0.65],[W*0.72,H],[W*0.38,H]], color: '#1e3a5f' },
+                    { pts: [[W*0.85,H*0.5],[W,H*0.65],[W,H],[W*0.72,H]], color: '#4a6e96' },
+                    { pts: [[W*0.3,H*0.45],[W*0.5,H*0.68],[W*0.18,H*0.72],[0,H*0.6],[0,H*0.3]], color: '#182c4e' },
+                    { pts: [[W*0.55,0],[W*0.78,0],[W*0.62,H*0.22]], color: '#4060a0' },
+                    { pts: [[0,0],[W*0.18,0],[W*0.08,H*0.18],[0,H*0.12]], color: '#243c6a' },
+                ];
+
+                shapes.forEach(s => {
+                    poly(s.pts);
+                    cx.fillStyle = s.color;
+                    cx.fill();
+                });
+
+                shapes.forEach(s => {
+                    poly(s.pts);
+                    cx.strokeStyle = 'rgba(255,255,255,0.04)';
+                    cx.lineWidth = 0.8;
+                    cx.stroke();
+                });
+
+                const vignette = cx.createRadialGradient(W*0.4, H*0.45, H*0.05, W*0.4, H*0.45, H*0.9);
+                vignette.addColorStop(0, 'rgba(0,0,0,0)');
+                vignette.addColorStop(1, 'rgba(0,0,0,0.45)');
+                cx.fillStyle = vignette;
+                cx.fillRect(0, 0, W, H);
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+        </script>
+
+
         <!-- Respuestas de los Formularios -->
         <script>
             document.addEventListener("DOMContentLoaded", function () {

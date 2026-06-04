@@ -235,7 +235,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Financiero Contable" id="dropdown-dp-fc">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Financiero Contable" id="dropdown-dp-fc">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-fc">
                                             <span>Financiero Contable</span>
                                             <span class="text-muted" id="dropdown-count-fc">(0)</span>
@@ -243,7 +243,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Gerencia" id="dropdown-dp-g">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Gerencia" id="dropdown-dp-g">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-g">
                                             <span>Gerencia</span>
                                             <span class="text-muted" id="dropdown-count-g">(0)</span>
@@ -251,7 +251,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Ingenieria" id="dropdown-dp-i">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Ingeniería" id="dropdown-dp-i">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-i">
                                             <span>Ingeniería</span>
                                             <span class="text-muted" id="dropdown-count-i">(0)</span>
@@ -259,7 +259,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Jefatura" id="dropdown-dp-j">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Jefatura" id="dropdown-dp-j">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-j">
                                             <span>Jefatura</span>
                                             <span class="text-muted" id="dropdown-count-j">(0)</span>
@@ -267,7 +267,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Legal" id="dropdown-dp-l">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Legal" id="dropdown-dp-l">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-l">
                                             <span>Legal</span>
                                             <span class="text-muted" id="dropdown-count-l">(0)</span>
@@ -275,7 +275,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Operaciones" id="dropdown-dp-o">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Operaciones" id="dropdown-dp-o">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-o">
                                             <span>Operaciones</span>
                                             <span class="text-muted" id="dropdown-count-o">(0)</span>
@@ -299,7 +299,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Tecnicos NCR" id="dropdown-dp-tncr">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Técnicos NCR" id="dropdown-dp-tncr">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-tncr">
                                             <span>Técnicos NCR</span>
                                             <span class="text-muted" id="dropdown-count-tncr">(0)</span>
@@ -307,7 +307,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Tecnologias de Informacion" id="dropdown-dp-ti">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Tecnologías de Información" id="dropdown-dp-ti">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-ti">
                                             <span>Tecnologías de Información</span>
                                             <span class="text-muted" id="dropdown-count-ti">(0)</span>
@@ -315,7 +315,7 @@
                                     </li>
 
                                     <li class="form-check my-2">
-                                        <input class="form-check-input filter-status" type="checkbox" value="Ventas" id="dropdown-dp-v">
+                                        <input class="form-check-input filter-departamento" type="checkbox" value="Ventas" id="dropdown-dp-v">
                                         <label class="form-check-label d-flex justify-content-between w-100" for="dropdown-dp-ti">
                                             <span>Ventas</span>
                                             <span class="text-muted" id="dropdown-count-v">(0)</span>
@@ -377,7 +377,6 @@
                                         <label class="form-label">Hasta</label>
                                         <input type="date" class="form-control filter-date" id="filter-date-to">
                                     </div>
-
                                 </div>
                             </div>
 
@@ -892,15 +891,61 @@
             fadeIn(beneficiosContainer);
         }
 
+        // Función para la paginación de los registros
         function renderPagination() {
             pagination.innerHTML = '';
+
+            const delta = 2; // páginas a mostrar a cada lado de la actual
+            const range = [];
+            const rangeWithDots = [];
+
+            // Siempre incluir primera, última y las cercanas a la actual
             for (let i = 1; i <= totalPaginas; i++) {
-                pagination.innerHTML += `
-                    <li class="page-item ${i === paginaActual ? 'active' : ''}">
-                        <a class="page-link" href="?page=${i}">${i}</a>
-                    </li>
-                `;
+                if (
+                    i === 1 ||
+                    i === totalPaginas ||
+                    (i >= paginaActual - delta && i <= paginaActual + delta)
+                ) {
+                    range.push(i);
+                }
             }
+
+            // Agregar "..." donde hay saltos
+            let prev = 0;
+            for (const i of range) {
+                if (prev && i - prev > 1) {
+                    rangeWithDots.push('...');
+                }
+                rangeWithDots.push(i);
+                prev = i;
+            }
+
+            // Botón anterior
+            pagination.innerHTML += `
+                <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="?page=${paginaActual - 1}">‹</a>
+                </li>`;
+
+            // Números y puntos suspensivos
+            for (const item of rangeWithDots) {
+                if (item === '...') {
+                    pagination.innerHTML += `
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>`;
+                } else {
+                    pagination.innerHTML += `
+                        <li class="page-item ${item === paginaActual ? 'active' : ''}">
+                            <a class="page-link" href="?page=${item}">${item}</a>
+                        </li>`;
+                }
+            }
+
+            // Botón siguiente
+            pagination.innerHTML += `
+                <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
+                    <a class="page-link" href="?page=${paginaActual + 1}">›</a>
+                </li>`;
         }
 
         // Función debounce para optimizar búsquedas por nombre

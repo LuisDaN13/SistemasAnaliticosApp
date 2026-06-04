@@ -6,6 +6,7 @@ namespace SistemasAnaliticos.ViewModels
     {
         // PASO 1 - Información General
         public decimal? Monto { get; set; }
+        public decimal? Porcentaje { get; set; }
         public char Moneda { get; set; } // CRC o USD
         public string AFavorDe { get; set; }
         public string NombreLicitacion { get; set; }

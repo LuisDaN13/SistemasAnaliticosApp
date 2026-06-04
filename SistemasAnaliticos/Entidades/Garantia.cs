@@ -27,7 +27,12 @@ namespace SistemasAnaliticos.Entidades
 
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "El monto debe ser mayor a 0")]
-        public decimal? monto { get; set; }
+        public decimal monto { get; set; }
+
+        public decimal? porcentaje { get; set; }
+
+        [Required]
+        public decimal montoFinal { get; set; }
 
         [Required]
         public string aFavorDe { get; set; }

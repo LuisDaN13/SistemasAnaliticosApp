@@ -149,7 +149,7 @@
     <script>
         // SISTEMA DE VALIDACIÓN ESPECÍFICO
         document.addEventListener('DOMContentLoaded', function() {
-            inicializarValidacionCons();
+            inicializarValidacionConsL();
             inicializarResetCons();
         });
 
@@ -183,6 +183,8 @@
             // 3. Limpiar mensajes de validación
             hideValidationErrorCons();
 
+            const submitBtn = document.getElementById('submitBtnConsL');
+            if (submitBtn) submitBtn.disabled = false;
         }
 
         function inicializarValidacionConsL() {
@@ -190,6 +192,7 @@
 
             submitBtn.addEventListener('click', function(e) {
                 e.preventDefault();
+                this.disabled = true;
 
                 let formularioValido = true;
                 const invalidFields = [];
@@ -227,6 +230,7 @@
                 });
 
                 if (!formularioValido) {
+                    this.disabled = false;
                     showValidationErrorCons('Por favor complete todos los campos requeridos antes de enviar el formulario.');
 
                     if (invalidFields.length > 0) {

@@ -575,7 +575,7 @@ namespace SistemasAnaliticos.Controllers
                         Operaciones = g.Count(b => b.departamento == "Operaciones"),
                         RecursosHumanos = g.Count(b => b.departamento == "Recursos Humanos"),
                         ServiciosGenerales = g.Count(b => b.departamento == "Servicios Generales"),
-                        TecnicosNCR = g.Count(b => b.departamento == "Tecnicos NCR"),
+                        TecnicosNCR = g.Count(b => b.departamento == "Técnicos NCR"),
                         TecnologiasInformacion = g.Count(b => b.departamento == "Tecnologías de Información"),
                         Ventas = g.Count(b => b.departamento == "Ventas")
                     })
@@ -833,6 +833,7 @@ namespace SistemasAnaliticos.Controllers
                     Accion = "Nuevo Registro"
                 };
                 _context.Auditoria.Add(auditoria);
+                await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Se creó el beneficio correctamente.";
                 return RedirectToAction("Index", "Permiso");
