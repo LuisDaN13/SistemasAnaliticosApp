@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href='/img/circulo - logo blanco.png' />
     <title>RRHH - Sistemas Analíticos</title>
+
     <!-- Bootstrap desde NuGet (via wwwroot) -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
-    <!-- Bootstrap Icons (puedes instalar también via NuGet o usar CDN) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Bootstrap Icons y DataTables -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" integrity="sha512-aW0Vuo46Z9+bXgbhwZtlIrY5hfPdsb+IvNQ3iMvtIKl0JgSDSFoFfcZ7gdp9oL8YIcA6QOiZreHj++olyg3BDA==" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" integrity="sha512-b6Ai4YnSM5LpNjNBvhPUrVQ2IgHCYKYnUgXPpAFmd9/zSx35YBnOKUEA3HRRMqm8dOFMVWQclQPRmEl9zD+DQw==" crossorigin="anonymous">
 
     <!-- Font Montserrat -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SistemasAnaliticos.styles.css" asp-append-version="true" />
@@ -235,27 +235,27 @@
     </div>
 
     <!-- Incluir Lottie -->
-    <script src="https://unpkg.com/@@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="~/lib/lottie-player/lottie-player.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.8/jquery.inputmask.min.js"></script>
+    <script src="~/lib/inputmask/inputmask.min.js"></script>
 
-    <!-- 1️⃣ jQuery (SIEMPRE primero) -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- jQuery (SIEMPRE primero) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous"></script>
 
-    <!-- 2️⃣ DataTables core -->
-    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <!-- DataTables core -->
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js" integrity="sha512-BQ3f0AMbTpWxc4YSQm03nL5LX7mb4KhgNQfEowc6IdpylTaRuzkiChTJISQlKWaof0rIYtHRaRBEl8G6F8GxzA==" crossorigin="anonymous"></script>
 
-    <!-- 3️⃣ DataTables Bootstrap 5 -->
-    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+    <!-- DataTables Bootstrap 5 -->
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js" integrity="sha512-zw34c1fnMeY29qzodeC+GGKfyQQ7hN+a9yjGnIAZbkPPn/Xeh8Z46uea/fjq5Mwsp4bxvGKfJrTNnh/GdIZJ1g==" crossorigin="anonymous"></script>
 
     <!-- Bootstrap Bundle desde NuGet -->
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- FontAwesome Script -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous"></script>
 
     <!-- SweetAlert -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" integrity="sha512-TA1p+I1AtmUN2QnvpJT01/hjvxCxjyBfXtNuKNnvvwyCaQpdl5JUfiJ7geQtMnJ55myntTq5JwPLiH3j6e222A==" crossorigin="anonymous"></script>
 
     <!-- D3 -->
     <script src="~/lib/d3orgchart/d3.min.js"></script>

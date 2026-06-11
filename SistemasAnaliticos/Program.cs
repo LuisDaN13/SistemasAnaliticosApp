@@ -52,9 +52,18 @@ builder.Services.AddControllersWithViews(options =>
         .Build()));
 });
 
+// Agregá después de AddControllersWithViews
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+});
+
 // Servicios esenciales
 builder.Services.AddMemoryCache();
 builder.Services.Configure<ConfiguracionEmail>(builder.Configuration.GetSection("Smtp"));
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IConstanciaService, ConstanciaService>();
 builder.Services.AddScoped<IFechaLargaService, FechaLargaService>();
@@ -90,30 +99,28 @@ app.UseHttpsRedirection();
 
 app.Use(async (context, next) =>
 {
+    // Genera un nonce único por cada request
+    var nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+    context.Items["CSPNonce"] = nonce;
+
     var headers = context.Response.Headers;
 
-    var cspBase =
-        "default-src 'self'; " +
-        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com https://cdn.datatables.net https://unpkg.com; " +
-        "script-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com https://cdn.datatables.net https://unpkg.com; " +
-        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdn.datatables.net https://cdnjs.cloudflare.com; " +
-        "style-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdn.datatables.net https://cdnjs.cloudflare.com; " + "img-src 'self' data: https://cdn.datatables.net; " +
-        "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
-        "frame-ancestors 'none'; " +
-        "base-uri 'self'; " +
-        "form-action 'self';";
+    var csp =
+        $"default-src 'self'; " +
+        $"script-src 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com https://cdn.datatables.net https://unpkg.com; " +
+        $"script-src-elem 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net https://code.jquery.com https://cdnjs.cloudflare.com https://cdn.datatables.net https://unpkg.com; " +
+        $"style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdn.datatables.net https://cdnjs.cloudflare.com; " +
+        $"style-src-elem 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com https://cdn.datatables.net https://cdnjs.cloudflare.com; " +
+        $"img-src 'self' data: https://cdn.datatables.net; " +
+        $"font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+        $"frame-ancestors 'none'; " +
+        $"base-uri 'self'; " +
+        $"form-action 'self'; " +
+        (app.Environment.IsDevelopment()
+            ? "connect-src 'self' wss://localhost:*;"
+            : "connect-src 'self';");
 
-    if (app.Environment.IsDevelopment())
-    {
-        headers["Content-Security-Policy"] = cspBase.Replace(
-            "connect-src 'self';",
-            "") + "connect-src 'self' wss://localhost:*;";
-    }
-    else
-    {
-        headers["Content-Security-Policy"] = cspBase + "connect-src 'self';";
-    }
-
+    headers["Content-Security-Policy"] = csp;
     headers["X-Content-Type-Options"] = "nosniff";
     headers["X-Frame-Options"] = "DENY";
     headers["Referrer-Policy"] = "no-referrer";
