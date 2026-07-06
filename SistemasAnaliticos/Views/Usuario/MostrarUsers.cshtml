@@ -404,20 +404,29 @@
                                                     </td>
                                                     <td class="pe-4 py-3 align-middle border-bottom text-end">
                                                         <div class="d-flex justify-content-end gap-2">
-                                                            <button class="btn btn-sm btn-outline-primary rounded-circle"
-                                                                    onclick="abrirModalCambiarRol('@usuario.Id', '@usuario.NombreCompleto', '@usuario.RolNombre')"
+                                                            <button id="btnCambiarRol_@usuario.Id"
+                                                                    class="btn btn-sm btn-outline-primary rounded-circle"
+                                                                    data-id="@usuario.Id"
+                                                                    data-nombre="@usuario.NombreCompleto"
+                                                                    data-rol="@usuario.RolNombre"
                                                                     title="Cambiar rol"
                                                                     style="width: 36px; height: 36px;">
                                                                 <i class="fas fa-exchange-alt"></i>
                                                             </button>
-                                                            <button class="btn btn-sm btn-outline-warning rounded-circle"
-                                                                    onclick="abrirModalInactivar('@usuario.Id', '@usuario.NombreCompleto', @usuario.Estado.ToString().ToLower())"
+
+                                                            <button id="btnCambiarEstado_@usuario.Id"
+                                                                    class="btn btn-sm btn-outline-warning rounded-circle"
+                                                                    data-id="@usuario.Id"
+                                                                    data-nombre="@usuario.NombreCompleto"
+                                                                    data-estado="@usuario.Estado.ToString().ToLower()"
                                                                     title="Cambiar estado"
                                                                     style="width: 36px; height: 36px;">
                                                                 <i class="fa-solid fa-ban"></i>
                                                             </button>
-                                                            <button class="btn btn-sm btn-outline-success rounded-circle"
-                                                                    onclick="abrirModalDatos('@usuario.Id')"
+
+                                                            <button id="btnIngresarDatos_@usuario.Id"
+                                                                    class="btn btn-sm btn-outline-success rounded-circle"
+                                                                    data-id="@usuario.Id"
                                                                     title="Ingresar días y fecha"
                                                                     style="width: 36px; height: 36px;">
                                                                 <i class="fa-solid fa-umbrella-beach"></i>
@@ -436,6 +445,8 @@
             </div>
         </div>
     </main>
+
+
 
     <!-- Modal para Cambiar Estado (Inactivar) -->
     <div class="modal fade" id="modalInactivarUsuario" tabindex="-1" aria-labelledby="modalInactivarUsuarioLabel" aria-hidden="true">
@@ -547,22 +558,15 @@
                         <i class="fas fa-user-tag fa-3x text-primary mb-3"></i>
                         <h6 class="fw-bold mb-1">Cambiar rol asignado</h6>
                         <p class="text-muted mb-0" id="usuarioInfoCambiarRol"></p>
-                        <p class="text-muted">Rol actual: <span id="rolActualUsuario" class="badge bg-info"></span></p>
+                        <p class="text-muted">Roles actuales: <span id="rolActualUsuario" class="badge bg-info"></span></p>
                     </div>
 
                     <div class="mb-3">
-                        <label for="nuevoRolId" class="form-label fw-medium">Seleccionar nuevo rol:</label>
-                        <select class="form-select" id="nuevoRolId" name="rolId" required>
-                            <option value="">-- Seleccione un rol --</option>
-                            @if (ViewBag.RolesDisponibles != null)
-                            {
-                                foreach (var rol in ViewBag.RolesDisponibles)
-                                {
-                                    <option value="@rol.Id">@rol.Name</option>
-                                }
-                            }
-                        </select>
-                        <div class="form-text">Seleccione el nuevo rol para asignar al usuario.</div>
+                        <label class="form-label fw-medium">Seleccionar roles:</label>
+                        <div id="rolesCambiarRolContainer" class="border rounded p-2">
+                            <!-- Checkboxes se cargan dinámicamente -->
+                        </div>
+                        <div class="form-text">Puede seleccionar uno o varios roles.</div>
                     </div>
                 </div>
                 <form id="formCambiarRol" method="post">
@@ -579,24 +583,29 @@
         </div>
     </div>
     <script>
-        function abrirModalCambiarRol(usuarioId, nombreCompleto, rolActual) {
+        function abrirModalCambiarRol(usuarioId, nombreCompleto, rolesActuales) {
+            // rolesActuales ahora se espera como array, ej: ["Administrador", "RRHH"]
+            // Si en algún onclick todavía lo llamas con un string, lo convertimos aquí:
+            if (typeof rolesActuales === 'string') {
+                rolesActuales = rolesActuales ? rolesActuales.split(',').map(r => r.trim()) : [];
+            }
 
             const modalEl = document.getElementById('modalCambiarRol');
             const modal = new bootstrap.Modal(modalEl);
             const form = document.getElementById('formCambiarRol');
-            const select = document.getElementById('nuevoRolId');
+            const container = document.getElementById('rolesCambiarRolContainer');
 
             // Info del usuario
             document.getElementById('usuarioInfoCambiarRol').textContent = nombreCompleto;
             document.getElementById('usuarioIdCambiarRol').value = usuarioId;
 
-            // Rol actual
+            // Roles actuales (badge informativo)
             const rolActualElement = document.getElementById('rolActualUsuario');
-            rolActualElement.textContent = rolActual;
+            rolActualElement.textContent = rolesActuales.length ? rolesActuales.join(', ') : 'Sin rol asignado';
             rolActualElement.className = 'badge bg-info text-white';
 
-            // Cargar roles
-            select.innerHTML = '<option value="">Cargando roles...</option>';
+            // Cargar roles como checkboxes
+            container.innerHTML = '<div class="text-muted small">Cargando roles...</div>';
 
             fetch('@Url.Action("GetRoles", "Usuario")')
                 .then(response => {
@@ -604,27 +613,24 @@
                     return response.json();
                 })
                 .then(data => {
-                    select.innerHTML = '<option value="">-- Seleccione un rol --</option>';
-
                     if (data && data.success && Array.isArray(data.roles)) {
-                        data.roles.forEach(rol => {
-                            if (rol.nombre.toLowerCase() !== rolActual.toLowerCase()) {
-                                const option = document.createElement('option');
-                                option.value = rol.id;
-                                option.textContent = rol.nombre;
-                                select.appendChild(option);
-                            }
-                        });
-
-                        if (select.options.length === 1) {
-                            select.innerHTML = '<option value="">No hay otros roles disponibles</option>';
-                        }
+                        container.innerHTML = data.roles.map(rol => {
+                            const marcado = rolesActuales.some(r => r.toLowerCase() === rol.nombre.toLowerCase());
+                            return `
+                                <div class="form-check">
+                                    <input class="form-check-input rol-cambiar-checkbox" type="checkbox"
+                                           value="${rol.id}" data-nombre="${rol.nombre}"
+                                           id="rolCambiar_${rol.id}" ${marcado ? 'checked' : ''}>
+                                    <label class="form-check-label" for="rolCambiar_${rol.id}">${rol.nombre}</label>
+                                </div>
+                            `;
+                        }).join('');
                     } else {
-                        select.innerHTML = '<option value="">Formato inválido</option>';
+                        container.innerHTML = '<div class="text-danger small">Formato inválido</div>';
                     }
                 })
                 .catch(() => {
-                    select.innerHTML = '<option value="">Error al cargar roles</option>';
+                    container.innerHTML = '<div class="text-danger small">Error al cargar roles</div>';
                 });
 
             // Limpiar submit previo
@@ -633,11 +639,15 @@
             form.onsubmit = async function (e) {
                 e.preventDefault();
 
-                if (!select.value) {
+                const rolesSeleccionados = Array.from(
+                    document.querySelectorAll('.rol-cambiar-checkbox:checked')
+                ).map(cb => cb.value);
+
+                if (rolesSeleccionados.length === 0) {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Rol requerido',
-                        text: 'Debe seleccionar un nuevo rol'
+                        text: 'Debe seleccionar al menos un rol'
                     });
                     return;
                 }
@@ -652,7 +662,7 @@
                             'RequestVerificationToken': token
                         },
                         body: JSON.stringify({
-                            rolId: select.value
+                            rolIds: rolesSeleccionados
                         })
                     });
 
@@ -663,14 +673,14 @@
                         Swal.fire({
                             icon: 'success',
                             title: 'Éxito',
-                            text: result.message || 'Rol cambiado correctamente',
+                            text: result.message || 'Roles cambiados correctamente',
                             timer: 3000
                         }).then(() => location.reload());
                     } else {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
-                            text: result.message || 'Error al cambiar el rol'
+                            text: result.message || 'Error al cambiar los roles'
                         });
                     }
 
@@ -684,7 +694,6 @@
                 }
             };
 
-            // 🔥 AHORA SÍ se abre el modal
             modal.show();
         }
     </script>
@@ -1390,6 +1399,46 @@
     </script>
 
     @section Scripts {
+        <!-- Script unificado para manejar todos los botones sin onclick -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ========== BOTONES CAMBIAR ROL ==========
+            document.querySelectorAll('[id^="btnCambiarRol_"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const usuarioId = this.dataset.id;
+                    const nombreCompleto = this.dataset.nombre;
+                    const rolActual = this.dataset.rol;
+
+                    // Llamar a la función existente
+                    abrirModalCambiarRol(usuarioId, nombreCompleto, rolActual);
+                });
+            });
+
+            // ========== BOTONES CAMBIAR ESTADO ==========
+            document.querySelectorAll('[id^="btnCambiarEstado_"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const usuarioId = this.dataset.id;
+                    const nombreCompleto = this.dataset.nombre;
+                    const estadoActual = this.dataset.estado;
+
+                    // Llamar a la función existente
+                    abrirModalInactivar(usuarioId, nombreCompleto, estadoActual);
+                });
+            });
+
+            // ========== BOTONES INGRESAR DATOS ==========
+            document.querySelectorAll('[id^="btnIngresarDatos_"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const usuarioId = this.dataset.id;
+
+                    // Llamar a la función existente
+                    abrirModalDatos(usuarioId);
+                });
+            });
+        });
+        </script>
+
         <!-- DATA TABLE -->
         <script>
             $(document).ready(function () {

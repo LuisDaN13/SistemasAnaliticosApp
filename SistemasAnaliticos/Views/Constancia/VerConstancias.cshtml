@@ -1,5 +1,4 @@
 ﻿@model SistemasAnaliticos.ViewModels.PaginacionConstanciasViewModel
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -147,7 +146,7 @@
             <div>
                 @if(!User.IsInRole("Empleado Normal") && !User.IsInRole("Jefatura"))
                 {
-                    <button type="button" class="btn btn-primary" onclick="abrirModalMasivo()">Cambiar estado</button>
+                    <button type="button" class="btn btn-primary" id="btnAbrirModalMasivo">Cambiar estado</button>
                 }
                 <button class="btn btn-success" id="exportExcelBtnC">
                     <i class="bi bi-file-earmark-excel"></i>
@@ -548,41 +547,30 @@
     <div class="modal fade" id="estadoModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-
                 <div class="modal-header">
                     <h5 class="modal-title">Cambiar estado</h5>
                     <button class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body text-center">
-
                     <input type="hidden" id="constanciaIdSeleccionada">
-
                     <p class="mb-3">Seleccione el nuevo estado:</p>
-
-                    <button class="btn btn-warning w-100 mb-2"
-                            onclick="cambiarEstado('Pendiente')">
-                        Pendiente
-                    </button>
-
-                    <button class="btn btn-danger w-100 mb-2"
-                            onclick="cambiarEstado('Rechazada')">
-                        Rechazada
-                    </button>
-
-                    <button class="btn btn-outline-success w-100 mb-2"
-                            onclick="cambiarEstado('Aprobada')">
-                        Aprobada
-                    </button>
+                    <button class="btn btn-warning w-100 mb-2" id="btnPendiente">Pendiente</button>
+                    <button class="btn btn-danger w-100 mb-2" id="btnRechazada">Rechazada</button>
+                    <button class="btn btn-outline-success w-100 mb-2" id="btnAprobada">Aprobada</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
+        // ✅ Event listeners en lugar de onclick
+        document.getElementById('btnAbrirModalMasivo')?.addEventListener('click', abrirModalMasivo);
+        document.getElementById('btnPendiente').addEventListener('click', () => cambiarEstado('Pendiente'));
+        document.getElementById('btnRechazada').addEventListener('click', () => cambiarEstado('Rechazada'));
+        document.getElementById('btnAprobada').addEventListener('click', () => cambiarEstado('Aprobada'));
+
         function abrirModalMasivo() {
             const seleccionados = [...document.querySelectorAll(".permiso-check:checked")]
                 .map(c => parseInt(c.value));
-
             if (seleccionados.length === 0) {
                 Swal.fire({
                     icon: 'error',
@@ -592,23 +580,17 @@
                 });
                 return;
             }
-
             window.idsSeleccionados = seleccionados;
             document.getElementById("constanciaIdSeleccionada").value = "";
-
             const modal = new bootstrap.Modal(document.getElementById('estadoModal'));
             modal.show();
         }
-    </script>
-    <script>
+
         function cambiarEstado(nuevoEstado) {
-
             const idIndividual = document.getElementById("constanciaIdSeleccionada").value;
-
             const ids = window.idsSeleccionados?.length
                 ? window.idsSeleccionados
                 : [parseInt(idIndividual)];
-
             fetch("/Constancia/CambiarEstadoMasivo", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -616,13 +598,9 @@
             })
             .then(res => res.json())
             .then(data => {
-
-                // Cerrar modal
                 bootstrap.Modal.getInstance(
                     document.getElementById("estadoModal")
                 ).hide();
-
-                // Redirigir para que muestre TempData
                 if (data.redirect) {
                     window.location.href = data.redirect;
                 }
@@ -662,28 +640,37 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-warning" onclick="enviarFormulario()">Guardar</button>
+                    <button type="button" class="btn btn-warning" id="btnGuardarSalarial">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        function abrirModalSalarial(idConstancia) {
-            // Guardar el ID en el hidden field
-            document.getElementById('idConstancia').value = idConstancia;
+        // Event delegation para botones dinámicos
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('[data-accion]');
+            if (!btn) return;
 
-            // Limpiar campos
+            const accion = btn.dataset.accion;
+            const id = btn.dataset.id;
+
+            if (accion === 'abrirModalPDF') abrirModalPDF(id);
+            if (accion === 'abrirModalSalarial') abrirModalSalarial(id);
+        });
+
+        // Botón guardar del modal
+        document.getElementById('btnGuardarSalarial')?.addEventListener('click', enviarFormulario);
+
+        function abrirModalSalarial(idConstancia) {
+            document.getElementById('idConstancia').value = idConstancia;
             document.getElementById('salarioBruto').value = '';
             document.getElementById('deducciones').value = '';
             document.getElementById('salarioNeto').value = '';
-
-            // Mostrar modal
             const modal = new bootstrap.Modal(document.getElementById('modalSalarial'));
             modal.show();
         }
 
         function enviarFormulario() {
-            // Enviar el formulario directamente al controlador
             document.getElementById('formSalarial').submit();
         }
     </script>
@@ -1167,8 +1154,8 @@
                                    style="width:18px; height:18px; cursor:pointer; padding:10px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);">
                         </div>
                         <div class="mb-2"
-                         style="cursor: pointer;"
-                         onclick="window.location.href='/Constancia/Details/${constanciaas.idConstancia}'">
+                            style="cursor: pointer;"
+                            data-navigate="/Constancia/Details/${constanciaas.idConstancia}">
                             <div class="d-flex align-items-start justify-content-between gap-1 mb-2 flex-wrap">
                                 <h3 class="h6 fw-bold text-dark mb-0" style="padding: 5px">
                                     <i class="fa-solid fa-user me-3"></i>${constanciaas.nombreEmpleado}
@@ -1283,7 +1270,8 @@
                                                                     ${constanciaas.estado !== "Aprobada"
                                                                         ? `                                                                        
                                                                         <button class="btn btn-primary btn-sm d-flex"
-                                                                                onclick="abrirModalPDF(${constanciaas.idConstancia})">
+                                                                                data-accion="abrirModalPDF"
+                                                                                data-id="${constanciaas.idConstancia}">
                                                                             <small>subir firmada</small>
                                                                         </button>
                                                                         `
@@ -1306,7 +1294,8 @@
                                                 constanciaas.tipo === "Salarial" && constanciaas.estado === "Creada" && tieneRolAlto
                                                     ? `
                                                         <button class="btn btn-sm btn-warning w-100"
-                                                                onclick="abrirModalSalarial(${constanciaas.idConstancia})">
+                                                                data-accion="abrirModalSalarial"
+                                                                data-id="${constanciaas.idConstancia}">
                                                             Crear Constancia Salarial
                                                         </button>
                                                     `

@@ -2,6 +2,7 @@
 {
     public static class Acciones
     {
+        public const string Entrar = "Entrar";
         public const string Ver = "Ver";
         public const string Crear = "Crear";
         public const string Detalles = "Detalles";

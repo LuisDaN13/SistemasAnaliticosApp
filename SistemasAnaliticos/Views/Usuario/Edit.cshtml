@@ -559,9 +559,8 @@
                                                     <img src="data:image/jpeg;base64,@base64foto"
                                                          alt="foto"
                                                          style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; cursor: pointer;"
-                                                         data-bs-toggle="modal"
-                                                         data-bs-target="#fotoModal"
-                                                         onclick="mostrarImagenModal('@base64foto')" />
+                                                         data-foto="@base64foto"
+                                                         class="img-foto-permiso" />
                                                 }
                                                 else
                                                 {
@@ -607,19 +606,19 @@
 
                                                 <div class="col-8" style="margin-top: 2.0rem !important">
                                                     <label class="form-label required-field">Provincia</label>
-                                                    <select class="form-select" required id="provincia" asp-for="provincia" data-value="@Model.provincia" onchange="cargarCantones()">
+                                                    <select class="form-select" required asp-for="provincia" data-value="@Model.provincia">
                                                         <option value="" selected disabled>Cargando provincias...</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-8" style="margin-top: 2.0rem !important">
                                                     <label class="form-label required-field">Cantón</label>
-                                                    <select class="form-select" required id="canton" asp-for="canton" data-value="@Model.canton" onchange="cargarDistritos()">
+                                                    <select class="form-select" required asp-for="canton" data-value="@Model.canton">
                                                         <option value="" selected disabled>Seleccione primero la provincia</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-8" style="margin-top: 2.0rem !important; margin-bottom: 2.0rem !important">
                                                     <label class="form-label required-field">Distrito</label>
-                                                    <select class="form-select" required id="distrito" asp-for="distrito" data-value="@Model.distrito">
+                                                    <select class="form-select" required asp-for="distrito" data-value="@Model.distrito">
                                                         <option value="" selected disabled>Seleccione primero el cantón</option>
                                                     </select>
                                                 </div>
@@ -813,7 +812,15 @@
             </div>
         </div>
     </div>
+
     <script>
+        document.addEventListener('click', function(e) {
+            const img = e.target.closest('.img-foto-permiso');
+            if (img) {
+                mostrarImagenModal(img.dataset.foto);
+            }
+        });
+
         function mostrarImagenModal(base64) {
             var modalImg = document.getElementById("modalFoto");
             modalImg.src = "data:image/jpeg;base64," + base64;
@@ -1157,7 +1164,9 @@
             inicializarStepper();
             cargarProvincias();
             inicializarLicencias();
-            inicializarSwitchHijos();
+
+            document.getElementById('provincia')?.addEventListener('change', cargarCantones);
+            document.getElementById('canton')?.addEventListener('change', cargarDistritos);
         });
 
         function cargarProvincias() {
@@ -1460,18 +1469,6 @@
 
             // 🔹 Inicializar estado
             actualizarHidden();
-        }
-
-        function inicializarSwitchHijos() {
-            const hijosSwitch = document.getElementById('hijosSwitch');
-            const noHijosInput = document.getElementById('cantidadHijos');
-
-            hijosSwitch.addEventListener('change', function() {
-                noHijosInput.disabled = !this.checked;
-                if (!this.checked) {
-                    noHijosInput.value = '';
-                }
-            });
         }
     </script>
 </body>

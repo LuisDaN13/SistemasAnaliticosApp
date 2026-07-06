@@ -492,10 +492,7 @@
                                     <img src="data:image/jpeg;base64,@Convert.ToBase64String(empleado.Foto)"
                                          alt="foto de Empleado"
                                          class="employee-avatar"
-                                         style="cursor: pointer;"
-                                         data-bs-toggle="modal"
-                                         data-bs-target="#fotoModal"
-                                         onclick="mostrarImagenModal('@Convert.ToBase64String(empleado.Foto)')">
+                                         style="cursor: pointer;">
                                 }
                                 else
                                 {
@@ -516,8 +513,8 @@
                             <div class="employee-info-item">
                                 <div class="employee-info-text">
                                     <strong>Correo Empresarial:</strong><br>
-                                    <span class="text-break"
-                                          onclick="copiarAlPortapapeles('@(empleado.CorreoEmp?.Replace("'", "\\'"))')"
+                                    <span class="text-break copiar-correo"
+                                          data-correo="@(empleado.CorreoEmp?.Replace("'", "&#39;"))"
                                           style="cursor: pointer; text-decoration: underline dotted;"
                                           title="Haz clic para copiar el correo">
                                         @(empleado.CorreoEmp ?? "Sin Correo Empresarial")
@@ -712,6 +709,15 @@
     </div>
 
     @section Scripts {
+
+    <!-- Lottie (solo si no hay resultados) -->
+    <script>
+    document.querySelectorAll('.copiar-correo').forEach(span => {
+        span.addEventListener('click', function() {
+        copiarAlPortapapeles(this.dataset.correo);
+        });
+    });
+    </script>
 
     <!-- Lottie (solo si no hay resultados) -->
     @if (!Model.Any())

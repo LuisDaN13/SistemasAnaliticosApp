@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SistemasAnaliticos.ViewModels;
 using SistemasAnaliticos.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SistemasAnaliticos.Controllers
 {
@@ -70,6 +71,7 @@ namespace SistemasAnaliticos.Controllers
             return View();
         }
 
+        [Authorize(Policy = "Garantia.Entrar")]
         public ActionResult HomeFinanciero()
         {
             return View();

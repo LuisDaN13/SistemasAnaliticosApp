@@ -242,10 +242,7 @@
                                             <img src="data:image/jpeg;base64,@Convert.ToBase64String(noticia.Foto)"
                                                  alt="foto de Empleado"
                                                  class="employee-avatar"
-                                                 style="cursor: pointer;"
-                                                 data-bs-toggle="modal"
-                                                 data-bs-target="#fotoModal"
-                                                 onclick="mostrarImagenModal('@Convert.ToBase64String(noticia.Foto)')">
+                                                 style="cursor: pointer;">
                                         }
                                         else
                                         {
@@ -269,12 +266,16 @@
                                             </a>
                                         </div>
                                         <div class="footer-slot-edit">
-                                            <a class="action-btn btn-edit" onclick="abrirModalInactivar('@Url.Action("Inactivar", "Noticia", new { id = @noticia.Id })')">
+                                            <a class="action-btn btn-edit"
+                                               id="btnInactivar"
+                                               data-url="@Url.Action("Inactivar", "Noticia", new { id = @noticia.Id })">
                                                 <i class="fa-solid fa-ban"></i>
                                             </a>
                                         </div>
                                         <div class="footer-slot-delete">
-                                            <a class="action-btn btn-delete" onclick="abrirModalEliminar('@Url.Action("Delete", "Noticia", new { id = @noticia.Id })')">
+                                            <a class="action-btn btn-delete"
+                                               id="btnEliminar"
+                                               data-url="@Url.Action("Delete", "Noticia", new { id = @noticia.Id })">
                                                 <i class="fa-solid fa-trash"></i>
                                             </a>
                                         </div>
@@ -344,6 +345,13 @@
     </div>
 
     <script>
+        document.getElementById('btnInactivar')?.addEventListener('click', function() {
+            abrirModalInactivar(this.dataset.url);
+        });
+
+        document.getElementById('btnEliminar')?.addEventListener('click', function() {
+            abrirModalEliminar(this.dataset.url);
+        });
         function abrirModalInactivar(url) {
             document.getElementById("formInactivar").action = url;
             var modal = new bootstrap.Modal(document.getElementById("modalInactivar"));

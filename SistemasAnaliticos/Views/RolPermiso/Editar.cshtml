@@ -134,6 +134,10 @@
         .empty-cell {
             background-color: #f9f9f9;
         }
+
+        .container-xxl {
+            max-width: 1600px !important; /* o el ancho que quieras */
+        }
     </style>
 </head>
 <body class="bg-gradient-custom min-vh-100">
@@ -203,6 +207,7 @@
                                 <th>Constancia</th>
                                 <th>Beneficios</th>
                                 <th>Liquidación Viático</th>
+                                <th>Garantía</th>
                                 <th>Extras</th>
                                 <th>Fotos</th>
                                 <th>Noticias</th>
@@ -213,6 +218,7 @@
                                 // Definir todas las acciones posibles
                                 var todasLasAcciones = new List<string>
                                                         {
+                                                        "Entrar",
                                                         "Ver",
                                                         "Crear",
                                                         "Detalles",
@@ -233,6 +239,7 @@
                                                         "Constancia",
                                                         "Beneficio",
                                                         "LiquidacionViatico",
+                                                        "Garantia",
                                                         "Extra",
                                                         "Foto",
                                                         "Noticia"

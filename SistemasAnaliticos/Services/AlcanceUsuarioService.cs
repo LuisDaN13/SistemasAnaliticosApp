@@ -38,5 +38,15 @@ namespace SistemasAnaliticos.Services
 
             return "Propio";
         }
+
+        public async Task<string> ObtenerAlcanceGarantiaAsync(Usuario user)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+
+            if (roles.Contains("Garantia Administrador"))
+                return "Global";
+
+            return "Propio";
+        }
     }
 }

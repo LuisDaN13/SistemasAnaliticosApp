@@ -36,7 +36,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.Strict;
-    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    options.ExpireTimeSpan = TimeSpan.FromHours(12);
     options.SlidingExpiration = true;
     options.LoginPath = "/Usuario/Login";
     options.LogoutPath = "/Usuario/LogOut";
@@ -84,7 +84,7 @@ builder.Services.AddAuthorization(options =>
 
 // Base de datos (simple)
 builder.Services.AddDbContext<DBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ambiente")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("pruebas")));
 
 var app = builder.Build();
 

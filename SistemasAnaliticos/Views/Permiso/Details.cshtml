@@ -246,7 +246,8 @@
                                          style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; cursor: pointer;"
                                          data-bs-toggle="modal"
                                          data-bs-target="#fotoModal"
-                                         onclick="mostrarImagenModal('@base64foto')" />
+                                         data-foto="@base64foto"
+                                         class="img-foto-permiso" />
                                 }
                                 else
                                 {
@@ -292,6 +293,26 @@
             </div>
         }
     </main>
+    <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <img id="modalFoto" src="" alt="Foto ampliada" class="img-fluid rounded" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.querySelectorAll('.img-foto-permiso').forEach(img => {
+            img.addEventListener('click', function() {
+                mostrarImagenModal(this.dataset.foto);
+            });
+        });
+        function mostrarImagenModal(base64) {
+            var modalImg = document.getElementById("modalFoto");
+            modalImg.src = "data:image/jpeg;base64," + base64;
+        }
+    </script>
     <script>
         // Función para obtener icono según tipo de archivo
         function obtenerIconoArchivo(nombreArchivo, tipoMIME) {

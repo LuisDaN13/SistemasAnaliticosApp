@@ -6,5 +6,6 @@ namespace SistemasAnaliticos.Services
     {
         Task<string> ObtenerAlcanceAsync(Usuario user);
         Task<string> ObtenerAlcanceFinancieroAsync(Usuario user);
+        Task<string> ObtenerAlcanceGarantiaAsync(Usuario user);
     }
 }

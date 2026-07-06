@@ -138,7 +138,7 @@
                                                      style="width: 70px; height: 70px; object-fit: cover; border-radius: 5px; cursor: pointer;"
                                                      data-bs-toggle="modal"
                                                      data-bs-target="#fotoModal"
-                                                     onclick="mostrarImagenModal('@base64foto')" />
+                                                     data-foto="@base64foto" />
                                             }
                                             else
                                             {
@@ -159,11 +159,15 @@
                                             }
                                         </td>
                                         <td class="text-center">
-                                            <a class="btn btn-warning btn-sm" onclick = "abrirModalInactivar('@Url.Action("Inactivar", "Foto", new { id = item.idFoto })')">
-                                                <i class="bi bi-ban"></i> Inactivar
+                                            <a class="btn btn-warning btn-sm"
+                                               id="btnInactivar"
+                                               data-url="@Url.Action("Inactivar", "Foto", new { id = item.idFoto })">
+                                                Inactivar Foto
                                             </a>
-                                            <a class="btn btn-danger btn-sm" onclick = "abrirModalEliminar('@Url.Action("Delete", "Foto", new { id = item.idFoto })')">
-                                                <i class="bi bi-trash"></i> Eliminar
+                                            <a class="btn btn-danger btn-sm"
+                                               id="btnEliminar"
+                                               data-url="@Url.Action("Delete", "Foto", new { id = item.idFoto })">
+                                                Eliminar Foto
                                             </a>
                                         </td>
                                     </tr>
@@ -199,6 +203,7 @@
             </div>
         </div>
     </div>
+
     <!-- Modal de Eliminacion -->
     <div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -222,6 +227,14 @@
         </div>
     </div>
     <script>
+        document.getElementById('btnInactivar')?.addEventListener('click', function() {
+            abrirModalInactivar(this.dataset.url);
+        });
+
+        document.getElementById('btnEliminar')?.addEventListener('click', function() {
+            abrirModalEliminar(this.dataset.url);
+        });
+
         function abrirModalInactivar(url) {
             document.getElementById("formInactivar").action = url;
             var modal = new bootstrap.Modal(document.getElementById("modalInactivar"));
@@ -234,6 +247,7 @@
             modal.show();
         }
     </script>
+
     <!-- Modal Nueva Foto -->
     <div class="modal fade" id="modalNuevaFoto" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -274,6 +288,7 @@
             </div>
         </div>
     </div>
+
     <!-- Modal de la Foto -->
     <div class="modal fade" id="fotoModal" tabindex="-1" aria-labelledby="fotoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -290,6 +305,7 @@
             modalImg.src = "data:image/jpeg;base64," + base64;
         }
     </script>
+    
     <!-- Respuestas de los Formularios -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {

@@ -44,6 +44,13 @@
             ClavesPermiso.Crear(Modulos.LiquidacionViatico, Acciones.Crear),
             ClavesPermiso.Crear(Modulos.LiquidacionViatico, Acciones.CambiarEstado),
 
+            // Garantia
+            ClavesPermiso.Crear(Modulos.Garantia, Acciones.Entrar),
+            ClavesPermiso.Crear(Modulos.Garantia, Acciones.Ver),
+            ClavesPermiso.Crear(Modulos.Garantia, Acciones.Detalles),
+            ClavesPermiso.Crear(Modulos.Garantia, Acciones.Crear),
+            ClavesPermiso.Crear(Modulos.Garantia, Acciones.CambiarEstado),
+
             // Extra
             ClavesPermiso.Crear(Modulos.Extra, Acciones.Ver),
             ClavesPermiso.Crear(Modulos.Extra, Acciones.Detalles),

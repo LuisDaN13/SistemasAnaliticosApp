@@ -676,13 +676,13 @@
                                             <div class="row g-3">
                                                 <div class="col-8" style="margin-top: 2.0rem !important">
                                                     <label class="form-label required-field">Provincia</label>
-                                                    <select class="form-select" required asp-for="provincia" onchange="cargarCantones()">
+                                                    <select class="form-select" required asp-for="provincia">
                                                         <option value="" selected disabled>Cargando provincias</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-8" style="margin-top: 2.0rem !important">
                                                     <label class="form-label required-field">Cantón</label>
-                                                    <select class="form-select" required asp-for="canton" onchange="cargarDistritos()">
+                                                    <select class="form-select" required asp-for="canton">
                                                         <option value="" selected disabled>Seleccione primero la provincia</option>
                                                     </select>
                                                 </div>
@@ -849,19 +849,20 @@
                                                 </div>
 
                                                 <div class="border-top">
-@*                                                     @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
-                                                    {
- *@                                                        <div class="col" style="margin-top: 1.5rem !important">
-                                                            <label class="form-label required-field">Rol del Usuario</label>
-                                                            <select class="form-select" id="rolDropdown" name="rolSeleccionado">
-                                                                <option value="" selected disabled>Seleccione un rol</option>
-                                                                <!-- Los roles se cargarán dinámicamente -->
-                                                            </select>
-                                                            <!-- Campo para mostrar el rol seleccionado -->
-                                                            <div id="rolSeleccionadoInfo" class="mt-2 small"></div>
-                                                        </div>
-@*                                                     }
- *@                                                </div>
+                                                    <div class="border-top">
+                                                        @if ((User.IsInRole("Administrador")) || User.IsInRole("RRHH"))
+                                                        {
+                                                            <div class="col" style="margin-top: 1.5rem !important">
+                                                                <label class="form-label required-field">Rol del Usuario</label>
+                                                                <div id="rolesContainer" class="border rounded p-2">
+                                                                    <div class="text-muted small">Cargando roles...</div>
+                                                                </div>
+                                                                <!-- Campo para mostrar el rol seleccionado -->
+                                                                <div id="rolSeleccionadoInfo" class="mt-2 small"></div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -896,59 +897,56 @@
     <script>
         // Función para cargar roles desde el servidor
         async function cargarRoles() {
-            const rolDropdown = document.getElementById('rolDropdown');
-            if (!rolDropdown) return;
-
+            const rolesContainer = document.getElementById('rolesContainer');
+            if (!rolesContainer) return;
             try {
-                // Mostrar indicador de carga
-                rolDropdown.innerHTML = '<option value="">Cargando roles...</option>';
-                rolDropdown.disabled = true;
+                rolesContainer.innerHTML = '<div class="text-muted small">Cargando roles...</div>';
 
                 const response = await fetch('/Usuario/GetRoles');
                 const data = await response.json();
 
                 if (data.success && data.roles && data.roles.length > 0) {
-                    // Limpiar y agregar opciones
-                    rolDropdown.innerHTML = '<option value="" selected disabled>Seleccione un rol</option>';
+                    rolesContainer.innerHTML = data.roles.map(rol => `
+                        <div class="form-check">
+                            <input class="form-check-input rol-checkbox" type="checkbox"
+                                   name="RolesSeleccionados" value="${rol.nombre}" id="rol_${rol.nombre}">
+                            <label class="form-check-label" for="rol_${rol.nombre}">${rol.nombre}</label>
+                        </div>
+                    `).join('');
 
-                    data.roles.forEach(rol => {
-                        const option = document.createElement('option');
-                        option.value = rol.nombre;
-                        option.textContent = rol.nombre;
-                        rolDropdown.appendChild(option);
+                    // Enlazar el evento change a cada checkbox recién creado
+                    document.querySelectorAll('.rol-checkbox').forEach(cb => {
+                        cb.addEventListener('change', actualizarInfoRolSeleccionado);
                     });
+
+                    actualizarInfoRolSeleccionado();
                 } else {
-                    rolDropdown.innerHTML = '<option value="" selected disabled>No hay roles disponibles</option>';
+                    rolesContainer.innerHTML = '<div class="text-danger small">No hay roles disponibles</div>';
                     console.error('Error al cargar roles:', data.message);
                 }
             } catch (error) {
                 console.error('Error en la solicitud:', error);
-                rolDropdown.innerHTML = '<option value="" selected disabled>Error de conexión</option>';
-            } finally {
-                rolDropdown.disabled = false;
+                rolesContainer.innerHTML = '<div class="text-danger small">Error de conexión</div>';
             }
         }
 
-        // Función para mostrar información del rol seleccionado
+        // Función para mostrar información de los roles seleccionados
         function actualizarInfoRolSeleccionado() {
-            const rolDropdown = document.getElementById('rolDropdown');
             const rolInfo = document.getElementById('rolSeleccionadoInfo');
+            if (!rolInfo) return;
 
-            if (!rolDropdown || !rolInfo) return;
+            const checkboxesSeleccionados = Array.from(document.querySelectorAll('.rol-checkbox:checked'));
+            const rolesContainer = document.getElementById('rolesContainer');
 
-            const rolSeleccionado = rolDropdown.value;
-            const textoSeleccionado = rolDropdown.options[rolDropdown.selectedIndex].text;
-
-            if (rolSeleccionado) {
+            if (checkboxesSeleccionados.length > 0) {
+                const nombres = checkboxesSeleccionados.map(cb => cb.value).join(', ');
                 rolInfo.innerHTML = `
                     <div class="alert alert-success p-2 mb-0">
                         <i class="bi bi-check-circle-fill me-2"></i>
-                        <strong>Rol seleccionado:</strong> ${textoSeleccionado}
+                        <strong>Roles seleccionados:</strong> ${nombres}
                     </div>
                 `;
-
-                // Validación visual
-                rolDropdown.classList.remove('is-invalid');
+                if (rolesContainer) rolesContainer.classList.remove('is-invalid');
             } else {
                 rolInfo.innerHTML = `
                     <div class="alert alert-warning p-2 mb-0">
@@ -959,24 +957,19 @@
             }
         }
 
+        // Función para obtener los roles seleccionados (útil si necesitas leerlos por JS antes de un submit manual)
+        function obtenerRolesSeleccionados() {
+            return Array.from(document.querySelectorAll('.rol-checkbox:checked')).map(cb => cb.value);
+        }
+
         // Inicializar cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
-            const rolDropdown = document.getElementById('rolDropdown');
-
-            // Cargar roles cuando se abra el modal
             const modal = document.getElementById('createEmployeeModal');
             if (modal) {
                 modal.addEventListener('show.bs.modal', function() {
                     setTimeout(() => {
                         cargarRoles();
                     }, 100);
-                });
-            }
-
-            // Actualizar información cuando se seleccione un rol
-            if (rolDropdown) {
-                rolDropdown.addEventListener('change', function() {
-                    actualizarInfoRolSeleccionado();
                 });
             }
         });
@@ -1128,7 +1121,7 @@
                     noHijos: getSafeValue('#noHijos'),
                     padecimientosAlergias: getSafeValue('#padecimientosAlergias'),
 
-                    // Paso 3: Dirección
+                     // Paso 3: Dirección
                     provincia: getSafeValue('#provincia'),
                     canton: getSafeValue('#canton'),
                     distrito: getSafeValue('#distrito'),
@@ -1161,16 +1154,18 @@
 
         // Esperar a que el DOM esté completamente cargado
         document.addEventListener('DOMContentLoaded', function() {
-
-            // Inicializar componentes en orden
             inicializarStepper();
             cargarProvincias();
             inicializarLicencias();
-            inicializarSwitchHijos();
+
+            // ✅ AGREGAR ESTOS
+            document.getElementById('provincia')?.addEventListener('change', cargarCantones);
+            document.getElementById('canton')?.addEventListener('change', cargarDistritos);
         });
 
+        // ✅ Usar el id que genera asp-for
         function cargarProvincias() {
-            const selectProvincia = document.querySelector('select[asp-for="provincia"]');
+            const selectProvincia = document.getElementById('provincia');
             if (!selectProvincia) {
                 return;
             }
@@ -1480,18 +1475,6 @@
             };
 
             validarLicencias();
-        }
-
-        function inicializarSwitchHijos() {
-            const hijosSwitch = document.getElementById('hijosSwitch');
-            const noHijosInput = document.getElementById('noHijos');
-
-            hijosSwitch.addEventListener('change', function() {
-                noHijosInput.disabled = !this.checked;
-                if (!this.checked) {
-                    noHijosInput.value = '';
-                }
-            });
         }
     </script>
 </body>

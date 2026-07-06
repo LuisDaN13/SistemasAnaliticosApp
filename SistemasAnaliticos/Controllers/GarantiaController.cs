@@ -34,7 +34,7 @@ namespace SistemasAnaliticos.Controllers
 
         // -------------------------------------------------------------------------------------------------------------------------------
         // INDEX DONDE SE VEN LOS PERMISOS
-        //[Authorize(Policy = "Garantia.Ver")]
+        [Authorize(Policy = "Garantia.Ver")]
         public async Task<IActionResult> VerGarantias(int page = 1)
         {
             int pageSize = 3;
@@ -135,9 +135,9 @@ namespace SistemasAnaliticos.Controllers
                 if (estados != null && estados.Length > 0)
                 {
                     var estadosMapeados = estados.Select(e =>
-                        e == "Revisada" ? "Revisada" :
+                        e == "Aprobada" ? "Aprobada" :
                         e == "Creada" ? "Creada" :
-                        "No Revisada").ToArray();
+                            "Rechazada").ToArray();
 
                     query = query.Where(p => estadosMapeados.Contains(p.estado));
                 }
@@ -161,7 +161,7 @@ namespace SistemasAnaliticos.Controllers
                     {
                         if (DateTime.TryParse(fechaUnica, out DateTime fechaUnicaDate))
                         {
-                            query = query.Where(p => p.fechaCreacion == fechaUnicaDate);
+                            query = query.Where(p => p.fechaCreacion.Date == fechaUnicaDate);
                         }
                     }
 
@@ -619,7 +619,8 @@ namespace SistemasAnaliticos.Controllers
 
                         // Contadores por estado
                         Creada = g.Count(p => p.estado == "Creada"),
-                        Revisada = g.Count(p => p.estado == "Revisada"),
+                        Aprobada = g.Count(p => p.estado == "Aprobada"),
+                        Rechazada = g.Count(p => p.estado == "Rechazada"),
 
                         // Contadores por departamento ← AGREGAR ESTOS
                         Bodega = g.Count(p => p.departamento == "Bodega"),
@@ -644,7 +645,8 @@ namespace SistemasAnaliticos.Controllers
                     LD = 0,
                     PX = 0,
                     Creada = 0,
-                    Revisada = 0,
+                    Aprobada = 0,
+                    Rechazada = 0,
                     Bodega = 0,
                     FinancieroContable = 0,
                     Gerencia = 0,
@@ -668,7 +670,8 @@ namespace SistemasAnaliticos.Controllers
                     LD = 0,
                     PX = 0,
                     Creada = 0,
-                    Revisada = 0,
+                    Aprobada = 0,
+                    Rechazada = 0,
                     Bodega = 0,
                     FinancieroContable = 0,
                     Gerencia = 0,
@@ -687,7 +690,7 @@ namespace SistemasAnaliticos.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //[Authorize(Policy = "Garantia.Crear")]
+        [Authorize(Policy = "Garantia.Crear")]
         public async Task<IActionResult> Create(Garantia model)
         {
             var usuario = await _userManager.GetUserAsync(User);
@@ -712,8 +715,6 @@ namespace SistemasAnaliticos.Controllers
                     // Datos del paso 1
                     moneda = model.moneda,
                     monto = model.monto,
-                    porcentaje = model.porcentaje ?? 0.00m,
-                    montoFinal = model.monto * (model.porcentaje ?? 0.00m),
                     aFavorDe = model.aFavorDe,
                     nombreLicitacion = model.nombreLicitacion,
                     prorroga = model.prorroga,
@@ -806,34 +807,33 @@ namespace SistemasAnaliticos.Controllers
 
                 try
                 {
-                    // 1. Correo al empleado
-                    var htmlEmpleado = PlantillasEmail.ConfirmacionEmpleadoGarantia(
-                        nombreEmpleado: usuario.nombreCompleto,
-                        nombreLicitacion: model.nombreLicitacion
-                    );
+                    Console.WriteLine($"Envio de Correo");
+                    //// 1. Correo al empleado
+                    //var htmlEmpleado = PlantillasEmail.ConfirmacionCreacionGarantia(
+                    //    nombreEmpleado: usuario.nombreCompleto,
+                    //    nombreLicitacion: model.nombreLicitacion,
+                    //    numeroGarantia: model.numeroGarantia
+                    //);
 
-                    await _emailService.SendEmailAsync(
-                        toEmail: usuario.Email,
-                        toName: usuario.nombreCompleto,
-                        subject: $"Confirmación de Garantía - {usuario.nombreCompleto}",
-                        htmlBody: htmlEmpleado
-                    );
+                    //await _emailService.SendEmailAsync(
+                    //    toEmail: usuario.Email,
+                    //    toName: usuario.nombreCompleto,
+                    //    subject: $"Confirmación de Garantía - {usuario.nombreCompleto}",
+                    //    htmlBody: htmlEmpleado
+                    //);
 
-                    // 2. Correo de notificación a la persona de revisión (Ana Novo y Hillary Hernández)
-                    if (!string.IsNullOrEmpty(usuario.jefeId))
-                    {
-                        var htmlRevision1 = PlantillasEmail.NotificacionRevisionGarantia(
-                            nombreEmpleado: usuario.nombreCompleto,
-                            nombreLicitacion: model.nombreLicitacion
-                        );
+                    //// 2. Correo de notificación al buzón de revision para garantias
+                    //var htmlRevision = PlantillasEmail.NotificacionRevisionGarantia(
+                    //    nombreEmpleado: usuario.nombreCompleto,
+                    //    nombreLicitacion: model.nombreLicitacion
+                    //);
 
-                        await _emailService.SendEmailAsync(
-                            toEmail: "financiero@sistemasanaliticos.cr",
-                            toName: "Garantías Financiero",
-                            subject: $"Solicitud de Garantía Revisión - {usuario.nombreCompleto}",
-                            htmlBody: htmlRevision1
-                        );
-                    }
+                    //await _emailService.SendEmailAsync(
+                    //    toEmail: "Garantias-Financiero@sistemasanaliticos.cr",
+                    //    toName: "Garantías Financiero",
+                    //    subject: $"Solicitud de Garantía Revisión - {usuario.nombreCompleto}",
+                    //    htmlBody: htmlRevision
+                    //);
                 }
                 catch (Exception exEmail)
                 {
@@ -853,16 +853,148 @@ namespace SistemasAnaliticos.Controllers
                 _context.Auditoria.Add(auditoria);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Se creó la garantía correctamente.";
-                return RedirectToAction("Index");
+                TempData["SuccessMessageGarantia"] = "Se creó la garantía correctamente.";
+                return RedirectToAction("VerGarantias");
             }
             catch (Exception ex)
             {
                 // Log del error
                 Console.WriteLine($"Error en creación de garantía: {ex.Message}");
-                TempData["ErrorMessage"] = "Error en la creación de la garantía.";
-                return RedirectToAction("Index");
+                TempData["ErrorMessageGarantia"] = "Error en la creación de la garantía.";
+                return RedirectToAction("VerGarantias");
             }
+        }
+
+        // -------------------------------------------------------------------------------------------------------------------------------
+        // CAMBIOS DE ESTADOS MASIVOS
+        [Authorize(Policy = "Garantia.CambiarEstado")]
+        [HttpPost]
+        public async Task<IActionResult> CambiarEstadoMasivo([FromBody] EstadoMasivoViewModel model)
+        {
+            // Auditoría
+            string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? "Central America Standard Time"
+                : "America/Costa_Rica";
+
+            TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+            DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
+            var usuario = await _userManager.GetUserAsync(User);
+
+            foreach (var id in model.Ids)
+            {
+                var garantia = await _context.Garantia.FindAsync(id);
+                if (garantia == null) continue; // Agregado: si no existe, salta
+
+                var usuarioGarantia = await _userManager.FindByIdAsync(garantia.UsuarioId);
+                if (usuarioGarantia == null) continue; // Agregado: validación básica
+
+                try
+                {
+                    if (garantia.estado == "Aprobada")
+                    {
+                        var auditoriaApro = new Auditoria
+                        {
+                            Fecha = hoy,
+                            Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                            Usuario = usuario.nombreCompleto ?? "Desconocido",
+                            Tabla = "Garantia",
+                            Accion = "Intento de Cambio de Garantía aprobada no." + id + " de " + usuarioGarantia.nombreCompleto
+                        };
+                        _context.Auditoria.Add(auditoriaApro);
+
+                        TempData["ErrorMessageGarantia"] = $"La garantía {id} de {usuarioGarantia.nombreCompleto} no cambió de estado porque ya tenia estado anteriormente.";
+                    }
+                    else if (garantia.estado == "Rechazada")
+                    {
+                        var auditoriaRecha = new Auditoria
+                        {
+                            Fecha = hoy,
+                            Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                            Usuario = usuario.nombreCompleto ?? "Desconocido",
+                            Tabla = "Garantia",
+                            Accion = "Intento de Cambio de Garantía rechazada no." + id + " de " + usuarioGarantia.nombreCompleto
+                        };
+                        _context.Auditoria.Add(auditoriaRecha);
+
+                        TempData["ErrorMessageGarantia"] = $"La garantía {id} de {usuarioGarantia.nombreCompleto} no cambió de estado porque ya tenia estado anteriormente.";
+                    }
+                    else if (model.estado == "Aprobada")
+                    {
+                        // ✅ GUARDAR CAMBIOS DE LA GARANTÍA (solo si se aprobó)
+                        garantia.estado = "Aprobada";
+                        _context.Garantia.Update(garantia);
+                        await _context.SaveChangesAsync();
+
+                        // Enviar correo de aprobación
+                        try
+                        {
+                            //var htmlEmpleado = PlantillasEmail.EstadoGarantiaAprob(
+                            //    nombreEmpleado: usuario.nombreCompleto,
+                            //    nombreLicitacion: garantia.nombreLicitacion,
+                            //    numeroGarantia: garantia.numeroGarantia,
+                            //    tipoGarantia: garantia.tipoLicitacion
+                            //);
+                            //await _emailService.SendEmailAsync(
+                            //    toEmail: usuarioGarantia.Email,
+                            //    toName: usuarioGarantia.nombreCompleto,
+                            //    subject: $"Aprobación de Garantía - {usuarioGarantia.nombreCompleto}",
+                            //    htmlBody: htmlEmpleado
+                            //);
+                        }
+                        catch (Exception exEmail)
+                        {
+                            Console.WriteLine($"Error enviando correo para permiso {id}: {exEmail.Message}");
+                        }
+                    }
+                    else if (model.estado == "Rechazada")
+                    {
+                        garantia.estado = "Rechazada";
+                        _context.Garantia.Update(garantia);
+                        await _context.SaveChangesAsync();
+
+                        // Enviar correo de rechazo
+                        try
+                        {
+                            //var htmlEmpleado = PlantillasEmail.EstadoGarantiaRechaz(
+                            //    nombreEmpleado: usuario.nombreCompleto,
+                            //    nombreLicitacion: garantia.nombreLicitacion,
+                            //    numeroGarantia: garantia.numeroGarantia,
+                            //    tipoGarantia: garantia.tipoLicitacion
+                            //);
+                            //await _emailService.SendEmailAsync(
+                            //    toEmail: usuarioGarantia.Email,
+                            //    toName: usuarioGarantia.nombreCompleto,
+                            //    subject: $"Rechazo de Garantía - {usuarioGarantia.nombreCompleto}",
+                            //    htmlBody: htmlEmpleado
+                            //);
+                        }
+                        catch (Exception exEmail)
+                        {
+                            Console.WriteLine($"Error enviando correo para permiso {id}: {exEmail.Message}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error procesando permiso {id}: {ex.Message}");
+                    // Opcional: agregar a TempData un mensaje de error general
+                }
+            }
+
+            var auditoria = new Auditoria
+            {
+                Fecha = hoy,
+                Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
+                Usuario = usuario.nombreCompleto ?? "Desconocido",
+                Tabla = "Garantia",
+                Accion = "Cambio de Estado del no." + string.Join(", ", model.Ids)
+            };
+            _context.Auditoria.Add(auditoria);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessageGarantia"] = "Se cambiaron los permisos de estados correctamente.";
+            return Ok(new { redirect = Url.Action("VerGarantias") });
         }
     }
 }

@@ -610,53 +610,13 @@
 
                                                 <div class="row g-4">
                                                     <!-- Monto -->
-                                                    <!-- Monto con Switch de Porcentaje -->
                                                     <div class="col-12">
-                                                        <div class="prorroga-container">
-                                                            <div class="prorroga-header">
-                                                                <label class="form-label fw-semibold mb-0 fs-5">¿Incluye Porcentaje?</label>
-                                                                <div class="form-check form-switch">
-                                                                    <input class="form-check-input prorroga-switch" type="checkbox" role="switch"
-                                                                           id="montoSwitch" onchange="toggleCamposMonto()">
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Sin porcentaje: solo monto -->
-                                                            <div id="montoSinPorcentaje" style="margin-top: 1rem;">
-                                                                <label class="form-label required-field">Monto de la Garantía</label>
-                                                                <div class="currency-input">
-                                                                    <div class="input-group">
-                                                                        <span class="input-group-text" id="monedaSimbolo">₡</span>
-                                                                        <input type="text" class="form-control salario-cr" asp-for="Monto"
-                                                                               placeholder="0.00" required>
-                                                                        <span asp-validation-for="Monto" class="text-danger"></span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Con porcentaje: monto + porcentaje -->
-                                                            <div id="montoConPorcentaje" style="display: none; margin-top: 1rem;">
-                                                                <div class="row g-3">
-                                                                    <div class="col-md-6">
-                                                                        <label class="form-label required-field">Monto de la Garantía</label>
-                                                                        <div class="currency-input">
-                                                                            <div class="input-group">
-                                                                                <span class="input-group-text">₡</span>
-                                                                                <input type="text" class="form-control salario-cr" asp-for="Monto"
-                                                                                       placeholder="0.00">
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-                                                                        <label class="form-label required-field">Porcentaje</label>
-                                                                        <div class="input-group">
-                                                                            <input type="text" class="form-control" asp-for="Porcentaje"
-                                                                                   placeholder="0.00">
-                                                                            <span class="input-group-text">%</span>
-                                                                        </div>
-                                                                        <span asp-validation-for="Porcentaje" class="text-danger"></span>
-                                                                    </div>
-                                                                </div>
+                                                        <label class="form-label required-field">Monto de la Garantía</label>
+                                                        <div class="currency-input">
+                                                            <div class="input-group">
+                                                                <span class="input-group-text" id="monedaSimbolo">₡</span>
+                                                                <input type="text" class="form-control salario-cr" asp-for="Monto" placeholder="0.00" required>
+                                                                <span asp-validation-for="Monto" class="text-danger"></span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -665,11 +625,11 @@
                                                     <div class="col-12">
                                                         <label class="form-label required-field">Moneda</label>
                                                         <div class="moneda-cards">
-                                                            <div class="moneda-card" data-moneda="CRC" onclick="seleccionarMoneda('CRC')">
+                                                            <div class="moneda-card" data-moneda="CRC">
                                                                 <div class="moneda-simbolo">₡</div>
                                                                 <div class="moneda-nombre">Colones</div>
                                                             </div>
-                                                            <div class="moneda-card" data-moneda="USD" onclick="seleccionarMoneda('USD')">
+                                                            <div class="moneda-card" data-moneda="USD">
                                                                 <div class="moneda-simbolo">$</div>
                                                                 <div class="moneda-nombre">Dólares</div>
                                                             </div>
@@ -731,19 +691,19 @@
                                                     <div class="col-12">
                                                         <label class="form-label required-field">Tipo de Licitación</label>
                                                         <div class="tipo-licitacion-cards">
-                                                            <div class="tipo-card" data-tipo="LY" onclick="seleccionarTipo('LY')">
+                                                            <div class="tipo-card" data-tipo="LY">
                                                                 <div class="tipo-codigo">LY</div>
                                                                 <div class="tipo-nombre">Mayor</div>
                                                             </div>
-                                                            <div class="tipo-card" data-tipo="LE" onclick="seleccionarTipo('LE')">
+                                                            <div class="tipo-card" data-tipo="LE">
                                                                 <div class="tipo-codigo">LE</div>
                                                                 <div class="tipo-nombre">Menor</div>
                                                             </div>
-                                                            <div class="tipo-card" data-tipo="LD" onclick="seleccionarTipo('LD')">
+                                                            <div class="tipo-card" data-tipo="LD">
                                                                 <div class="tipo-codigo">LD</div>
                                                                 <div class="tipo-nombre">Reducida</div>
                                                             </div>
-                                                            <div class="tipo-card" data-tipo="PX" onclick="seleccionarTipo('PX')">
+                                                            <div class="tipo-card" data-tipo="PX">
                                                                 <div class="tipo-codigo">PX</div>
                                                                 <div class="tipo-nombre">Excepción</div>
                                                             </div>
@@ -798,7 +758,7 @@
                                                         <!-- Los adjuntos se agregarán dinámicamente aquí -->
                                                     </div>
 
-                                                    <button type="button" class="btn-agregar-adjunto" id="btnAgregarAdjunto" onclick="agregarAdjunto()">
+                                                    <button type="button" class="btn-agregar-adjunto" id="btnAgregarAdjunto">
                                                         <i class="bi bi-plus-circle me-2"></i>Agregar Adjunto
                                                     </button>
 
@@ -837,15 +797,6 @@
     <!-- SCRIPT DE LOS FORMATOS DE CAMPOS-->
     <script src='~/JS/formatosUsuario.js'></script>
 
-    <!-- Cambio de Porcentaje y Monto -->
-    <script>
-        function toggleCamposMonto() {
-            const activo = document.getElementById('montoSwitch').checked;
-            document.getElementById('montoSinPorcentaje').style.display = activo ? 'none' : 'block';
-            document.getElementById('montoConPorcentaje').style.display = activo ? 'block' : 'none';
-        }
-    </script>
-
     <script>
         // Variables globales para adjuntos
         let adjuntosCount = 0;
@@ -866,7 +817,7 @@
                 fechaInput.value = `${año}-${mes}-${dia}T${horas}:${minutos}`;
             }
         });
-
+        
         // Función para seleccionar moneda
         function seleccionarMoneda(moneda) {
             // Remover selección anterior
@@ -922,14 +873,14 @@
                 <div class="adjunto-item" id="${adjuntoId}">
                     <div class="adjunto-header">
                         <div class="adjunto-numero">${adjuntosCount}</div>
-                        <button type="button" class="btn-eliminar-adjunto" onclick="eliminarAdjunto('${adjuntoId}')" ${adjuntosCount === 1 ? 'disabled' : ''}>
+                        <button type="button" class="btn-eliminar-adjunto" data-eliminar="${adjuntoId}" ${adjuntosCount === 1 ? 'disabled' : ''}>
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-12">
                             <label class="form-label">Archivo</label>
-                            <input type="file" class="form-control" name="Adjuntos" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="mostrarInfoArchivo(this, '${adjuntoId}')">
+                            <input type="file" class="form-control" name="Adjuntos" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" data-info-archivo="${adjuntoId}">
                         </div>
                     </div>
                     <div class="file-info" id="info_${adjuntoId}" style="display: none;">
@@ -1026,10 +977,10 @@
                 numeroLicitacion2Input.required = false;
                 numeroLicitacion2Input.value = ''; // Limpiar valor
 
-                // Si estamos en paso 2 y hay prórroga, mostrar advertencia
-                if (document.getElementById('step2').classList.contains('d-none') === false) {
-                    showTemporaryMessage('La prórroga está activada. Complete los números en el paso 1', 'info');
-                }
+                // // Si estamos en paso 2 y hay prórroga, mostrar advertencia
+                // if (document.getElementById('step2').classList.contains('d-none') === false) {
+                //     showTemporaryMessage('La prórroga está activada. Complete los números en el paso 1', 'info');
+                // }
             } else {
                 // SIN PRÓRROGA: Ocultar campos en paso 1, mostrar en paso 2
                 prorrogaFieldsPaso1.style.display = 'none';
@@ -1042,10 +993,10 @@
                 numeroLicitacion1Input.value = ''; // Limpiar valor
                 numeroLicitacion2Input.required = true;
 
-                // Si estamos en paso 1 y no hay prórroga, mostrar mensaje
-                if (document.getElementById('step1').classList.contains('d-none') === false) {
-                    showTemporaryMessage('Complete el número de licitación en el paso 2', 'info');
-                }
+                // // Si estamos en paso 1 y no hay prórroga, mostrar mensaje
+                // if (document.getElementById('step1').classList.contains('d-none') === false) {
+                //     showTemporaryMessage('Complete el número de licitación en el paso 2', 'info');
+                // }
             }
         }
 
@@ -1285,8 +1236,36 @@
             const prorrogaSwitch = document.getElementById('prorrogaSwitch');
             if (prorrogaSwitch) {
                 prorrogaSwitch.addEventListener('change', toggleCamposProrroga);
-                toggleCamposProrroga(); // Estado inicial
+                toggleCamposProrroga();
             }
+
+            // ✅ AGREGAR — cards de moneda
+            document.querySelectorAll('.moneda-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    seleccionarMoneda(this.dataset.moneda);
+                });
+            });
+
+            // ✅ AGREGAR — cards de tipo
+            document.querySelectorAll('.tipo-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    seleccionarTipo(this.dataset.tipo);
+                });
+            });
+
+            // ✅ AGREGAR — botón agregar adjunto
+            document.getElementById('btnAgregarAdjunto')?.addEventListener('click', agregarAdjunto);
+
+            // ✅ AGREGAR — event delegation para adjuntos dinámicos (eliminar y onchange archivo)
+            document.getElementById('adjuntosList')?.addEventListener('click', function(e) {
+                const btn = e.target.closest('[data-eliminar]');
+                if (btn) eliminarAdjunto(btn.dataset.eliminar);
+            });
+
+            document.getElementById('adjuntosList')?.addEventListener('change', function(e) {
+                const input = e.target.closest('[data-info-archivo]');
+                if (input) mostrarInfoArchivo(input, input.dataset.infoArchivo);
+            });
 
             setTimeout(() => {
                 seleccionarMoneda('CRC');
@@ -1298,4 +1277,4 @@
         });
     </script>
 </body>
-</html>s
+</html>

@@ -117,7 +117,8 @@ namespace SistemasAnaliticos.Controllers
                 var user = await userManager.GetUserAsync(User);
                 var userRoles = await userManager.GetRolesAsync(user);
 
-                var query = roleManager.Roles.AsQueryable();
+                var query = roleManager.Roles.AsQueryable()
+                    .Where(r => r.estado == true);
 
                 // 🔐 Regla especial: si es RRHH, no puede ver RRHH ni Administrador
                 if (userRoles.Contains("RRHH"))
@@ -351,7 +352,7 @@ namespace SistemasAnaliticos.Controllers
         // CREATE = REGISTRAR EMPLEADO CON FORMULARIO Y TODO
         [Authorize(Policy = "Usuarios.Crear")]
         [HttpPost]
-        public async Task<ActionResult> Create(Usuario model, string rolSeleccionado)
+        public async Task<ActionResult> Create(Usuario model, List<string> rolesSeleccionados)
         {
             try
             {
@@ -418,9 +419,13 @@ namespace SistemasAnaliticos.Controllers
                 if (resultado.Succeeded)
                 {
                     // Agregar roles seleccionados
-                    if (!string.IsNullOrEmpty(rolSeleccionado))
+                    if (rolesSeleccionados != null && rolesSeleccionados.Any())
                     {
-                        await userManager.AddToRoleAsync(nuevo, rolSeleccionado);
+                        var resultadoRoles = await userManager.AddToRolesAsync(nuevo, rolesSeleccionados);
+                        if (!resultadoRoles.Succeeded)
+                        {
+                            return RedirectToAction("Index", "Usuario");
+                        }
                     }
                     else
                     {
@@ -988,7 +993,7 @@ namespace SistemasAnaliticos.Controllers
 
             foreach (var user in usuarios)
             {
-                var rol = (await userManager.GetRolesAsync(user)).FirstOrDefault();
+                var roles = (await userManager.GetRolesAsync(user)).ToList();
 
                 usuariosViewModel.Add(new UsuarioViewModel
                 {
@@ -996,7 +1001,7 @@ namespace SistemasAnaliticos.Controllers
                     NombreCompleto = user.nombreCompleto,
                     UserName = user.UserName,
                     Email = user.Email,
-                    RolNombre = rol ?? "Sin rol asignado",
+                    Roles = roles,
                     Estado = user.estado
                 });
             }
@@ -1061,11 +1066,19 @@ namespace SistemasAnaliticos.Controllers
                 var body = await reader.ReadToEndAsync();
                 var json = JsonSerializer.Deserialize<JsonElement>(body);
 
-                string rolId = json.GetProperty("rolId").GetString();
-
-                if (string.IsNullOrEmpty(rolId))
+                if (!json.TryGetProperty("rolIds", out var rolIdsElement) || rolIdsElement.ValueKind != JsonValueKind.Array)
                 {
-                    return Json(new { success = false, message = "Debe seleccionar un rol" });
+                    return Json(new { success = false, message = "Debe seleccionar al menos un rol" });
+                }
+
+                var rolIds = rolIdsElement.EnumerateArray()
+                    .Select(r => r.GetString())
+                    .Where(r => !string.IsNullOrEmpty(r))
+                    .ToList();
+
+                if (!rolIds.Any())
+                {
+                    return Json(new { success = false, message = "Debe seleccionar al menos un rol" });
                 }
 
                 var usuario = await userManager.FindByIdAsync(id);
@@ -1074,11 +1087,20 @@ namespace SistemasAnaliticos.Controllers
                     return Json(new { success = false, message = "Usuario no encontrado" });
                 }
 
-                var rol = await roleManager.FindByIdAsync(rolId);
-                if (rol == null)
+                // Resolver los nombres de los roles a partir de los IDs
+                var nombresRoles = new List<string>();
+                foreach (var rolId in rolIds)
                 {
-                    return Json(new { success = false, message = "Rol no encontrado" });
+                    var rol = await roleManager.FindByIdAsync(rolId);
+                    if (rol == null)
+                    {
+                        return Json(new { success = false, message = $"Rol no encontrado: {rolId}" });
+                    }
+                    nombresRoles.Add(rol.Name);
                 }
+
+                // Recargar el usuario justo antes de tocar roles, para tener el stamp más fresco posible
+                await _context.Entry(usuario).ReloadAsync();
 
                 // Quitar roles actuales
                 var rolesActuales = await userManager.GetRolesAsync(usuario);
@@ -1087,22 +1109,27 @@ namespace SistemasAnaliticos.Controllers
                     var removeResult = await userManager.RemoveFromRolesAsync(usuario, rolesActuales);
                     if (!removeResult.Succeeded)
                     {
-                        return Json(new { success = false, message = "Error al remover roles actuales" });
+                        var errores = string.Join(", ", removeResult.Errors.Select(e => e.Description));
+                        return Json(new { success = false, message = "Error al remover roles actuales: " + errores });
                     }
                 }
 
-                // Asignar nuevo rol
-                var addResult = await userManager.AddToRoleAsync(usuario, rol.Name);
+                // Asignar nuevos roles
+                var addResult = await userManager.AddToRolesAsync(usuario, nombresRoles);
                 if (!addResult.Succeeded)
                 {
-                    return Json(new { success = false, message = "Error al asignar el nuevo rol" });
+                    return Json(new
+                    {
+                        success = false,
+                        message = "Error al asignar los nuevos roles: " +
+                        string.Join(", ", addResult.Errors.Select(e => e.Description))
+                    });
                 }
 
                 // Detectar sistema operativo y usar el ID de zona horaria adecuado
                 string timeZoneId = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                     ? "Central America Standard Time"           // Windows
                     : "America/Costa_Rica";                     // Linux/macOS
-
                 TimeZoneInfo zonaCR = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
                 DateTime ahoraCR = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
                 DateOnly hoy = DateOnly.FromDateTime(ahoraCR);
@@ -1115,14 +1142,15 @@ namespace SistemasAnaliticos.Controllers
                     Hora = TimeOnly.FromDateTime(ahoraCR).ToTimeSpan(),
                     Usuario = user.nombreCompleto ?? "Desconocido",
                     Tabla = "Usuario",
-                    Accion = "Cambió de Rol por " + rol.Name + " a " + usuario.primerNombre + " " + usuario.primerApellido
+                    Accion = "Cambió roles a " + string.Join(", ", nombresRoles) + " para " + usuario.primerNombre + " " + usuario.primerApellido
                 };
                 _context.Auditoria.Add(auditoria);
+                await _context.SaveChangesAsync();
 
                 return Json(new
                 {
                     success = true,
-                    message = "Rol cambiado correctamente",
+                    message = "Roles cambiados correctamente",
                     redirectUrl = Url.Action(nameof(MostrarUsers))
                 });
             }

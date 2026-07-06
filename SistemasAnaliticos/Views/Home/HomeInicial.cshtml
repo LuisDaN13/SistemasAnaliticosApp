@@ -283,21 +283,23 @@
                             </a>
 
                             <!-- Sistema 2: Financiero -->
-                            <a href="#" class="system-card-minimal">
-@*                             <a asp-controller="Home" asp-action="HomeFinanciero" class="system-card-minimal">                                
- *@                                <div class="icon-minimal">
-                                    <i class="bi bi-cash-stack"></i>
-                                </div>
+                            @if ((User.IsInRole("Garantia Normal")) || User.IsInRole("Garantia Administrador"))
+                            {
+                                <a asp-controller="Home" asp-action="HomeFinanciero" class="system-card-minimal">                                
+                                    <div class="icon-minimal">
+                                        <i class="bi bi-cash-stack"></i>
+                                    </div>
 
-                                <div class="content-minimal">
-                                    <h3>Financiero</h3>
-                                    <p>Control de garantías.</p>
-                                </div>
+                                    <div class="content-minimal">
+                                        <h3>Financiero</h3>
+                                        <p>Gestión de garantías y sus procesos relacionados.</p>
+                                    </div>
 
-                                <div class="arrow-minimal">
-                                    <i class="bi bi-arrow-right"></i>
-                                </div>
-                            </a>
+                                    <div class="arrow-minimal">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </div>
+                                </a>
+                            }
                         </div>
                     </div>
                 </div>
