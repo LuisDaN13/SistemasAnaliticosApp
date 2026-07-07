@@ -8,24 +8,22 @@ namespace SistemasAnaliticos.ViewModels
         public DateTime? fechaCreacion { get; set; }
         public string nombreEmpleado { get; set; }
         public string departamento { get; set; }
-        public string Moneda { get; set; }
-        public decimal? Monto { get; set; }
-        public decimal? porcentaje { get; set; }
-        public decimal montoFinal { get; set; }
-        public string AFavorDe { get; set; }
-        public string NombreLicitacion { get; set; }
-        public bool Prorroga { get; set; }
-        public string? NumeroGarantia { get; set; }
-        public string? NumeroLicitacion { get; set; }
+        public string moneda { get; set; }
+        public decimal monto { get; set; }
+        public string aFavorDe { get; set; }
+        public string nombreLicitacion { get; set; }
+        public bool prorroga { get; set; }
+        public string? numeroGarantia { get; set; }
+        public string? numeroLicitacion { get; set; }
 
-        public string TipoLicitacion { get; set; } // LY, LE, LD, PX
-        public DateTime? FechaInicio { get; set; }
-        public DateTime? FechaFinalizacion { get; set; }
-        public string Plazo { get; set; }
-        public string? Observacion { get; set; }
+        public string tipoLicitacion { get; set; } // LY, LE, LD, PX
+        public DateTime? fechaInicio { get; set; }
+        public DateTime? fechaFinalizacion { get; set; }
+        public string plazo { get; set; }
+        public string? observacion { get; set; }
 
         // PASO 3 - Documentos Adjuntos
-        public List<IFormFile> Adjuntos { get; set; }
+        public List<IFormFile> adjuntos { get; set; }
 
         public string estado { get; set; }
     }

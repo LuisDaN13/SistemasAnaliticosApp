@@ -54,12 +54,12 @@ namespace SistemasAnaliticos.Controllers
                     fechaCreacion = g.fechaCreacion,
                     nombreEmpleado = g.nombreEmpleado,
                     departamento = g.departamento,
-                    Moneda = g.moneda,
-                    Monto = g.monto,
-                    NombreLicitacion = g.nombreLicitacion,
-                    TipoLicitacion = g.tipoLicitacion,
-                    FechaInicio = g.fechaInicio,
-                    FechaFinalizacion = g.fechaFinalizacion,
+                    moneda = g.moneda,
+                    monto = g.monto,
+                    nombreLicitacion = g.nombreLicitacion,
+                    tipoLicitacion = g.tipoLicitacion,
+                    fechaInicio = g.fechaInicio,
+                    fechaFinalizacion = g.fechaFinalizacion,
                     estado = g.estado
                 })
                 .ToListAsync();
@@ -276,12 +276,12 @@ namespace SistemasAnaliticos.Controllers
                         g.moneda,
                         g.monto,
                         g.nombreLicitacion,
+                        g.numeroLicitacion,
                         g.tipoLicitacion,
                         g.fechaInicio,
                         g.fechaFinalizacion,
                         g.observacion,
                         g.estado,
-
                         g.nombreArchivo1,
                         g.nombreArchivo2,
                         g.nombreArchivo3,
@@ -301,26 +301,27 @@ namespace SistemasAnaliticos.Controllers
                 headerStyle.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
                 // Encabezados
-                worksheet.Cell(1, 1).Value = "ID Garantía";
+                worksheet.Cell(1, 1).Value = "ID";
                 worksheet.Cell(1, 2).Value = "Nombre Empleado";
                 worksheet.Cell(1, 3).Value = "Departamento";
                 worksheet.Cell(1, 4).Value = "Tipo";
-                worksheet.Cell(1, 5).Value = "Nombre";
-                worksheet.Cell(1, 6).Value = "Moneda";
-                worksheet.Cell(1, 7).Value = "Monto";
-                worksheet.Cell(1, 8).Value = "Estado";
-                worksheet.Cell(1, 9).Value = "Fecha Creación";
-                worksheet.Cell(1, 10).Value = "Fecha Inicio";
-                worksheet.Cell(1, 11).Value = "Fecha Finalización";
-                worksheet.Cell(1, 12).Value = "Observación";
-                worksheet.Cell(1, 13).Value = "Archivo Adjunto1";
-                worksheet.Cell(1, 14).Value = "Archivo Adjunto2";
-                worksheet.Cell(1, 15).Value = "Archivo Adjunto3";
-                worksheet.Cell(1, 16).Value = "Archivo Adjunto4";
-                worksheet.Cell(1, 17).Value = "Archivo Adjunto5";
+                worksheet.Cell(1, 5).Value = "Nombre Licitacion";
+                worksheet.Cell(1, 6).Value = "Numero Licitacion";
+                worksheet.Cell(1, 7).Value = "Moneda";
+                worksheet.Cell(1, 8).Value = "Monto";
+                worksheet.Cell(1, 9).Value = "Estado";
+                worksheet.Cell(1, 10).Value = "Fecha Creación";
+                worksheet.Cell(1, 11).Value = "Fecha Inicio";
+                worksheet.Cell(1, 12).Value = "Fecha Finalización";
+                worksheet.Cell(1, 13).Value = "Observación";
+                worksheet.Cell(1, 14).Value = "Archivo Adjunto1";
+                worksheet.Cell(1, 15).Value = "Archivo Adjunto2";
+                worksheet.Cell(1, 16).Value = "Archivo Adjunto3";
+                worksheet.Cell(1, 17).Value = "Archivo Adjunto4";
+                worksheet.Cell(1, 18).Value = "Archivo Adjunto5";
 
                 // Aplicar estilo al encabezado
-                worksheet.Range(1, 1, 1, 13).Style = headerStyle;
+                worksheet.Range(1, 1, 1, 18).Style = headerStyle;
 
                 // Llenar datos
                 int row = 2;
@@ -331,18 +332,19 @@ namespace SistemasAnaliticos.Controllers
                     worksheet.Cell(row, 3).Value = garantia.departamento;
                     worksheet.Cell(row, 4).Value = garantia.tipoLicitacion;
                     worksheet.Cell(row, 5).Value = garantia.nombreLicitacion;
-                    worksheet.Cell(row, 6).Value = garantia.moneda;
-                    worksheet.Cell(row, 7).Value = garantia.monto;
-                    worksheet.Cell(row, 8).Value = garantia.estado; // Estado directo, sin mapeo
-                    worksheet.Cell(row, 9).Value = garantia.fechaCreacion.ToString("yyyy-MM-dd");
-                    worksheet.Cell(row, 10).Value = garantia.fechaInicio?.ToString("yyyy-MM-dd");
-                    worksheet.Cell(row, 11).Value = garantia.fechaFinalizacion?.ToString("yyyy-MM-dd");
-                    worksheet.Cell(row, 12).Value = garantia.observacion;
-                    worksheet.Cell(row, 13).Value = string.IsNullOrEmpty(garantia.nombreArchivo1) ? "No" : "Sí";
-                    worksheet.Cell(row, 14).Value = string.IsNullOrEmpty(garantia.nombreArchivo2) ? "No" : "Sí";
-                    worksheet.Cell(row, 15).Value = string.IsNullOrEmpty(garantia.nombreArchivo3) ? "No" : "Sí";
-                    worksheet.Cell(row, 16).Value = string.IsNullOrEmpty(garantia.nombreArchivo4) ? "No" : "Sí";
-                    worksheet.Cell(row, 17).Value = string.IsNullOrEmpty(garantia.nombreArchivo5) ? "No" : "Sí";
+                    worksheet.Cell(row, 6).Value = garantia.numeroLicitacion;
+                    worksheet.Cell(row, 7).Value = garantia.moneda;
+                    worksheet.Cell(row, 8).Value = garantia.monto;
+                    worksheet.Cell(row, 9).Value = garantia.estado; // Estado directo, sin mapeo
+                    worksheet.Cell(row, 10).Value = garantia.fechaCreacion.ToString("yyyy-MM-dd");
+                    worksheet.Cell(row, 11).Value = garantia.fechaInicio?.ToString("yyyy-MM-dd");
+                    worksheet.Cell(row, 12).Value = garantia.fechaFinalizacion?.ToString("yyyy-MM-dd");
+                    worksheet.Cell(row, 13).Value = garantia.observacion;
+                    worksheet.Cell(row, 14).Value = string.IsNullOrEmpty(garantia.nombreArchivo1) ? "No" : "Sí";
+                    worksheet.Cell(row, 15).Value = string.IsNullOrEmpty(garantia.nombreArchivo2) ? "No" : "Sí";
+                    worksheet.Cell(row, 16).Value = string.IsNullOrEmpty(garantia.nombreArchivo3) ? "No" : "Sí";
+                    worksheet.Cell(row, 17).Value = string.IsNullOrEmpty(garantia.nombreArchivo4) ? "No" : "Sí";
+                    worksheet.Cell(row, 18).Value = string.IsNullOrEmpty(garantia.nombreArchivo5) ? "No" : "Sí";
                     row++;
                 }
 
@@ -454,12 +456,12 @@ namespace SistemasAnaliticos.Controllers
                         g.moneda,
                         g.monto,
                         g.nombreLicitacion,
+                        g.numeroLicitacion,
                         g.tipoLicitacion,
                         g.fechaInicio,
                         g.fechaFinalizacion,
                         g.observacion,
                         g.estado,
-
                         g.nombreArchivo1,
                         g.nombreArchivo2,
                         g.nombreArchivo3,
@@ -490,22 +492,24 @@ namespace SistemasAnaliticos.Controllers
                 document.Add(fechaGeneracion);
 
                 // Crear tabla
-                var table = new PdfPTable(10);
+                var table = new PdfPTable(12);
                 table.WidthPercentage = 100;
-                table.SetWidths(new float[] { 0.8f, 1.5f, 1.5f, 1.2f, 2f, 1f, 1.5f, 1.2f, 2f, 2f });
+                table.SetWidths(new float[] { 0.8f, 1.8f, 1.5f, 0.8f, 1.8f, 0.8f, 1.2f, 1.2f, 2f, 2f, 2f, 2f });
 
                 // Encabezados de tabla
                 var headerFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9);
-                AddTableCell(table, "ID Garantía", headerFont);
+                AddTableCell(table, "ID", headerFont);
                 AddTableCell(table, "Empleado", headerFont);
                 AddTableCell(table, "Departamento", headerFont);
                 AddTableCell(table, "Tipo", headerFont);
-                AddTableCell(table, "Nombre", headerFont);
+                AddTableCell(table, "Licitacion", headerFont);
+                AddTableCell(table, "# Licitacion", headerFont);
                 AddTableCell(table, "Moneda", headerFont);
                 AddTableCell(table, "Monto", headerFont);
                 AddTableCell(table, "Estado", headerFont);
                 AddTableCell(table, "Fechas", headerFont);
                 AddTableCell(table, "Observación", headerFont);
+                AddTableCell(table, "Cantidad Adjuntos", headerFont);
 
                 // Datos
                 var cellFont = FontFactory.GetFont(FontFactory.HELVETICA, 8);
@@ -518,6 +522,7 @@ namespace SistemasAnaliticos.Controllers
                     AddTableCell(table, garantia.departamento ?? "", cellFont);
                     AddTableCell(table, garantia.tipoLicitacion ?? "", cellFont);
                     AddTableCell(table, garantia.nombreLicitacion ?? "", cellFont);
+                    AddTableCell(table, garantia.numeroLicitacion ?? "", cellFont);
                     AddTableCell(table, garantia.moneda ?? "", cellFont);
                     AddTableCell(table, "₡ " + (garantia.monto).ToString("#,##0.00", new CultureInfo("es-CR")), cellFont);
 
@@ -525,11 +530,21 @@ namespace SistemasAnaliticos.Controllers
                     var estadoFont = GetEstadoFont(garantia.estado);
                     AddTableCell(table, garantia.estado ?? "", estadoFont);
 
-                    var fechas = $"Creación: {garantia.fechaCreacion:dd/MM/yyyy HH:mm}\n" +
+                    var fechas = $"Creación: {garantia.fechaCreacion:dd/MM/yyyy}\n" +
                                  $"Inicio: {(garantia.fechaInicio.HasValue ? garantia.fechaInicio.Value.ToString("dd/MM/yyyy") : "-")}\n" +
                                  $"Fin: {(garantia.fechaFinalizacion.HasValue ? garantia.fechaFinalizacion.Value.ToString("dd/MM/yyyy") : "-")}"; AddTableCell(table, fechas, cellFont);
 
                     AddTableCell(table, garantia.observacion ?? "Sin Observación", cellFont);
+
+                    int cantidadAdjuntos = new[] {
+                        garantia.nombreArchivo1,
+                        garantia.nombreArchivo2,
+                        garantia.nombreArchivo3,
+                        garantia.nombreArchivo4,
+                        garantia.nombreArchivo5
+                    }.Count(n => !string.IsNullOrWhiteSpace(n));
+
+                    AddTableCell(table, cantidadAdjuntos.ToString(), cellFont);
                 }
 
                 document.Add(table);
@@ -592,7 +607,8 @@ namespace SistemasAnaliticos.Controllers
             return estado.ToUpper() switch
             {
                 "CREADA" => FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.Blue),
-                "REVISADA" => FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.Green),
+                "APROBADA" => FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.Green),
+                "RECHAZADA" => FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8, BaseColor.Red),
                 _ => baseFont
             };
         }
@@ -691,7 +707,7 @@ namespace SistemasAnaliticos.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy = "Garantia.Crear")]
-        public async Task<IActionResult> Create(Garantia model)
+        public async Task<IActionResult> Create(GarantiaRegistroViewModel model)
         {
             var usuario = await _userManager.GetUserAsync(User);
 
@@ -713,95 +729,82 @@ namespace SistemasAnaliticos.Controllers
                     departamento = usuario.departamento,
 
                     // Datos del paso 1
-                    moneda = model.moneda,
-                    monto = model.monto,
-                    aFavorDe = model.aFavorDe,
-                    nombreLicitacion = model.nombreLicitacion,
-                    prorroga = model.prorroga,
-                    numeroGarantia = model.numeroGarantia,
-                    numeroLicitacion = model.numeroLicitacion,
+                    moneda = model.Moneda.ToString(),
+                    monto = model.Monto,
+                    aFavorDe = model.AFavorDe,
+                    nombreLicitacion = model.NombreLicitacion,
+                    prorroga = model.Prorroga,
+                    numeroGarantia = model.NumeroGarantia,
+                    numeroLicitacion = string.IsNullOrWhiteSpace(model.NumeroLicitacion2)
+                        ? model.NumeroLicitacion1
+                        : model.NumeroLicitacion2,
 
                     // Datos del paso 2
-                    tipoLicitacion = model.tipoLicitacion,
-                    fechaInicio = model.fechaInicio,
-                    fechaFinalizacion = model.fechaFinalizacion,
-                    plazo = model.plazo,
-                    observacion = model.observacion,
+                    tipoLicitacion = model.TipoLicitacion,
+                    fechaInicio = model.FechaInicio,
+                    fechaFinalizacion = model.FechaFinalizacion,
+                    plazo = model.Plazo,
+                    observacion = model.Observacion,
 
                     // Estado inicial
                     estado = "Creada"
                 };
 
-                // Procesar adjuntos (hasta 5 archivos)
-                var adjuntos = new[]
+                if (model.Adjuntos != null && model.Adjuntos.Any())
                 {
-                    model.adjuntoFile1,
-                    model.adjuntoFile2,
-                    model.adjuntoFile3,
-                    model.adjuntoFile4,
-                    model.adjuntoFile5
-                };
+                    var extensionesPermitidas = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx" };
 
-                for (int i = 0; i < adjuntos.Length; i++)
-                {
-                    var archivo = adjuntos[i];
-                    if (archivo != null && archivo.Length > 0)
+                    for (int i = 0; i < model.Adjuntos.Count && i < 5; i++)
                     {
-                        // Validar tamaño (máximo 10MB) - ya validado por el atributo MaxFileSize
-                        // Validar extensión
-                        var extension = Path.GetExtension(archivo.FileName).ToLowerInvariant();
-                        var extensionesPermitidas = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".doc", ".docx" };
+                        var archivo = model.Adjuntos[i];
+                        if (archivo == null || archivo.Length == 0) continue;
 
+                        var extension = Path.GetExtension(archivo.FileName).ToLowerInvariant();
                         if (!extensionesPermitidas.Contains(extension))
                         {
                             TempData["WarningMessage"] = $"El archivo {archivo.FileName} tiene formato no permitido y no fue adjuntado.";
                             continue;
                         }
 
-                        // Convertir archivo a byte array
-                        using (var memoryStream = new MemoryStream())
-                        {
-                            await archivo.CopyToAsync(memoryStream);
-                            var archivoBytes = memoryStream.ToArray();
+                        using var memoryStream = new MemoryStream();
+                        await archivo.CopyToAsync(memoryStream);
+                        var archivoBytes = memoryStream.ToArray();
 
-                            // Asignar según el índice del adjunto
-                            switch (i)
-                            {
-                                case 0:
-                                    nuevaGarantia.datosAdjuntos1 = archivoBytes;
-                                    nuevaGarantia.nombreArchivo1 = archivo.FileName;
-                                    nuevaGarantia.tipoMIME1 = archivo.ContentType;
-                                    nuevaGarantia.tamanoArchivo1 = archivo.Length;
-                                    break;
-                                case 1:
-                                    nuevaGarantia.datosAdjuntos2 = archivoBytes;
-                                    nuevaGarantia.nombreArchivo2 = archivo.FileName;
-                                    nuevaGarantia.tipoMIME2 = archivo.ContentType;
-                                    nuevaGarantia.tamanoArchivo2 = archivo.Length;
-                                    break;
-                                case 2:
-                                    nuevaGarantia.datosAdjuntos3 = archivoBytes;
-                                    nuevaGarantia.nombreArchivo3 = archivo.FileName;
-                                    nuevaGarantia.tipoMIME3 = archivo.ContentType;
-                                    nuevaGarantia.tamanoArchivo3 = archivo.Length;
-                                    break;
-                                case 3:
-                                    nuevaGarantia.datosAdjuntos4 = archivoBytes;
-                                    nuevaGarantia.nombreArchivo4 = archivo.FileName;
-                                    nuevaGarantia.tipoMIME4 = archivo.ContentType;
-                                    nuevaGarantia.tamanoArchivo4 = archivo.Length;
-                                    break;
-                                case 4:
-                                    nuevaGarantia.datosAdjuntos5 = archivoBytes;
-                                    nuevaGarantia.nombreArchivo5 = archivo.FileName;
-                                    nuevaGarantia.tipoMIME5 = archivo.ContentType;
-                                    nuevaGarantia.tamanoArchivo5 = archivo.Length;
-                                    break;
-                            }
+                        switch (i)
+                        {
+                            case 0:
+                                nuevaGarantia.datosAdjuntos1 = archivoBytes;
+                                nuevaGarantia.nombreArchivo1 = archivo.FileName;
+                                nuevaGarantia.tipoMIME1 = archivo.ContentType;
+                                nuevaGarantia.tamanoArchivo1 = archivo.Length;
+                                break;
+                            case 1:
+                                nuevaGarantia.datosAdjuntos2 = archivoBytes;
+                                nuevaGarantia.nombreArchivo2 = archivo.FileName;
+                                nuevaGarantia.tipoMIME2 = archivo.ContentType;
+                                nuevaGarantia.tamanoArchivo2 = archivo.Length;
+                                break;
+                            case 2:
+                                nuevaGarantia.datosAdjuntos3 = archivoBytes;
+                                nuevaGarantia.nombreArchivo3 = archivo.FileName;
+                                nuevaGarantia.tipoMIME3 = archivo.ContentType;
+                                nuevaGarantia.tamanoArchivo3 = archivo.Length;
+                                break;
+                            case 3:
+                                nuevaGarantia.datosAdjuntos4 = archivoBytes;
+                                nuevaGarantia.nombreArchivo4 = archivo.FileName;
+                                nuevaGarantia.tipoMIME4 = archivo.ContentType;
+                                nuevaGarantia.tamanoArchivo4 = archivo.Length;
+                                break;
+                            case 4:
+                                nuevaGarantia.datosAdjuntos5 = archivoBytes;
+                                nuevaGarantia.nombreArchivo5 = archivo.FileName;
+                                nuevaGarantia.tipoMIME5 = archivo.ContentType;
+                                nuevaGarantia.tamanoArchivo5 = archivo.Length;
+                                break;
                         }
                     }
                 }
-
                 _context.Garantia.Add(nuevaGarantia);
                 await _context.SaveChangesAsync();
 
