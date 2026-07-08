@@ -1117,7 +1117,10 @@
                         if (!field.value) {
                             isValid = false;
                             if (field.id === 'monedaSeleccionada') {
-                                showTemporaryMessage('Por favor seleccione una moneda', 'warning');
+                                if (field.value !== 'CRC' && field.value !== 'USD') {
+                                    isValid = false;
+                                    showTemporaryMessage('Por favor seleccione una moneda', 'warning');
+                                }
                             } else if (field.id === 'tipoLicitacionSeleccionado') {
                                 showTemporaryMessage('Por favor seleccione un tipo de licitación', 'warning');
                             }
@@ -1266,10 +1269,6 @@
                 const input = e.target.closest('[data-info-archivo]');
                 if (input) mostrarInfoArchivo(input, input.dataset.infoArchivo);
             });
-
-            setTimeout(() => {
-                seleccionarMoneda('CRC');
-            }, 100);
 
             setTimeout(() => {
                 agregarAdjunto();

@@ -5,8 +5,8 @@ namespace SistemasAnaliticos.ViewModels
     public class GarantiaRegistroViewModel
     {
         // PASO 1 - Información General
-        public decimal Monto { get; set; }
-        public char Moneda { get; set; } // CRC o USD
+        public decimal? Monto { get; set; }
+        public string Moneda { get; set; }
         public string AFavorDe { get; set; }
         public string NombreLicitacion { get; set; }
         public bool Prorroga { get; set; }

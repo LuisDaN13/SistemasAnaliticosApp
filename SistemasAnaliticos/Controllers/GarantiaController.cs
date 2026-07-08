@@ -118,7 +118,15 @@ namespace SistemasAnaliticos.Controllers
             [FromQuery] string fechaTipo = null,
             [FromQuery] string fechaUnica = null,
             [FromQuery] string fechaDesde = null,
-            [FromQuery] string fechaHasta = null)
+            [FromQuery] string fechaHasta = null,
+            [FromQuery] string fechaInicioTipo = null,
+            [FromQuery] string fechaInicioUnica = null,
+            [FromQuery] string fechaInicioDesde = null,
+            [FromQuery] string fechaInicioHasta = null,
+            [FromQuery] string fechaFinTipo = null,
+            [FromQuery] string fechaFinUnica = null,
+            [FromQuery] string fechaFinDesde = null,
+            [FromQuery] string fechaFinHasta = null)
         {
             try
             {
@@ -154,7 +162,7 @@ namespace SistemasAnaliticos.Controllers
                     query = query.Where(p => !string.IsNullOrEmpty(p.nombreEmpleado) && p.nombreEmpleado.Contains(nombre));
                 }
 
-                // Aplicar filtros de fecha
+                // Aplicar filtros de fecha de creación
                 if (!string.IsNullOrEmpty(fechaTipo))
                 {
                     if (fechaTipo == "single" && !string.IsNullOrEmpty(fechaUnica))
@@ -173,6 +181,54 @@ namespace SistemasAnaliticos.Controllers
                             query = query.Where(p =>
                                 p.fechaCreacion >= desdeDate &&
                                 p.fechaCreacion <= hastaDate
+                            );
+                        }
+                    }
+                }
+
+                // Aplicar filtros de Fecha de Inicio
+                if (!string.IsNullOrEmpty(fechaInicioTipo))
+                {
+                    if (fechaInicioTipo == "single" && !string.IsNullOrEmpty(fechaInicioUnica))
+                    {
+                        if (DateTime.TryParse(fechaInicioUnica, out DateTime inicioUnicaDate))
+                        {
+                            query = query.Where(p => p.fechaInicio.HasValue && p.fechaInicio.Value.Date == inicioUnicaDate);
+                        }
+                    }
+                    else if (fechaInicioTipo == "range" && !string.IsNullOrEmpty(fechaInicioDesde) && !string.IsNullOrEmpty(fechaInicioHasta))
+                    {
+                        if (DateTime.TryParse(fechaInicioDesde, out DateTime inicioDesdeDate) &&
+                            DateTime.TryParse(fechaInicioHasta, out DateTime inicioHastaDate))
+                        {
+                            query = query.Where(p =>
+                                p.fechaInicio.HasValue &&
+                                p.fechaInicio.Value >= inicioDesdeDate &&
+                                p.fechaInicio.Value <= inicioHastaDate
+                            );
+                        }
+                    }
+                }
+
+                // Aplicar filtros de Fecha de Fin
+                if (!string.IsNullOrEmpty(fechaFinTipo))
+                {
+                    if (fechaFinTipo == "single" && !string.IsNullOrEmpty(fechaFinUnica))
+                    {
+                        if (DateTime.TryParse(fechaFinUnica, out DateTime finUnicaDate))
+                        {
+                            query = query.Where(p => p.fechaFinalizacion.HasValue && p.fechaFinalizacion.Value.Date == finUnicaDate);
+                        }
+                    }
+                    else if (fechaFinTipo == "range" && !string.IsNullOrEmpty(fechaFinDesde) && !string.IsNullOrEmpty(fechaFinHasta))
+                    {
+                        if (DateTime.TryParse(fechaFinDesde, out DateTime finDesdeDate) &&
+                            DateTime.TryParse(fechaFinHasta, out DateTime finHastaDate))
+                        {
+                            query = query.Where(p =>
+                                p.fechaFinalizacion.HasValue &&
+                                p.fechaFinalizacion.Value >= finDesdeDate &&
+                                p.fechaFinalizacion.Value <= finHastaDate
                             );
                         }
                     }
@@ -730,7 +786,7 @@ namespace SistemasAnaliticos.Controllers
 
                     // Datos del paso 1
                     moneda = model.Moneda.ToString(),
-                    monto = model.Monto,
+                    monto = model.Monto ?? 0,
                     aFavorDe = model.AFavorDe,
                     nombreLicitacion = model.NombreLicitacion,
                     prorroga = model.Prorroga,

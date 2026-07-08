@@ -135,7 +135,7 @@
 
         <!-- Titulo de Garantias -->
         <div class="header-card p-4 mt-4 mb-4 d-flex justify-content-between">
-            <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todos los Permisos</h1>
+            <h1 class="h2 fw-bold text-gray-900 mb-0">Ver Todas las Garantías</h1>
             <div>
                 @if (!User.IsInRole("Empleado Normal"))
                 {
@@ -365,13 +365,12 @@
                             <!-- FILTRO POR FECHA DE CREACION -->
                             <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#dateFilter" aria-expanded="false">
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#dateFilter1" aria-expanded="false">
                                     Fecha de Creación
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
 
-                                <div class="collapse mt-3" id="dateFilter">
-
+                                <div class="collapse mt-3" id="dateFilter1">
                                     <!-- ACTIVAR RANGO -->
                                     <div class="form-check form-switch mb-3">
                                         <input class="form-check-input" type="checkbox" id="dateRangeSwitch">
@@ -399,12 +398,12 @@
                             <!-- FILTRO POR FECHA DE INICIO -->
                             <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#dateFilter" aria-expanded="false">
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#dateFilter2" aria-expanded="false">
                                     Fecha de Inicio
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
 
-                                <div class="collapse mt-3" id="dateFilter">
+                                <div class="collapse mt-3" id="dateFilter2">
 
                                     <!-- ACTIVAR RANGO -->
                                     <div class="form-check form-switch mb-3">
@@ -413,13 +412,13 @@
                                     </div>
 
                                     <!-- FECHA ÚNICA -->
-                                    <div id="singleDateContainer">
+                                    <div id="singleDateContainer2">
                                         <label class="form-label">Fecha</label>
                                         <input type="date" class="form-control filter-date" id="filter-date-single2">
                                     </div>
 
                                     <!-- RANGO DE FECHAS -->
-                                    <div id="rangeDateContainer" class="d-none">
+                                    <div id="rangeDateContainer2" class="d-none">
                                         <label class="form-label">Desde</label>
                                         <input type="date" class="form-control mb-2 filter-date" id="filter-date-from2">
 
@@ -433,12 +432,12 @@
                             <!-- FILTRO POR FECHA DE FIN -->
                             <div class="mb-3 pb-1 border-bottom">
                                 <button class="btn w-100 d-flex justify-content-between align-items-center p-0 text-dark fw-semibold"
-                                        type="button" data-bs-toggle="collapse" data-bs-target="#dateFilter" aria-expanded="false">
+                                        type="button" data-bs-toggle="collapse" data-bs-target="#dateFilter3" aria-expanded="false">
                                     Fecha de Fin
                                     <i class="bi bi-chevron-down"></i>
                                 </button>
 
-                                <div class="collapse mt-3" id="dateFilter">
+                                <div class="collapse mt-3" id="dateFilter3">
 
                                     <!-- ACTIVAR RANGO -->
                                     <div class="form-check form-switch mb-3">
@@ -447,13 +446,13 @@
                                     </div>
 
                                     <!-- FECHA ÚNICA -->
-                                    <div id="singleDateContainer">
+                                    <div id="singleDateContainer3">
                                         <label class="form-label">Fecha</label>
                                         <input type="date" class="form-control filter-date" id="filter-date-single3">
                                     </div>
 
                                     <!-- RANGO DE FECHAS -->
-                                    <div id="rangeDateContainer" class="d-none">
+                                    <div id="rangeDateContainer3" class="d-none">
                                         <label class="form-label">Desde</label>
                                         <input type="date" class="form-control mb-2 filter-date" id="filter-date-from3">
 
@@ -1054,6 +1053,27 @@
             }, 50);
         }
 
+        // Función reutilizable para inicializar cada switch de rango de fechas
+        function inicializarSwitchFecha(sufijo, propiedadFiltro) {
+            const dateSwitch = document.getElementById(`dateRangeSwitch${sufijo}`);
+            if (!dateSwitch) return;
+
+            dateSwitch.addEventListener("change", function() {
+                const isRange = this.checked;
+                document.getElementById(`singleDateContainer${sufijo}`).classList.toggle("d-none", isRange);
+                document.getElementById(`rangeDateContainer${sufijo}`).classList.toggle("d-none", !isRange);
+
+                if (isRange) {
+                    document.getElementById(`filter-date-single${sufijo}`).value = '';
+                } else {
+                    document.getElementById(`filter-date-from${sufijo}`).value = '';
+                    document.getElementById(`filter-date-to${sufijo}`).value = '';
+                }
+
+                actualizarFiltroFecha(sufijo, propiedadFiltro);
+            });
+        }
+
         // Función para renderizar garantias con efectos de fade
         async function renderGarantiasWithFade(data) {
             fadeOut(garantiasContainer, () => {
@@ -1230,7 +1250,6 @@
 
             // Event listener para nombre
             const inputNombre = document.getElementById('filter-name-input');
-
             if (inputNombre) {
                 inputNombre.addEventListener('input', debounce(async function (e) {
                     const valor = e.target.value || '';
@@ -1242,63 +1261,61 @@
             // Event listeners para fechas
             document.querySelectorAll('.filter-date').forEach(input => {
                 input.addEventListener('change', async function() {
-                    actualizarFiltroFecha('', 'fecha');
-                    actualizarFiltroFecha('2', 'fechaInicio');
-                    actualizarFiltroFecha('3', 'fechaFin');
+                    // Detectar sufijo según el id del input que cambió
+                    const id = this.id; // ej: "filter-date-from2"
+                    let sufijo = '';
+                    let propiedadFiltro = 'fecha';
+
+                    if (id.endsWith('2')) {
+                        sufijo = '2';
+                        propiedadFiltro = 'fechaInicio';
+                    } else if (id.endsWith('3')) {
+                        sufijo = '3';
+                        propiedadFiltro = 'fechaFin';
+                    }
+
+                    actualizarFiltroFecha(sufijo, propiedadFiltro);
                     await aplicarFiltros();
                 });
             });
 
-            // Switch de rango de fechas
-            const dateSwitch = document.getElementById(`dateRangeSwitch${sufijo}`);
-            if (!dateSwitch) return;
+            // Inicializar los 3 switches
+            inicializarSwitchFecha('', 'fecha');
+            inicializarSwitchFecha('2', 'fechaInicio');
+            inicializarSwitchFecha('3', 'fechaFin');
 
-            dateSwitch.addEventListener("change", function() {
-                const isRange = this.checked;
-                document.getElementById(`singleDateContainer${sufijo}`).classList.toggle("d-none", isRange);
-                document.getElementById(`rangeDateContainer${sufijo}`).classList.toggle("d-none", !isRange);
-
-                // Limpiar inputs no utilizados
-                if (isRange) {
-                    document.getElementById(`filter-date-single${sufijo}`).value = '';
-                } else {
-                    document.getElementById(`filter-date-from${sufijo}`).value = '';
-                    document.getElementById(`filter-date-to${sufijo}`).value = '';
-                }
-
-                actualizarFiltroFecha(sufijo, propiedadFiltro);
-            });
-
-            // Limpiar filtros
             document.getElementById('clear-filters').addEventListener('click', function() {
-
-                // Desmarcar checkboxes
                 document.querySelectorAll('.filter-type, .filter-status, .filter-departamento').forEach(checkbox => {
                     checkbox.checked = false;
                 });
 
-                // Limpiar inputs
                 document.getElementById('filter-name-input').value = '';
-                document.getElementById('filter-date-single').value = '';
-                document.getElementById('filter-date-from').value = '';
-                document.getElementById('filter-date-to').value = '';
-                document.getElementById('dateRangeSwitch').checked = false;
-                document.getElementById("singleDateContainer").classList.remove("d-none");
-                document.getElementById("rangeDateContainer").classList.add("d-none");
 
-                // Limpiar estado de filtros
+                // Resetear los 3 grupos de fecha
+                ['', '2', '3'].forEach(sufijo => {
+                    const single = document.getElementById(`filter-date-single${sufijo}`);
+                    const from = document.getElementById(`filter-date-from${sufijo}`);
+                    const to = document.getElementById(`filter-date-to${sufijo}`);
+                    const rangeSwitch = document.getElementById(`dateRangeSwitch${sufijo}`);
+
+                    if (single) single.value = '';
+                    if (from) from.value = '';
+                    if (to) to.value = '';
+                    if (rangeSwitch) rangeSwitch.checked = false;
+                    document.getElementById(`singleDateContainer${sufijo}`)?.classList.remove('d-none');
+                    document.getElementById(`rangeDateContainer${sufijo}`)?.classList.add('d-none');
+                });
+
                 filtrosActivos.tipos = [];
                 filtrosActivos.estados = [];
                 filtrosActivos.departamentos = [];
                 filtrosActivos.nombre = '';
-                filtrosActivos.fecha = {
-                    tipo: 'single',
-                    fechaUnica: null,
-                    fechaDesde: null,
-                    fechaHasta: null
-                };
 
-                // Mostrar garantias iniciales (de la paginación)
+                const filtroVacio = { tipo: 'single', fechaUnica: null, fechaDesde: null, fechaHasta: null };
+                filtrosActivos.fecha = { ...filtroVacio };
+                filtrosActivos.fechaInicio = { ...filtroVacio };
+                filtrosActivos.fechaFin = { ...filtroVacio };
+
                 renderGarantiasWithFade(garantiasPaginaActual);
                 pagination.style.display = 'flex';
             });
